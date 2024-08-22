@@ -40,7 +40,7 @@ namespace glash
         glfwTerminate();
     }
 
-    void Window::PollEvents()
+    void Window::PollEvents() const
     {
         glfwPollEvents();
     }
@@ -50,9 +50,21 @@ namespace glash
         return glfwWindowShouldClose(m_pWindow);
     }
 
-    void Window::SwapBuffers()
+    void Window::UpdateBuffer()
     {
+        glClearColor(m_ClearColor.r, m_ClearColor.g, m_ClearColor.b, m_ClearColor.y);
+        glClear(GL_COLOR_BUFFER_BIT);
         glfwSwapBuffers(m_pWindow);
+    }
+
+    void Window::SetClearColor(const Color& color)
+    {
+        m_ClearColor = color;
+    }
+
+    Color Window::GetClearColor() const
+    {
+        return m_ClearColor;
     }
 
 } // namespace glash

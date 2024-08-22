@@ -7,24 +7,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 if (POLICY CMP0072)
     cmake_policy(SET CMP0072 NEW)
 endif()
-
-set(GLASH_BUILD_SHARED "Build glash as a shared library" OFF FORCE)
-set(GLASH_BUILD_EXAMPLES "Build examples" ON FORCE)
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-
-# Build GLFW and GLEW statically
-set(GLFW_BUILD_SHARED OFF CACHE BOOL "Build GLFW as a static library" FORCE)
-set(GLEW_BUILD_SHARED OFF CACHE BOOL "Build GLEW as a static library" FORCE)
-set(GLFW_BUILD_WAYLAND OFF CACHE BOOL "Disable Wayland support" FORCE)
-
-
-if(GLEW_BUILD_SHARED)
-    set(glew-cmake_BUILD_SHARED ON)
-    set(glew-cmake_BUILD_STATIC OFF)
-else()
-    set(glew-cmake_BUILD_SHARED OFF)
-    set(glew-cmake_BUILD_STATIC ON)
+if(MSVC)
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MP /ZI")
 endif()
+
 include(FetchContent)
 FetchContent_Declare(
     glew
@@ -41,7 +27,31 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/fmtlib/fmt.git
     GIT_TAG 11.0.2
 )
-FetchContent_MakeAvailable(glew glfw fmt)
+FetchContent_Declare(
+    glm
+    GIT_REPOSITORY https://github.com/g-truc/glm.git
+    GIT_TAG 1.0.1
+)
+FetchContent_MakeAvailable(glew glfw fmt glm)
+
+set(GLASH_BUILD_SHARED OFF CACHE BOOL "Build glash as a shared library"  FORCE)
+set(GLASH_BUILD_EXAMPLES ON CACHE BOOL "Build examples"  FORCE)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON CACHE BOOL "" FORCE) 
+
+# Build GLFW and GLEW statically
+set(GLFW_BUILD_SHARED OFF CACHE BOOL "Build GLFW as a static library" FORCE)
+set(GLEW_BUILD_SHARED OFF CACHE BOOL "Build GLEW as a static library" FORCE)
+set(GLFW_BUILD_WAYLAND OFF CACHE BOOL "Disable Wayland support" FORCE)
+
+
+if(GLEW_BUILD_SHARED)
+    set(glew-cmake_BUILD_SHARED ON)
+    set(glew-cmake_BUILD_STATIC OFF)
+else()
+    set(glew-cmake_BUILD_SHARED OFF)
+    set(glew-cmake_BUILD_STATIC ON)
+endif()
+
 
 find_package(OpenGL REQUIRED)
 

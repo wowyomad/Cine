@@ -51,7 +51,7 @@
       "inherits": "win32-ninja-debug",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release"
-      },
+      }
     },
     {
       "name": "wsl-base",

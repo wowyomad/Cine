@@ -1,17 +1,18 @@
 set(GLASH_SOURCE_DIR glash)
-set(SOURCES
-    ${GLASH_SOURCE_DIR}/some.cpp
-    ${GLASH_SOURCE_DIR}/window.cpp
+file(GLOB SOURCES
+    "${GLASH_SOURCE_DIR}/*.cpp"
 )
 
-set(HEADERS
-    ${GLASH_SOURCE_DIR}/some.hpp
-    ${GLASH_SOURCE_DIR}/window.hpp
+file(GLOB HEADERS
+    "${GLASH_SOURCE_DIR}/*.hpp"
 )
 
 if(GLASH_BUILD_SHARED)
     set(GLASH_PROPERTIES SHARED)
+    else()
+    set(GLASH_PROPERTIES STATIC)
 endif()
+    
 
 add_library(glash ${GLASH_PROPERTIES} ${SOURCES} ${HEADERS})
 
@@ -24,6 +25,7 @@ target_link_libraries(glash
     PUBLIC glfw
     PUBLIC libglew_static
 	PUBLIC fmt
+    PUBLIC glm
 )
 
 target_include_directories(glash
@@ -32,6 +34,7 @@ target_include_directories(glash
     PUBLIC ${glfw_SOURCE_DIR}/include
     PUBLIC ${OPENGL_INCLUDE_DIR}
     PUBLIC ${fmt_SOURCE_DIR}/include
+    PUBLIC ${glm_SOURCE_DIR}/include
 )
 
 set_target_properties(glash PROPERTIES
