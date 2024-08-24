@@ -20,13 +20,12 @@ set_property(GLOBAL PROPERTY USE_FOLDER ON)
 set(glew-cmake_BUILD_SHARED OFF CACHE BOOL "Build GLEW as a shared library" FORCE)
 set(glew-cmake_BUILD_STATIC ON CACHE BOOL "Build GLEW as a static library" FORCE)
 #
+set(GLFW_BUILD_WAYLAND OFF CACHE BOOL "Enable wayland scanner" FORCE)
+#
 # Use vendor OpenGL 
 if (POLICY CMP0072)
     cmake_policy(SET CMP0072 NEW)
 endif()
-
-
-
 
 include(FetchContent)
 FetchContent_Declare(
@@ -78,12 +77,6 @@ else()
     message("GLM target is not available")
 endif()
 
-
-# Build GLFW and GLEW statically
-# set(GLFW_BUILD_SHARED OFF CACHE BOOL "Build GLFW as a static library" FORCE)
-# set(GLEW_BUILD_SHARED OFF CACHE BOOL "Build GLEW as a static library" FORCE)
-# set(GLFW_BUILD_WAYLAND OFF CACHE BOOL "Disable Wayland support" FORCE)
-
 find_package(OpenGL REQUIRED)
 
 add_subdirectory(src)
@@ -92,7 +85,7 @@ if (GLASH_BUILD_EXAMPLES)
 endif()
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    add_compile_options(-Wall -Wextra -pedantic)
+    add_compile_options(-Wall -Wextra -pedantic -fexperimental-library)
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
         add_compile_options(-Werror)
     elseif (CMAKE_BUILD_TYPE STREQUAL "Release")
