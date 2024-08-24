@@ -1,6 +1,4 @@
 #include "shader.hpp"
-#include "../glash_pch.hpp"
-
 #include "glash/helper/file_reader.hpp"
 
 namespace glash
@@ -64,7 +62,7 @@ namespace glash
 				char errorLog[1024];
 				glGetProgramInfoLog(shader, sizeof(errorLog), nullptr, errorLog);
 				fmt::println("MakeProgram:\n{}", errorLog);
-				glDeleteProgram(shader);
+				DestroyProgram(shader);
 				return 0;
 			}
 
@@ -78,6 +76,10 @@ namespace glash
 		void DestroyShader(GLuint shader)
 		{
 			glDeleteShader(shader);
+		}
+		void DestroyProgram(GLuint program)
+		{
+			glDeleteProgram(program);
 		}
 	}
 }

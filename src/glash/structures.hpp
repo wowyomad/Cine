@@ -1,28 +1,12 @@
-#include <string>
-#include <cstdint>
+#pragma once
+#include "glash_pch.hpp"
+
 namespace glash
 {
-		struct Color
-		{
-			uint8_t r, g, b, y;
-
-			static constexpr Color RED() { return { 255, 0, 0, 0 }; }
-			static constexpr Color GREEN() { return { 0, 255, 0, 0 }; }
-			static constexpr Color BLUE() { return { 0, 0, 255, 0 }; }
-			static constexpr Color YELLOW() { return { 255, 255, 0, 0 }; }
-
-			inline Color& operator+(const Color& color)
-			{
-				r += color.r;
-				g += color.g;
-				b += color.b;
-				y += color.y;
-				return* this;
-			}
-			inline Color& operator+=(const Color& color)
-			{
-				*this = *this + color;
-				return *this;
-			}
-		};
+	using Color = glm::vec4;
+	namespace color {
+		constexpr Color RED = Color(255, 0, 0, 0);
+		constexpr Color GREEN = Color(0, 255, 0, 0);
+		constexpr Color BLUE = Color(0, 0, 255, 0);
+	}
 }

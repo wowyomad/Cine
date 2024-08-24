@@ -1,12 +1,8 @@
 #pragma once
-
-#include "structures.hpp"
-
-#include <GL/glew.h>
+#include "glash_pch.hpp"
 #include <GLFW/glfw3.h>
 
-#include <string>
-#include <memory>
+#include "glash/structures.hpp"
 
 
 namespace glash
@@ -25,8 +21,8 @@ namespace glash
 
         void SetClearColor(const Color& color);
         Color GetClearColor() const;
-    private:
+    protected:
         GLFWwindow* m_pWindow;
-        Color m_ClearColor = Color::GREEN();
+        Color m_ClearColor;
     };
 } //namespace glash

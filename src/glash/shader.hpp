@@ -1,6 +1,5 @@
 #pragma once
-
-#include <GL/glew.h>
+#include "glash_pch.hpp"
 
 namespace glash
 {
@@ -16,8 +15,8 @@ namespace glash
 			GEOMETRY_SHADER = GL_GEOMETRY_SHADER,
 		};
 		GLuint MakeModule(const char* relPath, SHADER_TYPE type);
-		GLuint MakeShader(const char* vertexShaderPath, const char* fragmnetShaderPath);
+		GLuint MakeShader(const char* vertRelPath, const char* fragRelPath);
 		void DestroyShader(GLuint shader);
-
+		void DestroyProgram(GLuint program);
 	}
 }

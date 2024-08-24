@@ -35,6 +35,42 @@
       }
     },
     {
+      "name": "win32-msvc-debug",
+      "displayName": "win32 MSVC Debug",
+      "inherits": "win32-msvc",
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "cacheVariables": {
+        "CMAKE_CONFIGURATION_TYPES": "Debug"
+      }
+    },
+    {
+      "name": "win32-msvc-release",
+      "displayName": "win32 MSVC Release",
+      "inherits": "win32-msvc",
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "cacheVariables": {
+        "CMAKE_CONFIGURATION_TYPES": "Release"
+      }
+    },
+    {
+      "name": "win32-msvc-relwithdebinfo",
+      "displayName": "win32 MSVC RelWithDebInfo",
+      "inherits": "win32-msvc",
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "cacheVariables": {
+        "CMAKE_CONFIGURATION_TYPES": "RelWithDebInfo"
+      }
+    },
+    {
       "name": "win32-ninja-debug",
       "displayName": "win32 Ninja Debug",
       "inherits": "win32-ninja-base",

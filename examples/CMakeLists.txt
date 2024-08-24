@@ -43,13 +43,12 @@ add_custom_target(clean_shaders
 
 set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${SHADERS_OUT_DIR})
 
-add_library(examples_pch STATIC examples_pch.cpp examples_pch.hpp)
-target_precompile_headers(examples_pch PRIVATE examples_pch.hpp)
-
 add_executable(example1 example1.cpp)
 add_dependencies(example1 copy_shaders)
-target_link_libraries(example1 PRIVATE examples_pch glash)
+target_link_libraries(example1 PRIVATE glash_pch glash)
 
 set_target_properties(example1 PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>
+    FOLDER "Examples"
+    VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>"
 )

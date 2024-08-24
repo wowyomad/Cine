@@ -1,4 +1,5 @@
 set(GLASH_SOURCE_DIR "glash")
+project(glash_library)
 file(GLOB SOURCES
     "${GLASH_SOURCE_DIR}/*.cpp"
     "${GLASH_SOURCE_DIR}/helper/*.cpp"
@@ -20,7 +21,11 @@ target_precompile_headers(glash_pch PRIVATE glash_pch.hpp)
 add_library(glash ${GLASH_PROPERTIES} ${SOURCES} ${HEADERS})
 target_include_directories(glash_pch
     PUBLIC ${fmt_SOURCE_DIR}/include
+    PUBLIC ${glew_SOURCE_DIR}/include
     PUBLIC ${glm_SOURCE_DIR}/include
+)
+target_link_libraries(glash_pch
+    PUBLIC glm
 )
 
 set_target_properties(glash PROPERTIES

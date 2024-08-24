@@ -4,10 +4,29 @@ project(glash VERSION 0.0.1 LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Project properties
+set(GLASH_BUILD_SHARED OFF CACHE BOOL "Build glash as a shared library"  FORCE)
+#
+set(GLASH_BUILD_EXAMPLES ON CACHE BOOL "Build examples"  FORCE)
+
+#Dependency properties
+#
+# Might be needed for planned hot reload.
+set(CMAKE_POSITION_INDEPENDENT_CODE ON CACHE BOOL "" FORCE) 
+#
+# User folders to hide dependency targets
+set_property(GLOBAL PROPERTY USE_FOLDER ON)
+#
+set(glew-cmake_BUILD_SHARED OFF CACHE BOOL "Build GLEW as a shared library" FORCE)
+set(glew-cmake_BUILD_STATIC ON CACHE BOOL "Build GLEW as a static library" FORCE)
+#
 # Use vendor OpenGL 
 if (POLICY CMP0072)
     cmake_policy(SET CMP0072 NEW)
 endif()
+
+
+
 
 include(FetchContent)
 FetchContent_Declare(
@@ -32,24 +51,38 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(glew glfw fmt glm)
 
-set(GLASH_BUILD_SHARED OFF CACHE BOOL "Build glash as a shared library"  FORCE)
-set(GLASH_BUILD_EXAMPLES ON CACHE BOOL "Build examples"  FORCE)
-set(CMAKE_POSITION_INDEPENDENT_CODE ON CACHE BOOL "" FORCE) 
-
-# Build GLFW and GLEW statically
-set(GLFW_BUILD_SHARED OFF CACHE BOOL "Build GLFW as a static library" FORCE)
-set(GLEW_BUILD_SHARED OFF CACHE BOOL "Build GLEW as a static library" FORCE)
-set(GLFW_BUILD_WAYLAND OFF CACHE BOOL "Disable Wayland support" FORCE)
-
-
-if(GLEW_BUILD_SHARED)
-    set(glew-cmake_BUILD_SHARED ON)
-    set(glew-cmake_BUILD_STATIC OFF)
+if(TARGET libglew_static)
+    message("Static GLEW target is available!")
+    set_target_properties(libglew_static PROPERTIES FOLDER "Dependencies")
 else()
-    set(glew-cmake_BUILD_SHARED OFF)
-    set(glew-cmake_BUILD_STATIC ON)
+    message("Static GLEW target is not available")
+endif()
+if(TARGET glfw)
+    message("GLFW target is available!")
+    set_target_properties(glfw PROPERTIES FOLDER "Dependencies")
+else()
+    message("GLFW target is not available")
 endif()
 
+if(TARGET fmt)
+    message("FMT target is available!")
+    set_target_properties(fmt PROPERTIES FOLDER "Dependencies")
+else()
+    message("FMT target is not available")
+endif()
+
+if(TARGET glm)
+    message("GLM target is available!")
+    set_target_properties(glm PROPERTIES FOLDER "Dependencies")
+else()
+    message("GLM target is not available")
+endif()
+
+
+# Build GLFW and GLEW statically
+# set(GLFW_BUILD_SHARED OFF CACHE BOOL "Build GLFW as a static library" FORCE)
+# set(GLEW_BUILD_SHARED OFF CACHE BOOL "Build GLEW as a static library" FORCE)
+# set(GLFW_BUILD_WAYLAND OFF CACHE BOOL "Disable Wayland support" FORCE)
 
 find_package(OpenGL REQUIRED)
 
