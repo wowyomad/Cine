@@ -27,6 +27,6 @@ namespace glash
         Color GetClearColor() const;
     private:
         GLFWwindow* m_pWindow;
-        Color m_ClearColor;
+        Color m_ClearColor = Color::GREEN();
     };
 } //namespace glash
