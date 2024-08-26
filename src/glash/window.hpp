@@ -11,12 +11,13 @@ namespace glash
     {
 
     public:
-        Window(int width, int height, const std::string& title);
+        Window(int width, int height, const std::string& title, const Color& clearColor = color::RED);
         ~Window();
 
         void PollEvents() const;
         bool ShouldClose() const;
-        void UpdateBuffer();
+        void ClearBuffer();
+        void SwapBuffers() const;
 
 
         void SetClearColor(const Color& color);

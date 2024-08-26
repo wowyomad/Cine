@@ -1,9 +1,11 @@
+#include "glash/glash_pch.hpp"
 #include "window.hpp"
 
 namespace glash
 {
 
-    Window::Window(int width, int height, const std::string &title)
+    Window::Window(int width, int height, const std::string &title, const Color& clearColor)
+        : m_ClearColor(clearColor)
     {
         std::cout << "Window constructor called" << std::endl;
         if (!glfwInit())
@@ -19,6 +21,11 @@ namespace glash
         }
 
         glfwMakeContextCurrent(m_pWindow);
+
+        glfwSetWindowSizeCallback(m_pWindow, [](GLFWwindow* window, int width, int height)
+            {
+                glViewport(0, 0, width, height);
+            });
 
         GLenum err = glewInit();
         if (GLEW_OK != err)
@@ -45,10 +52,14 @@ namespace glash
         return glfwWindowShouldClose(m_pWindow);
     }
 
-    void Window::UpdateBuffer()
+    void Window::ClearBuffer()
     {
         glClearColor(m_ClearColor.r, m_ClearColor.g, m_ClearColor.b, m_ClearColor.y);
         glClear(GL_COLOR_BUFFER_BIT);
+    }
+
+    void Window::SwapBuffers() const
+    {
         glfwSwapBuffers(m_pWindow);
     }
 

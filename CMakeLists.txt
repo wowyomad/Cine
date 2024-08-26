@@ -4,6 +4,7 @@ project(glash VERSION 0.0.1 LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+
 # Project properties
 set(GLASH_BUILD_SHARED OFF CACHE BOOL "Build glash as a shared library"  FORCE)
 #
@@ -84,19 +85,21 @@ if (GLASH_BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()
 
-if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    message("Adding compile options for GNU")
     add_compile_options(-Wall -Wextra -pedantic -fexperimental-library)
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
         add_compile_options(-Werror)
     elseif (CMAKE_BUILD_TYPE STREQUAL "Release")
         add_compile_options(-Wno-unused-parameter)
     endif()
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    add_compile_options(/MP)
-
-    add_compile_options(
-        $<$<CONFIG:Debug>:/W4 /WX /ZI>      # Debug configuration: high warning level, treat warnings as errors, enable edit and continue
-        $<$<CONFIG:Release>:/W3 /O2>        # Release configuration: moderate warning level, enable optimizations
-        $<$<CONFIG:RelWithDebInfo>:/W3 /O2> # RelWithDebInfo: same as Release
-    )
+elseif (MSVC)
+    message("Adding compile options to MSVC")
+    if (MSVC)
+    # THESE DON'T WORK (?)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /W4 /WX /ZI")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /W3 /O2")
+    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /W3 /O2")
+    endif()
 endif()

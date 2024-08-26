@@ -1,5 +1,7 @@
 set(GLASH_SOURCE_DIR "glash")
-project(glash_library)
+set(GLASH_PCH_HEADER "${GLASH_SOURCE_DIR}/glash_pch.hpp")
+
+# Gather source and header files
 file(GLOB SOURCES
     "${GLASH_SOURCE_DIR}/*.cpp"
     "${GLASH_SOURCE_DIR}/helper/*.cpp"
@@ -10,37 +12,20 @@ file(GLOB HEADERS
     "${GLASH_SOURCE_DIR}/helper/*.hpp"
 )
 
+# Set library type (shared or static)
 if(GLASH_BUILD_SHARED)
     set(GLASH_PROPERTIES SHARED)
-    else()
+else()
     set(GLASH_PROPERTIES STATIC)
 endif()
 
-add_library(glash_pch STATIC glash_pch.hpp glash_pch.cpp)
-target_precompile_headers(glash_pch PRIVATE glash_pch.hpp)
+# Create the glash library
 add_library(glash ${GLASH_PROPERTIES} ${SOURCES} ${HEADERS})
-target_include_directories(glash_pch
-    PUBLIC ${fmt_SOURCE_DIR}/include
-    PUBLIC ${glew_SOURCE_DIR}/include
-    PUBLIC ${glm_SOURCE_DIR}/include
-)
-target_link_libraries(glash_pch
-    PUBLIC glm
-)
 
-set_target_properties(glash PROPERTIES
-    WINDOWS_EXPORT_ALL_SYMBOLS ON
-)
+# Set PCH for glash
+target_precompile_headers(glash PRIVATE ${GLASH_PCH_HEADER})
 
-target_link_libraries(glash
-    PUBLIC OpenGL::GL
-    PUBLIC glfw
-    PUBLIC libglew_static
-	PUBLIC fmt
-    PUBLIC glm
-    PRIVATE glash_pch
-)
-
+# Link dependencies
 target_include_directories(glash
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
     PUBLIC ${glew_SOURCE_DIR}/include
@@ -50,12 +35,24 @@ target_include_directories(glash
     PUBLIC ${glm_SOURCE_DIR}/include
 )
 
+target_link_libraries(glash
+    PUBLIC OpenGL::GL
+    PUBLIC glfw
+    PUBLIC libglew_static
+    PUBLIC fmt
+    PUBLIC glm
+)
+
+# Set output directories
 set_target_properties(glash PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
     ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+    WINDOWS_EXPORT_ALL_SYMBOLS ON
+    FOLDER "glash"
 )
 
+# Installation setup
 install(TARGETS glash
     EXPORT glashTargets
     ARCHIVE DESTINATION lib

@@ -1,3 +1,5 @@
+#include "glash/glash_pch.hpp"
+
 #include "shader.hpp"
 #include "glash/helper/file_reader.hpp"
 
@@ -14,7 +16,6 @@ namespace glash
 				GLuint module = glCreateShader(type);
 				glShaderSource(module, 1, &raw_shader, nullptr);
 				glCompileShader(module);
-
 				int success;
 				glGetShaderiv(module, GL_COMPILE_STATUS, &success);
 
