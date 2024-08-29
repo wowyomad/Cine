@@ -13,12 +13,13 @@
 #include <vector>
 #include <array>
 #include <string>
+#include <cstdint>
 
 //other
 #include <thread>
 #include <memory>
 #include <filesystem>
-#include <cstdint>
+#include <stdio.h>
 #include <stdexcept>
 
 //maths

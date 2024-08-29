@@ -1,6 +1,3 @@
-
-
-#include "glash/glash_pch.hpp"
 #include "window.hpp"
 #include "glash/helper/logger.hpp"
 namespace glash

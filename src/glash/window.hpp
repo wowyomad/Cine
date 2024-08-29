@@ -1,5 +1,5 @@
 #pragma once
-#include "glash_pch.hpp"
+#include "glash/glash_pch.hpp"
 #include <GLFW/glfw3.h>
 
 #include "glash/structures.hpp"

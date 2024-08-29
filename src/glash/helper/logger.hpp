@@ -1,4 +1,5 @@
 #pragma once
+#include "glash/glash_pch.hpp" 
 #ifndef NDEBUG
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_sinks.h"
