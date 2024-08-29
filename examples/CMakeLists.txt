@@ -51,7 +51,7 @@ set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${SHADERS_OUT
 set(GLASH_PCH_HEADER "${CMAKE_SOURCE_DIR}/src/glash/glash_pch.hpp")
 
 # Create the example1 executable
-add_executable(example1 example1.cpp)
+add_executable(example1 example1.cpp test_window.hpp)
 add_dependencies(example1 copy_shaders)
 
 # Link against the glash library
@@ -59,6 +59,13 @@ target_link_libraries(example1 PRIVATE glash)
 
 # Set up the same PCH for example1 as used in glash
 target_precompile_headers(example1 PRIVATE ${GLASH_PCH_HEADER})
+
+
+if(MSVC)
+    target_compile_options(example1 PRIVATE $<$<CONFIG:Debug>:/Zi>)
+    target_link_options(example1 PRIVATE $<$<CONFIG:Debug>:/INCREMENTAL>)
+
+endif()
 
 set_target_properties(example1 PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>

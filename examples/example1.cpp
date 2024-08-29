@@ -1,9 +1,8 @@
 #include "glash/glash_pch.hpp"
 #include "test_window.hpp"
-
+#include "glash/helper/logger.hpp"
 int main(int argc, char** argv)
 {
-	fmt::print("Fmt print");
+	LOG_INFO("Example created!");
 	RunTestWindow();
-	std::cout << "std::cout";
 }

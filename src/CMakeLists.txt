@@ -32,6 +32,7 @@ target_include_directories(glash
     PUBLIC ${glfw_SOURCE_DIR}/include
     PUBLIC ${OPENGL_INCLUDE_DIR}
     PUBLIC ${fmt_SOURCE_DIR}/include
+    PUBLIC ${spdlog_SOURCE_DIR}/include
     PUBLIC ${glm_SOURCE_DIR}/include
 )
 
@@ -41,6 +42,7 @@ target_link_libraries(glash
     PUBLIC libglew_static
     PUBLIC fmt
     PUBLIC glm
+    PUBLIC spdlog::spdlog
 )
 
 # Set output directories

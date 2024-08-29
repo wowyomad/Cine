@@ -18,6 +18,8 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON CACHE BOOL "" FORCE)
 # User folders to hide dependency targets
 set_property(GLOBAL PROPERTY USE_FOLDER ON)
 #
+set(SPDLOG_FMT_EXTERNAL ON CACHE BOOL "Use fetched fmt instead of bundled" FORCE)
+#
 set(glew-cmake_BUILD_SHARED OFF CACHE BOOL "Build GLEW as a shared library" FORCE)
 set(glew-cmake_BUILD_STATIC ON CACHE BOOL "Build GLEW as a static library" FORCE)
 #
@@ -49,7 +51,13 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/g-truc/glm.git
     GIT_TAG 1.0.1
 )
-FetchContent_MakeAvailable(glew glfw fmt glm)
+FetchContent_Declare(
+    spdlog
+    GIT_REPOSITORY https://github.com/gabime/spdlog.git
+    GIT_TAG v1.14.1
+)
+
+FetchContent_MakeAvailable(glew glfw fmt glm spdlog)
 
 if(TARGET libglew_static)
     message("Static GLEW target is available!")
@@ -73,6 +81,13 @@ endif()
 
 if(TARGET glm)
     message("GLM target is available!")
+    set_target_properties(glm PROPERTIES FOLDER "Dependencies")
+else()
+    message("GLM target is not available")
+endif()
+
+if(TARGET spdlog)
+    message("spdlog target is available!")
     set_target_properties(glm PROPERTIES FOLDER "Dependencies")
 else()
     message("GLM target is not available")

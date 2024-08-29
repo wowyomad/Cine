@@ -1,13 +1,18 @@
+
+
 #include "glash/glash_pch.hpp"
 #include "window.hpp"
-
+#include "glash/helper/logger.hpp"
 namespace glash
 {
 
     Window::Window(int width, int height, const std::string &title, const Color& clearColor)
         : m_ClearColor(clearColor)
     {
-        std::cout << "Window constructor called" << std::endl;
+        glash::initLogger();
+
+        LOG_INFO("Window constructor!");
+
         if (!glfwInit())
         {
             throw std::runtime_error("Failed to initialize GLFW");
