@@ -4,27 +4,21 @@ project(glash VERSION 0.0.1 LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-
 # Project properties
 set(GLASH_BUILD_SHARED OFF CACHE BOOL "Build glash as a shared library"  FORCE)
-#
 set(GLASH_BUILD_EXAMPLES ON CACHE BOOL "Build examples"  FORCE)
 
 #Dependency properties
-#
+
 # Might be needed for planned hot reload.
 set(CMAKE_POSITION_INDEPENDENT_CODE ON CACHE BOOL "" FORCE) 
-#
 # User folders to hide dependency targets
 set_property(GLOBAL PROPERTY USE_FOLDER ON)
-#
 set(SPDLOG_FMT_EXTERNAL ON CACHE BOOL "Use fetched fmt instead of bundled" FORCE)
-#
 set(glew-cmake_BUILD_SHARED OFF CACHE BOOL "Build GLEW as a shared library" FORCE)
 set(glew-cmake_BUILD_STATIC ON CACHE BOOL "Build GLEW as a static library" FORCE)
-#
 set(GLFW_BUILD_WAYLAND OFF CACHE BOOL "Enable wayland scanner" FORCE)
-#
+
 # Use vendor OpenGL 
 if (POLICY CMP0072)
     cmake_policy(SET CMP0072 NEW)
