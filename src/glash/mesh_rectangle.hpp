@@ -13,28 +13,26 @@ namespace glash
 			inline RectangleMesh(const glm::vec3 positions[4], const glm::vec3 colors[4])
 			{
 				float data[COLUMNS * ROWS];
-				const size_t stride = 6;
-				const size_t colorOffset = 3;
 				const size_t positionOffset = 0;
+				const size_t colorOffset = 3;
 
 
-				//Second triangle 
-				memcpy(data + positionOffset + 0 * stride, positions + 0, sizeof(glm::vec3));
-				memcpy(data + positionOffset + 1 * stride, positions + 1, sizeof(glm::vec3));
-				memcpy(data + positionOffset + 2 * stride, positions + 2, sizeof(glm::vec3));
+				//First triangle 
+				memcpy(&data[positionOffset + 0 * COLUMNS], &positions[0], sizeof(glm::vec3));
+				memcpy(&data[positionOffset + 1 * COLUMNS], &positions[1], sizeof(glm::vec3));
+				memcpy(&data[positionOffset + 2 * COLUMNS], &positions[2], sizeof(glm::vec3));
 
-				memcpy(data + colorOffset + 0 * stride, colors + 0, sizeof(glm::vec3));
-				memcpy(data + colorOffset + 1 * stride, colors + 1, sizeof(glm::vec3));
-				memcpy(data + colorOffset + 2 * stride, colors + 2, sizeof(glm::vec3));
+				memcpy(&data[colorOffset + 0 * COLUMNS], &colors[0], sizeof(glm::vec3));
+				memcpy(&data[colorOffset + 1 * COLUMNS], &colors[1], sizeof(glm::vec3));
+				memcpy(&data[colorOffset + 2 * COLUMNS], &colors[2], sizeof(glm::vec3));
 
 				//Second triangle
-				memcpy(data + positionOffset + 3 * stride, positions + 0, sizeof(glm::vec3));
-				memcpy(data + positionOffset + 4 * stride, positions + 2, sizeof(glm::vec3));
-				memcpy(data + positionOffset + 5 * stride, positions + 3, sizeof(glm::vec3));
-
-				memcpy(data + colorOffset + 3 * stride, colors + 0, sizeof(glm::vec3));
-				memcpy(data + colorOffset + 4 * stride, colors + 2, sizeof(glm::vec3));
-				memcpy(data + colorOffset + 5 * stride, colors + 3, sizeof(glm::vec3));
+				memcpy(&data[positionOffset + 3 * COLUMNS], &positions[0], sizeof(glm::vec3));
+				memcpy(&data[positionOffset + 4 * COLUMNS], &positions[2], sizeof(glm::vec3));
+				memcpy(&data[positionOffset + 5 * COLUMNS], &positions[3], sizeof(glm::vec3));
+				memcpy(&data[colorOffset + 3 * COLUMNS], &colors[0], sizeof(glm::vec3));
+				memcpy(&data[colorOffset + 4 * COLUMNS], &colors[2], sizeof(glm::vec3));
+				memcpy(&data[colorOffset + 5 * COLUMNS], &colors[3], sizeof(glm::vec3));
 
 				glGenVertexArrays(1, &m_Vao);
 				glBindVertexArray(m_Vao);

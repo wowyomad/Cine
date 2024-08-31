@@ -4,6 +4,9 @@
 
 #include "glash/structures.hpp"
 
+#include <functional>
+#include "../../out/build/win32-msvc/_deps/fmt-src/include/fmt/ranges.h"
+
 
 namespace glash
 {
@@ -18,6 +21,10 @@ namespace glash
         bool ShouldClose() const;
         void ClearBuffer();
         void SwapBuffers() const;
+
+    public:
+        void GetWindowSize(int* w, int* h) const;
+        void SetKeyCallback(GLFWkeyfun callback);
 
 
         void SetClearColor(const Color& color);

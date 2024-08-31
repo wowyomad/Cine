@@ -11,17 +11,17 @@ namespace glash
 		public:
 			inline TriangleMesh(const glm::vec3 positions[3], const glm::vec3 colors[3])
 			{
-				float data[6 * 3]; 
+				float data[ROWS * COLUMNS]; 
+				const size_t positionOffset = 0;
+				const size_t colorOffset = 3;
 
-				for (size_t i = 0; i < ROWS; i++)
-				{
-					data[i * COLUMNS] = positions[i].x;
-					data[i * COLUMNS + 1] = positions[i].y;
-					data[i * COLUMNS + 2] = positions[i].z;
-					data[i * COLUMNS + 3] = colors[i].r;
-					data[i * COLUMNS + 4] = colors[i].g;
-					data[i * COLUMNS + 5] = colors[i].b;
-				}
+				memcpy(&data[positionOffset + 0 * COLUMNS], &positions[0], sizeof(glm::vec3));
+				memcpy(&data[positionOffset + 1 * COLUMNS], &positions[1], sizeof(glm::vec3));
+				memcpy(&data[positionOffset + 2 * COLUMNS], &positions[2], sizeof(glm::vec3));
+
+				memcpy(&data[colorOffset + 0 * COLUMNS], &colors[0], sizeof(glm::vec3));
+				memcpy(&data[colorOffset + 1 * COLUMNS], &colors[1], sizeof(glm::vec3));
+				memcpy(&data[colorOffset + 2 * COLUMNS], &colors[2], sizeof(glm::vec3));
 
 				glGenVertexArrays(1, &m_Vao);
 				glBindVertexArray(m_Vao);
@@ -30,17 +30,20 @@ namespace glash
 				glBindBuffer(GL_ARRAY_BUFFER, m_Vbo);
 				glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
 
-				glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 24, (void*)0); // Position attribute
+				glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3), (void*)0);
 				glEnableVertexAttribArray(0);
 
-				glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 24, (void*)(3 * sizeof(float))); // Color attribute
+				glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3), (void*)(sizeof(glm::vec3)));
 				glEnableVertexAttribArray(1);
+
+				glBindVertexArray(0);
+				glDisableVertexAttribArray(0);
+				glDisableVertexAttribArray(1);
 			}
 
 			inline void draw()
 			{
 				glBindVertexArray(m_Vao);
-				glBindBuffer(GL_ARRAY_BUFFER, m_Vbo);
 				glDrawArrays(GL_TRIANGLES, 0, m_szVertexCount);
 			}
 
