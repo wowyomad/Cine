@@ -20,7 +20,7 @@ else()
 endif()
 
 # Create the glash library
-add_library(glash ${GLASH_PROPERTIES} ${SOURCES} ${HEADERS})
+add_library(glash ${GLASH_PROPERTIES} ${SOURCES} ${HEADERS} "glash/log_callback.cpp")
 
 # Set PCH for glash
 target_precompile_headers(glash PRIVATE ${GLASH_PCH_HEADER})

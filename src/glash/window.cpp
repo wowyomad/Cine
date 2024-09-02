@@ -1,9 +1,6 @@
-<<<<<<< Updated upstream
-=======
 #include "glash/glash_pch.hpp"
->>>>>>> Stashed changes
 #include "window.hpp"
-#include "glash/helper/logger.hpp"
+#include "glash/logger.hpp"
 namespace glash
 {
 

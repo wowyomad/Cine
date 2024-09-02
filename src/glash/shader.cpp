@@ -2,6 +2,7 @@
 
 #include "shader.hpp"
 #include "glash/helper/file_reader.hpp"
+#include "glash/logger.hpp"
 
 namespace glash
 {
@@ -15,6 +16,7 @@ namespace glash
 
 				GLuint module = glCreateShader(type);
 				glShaderSource(module, 1, &raw_shader, nullptr);
+				GlCall(glCompileShader(module));
 				glCompileShader(module);
 				int success;
 				glGetShaderiv(module, GL_COMPILE_STATUS, &success);
@@ -36,12 +38,12 @@ namespace glash
 
 		}
 
-		GLuint MakeShader(const char* vertRelPath, const char* fragRelPath)
+		GLuint MakeShader(const char* vsPath, const char* fsPath)
 		{
 			std::array<GLuint, 2> modules
 			{
-				MakeModule(vertRelPath, SHADER_TYPE::VERTEX_SHADER),
-				MakeModule(fragRelPath, SHADER_TYPE::FRAGMENT_SHADER)
+				MakeModule(vsPath, SHADER_TYPE::VERTEX_SHADER),
+				MakeModule(fsPath, SHADER_TYPE::FRAGMENT_SHADER)
 			};
 
 			if (!modules[0] || !modules[1])
@@ -78,9 +80,45 @@ namespace glash
 		{
 			glDeleteShader(shader);
 		}
-		void DestroyProgram(GLuint program)
+		void DestroyProgram(GLuint m_uiProgram)
 		{
-			glDeleteProgram(program);
+			glDeleteProgram(m_uiProgram);
+		}
+		Shader::Shader(const std::string& vertPath, const std::string& fragPath)
+		{
+			std::array<GLuint, 2> modules;
+			{
+				MakeModule(vertPath, SHADER_TYPE::VERTEX_SHADER);
+				MakeModule(fragPath, SHADER_TYPE::FRAGMENT_SHADER);
+			}
+
+			if (!modules[0] || !modules[1])
+			{
+				throw std::runtime_error("Shader compilation failed");
+			}
+
+			m_uiProgram = glCreateProgram();
+			for (GLuint module : modules)
+			{
+				glAttachShader(m_uiProgram, module);
+			}
+			glLinkProgram(m_uiProgram);
+
+			
+		}
+		Shader::~Shader()
+		{
+		}
+		GLuint Shader::GetProgram() const
+		{
+			return GLuint();
+		}
+		GLuint Shader::MakeModule(const std::string& shaderPath, SHADER_TYPE type)
+		{
+			return GLuint();
+		}
+		void Shader::Cleanup()
+		{
 		}
 	}
 }

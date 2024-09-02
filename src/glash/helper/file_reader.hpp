@@ -1,6 +1,7 @@
 #pragma once
 
 #include "glash/glash_pch.hpp"
+#include "glash/logger.hpp"
 
 namespace glash
 {
@@ -14,7 +15,9 @@ namespace glash
         std::ifstream file(full_path, std::ios::binary | std::ios::ate);
         if (!file)
         {
-            throw std::runtime_error("Couldn't open file: " + full_path.string());
+            const std::string message = "Coudln't open file: " + full_path.string();
+            LOG_ERROR(fmt::runtime(message));
+            throw std::runtime_error(message);
         }
 
         std::streamsize size = file.tellg();
@@ -23,7 +26,9 @@ namespace glash
         auto buffer = std::make_unique<char[]>(size + 1);
         if (!file.read(buffer.get(), size))
         {
-            throw std::runtime_error("Error reading file: " + full_path.string());
+            const std::string message = "Error reading file: " + full_path.string();
+            LOG_ERROR(fmt::runtime(message));
+            throw std::runtime_error(message);
         }
 
         buffer[size] = '\0';

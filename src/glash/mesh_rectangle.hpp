@@ -1,4 +1,5 @@
 #include "glash/glash_pch.hpp"
+#include "glash/logger.hpp"
 
 namespace glash
 {
@@ -46,13 +47,15 @@ namespace glash
 
 				glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 24, (void*)(3 * sizeof(float)));
 				glEnableVertexAttribArray(1);
+
+				glBindVertexArray(0);
+				glBindBuffer(GL_ARRAY_BUFFER, 0);
 			}
 
 			inline void draw()
 			{
-				glBindVertexArray(m_Vao);
-				glBindBuffer(GL_ARRAY_BUFFER, m_Vbo);
-				glDrawArrays(GL_TRIANGLES, 0, m_szVertexCount);
+				GlCall(glBindVertexArray(m_Vao));
+				GlCall(glDrawArrays(GL_TRIANGLES, 0, m_szVertexCount));
 			}
 
 			inline ~RectangleMesh()

@@ -3,9 +3,7 @@
 #include <GLFW/glfw3.h>
 
 #include "glash/structures.hpp"
-
 #include <functional>
-#include "../../out/build/win32-msvc/_deps/fmt-src/include/fmt/ranges.h"
 
 
 namespace glash
@@ -33,4 +31,9 @@ namespace glash
         GLFWwindow* m_pWindow;
         Color m_ClearColor;
     };
+
+    void APIENTRY GLDebugMessageCallback(GLenum source, GLenum type, GLuint id,
+        GLenum severity, GLsizei length, const GLchar* message,
+        const void* userParam);
+    void InitializeGLDebugCallback();
 } //namespace glash

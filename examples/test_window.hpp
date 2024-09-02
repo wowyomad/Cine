@@ -1,8 +1,14 @@
+#define GLM_ENABLE_EXPERIMENTAL
+
 #include "glash/glash_pch.hpp"
 #include "glash/window.hpp"
 #include "glash/shader.hpp"
 #include "glash/mesh_triangle.hpp"
 #include "glash/mesh_rectangle.hpp"
+#include "glash/log_callback.hpp"
+
+#include "glm/gtx/string_cast.hpp"
+
 
 inline void normalize(glm::vec3* positions, int width, int height)
 {
@@ -16,6 +22,8 @@ size_t gCounter = 0;
 inline void RunTestWindow()
 {
 	LOG_INFO("Running test window");
+
+
 	GLuint shader;
 	try {
 		glash::Window window(800, 800, "Test Window");
@@ -50,28 +58,29 @@ inline void RunTestWindow()
 
 		shader = glash::shader::MakeShader("shaders/vertex.vert", "shaders/fragment.frag");
 
-		glm::vec3* positions = new glm::vec3[4]{
+		std::vector <glm::vec3> positions = {
 		   glm::vec3(200.0f, 200.0f, .0f),
 		   glm::vec3(600.0f, 200.0f, .0f),
 		   glm::vec3(600.0f, 400.0f, .0f),
 		   glm::vec3(200.0f, 400.0f, .0f),
 		};
-		glm::vec3* colors = new glm::vec3[4]{
+		std::vector <glm::vec3> colors = {
 			glm::vec3(0.0f, 0.0f, 1.0f),
 			glm::vec3(1.0f, 0.0f, 0.0f),
 			glm::vec3(0.0f, 0.0f, 1.0f),
 			glm::vec3(1.0f, 0.0f, 0.0f),
 		};
-		normalize(positions, w, h);
-		auto mesh1 = glash::mesh::RectangleMesh(positions, colors);
+		normalize(positions.data(), w, h);
+		auto mesh1 = glash::mesh::RectangleMesh(positions.data(), colors.data());
 
+		positions[0] = positions[3];
+		positions[1] = positions[2];
+		positions[2] = (positions[0] + positions[1]) / 2.0f;
+		positions[2].y += 0.25f;
 
-		for (size_t i = 0; i < 3; i++)
-		{
-			positions[i] *= -1.0f;
-			colors[i] *= 0.5f;
-		}
-		auto mesh2 = glash::mesh::TriangleMesh(positions, colors);
+		std::swap(colors[0], colors[1]);
+
+		auto mesh2 = glash::mesh::TriangleMesh(positions.data(), colors.data());
 
 		if (shader > 0)
 		{
