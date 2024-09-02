@@ -44,6 +44,12 @@ target_link_libraries(glash
     PUBLIC glm
     PUBLIC spdlog::spdlog
 )
+# For hot reload in msvc
+if(MSVC)
+    target_compile_options(glash PRIVATE $<$<CONFIG:Debug>:/Zi>)
+    target_link_options(glash PRIVATE $<$<CONFIG:Debug>:/INCREMENTAL>)
+
+endif()
 
 # Set output directories
 set_target_properties(glash PROPERTIES

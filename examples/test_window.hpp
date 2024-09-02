@@ -23,6 +23,8 @@ inline void RunTestWindow()
 {
 	LOG_INFO("Running test window");
 
+	LOG_INFO("Fuck this {}", "shit");
+
 
 	GLuint shader;
 	try {

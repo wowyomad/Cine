@@ -15,38 +15,41 @@
 #define DEBUG_BREAK
 #endif
 
+#ifndef __FILENAME__
 #define __FILENAME__ std::filesystem::path(__FILE__).filename().string().c_str()
+#endif
 
 #define ASSERT(x) if((x)) DEBUG_BREAK;
-#define GlCall(x)\
-        glash::GlClearErrors();\
+#define GLCall(x)\
+        glash::GLClearErrors();\
         (x);\
-        ASSERT(glash::GlLogCall(#x, __FILENAME__, __LINE__))
+        ASSERT(glash::GLLogCall(#x, __FILENAME__, __LINE__))
 
 
 #define LOG_DEBUG(msg, ...) \
     spdlog::debug("{} ({}:{}) {}", fmt::format(msg, ##__VA_ARGS__), __func__, __LINE__, __FILENAME__)
 
-#define LOG_LIBRARY_DEBUG(msg, ...) \
-    LOG_DEBUG(msg, ##__VA_ARGS__)
+#define LOG_DEBUG_EX(msg, func, line, filename, ...) \
+    spdlog::debug("{} ({}:{}) {}", fmt::format(msg, ##__VA_ARGS__), func, line, filename)
 
 #define LOG_INFO(msg, ...) \
     spdlog::info("{} ({}:{}) {}", fmt::format(msg, ##__VA_ARGS__), __func__, __LINE__, __FILENAME__)
 
-#define LOG_LIBRARY_INFO(msg, ...) \
-    LOG_INFO(msg, ##__VA_ARGS__)
+#define LOG_INFO_EX(msg, func, line, filename, ...) \
+    spdlog::info("{} ({}:{}) {}", fmt::format(msg, ##__VA_ARGS__), func, line, filename)
 
 #define LOG_ERROR(msg, ...) \
     spdlog::error("{} ({}:{}) {}", fmt::format(msg, ##__VA_ARGS__), __func__, __LINE__, __FILENAME__)
 
-#define LOG_LIBRARY_ERROR(msg, ...) \
-    LOG_ERROR(msg, ##__VA_ARGS__)
+
+#define LOG_ERROR_EX(msg, func, line, filename, ...) \
+    spdlog::error("{} ({}:{}) {}", fmt::format(msg, ##__VA_ARGS__), func, line, filename)
 
 #define LOG_WARN(msg, ...) \
     spdlog::warn("{} ({}:{}) {}", fmt::format(msg, ##__VA_ARGS__), __func__, __LINE__, __FILENAME__)
 
-#define LOG_LIBRARY_WARN(msg, ...) \
-    LOG_WARN(msg, ##__VA_ARGS__)
+#define LOG_WARN_EX(msg, func, line, filename, ...) \
+    spdlog::warn("{} ({}:{}) {}", fmt::format(msg, ##__VA_ARGS__), func, line, filename)
 
 
 namespace glash
@@ -67,7 +70,7 @@ namespace glash
 	};
 
 
-	inline void GlClearErrors()
+	inline void GLClearErrors()
 	{
 		while (glGetError() != GL_NO_ERROR)
 		{
@@ -76,7 +79,7 @@ namespace glash
 
 	}
 
-	inline bool GlLogCall(const char* function, const char* file, int line)
+	inline bool GLLogCall(const char* function, const char* file, int line)
 	{
 		bool hasErrorOccured = false;
 		while (GLenum error = glGetError())
@@ -100,7 +103,7 @@ namespace glash
 			break;
 		default:
 			param = 0;
-			LOG_DEBUG(fmt::runtime("Uknown status"));
+			LOG_DEBUG("Uknown status");
 			throw std::runtime_error("Uknown status");
 		}
 		return param;
@@ -118,13 +121,13 @@ namespace glash
 
 #else
 #define LOG_INFO(msg, ...)
-#define LOG_LIBRARY_INFO(msg, ...)
 #define LOG_ERROR(msg, ...)
-#define LOG_LIBRARY_ERROR(msg, ...)
 #define LOG_WARN(msg, ...)
-#define LOG_LIBRARY_WARN(msg, ...)
 #define LOG_DEBUG(msg, ...)
-#define LOG_LIBRARY_DEBUG(msg, ...)
+#define LOG_INFO_EX(msg, func, line, file)
+#define LOG_ERROR_EX(msg, func, line, file)
+#define LOG_WARN_EX(msg, func, line, file)
+#define LOG_DEBUG_EX(msg, func, line, file)
 
 #define GLCall(x)\
         (x);

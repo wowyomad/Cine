@@ -54,8 +54,8 @@ namespace glash
 
 			inline void draw()
 			{
-				GlCall(glBindVertexArray(m_Vao));
-				GlCall(glDrawArrays(GL_TRIANGLES, 0, m_szVertexCount));
+				GLCall(glBindVertexArray(m_Vao));
+				GLCall(glDrawArrays(GL_TRIANGLES, 0, m_szVertexCount));
 			}
 
 			inline ~RectangleMesh()

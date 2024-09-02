@@ -16,7 +16,7 @@ namespace glash
 
 				GLuint module = glCreateShader(type);
 				glShaderSource(module, 1, &raw_shader, nullptr);
-				GlCall(glCompileShader(module));
+				GLCall(glCompileShader(module));
 				glCompileShader(module);
 				int success;
 				glGetShaderiv(module, GL_COMPILE_STATUS, &success);
