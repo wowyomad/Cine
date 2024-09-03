@@ -22,7 +22,6 @@ namespace glash
 				memcpy(&data[positionOffset + 0 * COLUMNS], &positions[0], sizeof(glm::vec3));
 				memcpy(&data[positionOffset + 1 * COLUMNS], &positions[1], sizeof(glm::vec3));
 				memcpy(&data[positionOffset + 2 * COLUMNS], &positions[2], sizeof(glm::vec3));
-
 				memcpy(&data[colorOffset + 0 * COLUMNS], &colors[0], sizeof(glm::vec3));
 				memcpy(&data[colorOffset + 1 * COLUMNS], &colors[1], sizeof(glm::vec3));
 				memcpy(&data[colorOffset + 2 * COLUMNS], &colors[2], sizeof(glm::vec3));

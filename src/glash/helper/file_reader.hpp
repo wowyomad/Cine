@@ -3,6 +3,8 @@
 #include "glash/glash_pch.hpp"
 #include "glash/logger.hpp"
 
+#include <optional>
+
 namespace glash
 {
     namespace fs = std::filesystem;
@@ -15,9 +17,9 @@ namespace glash
         std::ifstream file(full_path, std::ios::binary | std::ios::ate);
         if (!file)
         {
-            const std::string message = "Coudln't open file: " + full_path.string();
+            const std::string message = "Couldn't open file: " + full_path.string();
             LOG_ERROR(fmt::runtime(message));
-            throw std::runtime_error(message);
+            return nullptr;
         }
 
         std::streamsize size = file.tellg();
@@ -28,7 +30,7 @@ namespace glash
         {
             const std::string message = "Error reading file: " + full_path.string();
             LOG_ERROR(fmt::runtime(message));
-            throw std::runtime_error(message);
+            return nullptr;
         }
 
         buffer[size] = '\0';

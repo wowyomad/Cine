@@ -6,118 +6,114 @@
 
 namespace glash
 {
-	namespace shader
+
+	ShaderProgram ShaderProgram::MakeShaderProgram(const char* vsPath, const char* fsPath)
 	{
-		GLuint MakeModule(const char* shaderRelPath, SHADER_TYPE type)
-		{
-			try {
-				std::unique_ptr<char[]> module_source = glash::ReadFile(shaderRelPath);
-				const char* raw_shader = module_source.get();
-
-				GLuint module = glCreateShader(type);
-				GLCall(glShaderSource(module, 1, &raw_shader, nullptr));
-				GLCall(glCompileShader(module));
-				int success;
-				glGetShaderiv(module, GL_COMPILE_STATUS, &success);
-
-				if (!success)
-				{
-					char errorLog[1024];
-					glGetShaderInfoLog(module, sizeof(errorLog), nullptr, errorLog);
-					fmt::println("MakeShader:\n{}", errorLog);
-					DestroyShader(module);
-					return 0;
-				}
-				return module;
-			}
-			catch (const std::runtime_error& e) {
-				fmt::println("{}", e.what());
-				return 0;
-			}
-
-		}
-
-		GLuint MakeShader(const char* vsPath, const char* fsPath)
-		{
-			std::array<GLuint, 2> modules
-			{
-				MakeModule(vsPath, SHADER_TYPE::VERTEX_SHADER),
-				MakeModule(fsPath, SHADER_TYPE::FRAGMENT_SHADER)
-			};
-
-			if (!modules[0] || !modules[1])
-			{
-				return 0;
-			}
-
-			GLuint shader = glCreateProgram();
-			for (GLuint module : modules)
-			{
-				GLCall(glAttachShader(shader, module));
-			}
-			GLCall(glLinkProgram(shader));
-
-			int success;
-			glGetProgramiv(shader, GL_LINK_STATUS, &success);
-			if (!success)
-			{
-				char errorLog[1024];
-				glGetProgramInfoLog(shader, sizeof(errorLog), nullptr, errorLog);
-				fmt::println("MakeProgram:\n{}", errorLog);
-				DestroyProgram(shader);
-				return 0;
-			}
-
-			for (GLuint module : modules)
-			{
-				DestroyShader(module);
-			}
-
-			return shader;
-		}
-		void DestroyShader(GLuint shader)
-		{
-			GLCall(glDeleteShader(shader));
-		}
-		void DestroyProgram(GLuint m_uiProgram)
-		{
-			GLCall(glDeleteProgram(m_uiProgram));
-		}
-		Shader::Shader(const std::string& vertPath, const std::string& fragPath)
-		{
-			std::array<GLuint, 2> modules;
-			{
-				MakeModule(vertPath, SHADER_TYPE::VERTEX_SHADER);
-				MakeModule(fragPath, SHADER_TYPE::FRAGMENT_SHADER);
-			}
-
-			if (!modules[0] || !modules[1])
-			{
-				throw std::runtime_error("Shader compilation failed");
-			}
-
-			m_uiProgram = glCreateProgram();
-			for (GLuint module : modules)
-			{
-				GLCall(glAttachShader(m_uiProgram, module));
-			}
-			GLCall(glLinkProgram(m_uiProgram));
-
-			
-		}
-		Shader::~Shader()
-		{
-		}
-		GLuint Shader::GetProgram() const
-		{
-			return GLuint();
-		}
-		GLuint Shader::MakeModule(const std::string& shaderPath, SHADER_TYPE type)
-		{
-			return GLuint();
-		}
-		void Shader::Cleanup()
-		{
-		}
+		Builder builder;
+		builder.AddShader(vsPath, SHADER_TYPE::VERTEX_SHADER);
+		builder.AddShader(fsPath, SHADER_TYPE::FRAGMENT_SHADER);
+		auto program = builder.Build();
+		return program;
 	}
+
+	ShaderProgram::ShaderProgram(GLuint program_id)
+		: m_Program(program_id)
+	{
+
+	}
+	ShaderProgram::~ShaderProgram()
+	{
+		glDeleteProgram(m_Program);
+	}
+
+	ShaderProgram::operator bool() const
+	{
+		return isLinked();
+	}
+
+	bool ShaderProgram::isLinked() const
+	{
+		return GLGetStatus(m_Program, GLStatus::PROGRAM_LINK);
+	}
+
+	void ShaderProgram::Use() const
+	{
+		GLCall(glUseProgram(m_Program));
+	}
+
+
+	void ShaderProgram::Reset()
+	{
+		GLCall(glUseProgram(0));
+	}
+	bool ShaderProgram::Builder::AddShader(const std::string& shaderPath, enum SHADER_TYPE type)
+	{
+		GLuint shader = glCreateShader(type);
+		std::unique_ptr<char[]> data = glash::ReadFile(shaderPath);
+		const char* rawData = data.get();
+
+		if (!data)
+		{
+			LOG_ERROR("Trying to add non-existing shader file {}", shaderPath);
+			GLCall(glDeleteShader(shader));
+			return false;
+		}
+
+		GLCall(glShaderSource(shader, 1, &rawData, nullptr));
+
+		m_Shaders.push_back(shader);
+		return true;
+	}
+	void ShaderProgram::Builder::CleanShaders()
+	{
+		for (GLuint shader : m_Shaders)
+		{
+			glDeleteShader(shader);
+		}
+		m_Shaders.clear();
+	}
+	ShaderProgram ShaderProgram::ShaderProgram::Builder::Build()
+	{
+		std::map<GLuint, bool> requiredShaders{
+			{SHADER_TYPE::VERTEX_SHADER, false},
+			{SHADER_TYPE::FRAGMENT_SHADER, false}
+		};
+		GLuint program = glCreateProgram();
+		bool success = true;
+		for (GLuint shader : m_Shaders)
+		{
+			GLint shaderType = GLGetStatus(shader, GLStatus::SHADER_TYPE);
+			if (!requiredShaders.contains(shaderType))
+			{
+				LOG_WARN("Tried to add unsupported shader type {}", shaderType);
+				continue;
+			}
+
+			GLCall(glCompileShader(shader));
+			GLCall(glAttachShader(program, shader));
+			requiredShaders[shaderType] = true;
+		}
+
+		for (auto [shaderType, present] : requiredShaders)
+		{
+			if (!present)
+			{
+				LOG_WARN("Program doesn't contain required shader of type {}", shaderType);
+				success = false;
+				break;
+			}
+		}
+		
+		if (!success)
+		{
+			return ShaderProgram(0);
+		}
+
+		GLCall(glLinkProgram(program));
+
+		CleanShaders();
+
+		return ShaderProgram(program);
+	}
+
 }

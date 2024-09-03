@@ -15,6 +15,10 @@
 #include <array>
 #include <string>
 #include <cstdint>
+#include <map>
+#include <unordered_map>
+#include <set>
+#include <unordered_set>
 
 //other
 #include <thread>

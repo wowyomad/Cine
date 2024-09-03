@@ -17,30 +17,22 @@ inline void normalize(glm::vec3* positions, int width, int height)
 		positions[i].y = 2.0f * positions[i].y / height - 1.0f;
 	}
 }
-size_t gCounter = 0;
 inline void RunTestWindow()
 {
-	LOG_INFO("Running test window");
-
 	LOG_INFO("Fuck this {}", "shit");
-
-
-	GLuint shader;
 	try {
 		glash::Window window(800, 800, "Test Window");
 
-
 		window.SetKeyCallback([](GLFWwindow* window, int key, int scanconde, int action, int mods) -> void
 			{
-				return;
 				switch (action)
 				{
 				case GLFW_PRESS:
 				{
 					switch (key)
 					{
-					case GLFW_KEY_ENTER:
-						gCounter++;
+					case GLFW_KEY_ESCAPE:
+						glfwSetWindowShouldClose(window, true);
 						break;
 					default:
 						break;
@@ -56,8 +48,6 @@ inline void RunTestWindow()
 
 		int w = 0, h = 0;
 		window.GetWindowSize(&w, &h);
-
-		shader = glash::shader::MakeShader("shaders/vertex.vert", "shaders/fragment.frag");
 
 		std::vector <glm::vec3> positions = {
 		   glm::vec3(200.0f, 200.0f, .0f),
@@ -83,7 +73,15 @@ inline void RunTestWindow()
 
 		auto mesh2 = glash::mesh::TriangleMesh(positions.data(), colors.data());
 
-		if (shader > 0)
+
+		auto builder = glash::ShaderProgram::Builder();
+		bool success =
+			builder.AddShader("shaders/vertex.vert", glash::SHADER_TYPE::VERTEX_SHADER)
+			&&
+			builder.AddShader("shaders/fragment.frag", glash::SHADER_TYPE::FRAGMENT_SHADER);
+
+		auto shader = builder.Build();
+		if (shader)
 		{
 			window.SetClearColor(glash::color::GREEN);
 		}
@@ -95,11 +93,13 @@ inline void RunTestWindow()
 		while (!window.ShouldClose()) {
 			window.PollEvents();
 			window.ClearBuffer();
-			glUseProgram(shader);
 
+			shader.Use();
 			mesh1.draw();
 			mesh2.draw();
-			glUseProgram(0);
+			shader.Reset();
+
+
 			window.SwapBuffers();
 		}
 
@@ -108,5 +108,4 @@ inline void RunTestWindow()
 		std::cerr << "Exception: " << e.what() << std::endl;
 	}
 	std::cerr << "Closing..." << std::endl;
-	glDeleteProgram(shader);
 }

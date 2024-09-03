@@ -15,6 +15,9 @@
 #define DEBUG_BREAK
 #endif
 
+
+#define FORMAT_MESSAGE_DEBUG "\"{}\" in {} at {}:{}"
+
 #ifndef __FILENAME__
 #define __FILENAME__ std::filesystem::path(__FILE__).filename().string().c_str()
 #endif
@@ -27,29 +30,41 @@
 
 
 #define LOG_DEBUG(msg, ...) \
-    spdlog::debug("{} in {} at {}:{}", fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
+    spdlog::debug(FORMAT_MESSAGE_DEBUG, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
 
 #define LOG_DEBUG_EX(msg, func, filename, line, ...) \
-    spdlog::debug("{} in {} at {}:{}", fmt::format(msg, ##__VA_ARGS__), func, filename, line)
+    spdlog::debug(FORMAT_MESSAGE_DEBUG, fmt::format(msg, ##__VA_ARGS__), func, filename, line)
 
 #define LOG_INFO(msg, ...) \
-    spdlog::info("{} in {} at {}:{}", fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
+    spdlog::info(FORMAT_MESSAGE_DEBUG, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
 
 #define LOG_INFO_EX(msg, func, filename, line, ...) \
-    spdlog::info("{} in {} at {}:{}", fmt::format(msg, ##__VA_ARGS__), func, filename, line)
+    spdlog::info(FORMAT_MESSAGE_DEBUG, fmt::format(msg, ##__VA_ARGS__), func, filename, line)
 
 #define LOG_ERROR(msg, ...) \
-    spdlog::error("{} in {} at {}:{}", fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
+    spdlog::error(FORMAT_MESSAGE_DEBUG, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
 
 #define LOG_ERROR_EX(msg, func, filename, line, ...) \
-    spdlog::error("{} in {} at {}:{}", fmt::format(msg, ##__VA_ARGS__), func, filename, line)
+    spdlog::error(FORMAT_MESSAGE_DEBUG, fmt::format(msg, ##__VA_ARGS__), func, filename, line)
 
 #define LOG_WARN(msg, ...) \
-    spdlog::warn("{} in {} at {}:{}", fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
+    spdlog::warn(FORMAT_MESSAGE_DEBUG, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
 
 #define LOG_WARN_EX(msg, func, filename, line, ...) \
-    spdlog::warn("{} in {} at {}:{}", fmt::format(msg, ##__VA_ARGS__), func, filename, line)
+    spdlog::warn(FORMAT_MESSAGE_DEBUG, fmt::format(msg, ##__VA_ARGS__), func, filename, line)
+#else
+#define LOG_INFO(msg, ...)
+#define LOG_ERROR(msg, ...)
+#define LOG_WARN(msg, ...)
+#define LOG_DEBUG(msg, ...)
+#define LOG_INFO_EX(msg, func, line, file)
+#define LOG_ERROR_EX(msg, func, line, file)
+#define LOG_WARN_EX(msg, func, line, file)
+#define LOG_DEBUG_EX(msg, func, line, file)
 
+#define GLCall(x)\
+        (x);
+#endif
 
 namespace glash
 {
@@ -83,8 +98,6 @@ namespace glash
 		}
 	}
 
-
-
 	inline void GLClearErrors()
 	{
 		while (glGetError() != GL_NO_ERROR)
@@ -116,6 +129,9 @@ namespace glash
 		{
 		case PROGRAM_LINK:
 			glGetProgramiv(object, status, &param);
+			break;
+		case SHADER_TYPE:
+			glGetShaderiv(object, status, &param);
 			break;
 		default:
 			param = 0;
@@ -166,9 +182,6 @@ namespace glash
 			sourceStr, typeStr, severityStr, message);
 	}
 
-
-
-
 	inline void initLogger()
 	{
 		spdlog::set_level(spdlog::level::debug);
@@ -177,35 +190,12 @@ namespace glash
 	inline void InitializeOpenGLDebug()
 	{
 		glEnable(GL_DEBUG_OUTPUT);
-		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS); 
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 		glDebugMessageCallback(GLDebugMessageCallback, nullptr);
 
 		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
 	}
 }
-
-
-#else
-#define LOG_INFO(msg, ...)
-#define LOG_ERROR(msg, ...)
-#define LOG_WARN(msg, ...)
-#define LOG_DEBUG(msg, ...)
-#define LOG_INFO_EX(msg, func, line, file)
-#define LOG_ERROR_EX(msg, func, line, file)
-#define LOG_WARN_EX(msg, func, line, file)
-#define LOG_DEBUG_EX(msg, func, line, file)
-
-#define GLCall(x)\
-        (x);
-
-namespace glash
-{
-	inline void initLogger()
-	{
-
-	}
-}
-#endif
 
 
 
