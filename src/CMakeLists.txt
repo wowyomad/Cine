@@ -1,10 +1,6 @@
 set(GLASH_SOURCE_DIR "glash")
 set(GLASH_PCH_HEADER "${GLASH_SOURCE_DIR}/glash_pch.hpp")
 
-
-# LOG!!!
-remove_definitions(-DNO_LOGGING)
-
 # Gather source and header files
 file(GLOB SOURCES
     "${GLASH_SOURCE_DIR}/*.cpp"

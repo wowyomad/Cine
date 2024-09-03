@@ -9,12 +9,12 @@
 #include "glm/gtx/string_cast.hpp"
 
 
-inline void normalize(glm::vec3* positions, int width, int height)
+inline void normalize(std::vector<glm::vec3>& positions, int width, int height)
 {
-	for (size_t i = 0; i < 4; i++)
+	for (glm::vec3& pos : positions)
 	{
-		positions[i].x = 2.0f * positions[i].x / width - 1.0f;
-		positions[i].y = 2.0f * positions[i].y / height - 1.0f;
+		pos.x = 2.0f * pos.x / width - 1.0f;
+		pos.y = 2.0f * pos.y / height - 1.0f;
 	}
 }
 inline void RunTestWindow()
@@ -52,33 +52,25 @@ inline void RunTestWindow()
 		std::vector <glm::vec3> positions = {
 		   glm::vec3(200.0f, 200.0f, .0f),
 		   glm::vec3(600.0f, 200.0f, .0f),
-		   glm::vec3(600.0f, 400.0f, .0f),
-		   glm::vec3(200.0f, 400.0f, .0f),
+		   glm::vec3(400.0f, 500.0f, .0f)
 		};
+
+		normalize(positions, w, h);
+
 		std::vector <glm::vec3> colors = {
 			glm::vec3(0.0f, 0.0f, 1.0f),
 			glm::vec3(1.0f, 0.0f, 0.0f),
-			glm::vec3(0.0f, 0.0f, 1.0f),
-			glm::vec3(1.0f, 0.0f, 0.0f),
+			glm::vec3(0.5f, 0.0f, 0.5f)
 		};
-		normalize(positions.data(), w, h);
-		auto mesh1 = glash::mesh::RectangleMesh(positions.data(), colors.data());
+		auto mesh = glash::mesh::TriangleMesh(positions.data(), colors.data());
 
-		positions[0] = positions[3];
-		positions[1] = positions[2];
-		positions[2] = (positions[0] + positions[1]) / 2.0f;
-		positions[2].y += 0.25f;
 
-		std::swap(colors[0], colors[1]);
-
-		auto mesh2 = glash::mesh::TriangleMesh(positions.data(), colors.data());
 
 
 		auto builder = glash::ShaderProgram::Builder();
-		bool success =
-			builder.AddShader("shaders/vertex.vert", glash::SHADER_TYPE::VERTEX_SHADER)
-			&&
-			builder.AddShader("shaders/fragment.frag", glash::SHADER_TYPE::FRAGMENT_SHADER);
+
+		builder.AddShader("shaders/vertex.vert", glash::SHADER_TYPE::VERTEX_SHADER);
+		builder.AddShader("shaders/fragment.frag", glash::SHADER_TYPE::FRAGMENT_SHADER);
 
 		auto shader = builder.Build();
 		if (shader)
@@ -95,8 +87,7 @@ inline void RunTestWindow()
 			window.ClearBuffer();
 
 			shader.Use();
-			mesh1.draw();
-			mesh2.draw();
+			mesh.draw();
 			shader.Reset();
 
 
