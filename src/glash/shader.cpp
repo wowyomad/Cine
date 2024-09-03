@@ -15,9 +15,8 @@ namespace glash
 				const char* raw_shader = module_source.get();
 
 				GLuint module = glCreateShader(type);
-				glShaderSource(module, 1, &raw_shader, nullptr);
+				GLCall(glShaderSource(module, 1, &raw_shader, nullptr));
 				GLCall(glCompileShader(module));
-				glCompileShader(module);
 				int success;
 				glGetShaderiv(module, GL_COMPILE_STATUS, &success);
 
@@ -54,9 +53,9 @@ namespace glash
 			GLuint shader = glCreateProgram();
 			for (GLuint module : modules)
 			{
-				glAttachShader(shader, module);
+				GLCall(glAttachShader(shader, module));
 			}
-			glLinkProgram(shader);
+			GLCall(glLinkProgram(shader));
 
 			int success;
 			glGetProgramiv(shader, GL_LINK_STATUS, &success);
@@ -78,11 +77,11 @@ namespace glash
 		}
 		void DestroyShader(GLuint shader)
 		{
-			glDeleteShader(shader);
+			GLCall(glDeleteShader(shader));
 		}
 		void DestroyProgram(GLuint m_uiProgram)
 		{
-			glDeleteProgram(m_uiProgram);
+			GLCall(glDeleteProgram(m_uiProgram));
 		}
 		Shader::Shader(const std::string& vertPath, const std::string& fragPath)
 		{
@@ -100,9 +99,9 @@ namespace glash
 			m_uiProgram = glCreateProgram();
 			for (GLuint module : modules)
 			{
-				glAttachShader(m_uiProgram, module);
+				GLCall(glAttachShader(m_uiProgram, module));
 			}
-			glLinkProgram(m_uiProgram);
+			GLCall(glLinkProgram(m_uiProgram));
 
 			
 		}

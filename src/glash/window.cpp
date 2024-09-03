@@ -22,6 +22,8 @@ namespace glash
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
+
+
         m_pWindow = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
         if (!m_pWindow)
         {
@@ -36,6 +38,8 @@ namespace glash
                 glViewport(0, 0, width, height);
             });
 
+
+
         GLenum err = glewInit();
         if (GLEW_OK != err)
         {
@@ -43,6 +47,8 @@ namespace glash
         }
 
         fmt::println("OpenGL Version: {}\n", reinterpret_cast<const char*>(glGetString(GL_VERSION)));
+
+
     }
 
     Window::~Window()

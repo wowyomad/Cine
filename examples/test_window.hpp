@@ -5,7 +5,6 @@
 #include "glash/shader.hpp"
 #include "glash/mesh_triangle.hpp"
 #include "glash/mesh_rectangle.hpp"
-#include "glash/log_callback.hpp"
 
 #include "glm/gtx/string_cast.hpp"
 
