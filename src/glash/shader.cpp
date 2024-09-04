@@ -64,6 +64,22 @@ namespace glash
 		m_Shaders.push_back(shader);
 		return true;
 	}
+	void ShaderProgram::Builder::AddShader(const ShaderSource& shaderSource)
+	{
+		const char* rawData = shaderSource.source.c_str();
+
+		GLuint shader = glCreateShader(shaderSource.type);
+		GLCall(glShaderSource(shader, 1, &rawData, nullptr));
+
+		m_Shaders.push_back(shader);
+	}
+	void ShaderProgram::Builder::AddShaders(const std::vector<ShaderSource>& shaderSources)
+	{
+		for (const ShaderSource& shaderSource : shaderSources)
+		{
+			AddShader(shaderSource);
+		}
+	}
 	void ShaderProgram::Builder::CleanShaders()
 	{
 		for (GLuint shader : m_Shaders)

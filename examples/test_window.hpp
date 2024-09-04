@@ -7,7 +7,7 @@
 #include "glash/mesh_rectangle.hpp"
 
 #include "glm/gtx/string_cast.hpp"
-
+#include "glash/helper/file_reader.hpp"
 #include <algorithm>
 
 
@@ -22,6 +22,7 @@ inline void normalize(std::vector<glm::vec3>& positions, int width, int height)
 inline void RunTestWindow()
 {
 	LOG_INFO("Fuck this {}", "shit");
+
 	try {
 		glash::Window window(800, 800, "Test Window");
 
@@ -86,8 +87,8 @@ inline void RunTestWindow()
 
 		auto builder = glash::ShaderProgram::Builder();
 
-		builder.AddShader("shaders/vertex.vert", glash::SHADER_TYPE::VERTEX_SHADER);
-		builder.AddShader("shaders/fragment.frag", glash::SHADER_TYPE::FRAGMENT_SHADER);
+		auto sources = glash::ParseGLShaders("sha1ders/shader.shader");
+		builder.AddShaders(sources);
 
 		auto shader = builder.Build();
 		if (shader)

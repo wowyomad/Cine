@@ -14,6 +14,7 @@ set(SHADERS_OUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/shaders)
 file(GLOB SHADER_FILES
     "${SHADERS_DIR}/*.frag"
     "${SHADERS_DIR}/*.vert"
+    "${SHADERS_DIR}/*.shader"
 )
 
 # Create the shaders output directory

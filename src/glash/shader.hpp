@@ -11,6 +11,13 @@ namespace glash
 			TESS_CONTROL_SHADER = GL_TESS_CONTROL_SHADER,
 			TESS_EVALUATION_SHADER = GL_TESS_EVALUATION_SHADER,
 			GEOMETRY_SHADER = GL_GEOMETRY_SHADER,
+			NONE = -1,
+		};
+
+		struct ShaderSource
+		{
+			enum SHADER_TYPE type;
+			std::string source;
 		};
 
 		class ShaderProgram
@@ -20,6 +27,8 @@ namespace glash
 			{
 			public:
 				bool AddShader(const std::string& shaderPath, enum SHADER_TYPE type);
+				void AddShader(const ShaderSource& shaderSource);
+				void AddShaders(const std::vector<ShaderSource>& shaderSources);
 				void CleanShaders();
 				ShaderProgram Build();
 
