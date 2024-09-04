@@ -1,5 +1,7 @@
 #include "glash/glash_pch.hpp"
 
+#include "logger.hpp"
+
 namespace glash
 {
 	namespace mesh
@@ -30,10 +32,10 @@ namespace glash
 				glBindBuffer(GL_ARRAY_BUFFER, m_Vbo);
 				glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
 
-				glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3), (void*)0);
+				GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3), (void*)0));
 				glEnableVertexAttribArray(0);
 
-				glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3), (void*)(sizeof(glm::vec3)));
+				GLCall(glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3), (void*)(sizeof(glm::vec3))));
 				glEnableVertexAttribArray(1);
 
 				glBindVertexArray(0);
@@ -43,8 +45,8 @@ namespace glash
 
 			inline void draw()
 			{
-				glBindVertexArray(m_Vao);
-				glDrawArrays(GL_TRIANGLES, 0, m_szVertexCount);
+				GLCall(glBindVertexArray(m_Vao));
+				GLCall(glDrawArrays(GL_TRIANGLES, 0, m_szVertexCount));
 			}
 
 			inline ~TriangleMesh()

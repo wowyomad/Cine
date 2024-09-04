@@ -8,6 +8,8 @@
 
 #include "glm/gtx/string_cast.hpp"
 
+#include <algorithm>
+
 
 inline void normalize(std::vector<glm::vec3>& positions, int width, int height)
 {
@@ -52,7 +54,8 @@ inline void RunTestWindow()
 		std::vector <glm::vec3> positions = {
 		   glm::vec3(200.0f, 200.0f, .0f),
 		   glm::vec3(600.0f, 200.0f, .0f),
-		   glm::vec3(400.0f, 500.0f, .0f)
+		   glm::vec3(600.0f, 600.0f, .0f),
+			glm::vec3(200.0f, 600.0f, .0f)
 		};
 
 		normalize(positions, w, h);
@@ -60,10 +63,24 @@ inline void RunTestWindow()
 		std::vector <glm::vec3> colors = {
 			glm::vec3(0.0f, 0.0f, 1.0f),
 			glm::vec3(1.0f, 0.0f, 0.0f),
-			glm::vec3(0.5f, 0.0f, 0.5f)
+			glm::vec3(0.5f, 0.0f, 0.5f),
+			glm::vec3(0.5, 0.5, 1.0f)
 		};
-		auto mesh = glash::mesh::TriangleMesh(positions.data(), colors.data());
 
+
+
+
+		auto rectangle_first = glash::mesh::RectangleMesh(positions.data(), colors.data());
+
+		std::ranges::transform(positions, positions.begin(), [](glm::vec3 vec) -> glm::vec3 {
+			vec *= 0.5;
+			return vec;
+			});
+
+		std::swap(colors[0], colors[2]);
+		std::swap(colors[1], colors[3]);
+
+		auto rectangle_second = glash::mesh::RectangleMesh(positions.data(), colors.data());
 
 
 
@@ -85,9 +102,9 @@ inline void RunTestWindow()
 		while (!window.ShouldClose()) {
 			window.PollEvents();
 			window.ClearBuffer();
-
 			shader.Use();
-			mesh.draw();
+			rectangle_first.draw();
+			rectangle_second.draw();
 			shader.Reset();
 
 
