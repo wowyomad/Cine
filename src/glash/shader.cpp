@@ -127,6 +127,12 @@ namespace glash
 
 		GLCall(glLinkProgram(program));
 
+		success = GLGetStatus(program, GLStatus::PROGRAM_LINK);
+		if (!success)
+		{
+			LOG_ERROR("Program link failed");
+		}
+
 		CleanShaders();
 
 		return ShaderProgram(program);

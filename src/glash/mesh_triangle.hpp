@@ -43,7 +43,7 @@ namespace glash
 				glDisableVertexAttribArray(1);
 			}
 
-			inline void draw()
+			inline void Draw()
 			{
 				GLCall(glBindVertexArray(m_Vao));
 				GLCall(glDrawArrays(GL_TRIANGLES, 0, m_szVertexCount));

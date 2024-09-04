@@ -54,7 +54,7 @@ namespace glash
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 			}
 
-			inline void draw()
+			inline void Draw()
 			{
 				GLCall(glBindVertexArray(m_Vao));
 				GLCall(glDrawElements(GL_TRIANGLES, m_szVertexCount, GL_UNSIGNED_INT, (void*)0));

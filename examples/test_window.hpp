@@ -87,11 +87,15 @@ inline void RunTestWindow()
 
 		auto builder = glash::ShaderProgram::Builder();
 
-		auto sources = glash::ParseGLShaders("sha1ders/shader.shader");
-		builder.AddShaders(sources);
+		builder.AddShaders(glash::ParseGLShaders("shaders/pink.shader"));
+		auto shader1 = builder.Build();
+		
+		builder.AddShaders(glash::ParseGLShaders("shaders/shader.shader"));
+		auto shader2 = builder.Build();
 
-		auto shader = builder.Build();
-		if (shader)
+
+
+		if (shader1 && shader2)
 		{
 			window.SetClearColor(glash::color::GREEN);
 		}
@@ -103,11 +107,12 @@ inline void RunTestWindow()
 		while (!window.ShouldClose()) {
 			window.PollEvents();
 			window.ClearBuffer();
-			shader.Use();
-			rectangle_first.draw();
-			rectangle_second.draw();
-			shader.Reset();
 
+			shader1.Use();
+			rectangle_first.Draw();
+
+			shader2.Use();
+			rectangle_second.Draw();
 
 			window.SwapBuffers();
 		}
