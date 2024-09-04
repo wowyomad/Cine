@@ -22,8 +22,6 @@ namespace glash
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-
-
         m_pWindow = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
         if (!m_pWindow)
         {
@@ -32,6 +30,9 @@ namespace glash
         }
 
         glfwMakeContextCurrent(m_pWindow);
+
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         glfwSetWindowSizeCallback(m_pWindow, [](GLFWwindow* window, int width, int height)
             {

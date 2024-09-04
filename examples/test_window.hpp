@@ -68,9 +68,6 @@ inline void RunTestWindow()
 			glm::vec3(0.5, 0.5, 1.0f)
 		};
 
-
-
-
 		auto rectangle_first = glash::mesh::RectangleMesh(positions.data(), colors.data());
 
 		std::ranges::transform(positions, positions.begin(), [](glm::vec3 vec) -> glm::vec3 {
@@ -82,8 +79,6 @@ inline void RunTestWindow()
 		std::swap(colors[1], colors[3]);
 
 		auto rectangle_second = glash::mesh::RectangleMesh(positions.data(), colors.data());
-
-
 
 		auto builder = glash::ShaderProgram::Builder();
 
@@ -103,12 +98,13 @@ inline void RunTestWindow()
 		{
 			window.SetClearColor(glash::color::RED);
 		}
-
 		while (!window.ShouldClose()) {
 			window.PollEvents();
 			window.ClearBuffer();
 
 			shader1.Use();
+			shader1.SetUniformVec("time", { glfwGetTime(), 0.0f, 0.0f, 0.0f }, GL_FLOAT);
+
 			rectangle_first.Draw();
 
 			shader2.Use();

@@ -41,6 +41,21 @@ namespace glash
 		GLCall(glUseProgram(m_Program));
 	}
 
+	void ShaderProgram::SetUniformVec(const std::string& name, const glm::vec4& value, GLint type)
+	{
+		int location = glGetUniformLocation(m_Program, name.c_str());
+	
+		switch (type)
+		{
+		case GL_FLOAT:
+			glUniform1f(location, value.x);
+			break;
+		default:
+			LOG_ERROR("Non-existing uniform {}", name);
+			break;
+		}
+	}
+
 
 	void ShaderProgram::Reset()
 	{

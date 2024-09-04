@@ -1,4 +1,4 @@
- #include "glash/glash_pch.hpp"
+#include "glash/glash_pch.hpp"
 #include "glash/logger.hpp"
 
 namespace glash
@@ -28,7 +28,7 @@ namespace glash
 				memcpy(&vertices[colorOffset + 3 * COLUMNS], &colors[3], sizeof(glm::vec3));
 
 				//2 triangles to make up a rectangle
-				GLuint indices[3 * 2] = {	
+				GLuint indices[3 * 2] = {
 					0, 1, 2,
 					0, 2, 3
 				};
@@ -36,11 +36,14 @@ namespace glash
 				glGenVertexArrays(1, &m_Vao);
 				glBindVertexArray(m_Vao);
 
-				glGenBuffers(1, &m_Vbo);
+				GLuint buffers[2];
+				glGenBuffers(2, buffers);
+				m_Vbo = buffers[0];
+				m_Ebo = buffers[1];
+
 				glBindBuffer(GL_ARRAY_BUFFER, m_Vbo);
 				GLCall(glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW));
 
-				glGenBuffers(1, &m_Ebo);
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Ebo);
 				GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW));
 
@@ -74,7 +77,7 @@ namespace glash
 				{
 					glDeleteBuffers(1, &m_Ebo);
 				}
-				
+
 			}
 
 		private:

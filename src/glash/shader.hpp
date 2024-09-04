@@ -43,6 +43,7 @@ namespace glash
 
 			void Reset();
 			void Use() const;
+			void SetUniformVec(const std::string& name, const glm::vec4& value, GLint type);
 			
 			operator bool() const;
 			bool isLinked() const;
