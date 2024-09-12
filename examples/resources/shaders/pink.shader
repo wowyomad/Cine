@@ -5,6 +5,7 @@ layout (location=0) in vec3 vertexPosition;
 out vec4 vertexColor;
 
 uniform float time;
+uniform vec3 offset;
 
 void main()
 {
@@ -14,8 +15,8 @@ void main()
     float g = 0; 
     float b = 0;
 
-	vertexColor = vec4(r, g, b, 1);
 	gl_Position = vec4(vertexPosition, 1.0);
+	vertexColor = vec4(r, g, b, 1.0);
 }
 
 #shader fragment

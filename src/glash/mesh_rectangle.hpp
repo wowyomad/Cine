@@ -1,5 +1,8 @@
 #include "glash/glash_pch.hpp"
 #include "glash/logger.hpp"
+#include "glash/structures.hpp"
+#include "glash/VertexBuffer.hpp"
+#include "glash/IndexBuffer.hpp"
 
 namespace glash
 {
@@ -11,7 +14,7 @@ namespace glash
 			static const size_t ROWS = 4;
 
 		public:
-			inline RectangleMesh(const glm::vec3 positions[4], const glm::vec3 colors[4])
+			inline RectangleMesh(const glm::vec3 positions[4], const glm::vec3 colors[4], enum GLBufferUsage bufferUsage = GLBufferUsage::STATIC_DRAW)
 			{
 				float vertices[COLUMNS * ROWS];
 
@@ -27,7 +30,6 @@ namespace glash
 				memcpy(&vertices[colorOffset + 2 * COLUMNS], &colors[2], sizeof(glm::vec3));
 				memcpy(&vertices[colorOffset + 3 * COLUMNS], &colors[3], sizeof(glm::vec3));
 
-				//2 triangles to make up a rectangle
 				GLuint indices[3 * 2] = {
 					0, 1, 2,
 					0, 2, 3
@@ -36,16 +38,8 @@ namespace glash
 				glGenVertexArrays(1, &m_Vao);
 				glBindVertexArray(m_Vao);
 
-				GLuint buffers[2];
-				glGenBuffers(2, buffers);
-				m_Vbo = buffers[0];
-				m_Ebo = buffers[1];
-
-				glBindBuffer(GL_ARRAY_BUFFER, m_Vbo);
-				GLCall(glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW));
-
-				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Ebo);
-				GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW));
+				vb = VertexBuffer(std::vector<float>(vertices, vertices + ROWS * COLUMNS), GLBufferUsage::STATIC_DRAW);
+				ib = IndexBuffer(std::vector(indices, indices + 3 * 2), GLBufferUsage::STATIC_DRAW);
 
 				GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, COLUMNS * sizeof(float), (void*)0));
 				glEnableVertexAttribArray(0);
@@ -54,13 +48,12 @@ namespace glash
 				glEnableVertexAttribArray(1);
 
 				glBindVertexArray(0);
-				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 			}
 
 			inline void Draw()
 			{
 				GLCall(glBindVertexArray(m_Vao));
-				GLCall(glDrawElements(GL_TRIANGLES, m_szVertexCount, GL_UNSIGNED_INT, (void*)0));
+				GLCall(glDrawElements(GL_TRIANGLES, ib.GetCount(), GL_UNSIGNED_INT, (void*)0));
 			}
 
 			inline ~RectangleMesh()
@@ -69,21 +62,20 @@ namespace glash
 				{
 					glDeleteVertexArrays(1, &m_Vao);
 				}
-				if (m_Vbo != 0)
-				{
-					glDeleteBuffers(1, &m_Vbo);
-				}
-				if (m_Ebo != 0)
-				{
-					glDeleteBuffers(1, &m_Ebo);
-				}
 
 			}
 
+			inline unsigned int GetVao()
+			{
+				return m_Vao;
+			}
+
+
 		private:
+			VertexBuffer vb;
+			IndexBuffer ib;
 			GLuint m_Vao = 0;
-			GLuint m_Vbo = 0;
-			GLuint m_Ebo = 0;
+
 			const GLsizei m_szVertexCount = 6;
 		};
 	}

@@ -1,6 +1,6 @@
 #pragma once
 #include "glash/glash_pch.hpp" 
-#include "gl/glew.h" //can't find 'defines' without it(???)
+#include "glash/structures.hpp"
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_sinks.h"
 #include "spdlog/pattern_formatter.h"
@@ -16,7 +16,9 @@
 #endif
 
 
-#define FORMAT_MESSAGE_DEBUG "\"{}\" in {} at {}:{}"
+#ifndef FORMAT_DUBUG_MESSAGE
+#define FORMAT_DEBUG_MESSAGE "\"{}\" in {} at {}:{}"
+#endif
 
 #ifndef __FILENAME__
 #define __FILENAME__ std::filesystem::path(__FILE__).filename().string().c_str()
@@ -30,28 +32,28 @@
 
 
 #define LOG_DEBUG(msg, ...) \
-    spdlog::debug(FORMAT_MESSAGE_DEBUG, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
+    spdlog::debug(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
 
 #define LOG_DEBUG_EX(msg, func, filename, line, ...) \
-    spdlog::debug(FORMAT_MESSAGE_DEBUG, fmt::format(msg, ##__VA_ARGS__), func, filename, line)
+    spdlog::debug(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), func, filename, line)
 
 #define LOG_INFO(msg, ...) \
-    spdlog::info(FORMAT_MESSAGE_DEBUG, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
+    spdlog::info(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
 
 #define LOG_INFO_EX(msg, func, filename, line, ...) \
-    spdlog::info(FORMAT_MESSAGE_DEBUG, fmt::format(msg, ##__VA_ARGS__), func, filename, line)
+    spdlog::info(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), func, filename, line)
 
 #define LOG_ERROR(msg, ...) \
-    spdlog::error(FORMAT_MESSAGE_DEBUG, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
+    spdlog::error(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
 
 #define LOG_ERROR_EX(msg, func, filename, line, ...) \
-    spdlog::error(FORMAT_MESSAGE_DEBUG, fmt::format(msg, ##__VA_ARGS__), func, filename, line)
+    spdlog::error(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), func, filename, line)
 
 #define LOG_WARN(msg, ...) \
-    spdlog::warn(FORMAT_MESSAGE_DEBUG, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
+    spdlog::warn(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
 
 #define LOG_WARN_EX(msg, func, filename, line, ...) \
-    spdlog::warn(FORMAT_MESSAGE_DEBUG, fmt::format(msg, ##__VA_ARGS__), func, filename, line)
+    spdlog::warn(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), func, filename, line)
 #else
 #define LOG_INFO(msg, ...)
 #define LOG_ERROR(msg, ...)
@@ -65,24 +67,9 @@
 #define GLCall(x)\
         (x);
 #endif
-
+#include "glash/IndexBuffer.hpp"
 namespace glash
 {
-	enum GLStatus
-	{
-		SHADER_COMPILE = GL_COMPILE_STATUS,
-		SHADER_INFO_LOG_LENGTH = GL_INFO_LOG_LENGTH,
-		SHADER_SOURCE_LENGTH = GL_SHADER_SOURCE_LENGTH,
-		SHADER_TYPE = GL_SHADER_TYPE,
-		PROGRAM_LINK = GL_LINK_STATUS,
-		PROGRAM_VALIDATE = GL_VALIDATE_STATUS,
-		PROGRAM_INFO_LOG_LENGTH = GL_INFO_LOG_LENGTH,
-		PROGRAM_ATTACHED_SHADERS = GL_ATTACHED_SHADERS,
-		PROGRAM_ACTIVE_UNIFORMS = GL_ACTIVE_UNIFORMS,
-		PROGRAM_ACTIVE_ATTRIBUTES = GL_ACTIVE_ATTRIBUTES
-
-	};
-
 	inline const char* GetGLErrorString(GLenum error)
 	{
 		switch (error)
@@ -130,13 +117,12 @@ namespace glash
 		case PROGRAM_LINK:
 			glGetProgramiv(object, status, &param);
 			break;
-		case SHADER_TYPE:
+		case SHADER_TYPE: case SHADER_COMPILE:
 			glGetShaderiv(object, status, &param);
 			break;
 		default:
 			param = 0;
 			LOG_DEBUG("Uknown status");
-			throw std::runtime_error("Uknown status");
 		}
 		return param;
 	}

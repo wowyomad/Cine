@@ -10,6 +10,9 @@
 #include "glash/helper/file_reader.hpp"
 #include <algorithm>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 
 inline void normalize(std::vector<glm::vec3>& positions, int width, int height)
 {
@@ -21,8 +24,6 @@ inline void normalize(std::vector<glm::vec3>& positions, int width, int height)
 }
 inline void RunTestWindow()
 {
-	LOG_INFO("Fuck this {}", "shit");
-
 	try {
 		glash::Window window(800, 800, "Test Window");
 
@@ -53,10 +54,10 @@ inline void RunTestWindow()
 		window.GetWindowSize(&w, &h);
 
 		std::vector <glm::vec3> positions = {
-		   glm::vec3(200.0f, 200.0f, .0f),
-		   glm::vec3(600.0f, 200.0f, .0f),
-		   glm::vec3(600.0f, 600.0f, .0f),
-			glm::vec3(200.0f, 600.0f, .0f)
+		   glm::vec3(300, 300.0f, .0f),
+		   glm::vec3(500, 300.0f, .0f),
+		   glm::vec3(500.0f, 500.0f, .0f),
+			glm::vec3(300.0f, 500.0f, .0f)
 		};
 
 		normalize(positions, w, h);
@@ -68,29 +69,14 @@ inline void RunTestWindow()
 			glm::vec3(0.5, 0.5, 1.0f)
 		};
 
-		auto rectangle_first = glash::mesh::RectangleMesh(positions.data(), colors.data());
-
-		std::ranges::transform(positions, positions.begin(), [](glm::vec3 vec) -> glm::vec3 {
-			vec *= 0.5;
-			return vec;
-			});
-
-		std::swap(colors[0], colors[2]);
-		std::swap(colors[1], colors[3]);
-
-		auto rectangle_second = glash::mesh::RectangleMesh(positions.data(), colors.data());
-
 		auto builder = glash::ShaderProgram::Builder();
 
-		builder.AddShaders(glash::ParseGLShaders("shaders/pink.shader"));
+		builder.AddShaders(glash::ParseGLShaders("resources/shaders/shader.shader"));
 		auto shader1 = builder.Build();
 		
-		builder.AddShaders(glash::ParseGLShaders("shaders/shader.shader"));
-		auto shader2 = builder.Build();
+		auto rectangle_first = glash::mesh::RectangleMesh(positions.data(), colors.data(), glash::GLBufferUsage::DYNAMIC_DRAW);
 
-
-
-		if (shader1 && shader2)
+		if (shader1)
 		{
 			window.SetClearColor(glash::color::GREEN);
 		}
@@ -98,24 +84,40 @@ inline void RunTestWindow()
 		{
 			window.SetClearColor(glash::color::RED);
 		}
+
+		glm::vec3 offset = { 0.0f, 0.0f, 0.0f };
+		glm::vec3 move = { 0.001f, 0.0f, 0.0f };
+
+		size_t frames = 0;
+		double startTime = glfwGetTime();
+
 		while (!window.ShouldClose()) {
+			frames++;
+			offset += move;
+
+			if (offset.x >= 0.5f or offset.x <= -0.5f)
+				move = -move;
+
 			window.PollEvents();
 			window.ClearBuffer();
 
 			shader1.Use();
 			shader1.SetUniformVec("time", { glfwGetTime(), 0.0f, 0.0f, 0.0f }, GL_FLOAT);
-
+			shader1.SetUniformVec("offset", glm::vec4(offset, 0.0f), GL_FLOAT_VEC3);
 			rectangle_first.Draw();
-
-			shader2.Use();
-			rectangle_second.Draw();
 
 			window.SwapBuffers();
 		}
 
+		double elapsed = glfwGetTime() - startTime;
+		fmt::println("Drawn {} frames in {} secoconds;\nFPS {}; Frame Time: {}", frames, elapsed, frames / elapsed, elapsed / frames);
+
+
 	}
+
 	catch (const std::exception& e) {
 		std::cerr << "Exception: " << e.what() << std::endl;
 	}
+
 	std::cerr << "Closing..." << std::endl;
 }

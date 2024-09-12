@@ -19,7 +19,6 @@ namespace glash
 	ShaderProgram::ShaderProgram(GLuint program_id)
 		: m_Program(program_id)
 	{
-
 	}
 	ShaderProgram::~ShaderProgram()
 	{
@@ -50,10 +49,18 @@ namespace glash
 		case GL_FLOAT:
 			glUniform1f(location, value.x);
 			break;
+		case GL_FLOAT_VEC3:
+			glUniform3f(location, value.x, value.y, value.z);
+			break;
 		default:
 			LOG_ERROR("Non-existing uniform {}", name);
 			break;
 		}
+	}
+
+	GLuint ShaderProgram::GetID() const
+	{
+		return m_Program;
 	}
 
 
@@ -121,6 +128,15 @@ namespace glash
 			}
 
 			GLCall(glCompileShader(shader));
+
+			
+			GLCall(success = GLGetStatus(shader, GLStatus::SHADER_COMPILE));
+			if (!success)
+			{
+				LOG_ERROR("Shader {} didn't compile", shader);
+			}
+			
+
 			GLCall(glAttachShader(program, shader));
 			requiredShaders[shaderType] = true;
 		}

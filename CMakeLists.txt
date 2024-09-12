@@ -50,42 +50,42 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/gabime/spdlog.git
     GIT_TAG v1.14.1
 )
+FetchContent_Declare(
+    stb
+    stb
+    GIT_REPOSITORY https://github.com/nothings/stb.git
+    GIT_TAG f75e8d1cad7d90d72ef7a4661f1b994ef78b4e31
+)
 
-FetchContent_MakeAvailable(glew glfw fmt glm spdlog)
+FetchContent_MakeAvailable(glew glfw fmt glm spdlog stb)
 
 if(TARGET libglew_static)
-    message("Static GLEW target is available!")
     set_target_properties(libglew_static PROPERTIES FOLDER "Dependencies")
 else()
     message("Static GLEW target is not available")
 endif()
 if(TARGET glfw)
-    message("GLFW target is available!")
     set_target_properties(glfw PROPERTIES FOLDER "Dependencies")
 else()
     message("GLFW target is not available")
 endif()
-
 if(TARGET fmt)
-    message("FMT target is available!")
     set_target_properties(fmt PROPERTIES FOLDER "Dependencies")
 else()
     message("FMT target is not available")
 endif()
 
 if(TARGET glm)
-    message("GLM target is available!")
     set_target_properties(glm PROPERTIES FOLDER "Dependencies")
 else()
     message("GLM target is not available")
 endif()
-
 if(TARGET spdlog)
-    message("spdlog target is available!")
-    set_target_properties(glm PROPERTIES FOLDER "Dependencies")
+    set_target_properties(spdlog PROPERTIES FOLDER "Dependencies")
 else()
     message("GLM target is not available")
 endif()
+    
 
 find_package(OpenGL REQUIRED)
 

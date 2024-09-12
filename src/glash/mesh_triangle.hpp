@@ -1,5 +1,8 @@
 #include "glash/glash_pch.hpp"
 
+#include "glash/VertexBuffer.hpp"
+#include "glash/IndexBuffer.hpp"
+
 #include "logger.hpp"
 
 namespace glash
@@ -13,6 +16,7 @@ namespace glash
 		public:
 			inline TriangleMesh(const glm::vec3 positions[3], const glm::vec3 colors[3])
 			{
+
 				float data[ROWS * COLUMNS]; 
 				const size_t positionOffset = 0;
 				const size_t colorOffset = 3;
@@ -24,6 +28,9 @@ namespace glash
 				memcpy(&data[colorOffset + 0 * COLUMNS], &colors[0], sizeof(glm::vec3));
 				memcpy(&data[colorOffset + 1 * COLUMNS], &colors[1], sizeof(glm::vec3));
 				memcpy(&data[colorOffset + 2 * COLUMNS], &colors[2], sizeof(glm::vec3));
+
+
+
 
 				glGenVertexArrays(1, &m_Vao);
 				glBindVertexArray(m_Vao);
@@ -63,6 +70,7 @@ namespace glash
 
 
 		private:
+			VertexBuffer vb;
 			GLuint m_Vao = 0;
 			GLuint m_Vbo = 0;
 			const GLsizei m_szVertexCount = 3;
