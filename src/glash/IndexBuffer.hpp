@@ -7,17 +7,21 @@ namespace glash
 {
 	class IndexBuffer
 	{
-		using Index = GLuint;
 	public:
-		IndexBuffer(const std::vector<Index>& data, GLBufferUsage usage);
-		IndexBuffer() = default;
+		using Index = GLuint;
+
+
+		IndexBuffer() : m_Count(0), m_RendererID(0) { }
+		IndexBuffer(const std::vector<Index>& data, GLBufferUsage usage = GLBufferUsage::STATIC_DRAW);
+		IndexBuffer(const IndexBuffer& other) = default;
 		IndexBuffer(IndexBuffer&& other) noexcept;
 		~IndexBuffer();
 
+		IndexBuffer& operator=(IndexBuffer& other) = default;
 		IndexBuffer& operator=(IndexBuffer&& other) noexcept;
 
 		void Bind() const;
-		void Unbind() const;
+		static void Unbind();
 
 		inline Index GetCount() const { return m_Count; }
 	private:

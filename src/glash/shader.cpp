@@ -1,108 +1,154 @@
-#include "glash/glash_pch.hpp"
+#include "glash/Shader.hpp"
 
-#include "shader.hpp"
-#include "glash/helper/file_reader.hpp"
 #include "glash/logger.hpp"
+#include "glash/helper/file_reader.hpp"
 
 namespace glash
 {
-
-	ShaderProgram ShaderProgram::MakeShaderProgram(const char* vsPath, const char* fsPath)
-	{
-		Builder builder;
-		builder.AddShader(vsPath, SHADER_TYPE::VERTEX_SHADER);
-		builder.AddShader(fsPath, SHADER_TYPE::FRAGMENT_SHADER);
-		auto program = builder.Build();
-		return program;
-	}
-
-	ShaderProgram::ShaderProgram(GLuint program_id)
-		: m_Program(program_id)
+	Shader::Shader()
+		:m_ProgramID(0)
 	{
 	}
-	ShaderProgram::~ShaderProgram()
+	Shader::Shader(const std::string& filepath)
+		: m_FilePath(filepath), m_ProgramID(0)
 	{
-		glDeleteProgram(m_Program);
-	}
-
-	ShaderProgram::operator bool() const
-	{
-		return isLinked();
-	}
-
-	bool ShaderProgram::isLinked() const
-	{
-		return GLGetStatus(m_Program, GLStatus::PROGRAM_LINK);
-	}
-
-	void ShaderProgram::Use() const
-	{
-		GLCall(glUseProgram(m_Program));
-	}
-
-	void ShaderProgram::SetUniformVec(const std::string& name, const glm::vec4& value, GLint type)
-	{
-		int location = glGetUniformLocation(m_Program, name.c_str());
-	
-		switch (type)
+		auto shaders = ParseShader(filepath);
+		ShaderCompiler builder;
+		for (const auto& shader : shaders)
 		{
-		case GL_FLOAT:
-			glUniform1f(location, value.x);
-			break;
-		case GL_FLOAT_VEC3:
-			glUniform3f(location, value.x, value.y, value.z);
-			break;
-		default:
-			LOG_ERROR("Non-existing uniform {}", name);
-			break;
+			builder.AddShader(shader);
 		}
-	}
 
-	GLuint ShaderProgram::GetID() const
+		m_ProgramID = builder.CompileAndLink();
+
+	}
+	Shader::~Shader()
 	{
-		return m_Program;
+		GLCall(glDeleteProgram(m_ProgramID));
 	}
-
-
-	void ShaderProgram::Reset()
+	void Shader::Bind() const
+	{
+		GLCall(glUseProgram(m_ProgramID));
+	}
+	void Shader::Unbind() const
 	{
 		GLCall(glUseProgram(0));
 	}
-	bool ShaderProgram::Builder::AddShader(const std::string& shaderPath, enum SHADER_TYPE type)
+	Shader::operator bool() const
 	{
-		GLuint shader = glCreateShader(type);
-		std::unique_ptr<char[]> data = glash::ReadFile(shaderPath);
-		const char* rawData = data.get();
-
-		if (!data)
+		return GLGetStatus(m_ProgramID, GLStatus::PROGRAM_LINK);
+	}
+	bool Shader::CompileShader()
+	{
+		return false;
+	}
+	bool Shader::CreateShader()
+	{
+		return false;
+	}
+	GLint Shader::GetUniformLocation(const char* name)
+	{
+		if (uniformLocations.contains(name))
 		{
-			LOG_ERROR("Trying to add non-existing shader file {}", shaderPath);
-			GLCall(glDeleteShader(shader));
-			return false;
+			return uniformLocations[name];
+		}
+		GLint location = glGetUniformLocation(m_ProgramID, "brightness");
+
+		uniformLocations[name] = location;
+
+		return location;
+	}
+
+	GLenum Shader::GetUniformType(const char* name)
+	{
+		if (uniformTypes.contains(name))
+		{
+			return uniformTypes[name];
 		}
 
+		GLenum type;
+		GLint size;
+		GLsizei length;
+		GLCall(glGetActiveUniform(m_ProgramID, GetUniformLocation(name), 0, &length, &size, &type, nullptr));
+		uniformTypes[name] = type;
+
+		return type;
+	}
+
+	std::vector<ShaderSource> Shader::ParseShader(const fs::path& filepath)
+	{
+		std::ifstream file(filepath);
+
+		if (!file)
+		{
+			const std::string message = "Couldn't open file: " + filepath.string();
+			LOG_ERROR(fmt::runtime(message));
+			return {};
+		}
+
+		std::string line;
+		std::stringstream vertexShaderStream, fragmentShaderStream;
+		enum GLShaderType type = GLShaderType::NONE;
+
+		while (getline(file, line))
+		{
+			if (line.empty()) continue;
+			if (line.contains("#shader"))
+			{
+				if (line.contains("vertex"))
+				{
+					type = GLShaderType::VERTEX_SHADER;
+				}
+				else if (line.contains("fragment"))
+				{
+					type = GLShaderType::FRAGMENT_SHADER;
+				}
+			}
+			else
+			{
+				if (type == GLShaderType::VERTEX_SHADER)
+				{
+					vertexShaderStream << line << '\n';
+				}
+				else if (type == GLShaderType::FRAGMENT_SHADER)
+				{
+					fragmentShaderStream << line << '\n';
+				}
+				else
+				{
+					LOG_ERROR("File {} doesn't begin with #shader <type>", filepath.string());
+					return {};
+				}
+			}
+		}
+
+		std::vector<ShaderSource> sources
+		{
+			{
+			GLShaderType::VERTEX_SHADER,
+			vertexShaderStream.str()
+			},
+			{
+			GLShaderType::FRAGMENT_SHADER,
+			fragmentShaderStream.str()
+			}
+
+		};
+		return sources;
+	}
+
+
+	void Shader::ShaderCompiler::AddShader(const ShaderSource& source)
+	{
+		const char* rawData = source.source.c_str();
+
+		GLuint shader = glCreateShader(source.type);
 		GLCall(glShaderSource(shader, 1, &rawData, nullptr));
 
 		m_Shaders.push_back(shader);
-		return true;
 	}
-	void ShaderProgram::Builder::AddShader(const ShaderSource& shaderSource)
-	{
-		const char* rawData = shaderSource.source.c_str();
 
-		GLuint shader = glCreateShader(shaderSource.type);
-		GLCall(glShaderSource(shader, 1, &rawData, nullptr));
-
-		m_Shaders.push_back(shader);
-	}
-	void ShaderProgram::Builder::AddShaders(const std::vector<ShaderSource>& shaderSources)
-	{
-		for (const ShaderSource& shaderSource : shaderSources)
-		{
-			AddShader(shaderSource);
-		}
-	}
-	void ShaderProgram::Builder::CleanShaders()
+	void Shader::ShaderCompiler::CleanShaders()
 	{
 		for (GLuint shader : m_Shaders)
 		{
@@ -110,17 +156,19 @@ namespace glash
 		}
 		m_Shaders.clear();
 	}
-	ShaderProgram ShaderProgram::ShaderProgram::Builder::Build()
+
+
+	GLuint Shader::ShaderCompiler::CompileAndLink()
 	{
 		std::map<GLuint, bool> requiredShaders{
-			{SHADER_TYPE::VERTEX_SHADER, false},
-			{SHADER_TYPE::FRAGMENT_SHADER, false}
+			{GLShaderType::VERTEX_SHADER, false},
+			{GLShaderType::FRAGMENT_SHADER, false}
 		};
-		GLuint program = glCreateProgram();
+		GLuint programID = glCreateProgram();
 		bool success = true;
 		for (GLuint shader : m_Shaders)
 		{
-			GLint shaderType = GLGetStatus(shader, GLStatus::SHADER_TYPE);
+			GLint shaderType = GLGetStatus(shader, GLStatus::GLShaderType);
 			if (!requiredShaders.contains(shaderType))
 			{
 				LOG_WARN("Tried to add unsupported shader type {}", shaderType);
@@ -129,15 +177,15 @@ namespace glash
 
 			GLCall(glCompileShader(shader));
 
-			
+
 			GLCall(success = GLGetStatus(shader, GLStatus::SHADER_COMPILE));
 			if (!success)
 			{
 				LOG_ERROR("Shader {} didn't compile", shader);
 			}
-			
 
-			GLCall(glAttachShader(program, shader));
+
+			GLCall(glAttachShader(programID, shader));
 			requiredShaders[shaderType] = true;
 		}
 
@@ -150,15 +198,15 @@ namespace glash
 				break;
 			}
 		}
-		
+
 		if (!success)
 		{
-			return ShaderProgram(0);
+			return 0;
 		}
 
-		GLCall(glLinkProgram(program));
+		GLCall(glLinkProgram(programID));
 
-		success = GLGetStatus(program, GLStatus::PROGRAM_LINK);
+		success = GLGetStatus(programID, GLStatus::PROGRAM_LINK);
 		if (!success)
 		{
 			LOG_ERROR("Program link failed");
@@ -166,7 +214,7 @@ namespace glash
 
 		CleanShaders();
 
-		return ShaderProgram(program);
+		return programID;
 	}
 
 }

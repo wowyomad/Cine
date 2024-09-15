@@ -90,6 +90,7 @@ add_dependencies(example1 copy_shaders copy_images)
 add_executable(example2 example2.cpp)
 add_dependencies(example2 copy_shaders copy_images)
 
+
 target_link_libraries(example1 PRIVATE glash)
 target_link_libraries(example2 PRIVATE glash)
 

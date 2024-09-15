@@ -117,7 +117,7 @@ namespace glash
 		case PROGRAM_LINK:
 			glGetProgramiv(object, status, &param);
 			break;
-		case SHADER_TYPE: case SHADER_COMPILE:
+		case GLShaderType: case SHADER_COMPILE:
 			glGetShaderiv(object, status, &param);
 			break;
 		default:

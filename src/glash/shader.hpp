@@ -1,59 +1,80 @@
 #pragma once
+
 #include "glash/glash_pch.hpp"
+#include "glash/logger.hpp"
 
 namespace glash
 {
-		enum SHADER_TYPE
-		{
-			VERTEX_SHADER = GL_VERTEX_SHADER,
-			FRAGMENT_SHADER = GL_FRAGMENT_SHADER,
-			COMPUTE_SHADER = GL_COMPUTE_SHADER,
-			TESS_CONTROL_SHADER = GL_TESS_CONTROL_SHADER,
-			TESS_EVALUATION_SHADER = GL_TESS_EVALUATION_SHADER,
-			GEOMETRY_SHADER = GL_GEOMETRY_SHADER,
-			NONE = -1,
-		};
+	namespace fs = std::filesystem;
 
-		struct ShaderSource
-		{
-			enum SHADER_TYPE type;
-			std::string source;
-		};
+	class Shader
+	{
+	public:
+		Shader();
+		Shader(const std::string& filepath);
+		~Shader();
 
-		class ShaderProgram
+		template <class T>
+		void SetUniform(const char* name, const T value)
 		{
-		public:
-			class Builder
+			static_assert(false, "Uniform of type {} is not supported");
+		}
+
+		template <>
+		void SetUniform(const char* name, const float value)
+		{
+			GLenum type = GetUniformType(name);
+			if (type != GL_FLOAT)
 			{
-			public:
-				bool AddShader(const std::string& shaderPath, enum SHADER_TYPE type);
-				void AddShader(const ShaderSource& shaderSource);
-				void AddShaders(const std::vector<ShaderSource>& shaderSources);
-				void CleanShaders();
-				ShaderProgram Build();
+				LOG_ERROR("Received type: {}. Expected type {}.", type, GL_FLOAT);
+				return;
+			}
+			GLint location = GetUniformLocation(name);
+			GLCall(glUniform1f(location, value));
+		}
 
-			private:
-				std::vector<GLuint> m_Shaders = {};
-			};
+		template <>
+		void SetUniform(const char* name, const glm::vec4& value)
+		{
+			GLenum type = GetUniformType(name);
+			if (type != GL_FLOAT)
+			{
+				LOG_ERROR("Received type: {}. Expected type {}.", type, GL_FLOAT_VEC4);
+				return;
+			}
+			GLint location = GetUniformLocation(name);
+			GLCall(glUniform4f(location, value.x, value.y, value.z, value.w));
+		}
 
-			static ShaderProgram MakeShaderProgram(const char* vertRelPath, const char* fragRelPath);
+		void Bind() const;
+		void Unbind() const;
 
-			ShaderProgram(GLuint program_id);
-			~ShaderProgram();
 
-			void Reset();
-			void Use() const;
-			void SetUniformVec(const std::string& name, const glm::vec4& value, GLint type);
-			GLuint GetID() const;
-			
-			operator bool() const;
-			bool isLinked() const;
+		operator bool() const;
+
+		class ShaderCompiler
+		{
 		public:
-
-
+			void AddShader(const ShaderSource& shaderSource);
+			void CleanShaders();
+			GLuint CompileAndLink();
 
 		private:
-			GLuint m_Program = 0;
-			 
-		};	
+			std::vector<GLuint> m_Shaders = {};
+		};
+	private:
+		GLuint m_ProgramID;
+		std::unordered_map<std::string, GLint> uniformLocations;
+		std::unordered_map<std::string, GLenum> uniformTypes;
+
+		bool CompileShader();
+		bool CreateShader();
+		static std::vector<ShaderSource> ParseShader(const fs::path& filepath);
+
+		GLint GetUniformLocation(const char* name);
+		GLenum GetUniformType(const char* name);
+
+	private:
+		fs::path m_FilePath;
+	};
 }

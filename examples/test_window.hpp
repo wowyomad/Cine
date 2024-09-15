@@ -5,6 +5,7 @@
 #include "glash/shader.hpp"
 #include "glash/mesh_triangle.hpp"
 #include "glash/mesh_rectangle.hpp"
+#include "glash/Shader.hpp"
 
 #include "glm/gtx/string_cast.hpp"
 #include "glash/helper/file_reader.hpp"
@@ -53,28 +54,46 @@ inline void RunTestWindow()
 		int w = 0, h = 0;
 		window.GetWindowSize(&w, &h);
 
-		std::vector <glm::vec3> positions = {
+		std::vector <glm::vec3> rect_positions =
+		{
 		   glm::vec3(300, 300.0f, .0f),
 		   glm::vec3(500, 300.0f, .0f),
 		   glm::vec3(500.0f, 500.0f, .0f),
 			glm::vec3(300.0f, 500.0f, .0f)
 		};
 
-		normalize(positions, w, h);
+		normalize(rect_positions, w, h);
 
-		std::vector <glm::vec3> colors = {
+		std::vector <glm::vec3> rect_colors = 
+		{
 			glm::vec3(0.0f, 0.0f, 1.0f),
 			glm::vec3(1.0f, 0.0f, 0.0f),
 			glm::vec3(0.5f, 0.0f, 0.5f),
 			glm::vec3(0.5, 0.5, 1.0f)
 		};
 
-		auto builder = glash::ShaderProgram::Builder();
-
-		builder.AddShaders(glash::ParseGLShaders("resources/shaders/shader.shader"));
-		auto shader1 = builder.Build();
+		auto shader1 = glash::Shader("resources/shaders/shader.shader");
 		
-		auto rectangle_first = glash::mesh::RectangleMesh(positions.data(), colors.data(), glash::GLBufferUsage::DYNAMIC_DRAW);
+		auto rect = glash::mesh::RectangleMesh(rect_positions.data(), rect_colors.data(), glash::GLBufferUsage::DYNAMIC_DRAW);
+
+		std::vector<glm::vec3> tri_positoins =
+		{
+			{250.0f, 250.0f, 0.0f},
+			{450.0f, 250.0f, 0.0f},
+			{350.0, 450.0f, 0.0f}
+		};
+
+		normalize(tri_positoins, w, h);
+
+		std::vector<glm::vec3> tri_colors =
+		{
+			glm::vec3(1.0f, 0.0f, 0.0f),
+			glm::vec3(1.0f, 0.0f, 0.0f),
+			glm::vec3(1.0f, 0.0f, 0.0f)
+		};
+
+		auto tri = glash::mesh::TriangleMesh(tri_positoins.data(), tri_colors.data());
+
 
 		if (shader1)
 		{
@@ -91,6 +110,8 @@ inline void RunTestWindow()
 		size_t frames = 0;
 		double startTime = glfwGetTime();
 
+
+
 		while (!window.ShouldClose()) {
 			frames++;
 			offset += move;
@@ -101,10 +122,13 @@ inline void RunTestWindow()
 			window.PollEvents();
 			window.ClearBuffer();
 
-			shader1.Use();
-			shader1.SetUniformVec("time", { glfwGetTime(), 0.0f, 0.0f, 0.0f }, GL_FLOAT);
-			shader1.SetUniformVec("offset", glm::vec4(offset, 0.0f), GL_FLOAT_VEC3);
-			rectangle_first.Draw();
+			shader1.Bind();
+			shader1.SetUniform("brightness", 0.25f);
+
+			rect.Draw();
+			tri.Draw();
+
+			shader1.Unbind();
 
 			window.SwapBuffers();
 		}
