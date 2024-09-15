@@ -15,6 +15,23 @@ namespace glash
 			static const size_t ROWS = 4;
 
 		public:
+			inline RectangleMesh(const glm::vec3& position, const glm::vec3& color, const float width, const float height)
+			{
+				glm::vec3 positions[4] = {
+					{position.x - width, position.y - height, 0.0f},
+					{position.x + width, position.y - height, 0.0f},
+					{position.x + width, position.y + height, 0.0f},
+					{position.x - width, position.y + height, 0.0f},
+				};
+
+				glm::vec3 colors[4] =
+				{
+					color, color, color, color
+				};
+				
+				*this = RectangleMesh(positions, colors);
+			}
+
 			inline RectangleMesh(const glm::vec3 positions[4], const glm::vec3 colors[4], enum GLBufferUsage bufferUsage = GLBufferUsage::STATIC_DRAW)
 			{
 				std::vector<glm::vec3> vertices(4 + 4);

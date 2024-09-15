@@ -74,7 +74,7 @@ inline void RunTestWindow()
 
 		auto shader1 = glash::Shader("resources/shaders/shader.shader");
 		
-		auto rect = glash::mesh::RectangleMesh(rect_positions.data(), rect_colors.data(), glash::GLBufferUsage::DYNAMIC_DRAW);
+		auto rect = glash::mesh::RectangleMesh({0.0f, 0.0f, 0.0f}, { 0.8, 0.0, 0.9 }, 0.25, 0.45);
 
 		std::vector<glm::vec3> tri_positoins =
 		{
@@ -123,7 +123,7 @@ inline void RunTestWindow()
 			window.ClearBuffer();
 
 			shader1.Bind();
-			shader1.SetUniform("brightness", 0.25f);
+			shader1.SetUniform("brightness", 1.0f);
 
 			rect.Draw();
 			tri.Draw();
