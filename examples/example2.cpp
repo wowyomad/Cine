@@ -9,7 +9,6 @@
 #include "stb_image.h"
 
 
-
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
@@ -35,9 +34,8 @@ int main()
 
     // build and compile our shader zprogram
     // ------------------------------------
-    glash::ShaderProgram::Builder builder;
-    builder.AddShaders(glash::ParseGLShaders("./resources/shaders/tutorial.shader"));
-    glash::ShaderProgram shader = builder.Build();
+
+    glash::Shader shader("./resources/shaders/tutorial.shader");
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
@@ -94,7 +92,7 @@ int main()
 
     if (data)
     {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
     else
@@ -120,7 +118,7 @@ int main()
         glBindTexture(GL_TEXTURE_2D, texture);
 
         // render container
-        shader.Use();
+        shader.Bind();
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
