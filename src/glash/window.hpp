@@ -2,7 +2,7 @@
 #include "glash/glash_pch.hpp"
 #include <GLFW/glfw3.h>
 
-#include "glash/structures.hpp"
+#include "glash/Enums.hpp"
 #include <functional>
 
 

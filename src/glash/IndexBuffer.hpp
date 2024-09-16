@@ -1,7 +1,7 @@
 #pragma once
 
 #include "glash/glash_pch.hpp"
-#include "glash/structures.hpp"
+#include "glash/Enums.hpp"
 
 namespace glash
 {

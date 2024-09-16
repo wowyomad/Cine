@@ -28,7 +28,7 @@
 #include <filesystem>
 #include <stdio.h>
 #include <stdexcept>
-
+#include <algorithm>
 //maths
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"

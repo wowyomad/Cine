@@ -1,6 +1,6 @@
 #pragma once
 #include "glash/glash_pch.hpp" 
-#include "glash/structures.hpp"
+#include "glash/Enums.hpp"
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_sinks.h"
 #include "spdlog/pattern_formatter.h"

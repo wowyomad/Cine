@@ -23,6 +23,7 @@ namespace glash
 		template <>
 		void SetUniform(const char* name, const float value)
 		{
+
 			GLenum type = GetUniformType(name);
 			if (type != GL_FLOAT)
 			{

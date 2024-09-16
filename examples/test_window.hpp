@@ -1,15 +1,15 @@
 #define GLM_ENABLE_EXPERIMENTAL
-
 #include "glash/glash_pch.hpp"
+
 #include "glash/window.hpp"
+#include "glash/Renderer.hpp"
 #include "glash/shader.hpp"
 #include "glash/mesh_triangle.hpp"
 #include "glash/mesh_rectangle.hpp"
 #include "glash/Shader.hpp"
+#include "glash/helper/file_reader.hpp"
 
 #include "glm/gtx/string_cast.hpp"
-#include "glash/helper/file_reader.hpp"
-#include <algorithm>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -27,6 +27,7 @@ inline void RunTestWindow()
 {
 	try {
 		glash::Window window(800, 800, "Test Window");
+		glash::Renderer renderer;
 
 		window.SetKeyCallback([](GLFWwindow* window, int key, int scanconde, int action, int mods) -> void
 			{
@@ -111,31 +112,44 @@ inline void RunTestWindow()
 		double startTime = glfwGetTime();
 
 
+		const std::vector<float> vertices = {
+			0.5 * -0.5f, 0.5 * -0.5f, 1.0f, 0.0f, 0.0f,
+			0.5 * 0.5f, 0.5 * -0.5f, 0.25f, 0.0f, 0.0f,
+			0.5 * 0.5f, 0.5 * 0.5f, 0.5f, 0.0f, 0.0f,
+			0.5 * -0.5f, 0.5 * 0.5f, 0.75f, 0.0f, 0.0f
+		};
+
+		
+
+		const std::vector<GLuint> indices = {
+			0, 1, 2,
+			0, 2, 3
+		};
+
+		glash::IndexBuffer ib(indices, glash::GLBufferUsage::STATIC_DRAW);
+		glash::VertexBuffer vb(vertices, glash::GLBufferUsage::STATIC_DRAW);
+		glash::VertexBufferLayout layout;
+		layout.Push<float>(2);
+		layout.Push<float>(3);
+		glash::VertexArray va;
+		va.AddBuffer(vb, layout);
+
+	
+
 
 		while (!window.ShouldClose()) {
-			frames++;
-			offset += move;
-
-			if (offset.x >= 0.5f or offset.x <= -0.5f)
-				move = -move;
 
 			window.PollEvents();
 			window.ClearBuffer();
 
 			shader1.Bind();
 			shader1.SetUniform("brightness", 1.0f);
-
 			rect.Draw();
-			tri.Draw();
 
-			shader1.Unbind();
+			renderer.Draw(va, ib, shader1);
 
 			window.SwapBuffers();
 		}
-
-		double elapsed = glfwGetTime() - startTime;
-		fmt::println("Drawn {} frames in {} secoconds;\nFPS {}; Frame Time: {}", frames, elapsed, frames / elapsed, elapsed / frames);
-
 
 	}
 

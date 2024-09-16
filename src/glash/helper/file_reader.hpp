@@ -2,7 +2,7 @@
 
 #include "glash/glash_pch.hpp"
 #include "glash/logger.hpp"
-#include "glash/structures.hpp"
+#include "glash/Enums.hpp"
 
 namespace glash
 {

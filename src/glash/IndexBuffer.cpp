@@ -1,5 +1,5 @@
 #include "glash/IndexBuffer.hpp"
-#include "glash/structures.hpp"
+#include "glash/Enums.hpp"
 #include "glash/logger.hpp"
 
 namespace glash
