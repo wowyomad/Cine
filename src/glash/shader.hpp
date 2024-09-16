@@ -14,10 +14,15 @@ namespace glash
 		Shader(const std::string& filepath);
 		~Shader();
 
+		void Bind() const;
+		void Unbind() const;
+
+		operator bool() const;
+
 		template <class T>
 		void SetUniform(const char* name, const T value)
 		{
-			static_assert(false, "Uniform of type {} is not supported");
+			static_assert(false, "Uniform of type {:0X} is not supported");
 		}
 
 		template <>
@@ -27,7 +32,7 @@ namespace glash
 			GLenum type = GetUniformType(name);
 			if (type != GL_FLOAT)
 			{
-				LOG_ERROR("Received type: {}. Expected type {}.", type, GL_FLOAT);
+				LOG_ERROR("Received type: {:0X}. Expected type {:0X}.", type, GL_FLOAT);
 				return;
 			}
 			GLint location = GetUniformLocation(name);
@@ -38,20 +43,27 @@ namespace glash
 		void SetUniform(const char* name, const glm::vec4& value)
 		{
 			GLenum type = GetUniformType(name);
-			if (type != GL_FLOAT)
+			if (type != GL_FLOAT_VEC4)
 			{
-				LOG_ERROR("Received type: {}. Expected type {}.", type, GL_FLOAT_VEC4);
+				LOG_ERROR("Received type: {:0X}. Expected type {:0X}.", type, GL_FLOAT_VEC4);
 				return;
 			}
 			GLint location = GetUniformLocation(name);
 			GLCall(glUniform4f(location, value.x, value.y, value.z, value.w));
 		}
 
-		void Bind() const;
-		void Unbind() const;
-
-
-		operator bool() const;
+		template <>
+		void SetUniform(const char* name, const int value)
+		{
+			GLenum type = GetUniformType(name);
+			if (type != GL_SAMPLER_2D)
+			{
+				LOG_ERROR("Received type: {:0X}. Expected type {:0X}.", type, GL_SAMPLER_2D);
+				return;
+			}
+			GLint location = GetUniformLocation(name);
+			GLCall(glUniform1i(location, value));
+		}
 
 		class ShaderCompiler
 		{

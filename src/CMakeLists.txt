@@ -4,11 +4,13 @@ set(GLASH_PCH_HEADER "${GLASH_SOURCE_DIR}/glash_pch.hpp")
 file(GLOB SOURCES
     "${GLASH_SOURCE_DIR}/*.cpp"
     "${GLASH_SOURCE_DIR}/helper/*.cpp"
+    "${GLASH_SOURCE_DIR}/vendor/*.cpp"
 )
 
 file(GLOB HEADERS
     "${GLASH_SOURCE_DIR}/*.hpp"
     "${GLASH_SOURCE_DIR}/helper/*.hpp"
+    "${GLASH_SOURCE_DIR}/vendor/*.hpp"
 )
 
 if(GLASH_BUILD_SHARED)

@@ -52,7 +52,7 @@ namespace glash
 		{
 			return uniformLocations[name];
 		}
-		GLint location = glGetUniformLocation(m_ProgramID, "brightness");
+		GLint location = glGetUniformLocation(m_ProgramID, name);
 
 		uniformLocations[name] = location;
 

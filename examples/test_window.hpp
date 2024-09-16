@@ -8,7 +8,7 @@
 #include "glash/mesh_rectangle.hpp"
 #include "glash/Shader.hpp"
 #include "glash/helper/file_reader.hpp"
-
+#include "glash/Texture.hpp"
 #include "glm/gtx/string_cast.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -29,74 +29,10 @@ inline void RunTestWindow()
 		glash::Window window(800, 800, "Test Window");
 		glash::Renderer renderer;
 
-		window.SetKeyCallback([](GLFWwindow* window, int key, int scanconde, int action, int mods) -> void
-			{
-				switch (action)
-				{
-				case GLFW_PRESS:
-				{
-					switch (key)
-					{
-					case GLFW_KEY_ESCAPE:
-						glfwSetWindowShouldClose(window, true);
-						break;
-					default:
-						break;
-					}
-					break;
-				}
-				default:
-					break;
-				}
-
-			}
-		);
-
-		int w = 0, h = 0;
-		window.GetWindowSize(&w, &h);
-
-		std::vector <glm::vec3> rect_positions =
-		{
-		   glm::vec3(300, 300.0f, .0f),
-		   glm::vec3(500, 300.0f, .0f),
-		   glm::vec3(500.0f, 500.0f, .0f),
-			glm::vec3(300.0f, 500.0f, .0f)
-		};
-
-		normalize(rect_positions, w, h);
-
-		std::vector <glm::vec3> rect_colors = 
-		{
-			glm::vec3(0.0f, 0.0f, 1.0f),
-			glm::vec3(1.0f, 0.0f, 0.0f),
-			glm::vec3(0.5f, 0.0f, 0.5f),
-			glm::vec3(0.5, 0.5, 1.0f)
-		};
-
-		auto shader1 = glash::Shader("resources/shaders/shader.shader");
-		
-		auto rect = glash::mesh::RectangleMesh({0.0f, 0.0f, 0.0f}, { 0.8, 0.0, 0.9 }, 0.25, 0.45);
-
-		std::vector<glm::vec3> tri_positoins =
-		{
-			{250.0f, 250.0f, 0.0f},
-			{450.0f, 250.0f, 0.0f},
-			{350.0, 450.0f, 0.0f}
-		};
-
-		normalize(tri_positoins, w, h);
-
-		std::vector<glm::vec3> tri_colors =
-		{
-			glm::vec3(1.0f, 0.0f, 0.0f),
-			glm::vec3(1.0f, 0.0f, 0.0f),
-			glm::vec3(1.0f, 0.0f, 0.0f)
-		};
-
-		auto tri = glash::mesh::TriangleMesh(tri_positoins.data(), tri_colors.data());
-
-
-		if (shader1)
+		auto shader = glash::Shader("resources/shaders/shader_with_texture.shader");
+		auto texture = glash::Texture("resources/textures/face.png");
+		texture.Bind();
+		if (shader)
 		{
 			window.SetClearColor(glash::color::GREEN);
 		}
@@ -105,21 +41,12 @@ inline void RunTestWindow()
 			window.SetClearColor(glash::color::RED);
 		}
 
-		glm::vec3 offset = { 0.0f, 0.0f, 0.0f };
-		glm::vec3 move = { 0.001f, 0.0f, 0.0f };
-
-		size_t frames = 0;
-		double startTime = glfwGetTime();
-
-
 		const std::vector<float> vertices = {
-			0.5 * -0.5f, 0.5 * -0.5f, 1.0f, 0.0f, 0.0f,
-			0.5 * 0.5f, 0.5 * -0.5f, 0.25f, 0.0f, 0.0f,
-			0.5 * 0.5f, 0.5 * 0.5f, 0.5f, 0.0f, 0.0f,
-			0.5 * -0.5f, 0.5 * 0.5f, 0.75f, 0.0f, 0.0f
+			-0.2f, -0.2f,	0.0f, 0.0f,
+			 0.2f, -0.2f,	1.0f, 0.0f,
+			 0.2f,  0.2f,	1.0f, 1.0f,
+			-0.2f,  0.2f,	0.0f, 1.0f
 		};
-
-		
 
 		const std::vector<GLuint> indices = {
 			0, 1, 2,
@@ -130,11 +57,9 @@ inline void RunTestWindow()
 		glash::VertexBuffer vb(vertices, glash::GLBufferUsage::STATIC_DRAW);
 		glash::VertexBufferLayout layout;
 		layout.Push<float>(2);
-		layout.Push<float>(3);
+		layout.Push<float>(2);
 		glash::VertexArray va;
 		va.AddBuffer(vb, layout);
-
-	
 
 
 		while (!window.ShouldClose()) {
@@ -142,11 +67,9 @@ inline void RunTestWindow()
 			window.PollEvents();
 			window.ClearBuffer();
 
-			shader1.Bind();
-			shader1.SetUniform("brightness", 1.0f);
-			rect.Draw();
-
-			renderer.Draw(va, ib, shader1);
+			shader.Bind();
+			shader.SetUniform("u_Texture", 0);
+			renderer.Draw(va, ib, shader);
 
 			window.SwapBuffers();
 		}
