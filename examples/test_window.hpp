@@ -33,7 +33,6 @@ inline void RunTestWindow()
 
 		auto shader = glash::Shader("resources/shaders/shader_with_texture.shader");
 		auto texture = glash::Texture("resources/textures/face.png");
-		texture.Bind();
 		if (shader)
 		{
 			window.SetClearColor(glash::color::GREEN);

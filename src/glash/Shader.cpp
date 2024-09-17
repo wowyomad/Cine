@@ -13,15 +13,6 @@ namespace glash
 		: m_Path(filepath), m_ProgramID(0)
 	{
 		Reload();
-		/*auto shaders = ParseShader(filepath);
-
-		ShaderCompiler builder;
-		for (const auto& shader : shaders)
-		{
-			builder.AddShader(shader);
-		}
-
-		m_ProgramID = builder.CompileAndLink();*/
 
 	}
 	Shader::~Shader()

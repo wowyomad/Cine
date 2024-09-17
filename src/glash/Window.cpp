@@ -31,25 +31,21 @@ namespace glash
 
         glfwMakeContextCurrent(m_pWindow);
 
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
         glfwSetWindowSizeCallback(m_pWindow, [](GLFWwindow* window, int width, int height)
             {
                 glViewport(0, 0, width, height);
             });
-
-
 
         GLenum err = glewInit();
         if (GLEW_OK != err)
         {
             throw std::runtime_error("Failed to initialize GLEW");
         }
-
         fmt::println("OpenGL Version: {}\n", reinterpret_cast<const char*>(glGetString(GL_VERSION)));
 
-
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glBlendEquation(GL_FUNC_ADD);
     }
 
     Window::~Window()
