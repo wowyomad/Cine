@@ -23,6 +23,8 @@ inline void normalize(std::vector<glm::vec3>& positions, int width, int height)
 		pos.y = 2.0f * pos.y / height - 1.0f;
 	}
 }
+glash::Shader* g_Shader = nullptr;
+
 inline void RunTestWindow()
 {
 	try {
@@ -61,6 +63,15 @@ inline void RunTestWindow()
 		glash::VertexArray va;
 		va.AddBuffer(vb, layout);
 
+		g_Shader = &shader;
+
+		window.SetKeyCallback([](GLFWwindow* window, int key, int scancode, int action, int mods) {
+			if (key == GLFW_KEY_F5 && action == GLFW_PRESS) {
+				g_Shader->Reload();
+				std::cout << "Shader reloaded!" << std::endl;
+			}
+			});
+
 
 		while (!window.ShouldClose()) {
 
@@ -68,7 +79,7 @@ inline void RunTestWindow()
 			window.ClearBuffer();
 
 			shader.Bind();
-			shader.SetUniform("u_Texture", 0);
+			shader.SetSamplerSlot("u_Texture", glash::GLSampler::SAMPLER_2D, 0);
 			renderer.Draw(va, ib, shader);
 
 			window.SwapBuffers();

@@ -19,7 +19,7 @@ void main()
 in vec2 v_TexCoord;
 
 out vec4 color;
-uniform sampler2D u_Texture;
+layout(binding = 1) uniform sampler2D u_Texture;
 
 void main()
 {

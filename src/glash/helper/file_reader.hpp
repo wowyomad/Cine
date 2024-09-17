@@ -16,8 +16,7 @@ namespace glash
 		std::ifstream file(full_path, std::ios::binary | std::ios::ate);
 		if (!file)
 		{
-			const std::string message = "Couldn't open file: " + full_path.string();
-			LOG_ERROR(fmt::runtime(message));
+			LOG_ERROR("Couldn't open file: {}", full_path.string());
 			return nullptr;
 		}
 
@@ -27,8 +26,7 @@ namespace glash
 		auto buffer = std::make_unique<char[]>(size + 1);
 		if (!file.read(buffer.get(), size))
 		{
-			const std::string message = "Error reading file: " + full_path.string();
-			LOG_ERROR(fmt::runtime(message));
+			LOG_ERROR("Error reading file: {}", full_path.string());
 			return nullptr;
 		}
 

@@ -59,7 +59,7 @@ namespace glash
 
 	};
 
-	enum GLShaderType
+	enum GLShaderType : GLint
 	{
 		VERTEX_SHADER = GL_VERTEX_SHADER,
 		FRAGMENT_SHADER = GL_FRAGMENT_SHADER,
@@ -69,6 +69,17 @@ namespace glash
 		GEOMETRY_SHADER = GL_GEOMETRY_SHADER,
 		NONE = -1,
 	};
+
+	enum GLSampler : GLint
+	{
+		SAMPLER_1D = GL_SAMPLER_1D,
+		SAMPLER_2D = GL_SAMPLER_2D,
+		SAMPLER_3D = GL_SAMPLER_3D,
+		SAMPLER_CUBE = GL_SAMPLER_CUBE,
+		SAMPLER_1D_SHADOW = GL_SAMPLER_1D_SHADOW,
+		SAMPLER_2D_SHADOW = GL_SAMPLER_2D_SHADOW
+	};
+
 
 	struct ShaderSource
 	{

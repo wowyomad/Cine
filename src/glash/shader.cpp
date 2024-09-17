@@ -12,19 +12,29 @@ namespace glash
 	Shader::Shader(const std::string& filepath)
 		: m_FilePath(filepath), m_ProgramID(0)
 	{
-		auto shaders = ParseShader(filepath);
+		Reload();
+		/*auto shaders = ParseShader(filepath);
+
 		ShaderCompiler builder;
 		for (const auto& shader : shaders)
 		{
 			builder.AddShader(shader);
 		}
 
-		m_ProgramID = builder.CompileAndLink();
+		m_ProgramID = builder.CompileAndLink();*/
 
 	}
 	Shader::~Shader()
 	{
 		GLCall(glDeleteProgram(m_ProgramID));
+	}
+	void Shader::Reload()
+	{
+		auto shaders = ParseShader(m_FilePath);
+
+		if (!CreateShaderProgram(shaders)) {
+			LOG_ERROR("Failed to load shader from {}", m_FilePath);
+		}
 	}
 	void Shader::Bind() const
 	{
@@ -38,51 +48,106 @@ namespace glash
 	{
 		return GLGetStatus(m_ProgramID, GLStatus::PROGRAM_LINK);
 	}
-	bool Shader::CompileShader()
+
+	void Shader::SetSamplerSlot(const char* name, GLSampler sampler, const int slot)
 	{
-		return false;
+		GLenum type = GetUniformType(name);
+		if (type != sampler)
+		{
+			LOG_ERROR("Received type: {:0X}. Expected type {:0X}.", type, GL_INT);
+			return;
+		}
+		GLint location = GetUniformLocation(name);
+		GLCall(glUniform1i(location, slot));
 	}
-	bool Shader::CreateShader()
-	{
-		return false;
-	}
+	
 	GLint Shader::GetUniformLocation(const char* name)
 	{
-		if (uniformLocations.contains(name))
+		if (m_UniformLocations.contains(name))
 		{
-			return uniformLocations[name];
+			return m_UniformLocations[name];
 		}
 		GLint location = glGetUniformLocation(m_ProgramID, name);
 
-		uniformLocations[name] = location;
+		m_UniformLocations[name] = location;
 
 		return location;
 	}
 
 	GLenum Shader::GetUniformType(const char* name)
 	{
-		if (uniformTypes.contains(name))
+		if (m_UniformTypes.contains(name))
 		{
-			return uniformTypes[name];
+			return m_UniformTypes[name];
 		}
 
 		GLenum type;
 		GLint size;
 		GLsizei length;
 		GLCall(glGetActiveUniform(m_ProgramID, GetUniformLocation(name), 0, &length, &size, &type, nullptr));
-		uniformTypes[name] = type;
+		m_UniformTypes[name] = type;
 
 		return type;
 	}
 
-	std::vector<ShaderSource> Shader::ParseShader(const fs::path& filepath)
+	bool Shader::CompileShader(const ShaderSource& shaderSource, GLuint& shaderID)
+	{
+		const char* sourceCode = shaderSource.source.c_str();
+		GLCall(glShaderSource(shaderID, 1, &sourceCode, nullptr));
+		GLCall(glCompileShader(shaderID));
+
+		bool success = GLGetStatus(shaderID, GLStatus::SHADER_COMPILE);
+		if (!success) {
+			LOG_ERROR("Shader compilation failed for type {}", static_cast<GLuint>(shaderSource.type));
+			glDeleteShader(shaderID);
+			return false;
+		}
+		return true;
+	}
+
+	bool Shader::CreateShaderProgram(const std::vector<ShaderSource>& sources)
+	{
+		GLuint programID = glCreateProgram();
+		std::vector<GLuint> compiledShaders;
+
+		for (const auto& source : sources) {
+			GLuint shaderID;
+			GLCall(shaderID = glCreateShader(source.type));
+			if (CompileShader(source, shaderID)) {
+				GLCall(glAttachShader(programID, shaderID));
+				compiledShaders.push_back(shaderID);
+			}
+			else {
+				return false;
+			}
+		}
+
+		GLCall(glLinkProgram(programID));
+		bool success = GLGetStatus(programID, GLStatus::PROGRAM_LINK);
+		if (!success) {
+			LOG_ERROR("Program linking failed.");
+			GLCall(glDeleteProgram(programID));
+			return false;
+		}
+
+		for (GLuint shaderID : compiledShaders) {
+			GLCall(glDeleteShader(shaderID));
+		}
+
+		if (m_ProgramID != 0) {
+			GLCall(glDeleteProgram(m_ProgramID));
+		}
+		m_ProgramID = programID;
+		return true;
+	}
+
+	std::vector<ShaderSource> Shader::ParseShader(const std::string& filepath)
 	{
 		std::ifstream file(filepath);
 
 		if (!file)
 		{
-			const std::string message = "Couldn't open file: " + filepath.string();
-			LOG_ERROR(fmt::runtime(message));
+			LOG_ERROR("Coudln't open file {}", filepath);
 			return {};
 		}
 
@@ -116,7 +181,7 @@ namespace glash
 				}
 				else
 				{
-					LOG_ERROR("File {} doesn't begin with #shader <type>", filepath.string());
+					LOG_ERROR("File {} doesn't begin with #shader <type>", filepath);
 					return {};
 				}
 			}
@@ -157,14 +222,13 @@ namespace glash
 		m_Shaders.clear();
 	}
 
-
-	GLuint Shader::ShaderCompiler::CompileAndLink()
+	GLuint Shader::ShaderCompiler::CompileAndLink(GLuint programID)
 	{
 		std::map<GLuint, bool> requiredShaders{
 			{GLShaderType::VERTEX_SHADER, false},
 			{GLShaderType::FRAGMENT_SHADER, false}
 		};
-		GLuint programID = glCreateProgram();
+
 		bool success = true;
 		for (GLuint shader : m_Shaders)
 		{
@@ -182,6 +246,7 @@ namespace glash
 			if (!success)
 			{
 				LOG_ERROR("Shader {} didn't compile", shader);
+				return 0;
 			}
 
 
@@ -210,11 +275,24 @@ namespace glash
 		if (!success)
 		{
 			LOG_ERROR("Program link failed");
+			return 0;
 		}
 
 		CleanShaders();
 
 		return programID;
+	}
+
+	GLuint Shader::ShaderCompiler::CompileAndLink()
+	{
+		
+		GLuint programID = glCreateProgram();
+		GLuint resultID = CompileAndLink(programID);
+		if (resultID == 0)
+		{
+			GLCall(glDeleteProgram(programID));
+			return 0;
+		}
 	}
 
 }
