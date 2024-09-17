@@ -12,6 +12,8 @@ namespace glash
 		Texture(const std::string& path);
 		~Texture();
 
+		void LoadTexture(const std::string& path);
+
 		void Bind(const GLuint slot = 0) const;
 		void Unbind() const;
 	
@@ -21,7 +23,7 @@ namespace glash
 
 	private:
 		GLuint m_RendererID;
-		std::string m_FilePath;
+		std::string m_Path;
 		std::unique_ptr<unsigned char[], StbiImageDeleter> m_LocalBuffer;
 		int m_Width, m_Height, m_Bits;
 	};

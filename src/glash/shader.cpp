@@ -10,7 +10,7 @@ namespace glash
 	{
 	}
 	Shader::Shader(const std::string& filepath)
-		: m_FilePath(filepath), m_ProgramID(0)
+		: m_Path(filepath), m_ProgramID(0)
 	{
 		Reload();
 		/*auto shaders = ParseShader(filepath);
@@ -30,10 +30,10 @@ namespace glash
 	}
 	void Shader::Reload()
 	{
-		auto shaders = ParseShader(m_FilePath);
+		auto shaders = ParseShader(m_Path);
 
 		if (!CreateShaderProgram(shaders)) {
-			LOG_ERROR("Failed to load shader from {}", m_FilePath);
+			LOG_ERROR("Failed to load shader from {}", m_Path);
 		}
 	}
 	void Shader::Bind() const
@@ -201,98 +201,4 @@ namespace glash
 		};
 		return sources;
 	}
-
-
-	void Shader::ShaderCompiler::AddShader(const ShaderSource& source)
-	{
-		const char* rawData = source.source.c_str();
-
-		GLuint shader = glCreateShader(source.type);
-		GLCall(glShaderSource(shader, 1, &rawData, nullptr));
-
-		m_Shaders.push_back(shader);
-	}
-
-	void Shader::ShaderCompiler::CleanShaders()
-	{
-		for (GLuint shader : m_Shaders)
-		{
-			glDeleteShader(shader);
-		}
-		m_Shaders.clear();
-	}
-
-	GLuint Shader::ShaderCompiler::CompileAndLink(GLuint programID)
-	{
-		std::map<GLuint, bool> requiredShaders{
-			{GLShaderType::VERTEX_SHADER, false},
-			{GLShaderType::FRAGMENT_SHADER, false}
-		};
-
-		bool success = true;
-		for (GLuint shader : m_Shaders)
-		{
-			GLint shaderType = GLGetStatus(shader, GLStatus::GLShaderType);
-			if (!requiredShaders.contains(shaderType))
-			{
-				LOG_WARN("Tried to add unsupported shader type {}", shaderType);
-				continue;
-			}
-
-			GLCall(glCompileShader(shader));
-
-
-			GLCall(success = GLGetStatus(shader, GLStatus::SHADER_COMPILE));
-			if (!success)
-			{
-				LOG_ERROR("Shader {} didn't compile", shader);
-				return 0;
-			}
-
-
-			GLCall(glAttachShader(programID, shader));
-			requiredShaders[shaderType] = true;
-		}
-
-		for (auto [shaderType, present] : requiredShaders)
-		{
-			if (!present)
-			{
-				LOG_WARN("Program doesn't contain required shader of type {}", shaderType);
-				success = false;
-				break;
-			}
-		}
-
-		if (!success)
-		{
-			return 0;
-		}
-
-		GLCall(glLinkProgram(programID));
-
-		success = GLGetStatus(programID, GLStatus::PROGRAM_LINK);
-		if (!success)
-		{
-			LOG_ERROR("Program link failed");
-			return 0;
-		}
-
-		CleanShaders();
-
-		return programID;
-	}
-
-	GLuint Shader::ShaderCompiler::CompileAndLink()
-	{
-		
-		GLuint programID = glCreateProgram();
-		GLuint resultID = CompileAndLink(programID);
-		if (resultID == 0)
-		{
-			GLCall(glDeleteProgram(programID));
-			return 0;
-		}
-	}
-
 }

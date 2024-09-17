@@ -33,19 +33,6 @@ namespace glash
 
 		void SetSamplerSlot(const char* name, GLSampler sampler, const int slot);
 
-
-		class ShaderCompiler
-		{
-		public:
-			void AddShader(const ShaderSource& shaderSource);
-			void CleanShaders();
-			GLuint CompileAndLink();
-			GLuint CompileAndLink(GLuint programID);
-
-
-		private:
-			std::vector<GLuint> m_Shaders = {};
-		};
 	private:
 		bool CompileShader(const ShaderSource& shaderSource, GLuint& shaderID);
 		bool CreateShaderProgram(const std::vector<ShaderSource>& sources);
@@ -55,7 +42,7 @@ namespace glash
 		GLenum GetUniformType(const char* name);
 
 	private:
-		std::string m_FilePath;
+		std::string m_Path;
 		GLuint m_ProgramID;
 		std::unordered_map<std::string, GLint> m_UniformLocations;
 		std::unordered_map<std::string, GLenum> m_UniformTypes;

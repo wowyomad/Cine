@@ -12,14 +12,25 @@ namespace glash
 	{
 	}
 	Texture::Texture(const std::string& path)
-		: m_RendererID(0), m_FilePath(), m_LocalBuffer(nullptr), m_Bits(0), m_Height(0), m_Width(0)
+		: m_RendererID(0), m_Path(), m_LocalBuffer(nullptr), m_Bits(0), m_Height(0), m_Width(0)
+	{
+		LoadTexture(path);
+	}
+	Texture::~Texture()
+	{
+		GLCall(glDeleteTextures(1, &m_RendererID));
+	}
+	void Texture::LoadTexture(const std::string& path)
 	{
 		stbi_set_flip_vertically_on_load(true);
 		unsigned char* buffer = stbi_load(path.c_str(), &m_Width, &m_Height, &m_Bits, 4);
-		if (buffer)
+		if (!buffer)
 		{
-			m_LocalBuffer = std::unique_ptr<unsigned char[], StbiImageDeleter>(buffer);
+			LOG_ERROR("Couldn't load texture {}", path);
 		}
+
+		m_LocalBuffer = std::unique_ptr<unsigned char[], StbiImageDeleter>(buffer);
+		m_Path = path;
 
 		GLCall(glGenTextures(1, &m_RendererID));
 		GLCall(glBindTexture(GL_TEXTURE_2D, m_RendererID));
@@ -32,10 +43,6 @@ namespace glash
 		GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_Width, m_Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_LocalBuffer.get()));
 
 		GLCall(glBindTexture(GL_TEXTURE_2D, 0));
-	}
-	Texture::~Texture()
-	{
-		GLCall(glDeleteTextures(1, &m_RendererID));
 	}
 	void Texture::Bind(const GLuint slot) const
 	{
