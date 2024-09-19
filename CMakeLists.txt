@@ -85,7 +85,6 @@ if(TARGET spdlog)
 else()
     message("GLM target is not available")
 endif()
-    
 
 find_package(OpenGL REQUIRED)
 
