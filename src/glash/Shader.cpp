@@ -35,9 +35,70 @@ namespace glash
 	{
 		GLCall(glUseProgram(0));
 	}
-	Shader::operator bool() const
+
+	bool Shader::isLinked() const
 	{
 		return GLGetStatus(m_ProgramID, GLStatus::PROGRAM_LINK);
+	}
+
+	void Shader::SetUniform(const char* name, const float value)
+	{
+		GLenum type = GetUniformType(name);
+		if (type != GL_FLOAT)
+		{
+			LOG_ERROR("Received type: {:0X}. Expected type {:0X}.", type, GL_FLOAT);
+			return;
+		}
+		GLint location = GetUniformLocation(name);
+		GLCall(glUniform1f(location, value));
+	}
+
+	void Shader::SetUniform(const char* name, const glm::vec4& value)
+	{
+		GLenum type = GetUniformType(name);
+		if (type != GL_FLOAT_VEC4)
+		{
+			LOG_ERROR("Received type: {:0X}. Expected type {:0X}.", type, GL_FLOAT_VEC4);
+			return;
+		}
+		GLint location = GetUniformLocation(name);
+		GLCall(glUniform4f(location, value.x, value.y, value.z, value.w));
+	}
+
+	void Shader::SetUniform(const char* name, const int value)
+	{
+		GLenum type = GetUniformType(name);
+		if (type != GL_INT)
+		{
+			LOG_ERROR("Received type: {:0X}. Expected type {:0X}.", type, GL_INT);
+			return;
+		}
+		GLint location = GetUniformLocation(name);
+		GLCall(glUniform1i(location, value));
+	}
+
+	void Shader::SetUniform(const char* name, const bool value)
+	{
+		GLenum type = GetUniformType(name);
+		if (type != GL_BOOL)
+		{
+			LOG_ERROR("Received type: {:0X}. Expected type {:0X}.", type, GL_BOOL);
+			return;
+		}
+		GLint location = GetUniformLocation(name);
+		glUniformMatrix4fv(location, 1, GL_FALSE, reinterpret_cast<const float*>(&value));
+	}
+
+	void Shader::SetUniform(const char* name, const glm::mat4& value)
+	{
+		GLenum type = GetUniformType(name);
+		if (type != GL_FLOAT_MAT4)
+		{
+			LOG_ERROR("Received type: {:0X}. Expected type {:0X}.", type, GL_FLOAT_MAT4);
+			return;
+		}
+		GLint location = GetUniformLocation(name);
+		glUniformMatrix4fv(location, 1, GL_FALSE, reinterpret_cast<const float*>(&value));
 	}
 
 	void Shader::SetSamplerSlot(const char* name, GLSampler sampler, const int slot)

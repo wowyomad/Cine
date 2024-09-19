@@ -12,13 +12,16 @@ namespace glash
     {
 
     public:
-        Window(int width, int height, const std::string& title, const Color& clearColor = color::RED);
+        Window(int width, int height, const std::string& title, const Color& clearColor = color::GRAY);
         ~Window();
 
         void PollEvents() const;
         bool ShouldClose() const;
         void ClearBuffer();
         void SwapBuffers() const;
+
+        GLFWwindow* GetPtr();
+        std::string GetGLVersion() const;
 
     public:
         void GetWindowSize(int* w, int* h) const;

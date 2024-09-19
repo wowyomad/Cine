@@ -9,14 +9,10 @@ namespace glash
     {
         glash::initLogger();
 
-        LOG_INFO("Window constructor!");
-
-
         if (!glfwInit())
         {
             throw std::runtime_error("Failed to initialize GLFW");
         }
-
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -73,6 +69,22 @@ namespace glash
     void Window::SwapBuffers() const
     {
         glfwSwapBuffers(m_pWindow);
+    }
+
+    GLFWwindow* Window::GetPtr()
+    {
+
+        return m_pWindow;
+    }
+
+    std::string Window::GetGLVersion() const
+    {
+        const char* version = reinterpret_cast<const char*>(glGetString(GL_VERSION));
+        int major, minor;
+        sscanf(version, "%d.%d", &major, &minor);
+        int versionNumber = major * 100 + minor * 10;
+
+        return std::string("#version ") + std::to_string(versionNumber);
     }
 
     void Window::GetWindowSize(int* w, int* h) const

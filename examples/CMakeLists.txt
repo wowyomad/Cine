@@ -1,6 +1,26 @@
 cmake_minimum_required(VERSION 3.10)
 project(TimingExample)
 
+include(FetchContent)
+FetchContent_Declare(
+    imgui
+    GIT_REPOSITORY https://github.com/ocornut/imgui.git
+    GIT_TAG v1.91.2
+)
+
+FetchContent_MakeAvailable(imgui)
+message("Imgui dir: ${imgui_SOURCE_DIR}")
+add_library(imgui STATIC
+    ${imgui_SOURCE_DIR}/imgui.cpp
+    ${imgui_SOURCE_DIR}/imgui_draw.cpp
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
+    ${imgui_SOURCE_DIR}/imgui_widgets.cpp
+    ${imgui_SOURCE_DIR}/imgui_tables.cpp
+)
+target_include_directories(imgui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(imgui PUBLIC ${glfw_SOURCE_DIR}/include)
+
 # Set directories
 set(RESOURCES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/resources)
 set(SHADERS_DIR ${RESOURCES_DIR}/shaders)
@@ -84,15 +104,18 @@ add_custom_target(clean_images
 set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${SHADERS_OUT_DIR})
 set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${TEXTURES_OUT_DIR})
 
-add_executable(example1 example1.cpp)
+add_executable(example1 "glash_example.cpp")
 add_dependencies(example1 copy_shaders copy_images)
 
-add_executable(example2 example2.cpp)
+add_executable(example2 "imgui_example.cpp")
 add_dependencies(example2 copy_shaders copy_images)
 
+target_link_libraries(example1 PRIVATE glash imgui)
+target_link_libraries(example2 PRIVATE glash imgui)
 
-target_link_libraries(example1 PRIVATE glash)
-target_link_libraries(example2 PRIVATE glash)
+target_include_directories(example1 PRIVATE ${imgui_SOURCE_DIR})
+target_include_directories(example2 PRIVATE ${imgui_SOURCE_DIR})
+
 
 set(GLASH_PCH_HEADER "${CMAKE_SOURCE_DIR}/src/glash/glash_pch.hpp")
 target_precompile_headers(example1 PRIVATE ${GLASH_PCH_HEADER})

@@ -17,19 +17,14 @@ namespace glash
 		void Bind() const;
 		void Unbind() const;
 
-		operator bool() const;
-
-		template <class T>
-		void SetUniform(const char* name, const T value)
-		{
-			static_assert(false, "Uniform of type {:0X} is not supported");
-		}
-		template <>
-		void SetUniform(const char* name, const float value);
-		template <>
-		void SetUniform(const char* name, const glm::vec4& value);
-		template <>
-		void SetUniform(const char* name, const int value);
+		inline operator bool() const { return isLinked(); }
+		bool isLinked() const;
+		
+		void SetUniform(const char* name, const float fValue);
+		void SetUniform(const char* name, const int iValue);
+		void SetUniform(const char* name, const bool bValue);
+		void SetUniform(const char* name, const glm::vec4& v4Value);
+		void SetUniform(const char* name, const glm::mat4& m4Value);
 
 		void SetSamplerSlot(const char* name, GLSampler sampler, const int slot);
 
@@ -47,40 +42,4 @@ namespace glash
 		std::unordered_map<std::string, GLint> m_UniformLocations;
 		std::unordered_map<std::string, GLenum> m_UniformTypes;
 	};
-	template<>
-	inline void Shader::SetUniform(const char* name, const float value)
-	{
-		GLenum type = GetUniformType(name);
-		if (type != GL_FLOAT)
-		{
-			LOG_ERROR("Received type: {:0X}. Expected type {:0X}.", type, GL_FLOAT);
-			return;
-		}
-		GLint location = GetUniformLocation(name);
-		GLCall(glUniform1f(location, value));
-	}
-	template<>
-	inline void Shader::SetUniform(const char* name, const glm::vec4& value)
-	{
-		GLenum type = GetUniformType(name);
-		if (type != GL_FLOAT_VEC4)
-		{
-			LOG_ERROR("Received type: {:0X}. Expected type {:0X}.", type, GL_FLOAT_VEC4);
-			return;
-		}
-		GLint location = GetUniformLocation(name);
-		GLCall(glUniform4f(location, value.x, value.y, value.z, value.w));
-	}
-	template<>
-	inline void Shader::SetUniform(const char* name, const int value)
-	{
-		GLenum type = GetUniformType(name);
-		if (type != GL_INT)
-		{
-			LOG_ERROR("Received type: {:0X}. Expected type {:0X}.", type, GL_INT);
-			return;
-		}
-		GLint location = GetUniformLocation(name);
-		GLCall(glUniform1i(location, value));
-	}
 }

@@ -1,31 +1,14 @@
-#define GLM_ENABLE_EXPERIMENTAL
 #include "glash/glash_pch.hpp"
 
-#include "glash/window.hpp"
+#include "glash/Window.hpp"
 #include "glash/Renderer.hpp"
-#include "glash/shader.hpp"
-#include "glash/mesh_triangle.hpp"
-#include "glash/mesh_rectangle.hpp"
 #include "glash/Shader.hpp"
-#include "glash/helper/file_reader.hpp"
 #include "glash/Texture.hpp"
-#include "glm/gtx/string_cast.hpp"
-
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
 
 
-inline void normalize(std::vector<glm::vec3>& positions, int width, int height)
-{
-	for (glm::vec3& pos : positions)
-	{
-		pos.x = 2.0f * pos.x / width - 1.0f;
-		pos.y = 2.0f * pos.y / height - 1.0f;
-	}
-}
 glash::Shader* g_Shader = nullptr;
 
-inline void RunTestWindow()
+int main(int argc, char** argv)
 {
 	try {
 		glash::Window window(800, 800, "Test Window");
@@ -33,6 +16,8 @@ inline void RunTestWindow()
 
 		auto shader = glash::Shader("resources/shaders/shader_with_texture.shader");
 		auto texture = glash::Texture("resources/textures/face.png");
+		float modelWidth = 512, modelHeight = 512;
+		float modelScale = 0.5;
 		if (shader)
 		{
 			window.SetClearColor(glash::color::GREEN);
@@ -43,10 +28,10 @@ inline void RunTestWindow()
 		}
 
 		const std::vector<float> vertices = {
-			-0.2f, -0.2f,	0.0f, 0.0f,
-			 0.2f, -0.2f,	1.0f, 0.0f,
-			 0.2f,  0.2f,	1.0f, 1.0f,
-			-0.2f,  0.2f,	0.0f, 1.0f
+			modelWidth / 2,	-modelHeight / 2,	0.0f, 0.0f,
+			-modelWidth / 2, -modelHeight / 2,	1.0f, 0.0f,
+			-modelWidth / 2, modelHeight / 2,	1.0f, 1.0f,
+			modelWidth / 2, modelHeight / 2,	0.0f, 1.0f
 		};
 
 		const std::vector<GLuint> indices = {
@@ -65,20 +50,35 @@ inline void RunTestWindow()
 		g_Shader = &shader;
 
 		window.SetKeyCallback([](GLFWwindow* window, int key, int scancode, int action, int mods) {
-			if (key == GLFW_KEY_F5 && action == GLFW_PRESS) {
-				g_Shader->Reload();
-				std::cout << "Shader reloaded!" << std::endl;
+			if (action == GLFW_PRESS)
+			{
+				if (key == GLFW_KEY_F5) {
+					g_Shader->Reload();
+					std::cout << "Shader reloaded!" << std::endl;
+				}
 			}
 			});
 
 
 		while (!window.ShouldClose()) {
-
 			window.PollEvents();
+
+			int w, h;
+			window.GetWindowSize(&w, &h);
+
 			window.ClearBuffer();
 
 			shader.Bind();
 			shader.SetSamplerSlot("u_Texture", glash::GLSampler::SAMPLER_2D, 0);
+
+			auto projection = glm::ortho<float>(0, w, 0, h);
+			auto model = glm::mat4(1.0f);
+			model = glm::translate(model, { w / 2, h / 2, 0 });
+			model = glm::scale(model, { modelScale, modelScale, 1.0 });
+
+			glm::mat4 MVP = projection * model;
+			shader.SetUniform("uMVP", MVP);
+
 			renderer.Draw(va, ib, shader);
 
 			window.SwapBuffers();
