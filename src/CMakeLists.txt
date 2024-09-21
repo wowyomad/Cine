@@ -1,6 +1,37 @@
 set(GLASH_SOURCE_DIR "glash")
 set(GLASH_PCH_HEADER "${GLASH_SOURCE_DIR}/glash_pch.hpp")
 
+if(TARGET libglew_static)
+    set_target_properties(libglew_static PROPERTIES FOLDER "Dependencies")
+else()
+    message("Static GLEW target is not available")
+endif()
+if(TARGET glfw)
+    set_target_properties(glfw PROPERTIES FOLDER "Dependencies")
+else()
+    message("GLFW target is not available")
+endif()
+if(TARGET fmt)
+    set_target_properties(fmt PROPERTIES FOLDER "Dependencies")
+else()
+    message("FMT target is not available")
+endif()
+
+if(TARGET glm)
+    set_target_properties(glm PROPERTIES FOLDER "Dependencies")
+else()
+    message("GLM target is not available")
+endif()
+if(TARGET spdlog)
+    set_target_properties(spdlog PROPERTIES FOLDER "Dependencies")
+else()
+    message("GLM target is not available")
+endif()
+
+find_package(OpenGL REQUIRED)
+
+
+
 file(GLOB SOURCES
     "${GLASH_SOURCE_DIR}/*.cpp"
     "${GLASH_SOURCE_DIR}/helper/*.cpp"

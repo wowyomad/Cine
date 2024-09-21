@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(TimingExample)
+project(Examples)
 
 include(FetchContent)
 FetchContent_Declare(
@@ -32,83 +32,34 @@ set(RESOURCES_OUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/resources)
 set(SHADERS_OUT_DIR ${RESOURCES_OUT_DIR}/shaders)
 set(TEXTURES_OUT_DIR ${RESOURCES_OUT_DIR}/textures)
 
-file(GLOB SHADER_FILES
-    "${SHADERS_DIR}/*.frag"
-    "${SHADERS_DIR}/*.vert"
-    "${SHADERS_DIR}/*.shader"
-)
+file(GLOB SHADER_FILES "${SHADERS_DIR}/*.frag" "${SHADERS_DIR}/*.vert" "${SHADERS_DIR}/*.shader")
+file(GLOB TEXTURE_FILES "${TEXTURES_DIR}/*.png" "${TEXTURES_DIR}/*.jpg")
 
-file(GLOB IMAGE_FILES
-    "${TEXTURES_DIR}/*.png"
-    "${TEXTURES_DIR}/*.jpg"
-)
+# Utility function for shader/image copying
+function(copy_files FILE_LIST DEST_DIR TARGET_NAME)
+    foreach(FILE ${FILE_LIST})
+        get_filename_component(NAME ${FILE} NAME)
+        set(DEST_FILE ${DEST_DIR}/${NAME})
+        add_custom_command(
+            OUTPUT ${DEST_FILE}
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${FILE} ${DEST_FILE}
+            COMMENT "Copying ${NAME} to ${DEST_DIR}"
+            DEPENDS ${FILE}
+        )
+        list(APPEND COPY_TARGETS ${DEST_FILE})
+    endforeach()
+    add_custom_target(${TARGET_NAME} ALL DEPENDS ${COPY_TARGETS})
+endfunction()
 
-# Create the shaders output directory
-add_custom_command(
-    OUTPUT ${SHADERS_OUT_DIR}
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${SHADERS_OUT_DIR}
-    COMMENT "Creating shaders output directory"
-)
-# Create the images output directory
-add_custom_command(
-    OUTPUT ${TEXTURES_OUT_DIR}
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${TEXTURES_OUT_DIR}
-    COMMENT "Creating images output directory"
-)
-
-# Copy shader files
-foreach(SHADER_FILE ${SHADER_FILES})
-    get_filename_component(SHADER_NAME ${SHADER_FILE} NAME)
-    set(DEST_FILE ${SHADERS_OUT_DIR}/${SHADER_NAME})
-    
-    add_custom_command(
-        OUTPUT ${DEST_FILE}
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${SHADER_FILE} ${DEST_FILE}
-        COMMAND ${CMAKE_COMMAND} -E echo "Copied ${SHADER_NAME} to output directory"
-        COMMENT "Checking if ${SHADER_NAME} needs to be copied"
-        DEPENDS ${SHADER_FILE}
-    )
-    
-    list(APPEND COPIED_SHADERS ${DEST_FILE})
-endforeach()
-# Copy image files
-foreach(IMAGE_FILE ${IMAGE_FILES})
-    get_filename_component(IMAGE_NAME ${IMAGE_FILE} NAME)
-    set(DEST_FILE ${TEXTURES_OUT_DIR}/${IMAGE_NAME})
-    
-    add_custom_command(
-        OUTPUT ${DEST_FILE}
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${IMAGE_FILE} ${DEST_FILE}
-        COMMAND ${CMAKE_COMMAND} -E echo "Copied ${IMAGE_NAME} to output directory"
-        COMMENT "Checking if ${IMAGE_NAME} needs to be copied"
-        DEPENDS ${IMAGE_FILE}
-    )
-    
-    list(APPEND COPIED_TEXTURES ${DEST_FILE})
-endforeach()
-
-# Create custom targets for shaders and images
-add_custom_target(copy_shaders ALL DEPENDS ${COPIED_SHADERS})
-add_custom_target(copy_images ALL DEPENDS ${COPIED_TEXTURES})
-
-# Clean up shaders and images directories
-add_custom_target(clean_shaders
-    COMMAND ${CMAKE_COMMAND} -E remove_directory ${SHADERS_OUT_DIR}
-    COMMENT "Removing shaders directory and its contents"
-)
-add_custom_target(clean_images
-    COMMAND ${CMAKE_COMMAND} -E remove_directory ${TEXTURES_OUT_DIR}
-    COMMENT "Removing images directory and its contents"
-)
-
-set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${SHADERS_OUT_DIR})
-set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${TEXTURES_OUT_DIR})
+# Copy shaders and textures
+copy_files("${SHADER_FILES}" "${SHADERS_OUT_DIR}" copy_shaders)
+copy_files("${TEXTURE_FILES}" "${TEXTURES_OUT_DIR}" copy_textures)
 
 add_executable(example1 "glash_example.cpp")
-add_dependencies(example1 copy_shaders copy_images)
+add_dependencies(example1 copy_shaders copy_textures)
 
 add_executable(example2 "imgui_example.cpp")
-add_dependencies(example2 copy_shaders copy_images)
+add_dependencies(example2 copy_shaders copy_textures)
 
 target_link_libraries(example1 PRIVATE glash imgui)
 target_link_libraries(example2 PRIVATE glash imgui)
@@ -131,6 +82,6 @@ set_target_properties(example1 example2 PROPERTIES
     VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>"
 )
 
-set_target_properties(copy_shaders clean_shaders copy_images clean_images PROPERTIES
+set_target_properties(copy_shaders copy_textures PROPERTIES
     FOLDER "Examples"
 )

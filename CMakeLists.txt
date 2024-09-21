@@ -8,21 +8,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(GLASH_BUILD_SHARED OFF CACHE BOOL "Build glash as a shared library"  FORCE)
 set(GLASH_BUILD_EXAMPLES ON CACHE BOOL "Build examples"  FORCE)
 
-#Dependency properties
-
 # Might be needed for planned hot reload.
 set(CMAKE_POSITION_INDEPENDENT_CODE ON CACHE BOOL "" FORCE) 
+
 # User folders to hide dependency targets
 set_property(GLOBAL PROPERTY USE_FOLDER ON)
 set(SPDLOG_FMT_EXTERNAL ON CACHE BOOL "Use fetched fmt instead of bundled" FORCE)
 set(glew-cmake_BUILD_SHARED OFF CACHE BOOL "Build GLEW as a shared library" FORCE)
 set(glew-cmake_BUILD_STATIC ON CACHE BOOL "Build GLEW as a static library" FORCE)
 set(GLFW_BUILD_WAYLAND OFF CACHE BOOL "Enable wayland scanner" FORCE)
-
-# Use vendor OpenGL 
-if (POLICY CMP0072)
-    cmake_policy(SET CMP0072 NEW)
-endif()
 
 include(FetchContent)
 FetchContent_Declare(
@@ -59,34 +53,11 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(glew glfw fmt glm spdlog stb)
 
-if(TARGET libglew_static)
-    set_target_properties(libglew_static PROPERTIES FOLDER "Dependencies")
-else()
-    message("Static GLEW target is not available")
-endif()
-if(TARGET glfw)
-    set_target_properties(glfw PROPERTIES FOLDER "Dependencies")
-else()
-    message("GLFW target is not available")
-endif()
-if(TARGET fmt)
-    set_target_properties(fmt PROPERTIES FOLDER "Dependencies")
-else()
-    message("FMT target is not available")
-endif()
 
-if(TARGET glm)
-    set_target_properties(glm PROPERTIES FOLDER "Dependencies")
-else()
-    message("GLM target is not available")
+# Use vendor OpenGL 
+if (POLICY CMP0072)
+    cmake_policy(SET CMP0072 NEW)
 endif()
-if(TARGET spdlog)
-    set_target_properties(spdlog PROPERTIES FOLDER "Dependencies")
-else()
-    message("GLM target is not available")
-endif()
-
-find_package(OpenGL REQUIRED)
 
 add_subdirectory(src)
 if (GLASH_BUILD_EXAMPLES)
