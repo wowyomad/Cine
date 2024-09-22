@@ -1,6 +1,12 @@
 set(GLASH_SOURCE_DIR "glash")
 set(GLASH_PCH_HEADER "${GLASH_SOURCE_DIR}/glash_pch.hpp")
 
+
+if(TARGET imgui)
+    set_target_properties(imgui PROPERTIES FOLDER "ui")
+else()
+    message("imgui not available")
+endif()
 if(TARGET libglew_static)
     set_target_properties(libglew_static PROPERTIES FOLDER "Dependencies")
 else()
@@ -25,7 +31,7 @@ endif()
 if(TARGET spdlog)
     set_target_properties(spdlog PROPERTIES FOLDER "Dependencies")
 else()
-    message("GLM target is not available")
+    message("spdlog target is not available")
 endif()
 
 find_package(OpenGL REQUIRED)
@@ -63,6 +69,7 @@ target_include_directories(glash
     PUBLIC ${spdlog_SOURCE_DIR}/include
     PUBLIC ${glm_SOURCE_DIR}/include
     PUBLIC ${stb_SOURCE_DIR}
+    PUBLIC ${imgui_SOURCE_DIR}
 )
 
 target_link_libraries(glash
@@ -72,7 +79,20 @@ target_link_libraries(glash
     PUBLIC fmt
     PUBLIC glm
     PUBLIC spdlog::spdlog
+    PUBLIC imgui
 )
+
+add_library(imgui STATIC
+    ${imgui_SOURCE_DIR}/imgui.cpp
+    ${imgui_SOURCE_DIR}/imgui_draw.cpp
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
+    ${imgui_SOURCE_DIR}/imgui_widgets.cpp
+    ${imgui_SOURCE_DIR}/imgui_tables.cpp
+)
+target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR} ${glfw_SOURCE_DIR}/include)
+
+
 if(MSVC)
     target_compile_options(glash PRIVATE $<$<CONFIG:Debug>:/Zi>)
     target_link_options(glash PRIVATE $<$<CONFIG:Debug>:/INCREMENTAL>)

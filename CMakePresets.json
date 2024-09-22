@@ -9,7 +9,11 @@
       "installDir": "${sourceDir}/out/install/${presetName}",
       "cacheVariables": {
         "CMAKE_C_COMPILER": "cl.exe",
-        "CMAKE_CXX_COMPILER": "cl.exe"
+        "CMAKE_CXX_COMPILER": "cl.exe",
+        "CMAKE_LINKER": "link.exe",
+        "CMAKE_NM": "dumpbin.exe",
+        "CMAKE_AR": "lib.exe",
+        "CMAKE_RANLIB": null,
       },
       "warnings": { "dev": false },
       "condition": {

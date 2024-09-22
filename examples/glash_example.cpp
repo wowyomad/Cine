@@ -75,8 +75,9 @@ int main(int argc, char** argv)
 			auto model = glm::mat4(1.0f);
 			model = glm::translate(model, { w / 2, h / 2, 0 });
 			model = glm::scale(model, { modelScale, modelScale, 1.0 });
+			auto view = glm::translate(glm::mat4(1.0f), {0.0f, 0.0f, 0.0f});
 
-			glm::mat4 MVP = projection * model;
+			glm::mat4 MVP = projection * model * view;
 			shader.SetUniform("uMVP", MVP);
 
 			renderer.Draw(va, ib, shader);

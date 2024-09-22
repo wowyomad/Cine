@@ -28,6 +28,8 @@ int main()
 	
 	while (!window.ShouldClose())
 	{
+        window.ClearBuffer();
+
 		window.PollEvents();
 		
 		ImGui_ImplOpenGL3_NewFrame();
@@ -59,7 +61,7 @@ int main()
 
         // Rendering
         ImGui::Render();
-        window.ClearBuffer();
+
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         window.SwapBuffers();

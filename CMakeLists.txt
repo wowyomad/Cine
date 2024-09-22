@@ -7,6 +7,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Project properties
 set(GLASH_BUILD_SHARED OFF CACHE BOOL "Build glash as a shared library"  FORCE)
 set(GLASH_BUILD_EXAMPLES ON CACHE BOOL "Build examples"  FORCE)
+set(GLASH_BUILD_TESTS ON CACHE BOOL "Build tests"  FORCE)
+
 
 # Might be needed for planned hot reload.
 set(CMAKE_POSITION_INDEPENDENT_CODE ON CACHE BOOL "" FORCE) 
@@ -50,8 +52,13 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/nothings/stb.git
     GIT_TAG f75e8d1cad7d90d72ef7a4661f1b994ef78b4e31
 )
+FetchContent_Declare(
+    imgui
+    GIT_REPOSITORY https://github.com/ocornut/imgui.git
+    GIT_TAG v1.91.2
+)
 
-FetchContent_MakeAvailable(glew glfw fmt glm spdlog stb)
+FetchContent_MakeAvailable(glew glfw fmt glm spdlog stb imgui)
 
 
 # Use vendor OpenGL 
@@ -62,6 +69,9 @@ endif()
 add_subdirectory(src)
 if (GLASH_BUILD_EXAMPLES)
     add_subdirectory(examples)
+endif()
+if (GLASH_BUILD_TESTS)
+    add_subdirectory(tests)
 endif()
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
