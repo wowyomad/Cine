@@ -7,14 +7,19 @@ namespace glash
 {
 	namespace test
 	{
-		ClearColorTest::ClearColorTest(Window& window, const float color[4])
-			: m_Window(window)
+		ClearColorTest::ClearColorTest(Window& window)
+			: Test(window), m_ClearColor(0, 0, 0, 1), m_DefaultColor(window.GetClearColor())
 		{
-			memcpy(m_ClearColor, color, 4 * sizeof(float));
+			
+		}
+		ClearColorTest::ClearColorTest(Window& window, const Color& color)
+			: Test(window), m_ClearColor(color), m_DefaultColor(window.GetClearColor())
+		{
+
 		}
 		ClearColorTest::~ClearColorTest()
 		{
-
+			m_Window.SetClearColor(m_DefaultColor);
 		}
 
 		void ClearColorTest::OnUpdate(float deltaTime)
@@ -24,13 +29,12 @@ namespace glash
 
 		void ClearColorTest::OnRender()
 		{
-			GLCall(glClearColor(m_ClearColor[0], m_ClearColor[1], m_ClearColor[2], m_ClearColor[3]));
-			GLCall(glClear(GL_COLOR_BUFFER_BIT));
+			m_Window.SetClearColor(m_ClearColor);
 		}
 
 		void ClearColorTest::OnImGuiRender()
 		{
-			ImGui::ColorPicker4("Color Picker", m_ClearColor);
+			ImGui::ColorPicker4("Color Picker", reinterpret_cast<float*>(& m_ClearColor));
 		}
 
 	}

@@ -1,14 +1,19 @@
+#pragma once
+
+
 #include "Test.hpp"
 #include "glash/Window.hpp"
+#include "glash/Enums.hpp"
 
 namespace glash
 {
 	namespace test
 	{
-		class ClearColorTest : Test
+		class ClearColorTest : public Test
 		{
 		public:
-			ClearColorTest(Window& window, const float color[4]);
+			ClearColorTest(Window& window);
+			ClearColorTest(Window& window, const Color& color);
 			~ClearColorTest();
 
 			virtual void OnUpdate(float deltaTime) override;
@@ -16,8 +21,8 @@ namespace glash
 			virtual void OnImGuiRender() override;
 
 		private:
-			float m_ClearColor[4];
-			Window& m_Window;
+			Color m_ClearColor;
+			Color m_DefaultColor;
 		};
 	}
 }

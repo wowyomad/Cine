@@ -5,10 +5,11 @@ namespace glash
 {
 	using Color = glm::vec4;
 	namespace color {
-		constexpr Color RED		=	Color(1.0f, 0, 0, 0);
-		constexpr Color GREEN	=	Color(0, 1, 0, 0);
-		constexpr Color BLUE	=	Color(0, 0, 1.0f, 0);
-		constexpr Color GRAY	=	Color(0.5f, 0.5f, 0.5f, 0);
+		constexpr Color RED		=	Color(1.0f, 0.0f, 0.0f, 0.0f);
+		constexpr Color GREEN	=	Color(0.0f, 1.0f, 0.0f, 0.0f);
+		constexpr Color BLUE	=	Color(0.0f, 0.0f, 1.0f, 1.0f);
+		constexpr Color GRAY	=	Color(0.5f, 0.5f, 0.5f, 1.0f);
+		constexpr Color BLACK	=	Color(0.0f, 0.0f, 0.0f, 1.0f);
 	}
 
 	enum GLTarget
