@@ -47,7 +47,8 @@
         "strategy": "external"
       },
       "cacheVariables": {
-        "CMAKE_CONFIGURATION_TYPES": "Debug"
+        "CMAKE_CONFIGURATION_TYPES": "Debug",
+        "CMAKE_CXX_FLAGS_DEBUG": "/DGLASH_DEBUG"
       }
     },
     {

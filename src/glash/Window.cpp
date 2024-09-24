@@ -1,5 +1,6 @@
 #include "glash/glash_pch.hpp"
 #include "Window.hpp"
+
 #include "glash/logger.hpp"
 namespace glash
 {
@@ -7,7 +8,7 @@ namespace glash
     Window::Window(int width, int height, const std::string &title, const Color& clearColor)
         : m_ClearColor(clearColor)
     {
-        glash::initLogger();
+        glash::debug::InitLogger();
 
         if (!glfwInit())
         {
@@ -17,6 +18,7 @@ namespace glash
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+        glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 
         m_pWindow = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
         if (!m_pWindow)

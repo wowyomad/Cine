@@ -26,7 +26,8 @@ namespace glash
 		unsigned char* buffer = stbi_load(path.c_str(), &m_Width, &m_Height, &m_Bits, 4);
 		if (!buffer)
 		{
-			LOG_ERROR("Couldn't load texture {}", path);
+			LOG_ERROR("Couldn't load texture {}", path); DEBUG_BREAK;
+			return;
 		}
 
 		m_LocalBuffer = std::unique_ptr<unsigned char[], StbiImageDeleter>(buffer);
@@ -50,6 +51,14 @@ namespace glash
 	void Texture::Unbind() const
 	{
 		GLCall(glBindTexture(GL_TEXTURE_2D, 0));
+	}
+	int Texture::Width() const
+	{
+		return m_Width;
+	}
+	int Texture::Height() const
+	{
+		return m_Height;
 	}
 	void Texture::StbiImageDeleter::operator()(unsigned char* image)
 	{

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "glash/Window.hpp"
+#include "glash/Logger.hpp"
 
 namespace glash
 {
@@ -9,8 +10,8 @@ namespace glash
 		class Test
 		{
 		public:
-			Test(Window& window) : m_Window(window) {}
-			virtual ~Test() {}
+			Test(Window& window) : m_Window(window), m_PreviuosColor(window.GetClearColor()) { }
+			virtual ~Test() { m_Window.SetClearColor(m_PreviuosColor);  }
 
 			virtual void OnUpdate(float deltaTime) {}
 			virtual void OnRender() {}
@@ -18,6 +19,7 @@ namespace glash
 
 		protected:
 			Window& m_Window;
+			Color m_PreviuosColor;
 		};
 	}
 }

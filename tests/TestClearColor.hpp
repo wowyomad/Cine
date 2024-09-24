@@ -22,7 +22,6 @@ namespace glash
 
 		private:
 			Color m_ClearColor;
-			Color m_DefaultColor;
 		};
 	}
 }

@@ -12,6 +12,7 @@ int main(int argc, char** argv)
 {
 	try {
 		glash::Window window(800, 800, "Test Window");
+		glash::debug::InitializeOpenGLDebug();
 		glash::Renderer renderer;
 
 		auto shader = glash::Shader("resources/shaders/shader_with_texture.shader");

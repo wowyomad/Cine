@@ -16,6 +16,9 @@ namespace glash
 
 		void Bind(const GLuint slot = 0) const;
 		void Unbind() const;
+
+		int Width() const;
+		int Height() const;
 	
 		struct StbiImageDeleter {
 			void operator()(unsigned char* image);

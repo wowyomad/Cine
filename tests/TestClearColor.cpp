@@ -8,18 +8,18 @@ namespace glash
 	namespace test
 	{
 		ClearColorTest::ClearColorTest(Window& window)
-			: Test(window), m_ClearColor(0, 0, 0, 1), m_DefaultColor(window.GetClearColor())
+			: Test(window), m_ClearColor(0, 0, 0, 1)
 		{
 			
 		}
 		ClearColorTest::ClearColorTest(Window& window, const Color& color)
-			: Test(window), m_ClearColor(color), m_DefaultColor(window.GetClearColor())
+			: Test(window), m_ClearColor(color)
 		{
 
 		}
 		ClearColorTest::~ClearColorTest()
 		{
-			m_Window.SetClearColor(m_DefaultColor);
+
 		}
 
 		void ClearColorTest::OnUpdate(float deltaTime)

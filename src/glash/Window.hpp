@@ -1,9 +1,8 @@
 #pragma once
 #include "glash/glash_pch.hpp"
-#include <GLFW/glfw3.h>
 
+#include <GLFW/glfw3.h>
 #include "glash/Enums.hpp"
-#include <functional>
 
 
 namespace glash
@@ -34,8 +33,4 @@ namespace glash
         GLFWwindow* m_pWindow;
         Color m_ClearColor;
     };
-
-    void APIENTRY GLDebugMessageCallback(GLenum source, GLenum type, GLuint id,
-        GLenum severity, GLsizei length, const GLchar* message,
-        const void* userParam);
 } //namespace glash
