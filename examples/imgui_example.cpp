@@ -48,17 +48,6 @@ int main()
             ImGui::End();
         }
 
-        // Create another window
-        {
-            show_another_window = button_clicks % 2;
-            if (show_another_window) {
-                ImGui::Begin("Another Window", &show_another_window);
-                ImGui::Text("This is another window.");
-                ImGui::End();
-            }
-        }
-
-
         // Rendering
         ImGui::Render();
 

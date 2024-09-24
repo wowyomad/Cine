@@ -18,7 +18,7 @@ copy_files("${SHADER_FILES}" "${SHADERS_OUT_DIR}" copy_shaders)
 copy_files("${TEXTURE_FILES}" "${TEXTURES_OUT_DIR}" copy_textures)
 
 add_executable(test_runner 
-test_main.cpp 
+"Entry.cpp" 
 TestClearColor.cpp
 TestMenu.cpp
 TestTexture.cpp

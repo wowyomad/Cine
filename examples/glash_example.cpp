@@ -48,13 +48,12 @@ int main(int argc, char** argv)
 		glash::VertexArray va;
 		va.AddBuffer(vb, layout);
 
-		g_Shader = &shader;
 
-		window.SetKeyCallback([](GLFWwindow* window, int key, int scancode, int action, int mods) {
+		window.AddKeyListener(&window, [&shader](GLFWwindow* window, int key, int scancode, int action, int mods) {
 			if (action == GLFW_PRESS)
 			{
 				if (key == GLFW_KEY_F5) {
-					g_Shader->Reload();
+					shader.Reload();
 					std::cout << "Shader reloaded!" << std::endl;
 				}
 			}
