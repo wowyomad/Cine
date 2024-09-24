@@ -1,14 +1,15 @@
 #include "glash/glash_pch.hpp"
 #include "Window.hpp"
-
 #include "glash/logger.hpp"
 namespace glash
 {
+    Window* g_Window = nullptr;
 
     Window::Window(int width, int height, const std::string &title, const Color& clearColor)
         : m_ClearColor(clearColor)
     {
-        glash::debug::InitLogger();
+        assert(g_Window == nullptr && "Only works for one window!");
+        g_Window = this;
 
         if (!glfwInit())
         {
@@ -18,7 +19,6 @@ namespace glash
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-        glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 
         m_pWindow = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
         if (!m_pWindow)
@@ -33,6 +33,8 @@ namespace glash
             {
                 glViewport(0, 0, width, height);
             });
+        glfwSetKeyCallback(m_pWindow, MainKeyCallback);
+
 
         GLenum err = glewInit();
         if (GLEW_OK != err)
@@ -44,6 +46,9 @@ namespace glash
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glBlendEquation(GL_FUNC_ADD);
+
+        glash::debug::InitializeOpenGLDebug();
+
     }
 
     Window::~Window()
@@ -94,9 +99,19 @@ namespace glash
         glfwGetWindowSize(m_pWindow, w, h);
     }
 
-    void Window::SetKeyCallback(GLFWkeyfun callback)
+
+    void Window::AddKeyListener(const void* owner, KeyCallback callback)
     {
-        glfwSetKeyCallback(m_pWindow, callback);
+        m_KeyCallbacks[(size_t)owner] = callback;
+    }
+
+    void Window::RemoveKeyListener(const void* owner)
+    {
+        auto it = m_KeyCallbacks.find((size_t)owner);
+        if (it != m_KeyCallbacks.end())
+        {
+            m_KeyCallbacks.erase(it);
+        }
     }
 
     void Window::SetClearColor(const Color& color)

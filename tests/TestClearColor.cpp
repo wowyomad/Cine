@@ -8,7 +8,7 @@ namespace glash
 	namespace test
 	{
 		ClearColorTest::ClearColorTest(Window& window)
-			: Test(window), m_ClearColor(0, 0, 0, 1)
+			: ClearColorTest(window, color::GRAY)
 		{
 			
 		}
