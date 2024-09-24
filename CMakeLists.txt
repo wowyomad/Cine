@@ -5,10 +5,9 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Project properties
-set(GLASH_BUILD_SHARED OFF CACHE BOOL "Build glash as a shared library"  FORCE)
+set(GLASH_BUILD_SHARED OFF CACHE BOOL "Build glash as a shared library" FORCE)
 set(GLASH_BUILD_EXAMPLES ON CACHE BOOL "Build examples"  FORCE)
 set(GLASH_BUILD_TESTS ON CACHE BOOL "Build tests"  FORCE)
-
 
 # Might be needed for planned hot reload.
 set(CMAKE_POSITION_INDEPENDENT_CODE ON CACHE BOOL "" FORCE) 
@@ -71,7 +70,7 @@ if (GLASH_BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()
 if (GLASH_BUILD_TESTS)
-    add_subdirectory(tests)
+    add_subdirectory(sandbox)
 endif()
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")

@@ -13,7 +13,7 @@
         "CMAKE_LINKER": "link.exe",
         "CMAKE_NM": "dumpbin.exe",
         "CMAKE_AR": "lib.exe",
-        "CMAKE_RANLIB": null,
+        "CMAKE_RANLIB": null
       },
       "warnings": { "dev": false },
       "condition": {

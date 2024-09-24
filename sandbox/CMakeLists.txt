@@ -17,23 +17,28 @@ file(GLOB TEXTURE_FILES "${TEXTURES_DIR}/*.png" "${TEXTURES_DIR}/*.jpg")
 copy_files("${SHADER_FILES}" "${SHADERS_OUT_DIR}" copy_shaders)
 copy_files("${TEXTURE_FILES}" "${TEXTURES_OUT_DIR}" copy_textures)
 
-add_executable(test_runner 
-"Entry.cpp" 
+add_executable(Sandbox 
+Sandbox.cpp
 TestClearColor.cpp
 TestMenu.cpp
 TestTexture.cpp
 )
 
-set_target_properties(test_runner PROPERTIES
+
+
+
+set_target_properties(Sandbox PROPERTIES
     VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
 )
 
-target_link_libraries(test_runner glash)
-add_dependencies(test_runner copy_shaders copy_textures)
+target_link_libraries(Sandbox glash)
+add_dependencies(Sandbox copy_shaders copy_textures)
+target_precompile_headers(Sandbox PRIVATE ${GLASH_PCH_HEADER})
+
 
 if(MSVC)
-    target_compile_options(test_runner PRIVATE $<$<CONFIG:Debug>:/Zi>)
-    target_link_options(test_runner PRIVATE $<$<CONFIG:Debug>:/INCREMENTAL>)
+    target_compile_options(Sandbox PRIVATE $<$<CONFIG:Debug>:/Zi>)
+    target_link_options(Sandbox PRIVATE $<$<CONFIG:Debug>:/INCREMENTAL>)
 
 endif()
 

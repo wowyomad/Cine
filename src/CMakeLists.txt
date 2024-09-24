@@ -1,5 +1,5 @@
-set(GLASH_SOURCE_DIR "glash")
-set(GLASH_PCH_HEADER "${GLASH_SOURCE_DIR}/glash_pch.hpp")
+set(glash_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/glash")
+set(GLASH_PCH_HEADER "${glash_SOURCE_DIR}/glash_pch.hpp")
 
 
 if(TARGET imgui)
@@ -39,15 +39,15 @@ find_package(OpenGL REQUIRED)
 
 
 file(GLOB SOURCES
-    "${GLASH_SOURCE_DIR}/*.cpp"
-    "${GLASH_SOURCE_DIR}/helper/*.cpp"
-    "${GLASH_SOURCE_DIR}/vendor/*.cpp"
+    "${glash_SOURCE_DIR}/*.cpp"
+    "${glash_SOURCE_DIR}/helper/*.cpp"
+    "${glash_SOURCE_DIR}/vendor/*.cpp"
 )
 
 file(GLOB HEADERS
-    "${GLASH_SOURCE_DIR}/*.hpp"
-    "${GLASH_SOURCE_DIR}/helper/*.hpp"
-    "${GLASH_SOURCE_DIR}/vendor/*.hpp"
+    "${glash_SOURCE_DIR}/*.hpp"
+    "${glash_SOURCE_DIR}/helper/*.hpp"
+    "${glash_SOURCE_DIR}/vendor/*.hpp"
 )
 
 if(GLASH_BUILD_SHARED)
@@ -56,9 +56,10 @@ else()
     set(GLASH_PROPERTIES STATIC)
 endif()
 
+message("Glash build shared ${GLASH_BUILD_SHARED}")
 add_library(glash ${GLASH_PROPERTIES} ${SOURCES} ${HEADERS})
 
-target_precompile_headers(glash PRIVATE ${GLASH_PCH_HEADER})
+target_precompile_headers(glash PUBLIC ${GLASH_PCH_HEADER})
 
 target_include_directories(glash
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
