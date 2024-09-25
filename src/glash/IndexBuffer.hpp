@@ -10,7 +10,6 @@ namespace glash
 	public:
 		using Index = GLuint;
 
-
 		IndexBuffer() : m_Count(0), m_RendererID(0) { }
 		IndexBuffer(const std::vector<Index>& data, GLBufferUsage usage = GLBufferUsage::STATIC_DRAW);
 		IndexBuffer(const IndexBuffer& other) = default;

@@ -2,8 +2,7 @@
 
 #include "glash/VertexBuffer.hpp"
 #include "glash/VertexArray.hpp"
-
-#include "logger.hpp"
+#include "glash/Log.hpp"
 
 namespace glash
 {
@@ -39,9 +38,7 @@ namespace glash
 			{
 				va.Bind();
 				GLCall(glDrawArrays(GL_TRIANGLES, 0, 3));
-				va.Unbind();
 			}
-
 		private:
 			VertexArray va;
 			VertexBuffer vb;
