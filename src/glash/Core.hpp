@@ -20,3 +20,9 @@
 #define GLASH_API  // Empty macro for static builds
 #define BUILD_STR "STATIC BUILD"
 #endif
+
+template<typename T>
+inline constexpr T BIT(T x) {
+    static_assert(std::is_integral_v<T>, "BIT can only be used with integral types.");
+    return T(1) << x;
+}

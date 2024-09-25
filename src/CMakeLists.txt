@@ -33,6 +33,7 @@ find_package(OpenGL REQUIRED)
 file(GLOB SOURCES
     "${glash_SOURCE_DIR}/*.cpp"
     "${glash_SOURCE_DIR}/helper/*.cpp"
+    "${glash_SOURCE_DIR}/events/*.cpp"
     "${glash_SOURCE_DIR}/vendor/*.cpp"
     "${glash_SOURCE_DIR}/utils/*.cpp"
 )
@@ -40,6 +41,7 @@ file(GLOB SOURCES
 file(GLOB HEADERS
     "${glash_SOURCE_DIR}/*.hpp"
     "${glash_SOURCE_DIR}/helper/*.hpp"
+    "${glash_SOURCE_DIR}/events/*.hpp"
     "${glash_SOURCE_DIR}/vendor/*.hpp"
     "${glash_SOURCE_DIR}/utils/*.hpp"
 
