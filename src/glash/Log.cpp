@@ -2,6 +2,9 @@
 
 namespace glash
 {
+	std::shared_ptr<spdlog::logger> Log::s_CoreLogger;
+	std::shared_ptr<spdlog::logger> Log::s_ClientLogger;
+
 	void Log::Init()
 	{
 		spdlog::set_pattern("%^[%T] %n: %v%$");
@@ -9,6 +12,15 @@ namespace glash
 		s_CoreLogger->set_level(spdlog::level::trace);
 		s_ClientLogger = spdlog::stdout_logger_mt("APP");
 		s_ClientLogger->set_level(spdlog::level::trace);
+	}
+	std::shared_ptr<spdlog::logger>& Log::GetCoreLogger()
+	{
+		return s_CoreLogger;
+	}
+
+	std::shared_ptr<spdlog::logger>& Log::GetClientLogger()
+	{
+		return s_ClientLogger;
 	}
 
 }

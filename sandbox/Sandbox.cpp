@@ -1,10 +1,13 @@
-#ifdef GLASH_EXPORT
-#undef GLASH_EXPORT
-#endif
+#include "Sandbox.hpp"
 
 #include "glash/Core.hpp"
-#include "Sandbox.hpp"
 #include "glash/Glash.hpp"
+
+glash::Application* glash::CreateApplication()
+{
+	glash::Log::GetClientLogger()->info(BUILD_STR);
+	return new Sandbox();
+}
 
 
 
@@ -16,12 +19,6 @@
 //#include "glash/Renderer.hpp"
 //
 //#include "glash/Glash.hpp"
-
-
-glash::Application* glash::CreateApplication()
-{
-	return new Sandbox();
-}
 
 //int main(int argc, char** argv)
 //{

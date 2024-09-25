@@ -5,9 +5,11 @@
 #ifdef GLASH_EXPORT  // Defined during the DLL build to export symbols
 #define BUILD_STR "DLL EXPORT"
 #define GLASH_API __declspec(dllexport)
-#else  // Consumers of the DLL (like Sandbox) should use dllimport
+#else
+#ifdef GLASH_IMPORT // Consumers of the DLL (like Sandbox) should use dllimport
 #define BUILD_STR "DLL IMPORT"
 #define GLASH_API __declspec(dllimport)
+#endif
 #endif
 #else
 // Non-Windows platforms (like Linux, macOS) can use default visibility

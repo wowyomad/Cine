@@ -84,16 +84,12 @@ namespace glash
 	{
 	public:
 		static void Init();
+		static std::shared_ptr<spdlog::logger>& GetCoreLogger(); 
+		static std::shared_ptr<spdlog::logger>& GetClientLogger();
 
-		inline static std::shared_ptr<spdlog::logger>& GetCoreLogger() {
-			return s_CoreLogger;
-		}
-		inline static std::shared_ptr<spdlog::logger>& GetClientLogger() {
-			return s_ClientLogger;
-		}
 	private:
-		inline static std::shared_ptr<spdlog::logger> s_CoreLogger;
-		inline static std::shared_ptr<spdlog::logger> s_ClientLogger;
+		static std::shared_ptr<spdlog::logger> s_CoreLogger;
+		static std::shared_ptr<spdlog::logger> s_ClientLogger;
 
 	};
 	namespace debug

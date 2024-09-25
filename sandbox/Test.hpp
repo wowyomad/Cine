@@ -7,7 +7,7 @@ namespace glash
 {
 	namespace test
 	{
-		class GLASH_API Test
+		class Test
 		{
 		public:
 			Test(Window& window) : m_Window(window), m_PreviuosColor(window.GetClearColor()) { }

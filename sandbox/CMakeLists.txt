@@ -33,10 +33,17 @@ add_library(imgui STATIC
     ${imgui_SOURCE_DIR}/imgui_widgets.cpp
     ${imgui_SOURCE_DIR}/imgui_tables.cpp
  )
-
 target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR} ${glfw_SOURCE_DIR}/include)
-target_compile_definitions(Sandbox PRIVATE GLASH_BUILD_DLL)
 
+message("GLASH_BUILD_DLL in Sandbox: ${GLASH_BUILD_DLL}")
+if(GLASH_BUILD_DLL) 
+    set(SANDBOX_COMPILE_DEFINITIONS GLASH_BUILD_DLL GLASH_IMPORT)
+else()
+    set(SANDBOX_COMPILE_DEFINITIONS "")
+endif()
+message("SANDBOX_COMPILE_DEFINITIONS in Sandbox: ${SANDBOX_COMPILE_DEFINITIONS}")
+
+target_compile_definitions(Sandbox PRIVATE ${SANDBOX_COMPILE_DEFINITIONS})
 set_target_properties(Sandbox PROPERTIES
     VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
 )

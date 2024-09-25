@@ -10,9 +10,7 @@ namespace glash
 	Window::Window(int width, int height, const std::string& title, const Color& clearColor)
 		: m_ClearColor(clearColor)
 	{
-		LOG_INFO("BUILD_STR on glash side: {}", BUILD_STR);
-
-		assert(s_Window == nullptr && "Only works for one window!");
+		assert(s_Window == nullptr && "Only works for one window for now!");
 		s_Window = this;
 
 		if (!glfwInit())

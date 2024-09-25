@@ -14,7 +14,7 @@ namespace glash
 {
 	namespace test
 	{
-		class GLASH_API TestTexture : public Test
+		class TestTexture : public Test
 		{
 		public: 
 			TestTexture(Window& window);

@@ -45,15 +45,17 @@ file(GLOB HEADERS
 )
 
 if(GLASH_BUILD_DLL)
-    set(GLASH_PROPERTIES SHARED)
-    set(GLASH_COMPILED_DEFINITIONS GLASH_EXPORT GLASH_BUILD_DLL)
+    set(GLASH_LIB_TYPE SHARED)
+    set(GLASH_COMPILE_DEFINITIONS GLASH_BUILD_DLL GLASH_EXPORT)
 else()
-    set(GLASH_PROPERTIES STATIC)
+    set(GLASH_LIB_TYPE STATIC)
+    set(GLASH_COMPILE_DEFINITIONS "")
 endif()
+message("Glash build type: ${GLASH_LIB_TYPE}")
+message("Glash compile definitions: ${GLASH_COMPILE_DEFINITIONS}")
 
-message("Glash build shared ${GLASH_BUILD_SHARED}")
-add_library(glash ${GLASH_PROPERTIES} ${SOURCES} ${HEADERS})
-target_compile_definitions(glash PUBLIC ${GLASH_COMPILED_DEFINITIONS})
+add_library(glash ${GLASH_LIB_TYPE} ${SOURCES} ${HEADERS})
+target_compile_definitions(glash PRIVATE ${GLASH_COMPILE_DEFINITIONS})
 
 target_precompile_headers(glash PUBLIC ${GLASH_PCH_HEADER})
 

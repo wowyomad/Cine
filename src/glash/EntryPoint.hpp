@@ -7,7 +7,7 @@ extern glash::Application* glash::CreateApplication();
 int main(int argc, char** argv)
 {
 	glash::Log::Init();
-	glash::Log::GetClientLogger()->info("Info");
+	glash::Log::GetClientLogger()->info(BUILD_STR);
 	auto app = glash::CreateApplication();
 	app->Run();
 	delete app;

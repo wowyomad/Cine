@@ -66,6 +66,7 @@ if (POLICY CMP0072)
 endif()
 
 add_subdirectory(src)
+
 if (GLASH_BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()
