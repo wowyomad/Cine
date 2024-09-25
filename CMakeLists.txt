@@ -59,7 +59,6 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(glew glfw fmt glm spdlog stb imgui)
 
-
 # Use vendor OpenGL 
 if (POLICY CMP0072)
     cmake_policy(SET CMP0072 NEW)

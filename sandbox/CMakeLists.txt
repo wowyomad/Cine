@@ -57,7 +57,6 @@ target_link_libraries(Sandbox
 add_dependencies(Sandbox copy_shaders copy_textures)
 target_precompile_headers(Sandbox PRIVATE ${GLASH_PCH_HEADER})
 
-
 if(MSVC)
     target_compile_options(Sandbox PRIVATE $<$<CONFIG:Debug>:/Zi>)
     target_link_options(Sandbox PRIVATE $<$<CONFIG:Debug>:/INCREMENTAL>)

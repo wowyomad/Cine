@@ -30,18 +30,19 @@ endif()
 
 find_package(OpenGL REQUIRED)
 
-
-
 file(GLOB SOURCES
     "${glash_SOURCE_DIR}/*.cpp"
     "${glash_SOURCE_DIR}/helper/*.cpp"
     "${glash_SOURCE_DIR}/vendor/*.cpp"
+    "${glash_SOURCE_DIR}/utils/*.cpp"
 )
 
 file(GLOB HEADERS
     "${glash_SOURCE_DIR}/*.hpp"
     "${glash_SOURCE_DIR}/helper/*.hpp"
     "${glash_SOURCE_DIR}/vendor/*.hpp"
+    "${glash_SOURCE_DIR}/utils/*.hpp"
+
 )
 
 if(GLASH_BUILD_DLL)
@@ -78,7 +79,6 @@ target_link_libraries(glash
     PUBLIC glm
     PUBLIC spdlog::spdlog
 )
-
 
 if(MSVC)
     target_compile_options(glash PRIVATE $<$<CONFIG:Debug>:/Zi>)
