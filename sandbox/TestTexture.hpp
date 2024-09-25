@@ -1,5 +1,6 @@
 #pragma once
 
+#include "glash/Core.hpp"
 #include "Test.hpp"
 #include "glash/Shader.hpp"
 #include "glash/IndexBuffer.hpp"
@@ -13,7 +14,7 @@ namespace glash
 {
 	namespace test
 	{
-		class TestTexture : public Test
+		class GLASH_API TestTexture : public Test
 		{
 		public: 
 			TestTexture(Window& window);

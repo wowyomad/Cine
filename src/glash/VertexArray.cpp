@@ -3,6 +3,12 @@
 
 namespace glash
 {
+
+	VertexArray::VertexArray()
+		: m_RendererID(0)
+	{
+		GLCall(glGenVertexArrays(1, &m_RendererID));
+	}
 	VertexArray::VertexArray(VertexArray&& other)
 	{
 		*this = std::move(other);

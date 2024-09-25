@@ -1,11 +1,11 @@
 #pragma once
-
+#include "glash/Core.hpp"
 #include "glash/glash_pch.hpp"
 #include "glash/logger.hpp"
 
 namespace glash
 {
-	class Shader
+	class GLASH_API Shader
 	{
 	public:
 		Shader();

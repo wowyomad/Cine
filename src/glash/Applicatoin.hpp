@@ -1,4 +1,4 @@
-
+#pragma once
 
 namespace glash
 {
@@ -10,5 +10,8 @@ namespace glash
 
 		virtual void Run();
 	};
+
+	//Should be defined in Client
+	Application* CreateApplication();
 }
 

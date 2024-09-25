@@ -1,5 +1,6 @@
 #pragma once
 
+#include "glash/Core.hpp"
 #include "glash/Window.hpp"
 #include "glash/Logger.hpp"
 
@@ -7,7 +8,7 @@ namespace glash
 {
 	namespace test
 	{
-		class Test
+		class GLASH_API Test
 		{
 		public:
 			Test(Window& window) : m_Window(window), m_PreviuosColor(window.GetClearColor()) { }

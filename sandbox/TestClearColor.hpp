@@ -1,6 +1,4 @@
 #pragma once
-
-
 #include "Test.hpp"
 #include "glash/Window.hpp"
 #include "glash/Enums.hpp"

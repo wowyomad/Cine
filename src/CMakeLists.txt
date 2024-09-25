@@ -1,12 +1,6 @@
 set(glash_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/glash")
 set(GLASH_PCH_HEADER "${glash_SOURCE_DIR}/glash_pch.hpp")
 
-
-if(TARGET imgui)
-    set_target_properties(imgui PROPERTIES FOLDER "ui")
-else()
-    message("imgui not available")
-endif()
 if(TARGET libglew_static)
     set_target_properties(libglew_static PROPERTIES FOLDER "Dependencies")
 else()
@@ -50,14 +44,16 @@ file(GLOB HEADERS
     "${glash_SOURCE_DIR}/vendor/*.hpp"
 )
 
-if(GLASH_BUILD_SHARED)
+if(GLASH_BUILD_DLL)
     set(GLASH_PROPERTIES SHARED)
+    set(GLASH_COMPILED_DEFINITIONS GLASH_EXPORT GLASH_BUILD_DLL)
 else()
     set(GLASH_PROPERTIES STATIC)
 endif()
 
 message("Glash build shared ${GLASH_BUILD_SHARED}")
 add_library(glash ${GLASH_PROPERTIES} ${SOURCES} ${HEADERS})
+target_compile_definitions(glash PUBLIC ${GLASH_COMPILED_DEFINITIONS})
 
 target_precompile_headers(glash PUBLIC ${GLASH_PCH_HEADER})
 
@@ -70,28 +66,16 @@ target_include_directories(glash
     PUBLIC ${spdlog_SOURCE_DIR}/include
     PUBLIC ${glm_SOURCE_DIR}/include
     PUBLIC ${stb_SOURCE_DIR}
-    PUBLIC ${imgui_SOURCE_DIR}
 )
 
 target_link_libraries(glash
-    PUBLIC OpenGL::GL
+    PRIVATE OpenGL::GL
     PUBLIC glfw
     PUBLIC libglew_static
     PUBLIC fmt
     PUBLIC glm
     PUBLIC spdlog::spdlog
-    PUBLIC imgui
 )
-
-add_library(imgui STATIC
-    ${imgui_SOURCE_DIR}/imgui.cpp
-    ${imgui_SOURCE_DIR}/imgui_draw.cpp
-    ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
-    ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
-    ${imgui_SOURCE_DIR}/imgui_widgets.cpp
-    ${imgui_SOURCE_DIR}/imgui_tables.cpp
-)
-target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR} ${glfw_SOURCE_DIR}/include)
 
 
 if(MSVC)

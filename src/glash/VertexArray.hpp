@@ -1,18 +1,16 @@
 #pragma once
 
+#include "glash/Core.hpp"
 #include "glash/glash_pch.hpp"
 #include "glash/VertexBuffer.hpp"
 #include "glash/VertexBufferLayout.hpp"
 
 namespace glash
 {
-	class VertexArray
+	class GLASH_API VertexArray
 	{
 	public:
-		VertexArray() : m_RendererID(0) 
-		{
-			GLCall(glGenVertexArrays(1, &m_RendererID));
-		}
+		VertexArray();
 		VertexArray(const VertexArray& other) = default;
 		VertexArray(VertexArray&& other);
 		~VertexArray();

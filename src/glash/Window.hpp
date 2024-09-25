@@ -1,19 +1,18 @@
 #pragma once
-#include "glash/glash_pch.hpp"
 #include <GLFW/glfw3.h>
-
+#include "glash/Core.hpp"
+#include "glash/glash_pch.hpp"
 #include "glash/Enums.hpp"
-#include <functional>
+
 
 
 namespace glash
 {
 	class Window;
 
-	extern Window* g_Window;
-
-	class Window
+	class GLASH_API Window
 	{
+	static Window* s_Window;
 
 	public:
 		using KeyCallback = std::function<void(GLFWwindow* window, int key, int scancode, int action, int mods)>;
@@ -26,7 +25,7 @@ namespace glash
 		void ClearBuffer();
 		void SwapBuffers() const;
 
-		GLFWwindow* GetPtr();
+		GLFWwindow* GetPtr() const;
 		std::string GetGLVersion() const;
 
 	public:
@@ -42,13 +41,7 @@ namespace glash
 
 		std::map<size_t, KeyCallback> m_KeyCallbacks;
 
-		inline static void MainKeyCallback (GLFWwindow* window, int key, int scancode, int action, int mods)
-			{
-			for (auto& [id, callback] : g_Window->m_KeyCallbacks)
-				{
-					callback(window, key, scancode, action, mods);
-				}
-			};
+		static void MainKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 	};
 
 } //namespace glash

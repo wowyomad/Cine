@@ -22,16 +22,31 @@ Sandbox.cpp
 TestClearColor.cpp
 TestMenu.cpp
 TestTexture.cpp
+ImguiWindow.cpp
 )
 
+add_library(imgui STATIC
+    ${imgui_SOURCE_DIR}/imgui.cpp
+    ${imgui_SOURCE_DIR}/imgui_draw.cpp
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
+    ${imgui_SOURCE_DIR}/imgui_widgets.cpp
+    ${imgui_SOURCE_DIR}/imgui_tables.cpp
+ )
 
-
+target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR} ${glfw_SOURCE_DIR}/include)
+target_compile_definitions(Sandbox PRIVATE GLASH_BUILD_DLL)
 
 set_target_properties(Sandbox PROPERTIES
     VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
 )
 
-target_link_libraries(Sandbox glash)
+target_link_libraries(Sandbox
+    PRIVATE glash 
+    PUBLIC glfw
+    PUBLIC libglew_static
+    PRIVATE imgui
+)
 add_dependencies(Sandbox copy_shaders copy_textures)
 target_precompile_headers(Sandbox PRIVATE ${GLASH_PCH_HEADER})
 
