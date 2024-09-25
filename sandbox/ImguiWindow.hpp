@@ -1,3 +1,5 @@
+#pragma once
+
 #include "glash/Window.hpp"
 #include "imgui.h"
 

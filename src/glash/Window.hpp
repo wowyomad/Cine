@@ -1,8 +1,11 @@
 #pragma once
-#include <GLFW/glfw3.h>
-#include "glash/Core.hpp"
 #include "glash/glash_pch.hpp"
+
+#include "GLFW/glfw3.h"
+
+#include "glash/Core.hpp"
 #include "glash/Enums.hpp"
+
 
 
 

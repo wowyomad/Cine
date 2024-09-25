@@ -1,5 +1,4 @@
 #pragma once
-
 //input/output
 #include <iostream>
 #include <sstream>
@@ -40,4 +39,8 @@
 
 
 //graphics
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#include "Windows.h"
+#endif
 #include "GL/glew.h"
