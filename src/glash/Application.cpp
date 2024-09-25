@@ -3,8 +3,17 @@
 #include "glash/Log.hpp"
 namespace glash
 {
+	Application::Application()
+	{
+		
+	}
 	void Application::Run()
 	{
+		GLASH_CORE_TRACE("Trace inside {}", __FUNCTION__);
+		GLASH_CORE_DEBUG("Debug inside {}", __FUNCTION__);
+		GLASH_CORE_INFO("Info inside {}", __FUNCTION__);
+		GLASH_CORE_ERROR("Error inside {}", __FUNCTION__);
+
 		Window window(800, 600, "Window");
 		while (!window.ShouldClose())
 		{

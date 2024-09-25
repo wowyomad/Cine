@@ -5,7 +5,7 @@ namespace glash
 	class Application
 	{
 	public:
-		Application() = default;
+		Application();
 		virtual ~Application() = default;
 
 		virtual void Run();

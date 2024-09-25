@@ -36,7 +36,7 @@ namespace glash
 		{
 			const auto& element = elements[i];
 			GLCall(glEnableVertexAttribArray(i));
-			glVertexAttribPointer(i, element.count, element.type, element.normalized, stride, (void*)(offset));
+			glVertexAttribPointer(i, element.count, element.type, element.normalized, stride, reinterpret_cast<void*>(offset));
 			offset += element.size * element.count;
 		}
 		Unbind();

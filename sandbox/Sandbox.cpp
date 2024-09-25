@@ -5,7 +5,11 @@
 
 glash::Application* glash::CreateApplication()
 {
-	glash::Log::GetClientLogger()->info(BUILD_STR);
+	GLASH_TRACE("Trace inside {}", __FUNCTION__);
+	GLASH_DEBUG("Debug inside {}", __FUNCTION__);
+	GLASH_INFO("Info inside {}", __FUNCTION__);
+	GLASH_ERROR("Error inside {}", __FUNCTION__);
+
 	return new Sandbox();
 }
 

@@ -5,80 +5,91 @@
 
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_sinks.h"
+#include "spdlog/sinks/stdout_color_sinks.h"
 #include "spdlog/pattern_formatter.h"
 
+#ifndef ENABLE_GLASH_DEBUG //!always on only for testing purposes!//
+#define ENABLE_GLASH_DEBUG
+#endif
 namespace glash
 {
-#ifdef GLASH_DEBUG
+#ifdef ENABLE_GLASH_DEBUG
+	#ifdef _MSC_VER
+		#define DEBUG_BREAK __debugbreak()
+	#else
+		#define DEBUG_BREAK
+	#endif
+	#ifndef FORMAT_DEBUG_MESSAGE
+		#define FORMAT_DEBUG_MESSAGE "\"{}\" in {} at {}:{}"
+	#endif
 
-#ifdef _MSC_VER
-#define DEBUG_BREAK __debugbreak()
-#else
-#define DEBUG_BREAK
-#endif
+	#ifndef __FILENAME__
+		#define __FILENAME__ std::filesystem::path(__FILE__).filename().string().c_str()
+	#endif
 
-#ifndef FORMAT_DEBUG_MESSAGE
-#define FORMAT_DEBUG_MESSAGE "\"{}\" in {} at {}:{}"
-#endif
-
-#ifndef __FILENAME__
-#define __FILENAME__ std::filesystem::path(__FILE__).filename().string().c_str()
-#endif
-
-#define ASSERT(x) if(!(x)) DEBUG_BREAK;
-
-	// Old macro definition
-//#define GLCall(x) \
-//			glash::GLClearErrors();\
-//			(x);\
-//			ASSERT(glash::GLLogCall(#x, __FILENAME__, __LINE__))
-
-		// New macro definition
-#define GLCall(x)\
+	#define ASSERT(x) if(!(x)) DEBUG_BREAK;
+	#define GLCall(x)\
 			glash::debug::g_Func = __func__;\
 			glash::debug::g_Line = __LINE__;\
 			glash::debug::g_FileName = __FILENAME__;\
 			(x);\
 			if (glash::debug::g_HasErrorOccured) DEBUG_BREAK;\
 			glash::debug::g_HasErrorOccured = false;
-
-#define LOG_DEBUG(msg, ...) \
-			spdlog::debug(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
-
-#define LOG_DEBUG_EX(msg, func, filename, line, ...) \
-			spdlog::debug(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), func, filename, line)
-
-#define LOG_INFO(msg, ...) \
-			spdlog::info(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
-
-#define LOG_INFO_EX(msg, func, filename, line, ...) \
-			spdlog::info(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), func, filename, line)
-
-#define LOG_ERROR(msg, ...) \
-			spdlog::error(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
-
-#define LOG_ERROR_EX(msg, func, filename, line, ...) \
-			spdlog::error(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), func, filename, line)
-
-#define LOG_WARN(msg, ...) \
-			spdlog::warn(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
-
-#define LOG_WARN_EX(msg, func, filename, line, ...) \
+	#define GLASH_CORE_TRACE(msg, ...)\
+		glash::Log::GetCoreLogger()->trace(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
+	#define GLASH_CORE_DEBUG(msg, ...)\
+		glash::Log::GetCoreLogger()->debug(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
+	#define GLASH_CORE_INFO(msg, ...)\
+		glash::Log::GetCoreLogger()->info(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
+	#define GLASH_CORE_ERROR(msg, ...)\
+		glash::Log::GetCoreLogger()->error(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
+	#define GLASH_TRACE(msg, ...)\
+		glash::Log::GetClientLogger()->trace(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
+	#define GLASH_DEBUG(msg, ...)\
+		glash::Log::GetClientLogger()->debug(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
+	#define GLASH_INFO(msg, ...)\
+		glash::Log::GetClientLogger()->info(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
+	#define GLASH_ERROR(msg, ...)\
+		glash::Log::GetClientLogger()->error(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
+	#define GLASH_MACROS_DEFINED
+	
+	#define LOG_DEBUG(msg, ...) \
+				spdlog::debug(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
+	
+	#define LOG_DEBUG_EX(msg, func, filename, line, ...) \
+				spdlog::debug(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), func, filename, line)
+	
+	#define LOG_INFO(msg, ...) \
+				spdlog::info(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
+	
+	#define LOG_INFO_EX(msg, func, filename, line, ...) \
+				spdlog::info(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), func, filename, line)
+	
+	#define LOG_ERROR(msg, ...) \
+				spdlog::error(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
+	
+	#define LOG_ERROR_EX(msg, func, filename, line, ...) \
+				spdlog::error(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), func, filename, line)
+	
+	#define LOG_WARN(msg, ...) \
+				spdlog::warn(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
+	
+	#define LOG_WARN_EX(msg, func, filename, line, ...) \
 			spdlog::warn(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), func, filename, line)
 
 #else
-#define DEBUG_BREAK
-#define GLCall(x) (x)
-#define ASSERT(x)
-#define LOG_DEBUG(msg, ...)
-#define LOG_DEBUG_EX(msg, func, filename, line, ...)
-#define LOG_INFO(msg, ...)
-#define LOG_INFO_EX(msg, func, filename, line, ...)
-#define LOG_ERROR(msg, ...)
-#define LOG_ERROR_EX(msg, func, filename, line, ...)
-#define LOG_WARN(msg, ...)
-#define LOG_WARN_EX(msg, func, filename, line, ...)
-
+	#define DEBUG_BREAK
+	#define GLCall(x) (x)
+	#define ASSERT(x)
+	#define LOG_DEBUG(msg, ...)
+	#define LOG_DEBUG_EX(msg, func, filename, line, ...)
+	#define LOG_INFO(msg, ...)
+	#define LOG_INFO_EX(msg, func, filename, line, ...)
+	#define LOG_ERROR(msg, ...)
+	#define LOG_ERROR_EX(msg, func, filename, line, ...)
+	#define LOG_WARN(msg, ...)
+	#define LOG_WARN_EX(msg, func, filename, line, ...)
+	#define GLASH_MACROS_DEFINED
 #endif
 	class GLASH_API Log
 	{
@@ -169,13 +180,6 @@ namespace glash
 
 			LOG_ERROR_EX("[OpenGL Debug] Source: {}, Type: {}, Severity: {}, Message: {}",
 				g_Func, g_FileName, g_Line, sourceStr, typeStr, severityStr, message);
-		}
-
-		inline void InitLogger()
-		{
-#ifdef GLASH_DEBUG
-			spdlog::set_level(spdlog::level::debug);
-#endif
 		}
 
 		inline void InitializeOpenGLDebug()

@@ -6,9 +6,6 @@
 #include "glash/Core.hpp"
 #include "glash/Enums.hpp"
 
-
-
-
 namespace glash
 {
 	class Window;
