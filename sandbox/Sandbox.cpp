@@ -1,20 +1,21 @@
-#include "Sandbox.hpp"
-
-#include "GLFW/glfw3.h"
-#include "glash/glash_pch.hpp"
 #ifdef GLASH_EXPORT
 #undef GLASH_EXPORT
 #endif
 
-#include "TestClearColor.hpp"
-#include "TestTexture.hpp"
-#include "TestMenu.hpp"
-#include "glash/Renderer.hpp"
-//#include "glash/Logger.hpp"
-//#include "glash/Core.hpp"
-//#include "ImguiWindow.hpp"
-
+#include "glash/Core.hpp"
+#include "Sandbox.hpp"
 #include "glash/Glash.hpp"
+
+
+
+//#include "GLFW/glfw3.h"
+//#include "glash/glash_pch.hpp"
+//#include "TestClearColor.hpp"
+//#include "TestTexture.hpp"
+//#include "TestMenu.hpp"
+//#include "glash/Renderer.hpp"
+//
+//#include "glash/Glash.hpp"
 
 
 glash::Application* glash::CreateApplication()

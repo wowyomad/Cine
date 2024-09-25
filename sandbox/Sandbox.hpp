@@ -1,11 +1,10 @@
 #include "glash/Applicatoin.hpp"
 
-#include "glash/Window.hpp"
-
 class Sandbox : public glash::Application
 {
 public:
 	Sandbox()
+
 	{
 
 	}
@@ -15,7 +14,5 @@ public:
 			
 	}
 
-private:
-	glash::Window m_Window;
 };
 

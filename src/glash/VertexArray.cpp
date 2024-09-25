@@ -1,5 +1,5 @@
 #include "VertexArray.hpp"
-#include "logger.hpp"
+#include "Log.hpp"
 
 namespace glash
 {

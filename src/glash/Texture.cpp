@@ -3,7 +3,7 @@
 
 #include "stb_image.h"
 
-#include "glash/logger.hpp"
+#include "glash/Log.hpp"
 
 namespace glash
 {

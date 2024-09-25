@@ -1,6 +1,5 @@
 #include "TestClearColor.hpp"
 #include "glash/glash_pch.hpp"
-#include "glash/Logger.hpp"
 #include "imgui.h"
 
 namespace glash

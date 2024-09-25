@@ -9,9 +9,6 @@
 #include <format>
 #include <print>
 
-//log
-// #include "helper/logger.hpp" (when finished)
-
 //data structures
 #include <vector>
 #include <array>

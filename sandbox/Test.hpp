@@ -2,7 +2,6 @@
 
 #include "glash/Core.hpp"
 #include "glash/Window.hpp"
-#include "glash/Logger.hpp"
 
 namespace glash
 {

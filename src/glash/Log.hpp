@@ -1,6 +1,8 @@
 #pragma once
+#include "glash/Core.hpp"
 #include "glash/glash_pch.hpp" 
 #include "glash/Enums.hpp"
+
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_sinks.h"
 #include "spdlog/pattern_formatter.h"
@@ -78,6 +80,22 @@ namespace glash
 #define LOG_WARN_EX(msg, func, filename, line, ...)
 
 #endif
+	class GLASH_API Log
+	{
+	public:
+		static void Init();
+
+		inline static std::shared_ptr<spdlog::logger>& GetCoreLogger() {
+			return s_CoreLogger;
+		}
+		inline static std::shared_ptr<spdlog::logger>& GetClientLogger() {
+			return s_ClientLogger;
+		}
+	private:
+		inline static std::shared_ptr<spdlog::logger> s_CoreLogger;
+		inline static std::shared_ptr<spdlog::logger> s_ClientLogger;
+
+	};
 	namespace debug
 	{
 		inline bool g_HasErrorOccured = false;
