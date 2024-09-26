@@ -1,3 +1,5 @@
+#pragma once
+
 #include "glash/Core.hpp"
 #include "glash/glash_pch.hpp"
 
@@ -5,7 +7,23 @@
 
 namespace glash
 {
-	class GLASH_API WindowResizeEvent : public Event
+	class GLASH_API ApplicationEvent : public Event
+	{
+	public:
+		ApplicationEvent() {}
+		
+		EVENT_CLASS_CATEGORY(EventCategoryApplication)
+	};
+
+	class GLASH_API WindowCloseEvent : public ApplicationEvent
+	{
+	public:
+		WindowCloseEvent() {}
+
+		EVENT_CLASS_TYPE(WindowClose)
+	};
+
+	class GLASH_API WindowResizeEvent : public ApplicationEvent
 	{
 	public:
 		WindowResizeEvent(unsigned int width, unsigned int height)
@@ -18,14 +36,47 @@ namespace glash
 		{
 			return fmt::format("WindowResizeEvent: {}, {}", m_Width, m_Height);
 		}
-		EVENT_CLASS_TYPE(WindowResize)
-		EVENT_CLASS_CATEGORY(EventCategoryApplication)
 
-		inline EventType GetEventType() const override { return EventType(); }
-		inline const char* GetName() const override { return nullptr; }
-		inline int GetCategoryFlags() const override { return 0; }
+		EVENT_CLASS_TYPE(WindowResize)
 
 	protected:
 		unsigned int m_Width, m_Height;
+	};
+
+	class GLASH_API WindowFocusEvent : public ApplicationEvent
+	{
+	public:
+		WindowFocusEvent() {}
+
+		EVENT_CLASS_TYPE(WindowFocus)
+	};
+
+	class GLASH_API WindowLostFocusEvent : public ApplicationEvent
+	{
+	public: 
+		WindowLostFocusEvent() {}
+
+		EVENT_CLASS_TYPE(WindowLostFocus)
+	};
+
+	class GLASH_API AppTickEvent : public ApplicationEvent
+	{
+		AppTickEvent() {}
+		
+		EVENT_CLASS_TYPE(AppTick)
+	};
+
+	class GLASH_API AppUpdateEvent : public ApplicationEvent
+	{
+		AppUpdateEvent() {}
+
+		EVENT_CLASS_TYPE(AppUpdate)
+	};
+
+	class GLASH_API AppRenderEvent : public ApplicationEvent
+	{
+		AppRenderEvent() {}
+
+		EVENT_CLASS_TYPE(AppRender)
 	};
 }

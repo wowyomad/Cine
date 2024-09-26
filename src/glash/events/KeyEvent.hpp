@@ -1,3 +1,6 @@
+#pragma once
+
+
 #include "glash/Core.hpp"
 #include "glash/glash_pch.hpp"
 
@@ -37,10 +40,10 @@ namespace glash
 		int m_RepeatCount;
 	};
 
-	class  GLASH_API KeyPressedEvent : public KeyEvent
+	class  GLASH_API KeyReleasedEvent : public KeyEvent
 	{
 	public:
-		KeyPressedEvent(int keyCode)
+		KeyReleasedEvent(int keyCode)
 			: KeyEvent(keyCode) { }
 
 		inline std::string Tostring() const

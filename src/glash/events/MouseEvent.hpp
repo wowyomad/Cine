@@ -1,3 +1,6 @@
+#pragma once
+
+
 #include "glash/Core.hpp"
 #include "glash/glash_pch.hpp"
 
@@ -5,14 +8,14 @@
 
 namespace glash
 {
-	class MouseMovedEvent : public Event
+	class GLASH_API MouseMovedEvent : public Event
 	{
 	public:
 
 		MouseMovedEvent(float x, float y)
 			: m_MouseX(x), m_MouseY(y) { }
 
-		std::string ToString() const override
+		inline std::string ToString() const override
 		{
 			return fmt::format("MouseMovedEvent: {}, {}", m_MouseX, m_MouseY);
 		}
@@ -24,14 +27,14 @@ namespace glash
 		float m_MouseX, m_MouseY;
 	};
 
-	class MouseScrolledEvent : public Event
+	class GLASH_API MouseScrolledEvent : public Event
 	{
 	public:
 
 		MouseScrolledEvent(float offsetX, float offsetY)
-			: m_OffsetX(x), m_OffsetY(y) { }
+			: m_OffsetX(offsetX), m_OffsetY(offsetY) { }
 
-		std::string ToString() const override
+		inline std::string ToString() const override
 		{
 			return fmt::format("MouseScrolledEvent: {}, {}", m_OffsetX, m_OffsetY);
 		}
@@ -46,8 +49,7 @@ namespace glash
 	class MouseButtonEvent : public Event
 	{
 	public:
-
-		EVENT_CLASS_CATEGORY(EventCategoryInput | EventCategoryMouse)
+		EVENT_CLASS_CATEGORY(EventCategoryInput | EventCategoryMouse | EventCategoryMouseButton)
 
 	protected:
 		int m_Button;
@@ -55,13 +57,13 @@ namespace glash
 			: m_Button(button) { }
 	};
 
-	class MouseButtonPressedEvent : public Event
+	class GLASH_API MouseButtonPressedEvent : MouseButtonEvent
 	{
 	public:
 		MouseButtonPressedEvent(int button)
 			: MouseButtonEvent(button) { }
 
-		std::string ToString() const override
+		inline std::string ToString() const override
 		{
 			return fmt::format("MouseButtonPressed: {}", m_Button);
 		}
@@ -69,15 +71,15 @@ namespace glash
 		EVENT_CLASS_TYPE(MouseButtonPressed)
 	};
 
-	class MouseButtonReleasedEvent : public Event
+	class GLASH_API MouseButtonReleasedEvent : public MouseButtonEvent
 	{
 	public:
 		MouseButtonReleasedEvent(int button)
 			: MouseButtonEvent(button) { }
 
-		std::string ToString() const override
+		inline std::string ToString() const override
 		{
-			return fmt::format("MouseButtonPressed: {}", m_Button);
+			return fmt::format("MouseButtonReleased: {}", m_Button);
 		}
 
 		EVENT_CLASS_TYPE(MouseButtonReleased)
