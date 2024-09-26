@@ -1,11 +1,12 @@
 #pragma once
+#include "glash/Core.hpp"
 
 #include "glash/glash_pch.hpp"
 #include "glash/Enums.hpp"
 
 namespace glash
 {
-	class IndexBuffer
+	class GLASH_API IndexBuffer
 	{
 	public:
 		using Index = GLuint;

@@ -1,4 +1,5 @@
 #pragma once
+#include "glash/Core.hpp"
 
 #include "glash/glash_pch.hpp"
 #include "glash/Enums.hpp"
@@ -13,7 +14,7 @@ namespace glash
 		uint32_t size;
 	};
 
-	class VertexBufferLayout
+	class GLASH_API VertexBufferLayout
 	{
 	public:
 

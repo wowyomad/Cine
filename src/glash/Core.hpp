@@ -48,7 +48,7 @@ struct fmt::formatter<glash::ClassName> {									\
 																			\
     template <typename FormatContext>										\
     auto format(const glash::ClassName& event, FormatContext& ctx) const {	\
-		if constexpr (glash::has_to_string<glash::ClassName>::value) {				\
+		if constexpr (glash::has_to_string<glash::ClassName>::value) {				 \
 			return fmt::format_to(ctx.out(), "{}", event.ToString());		\
 		}																	\
 		else {																\

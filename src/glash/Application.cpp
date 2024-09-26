@@ -1,9 +1,11 @@
+#include "Core.hpp"
+
 #include "glash/Applicatoin.hpp"
 #include "glash/Window.hpp"
 #include "glash/Log.hpp"
-#include "glash/events/Event.hpp"
 #include "glash/events/KeyEvent.hpp"
 #include "glash/events/ApplicationEvent.hpp"
+#include "glash/events/MouseEvent.hpp"
 
 namespace glash
 {
@@ -14,9 +16,16 @@ namespace glash
 	void Application::Run()
 	{
 		Window window(800, 600, "Window");
+		WindowFocusEvent focusEvent;
+
+		EventDispatcher dispatcher(focusEvent);
+
+		dispatcher.Dispatch<WindowFocusEvent>([](WindowFocusEvent& event) -> bool { LOG_INFO("Event dispatcher: {}", event);  return true;  }); //This works
+
 		while (!window.ShouldClose())
 		{
 			window.PollEvents();
 		}
 	}
 }
+

@@ -1,4 +1,5 @@
 #include "glash/glash_pch.hpp"
+#include "glash/Core.hpp"
 
 #include "glash/VertexBuffer.hpp"
 #include "glash/VertexArray.hpp"
@@ -8,7 +9,7 @@ namespace glash
 {
 	namespace mesh
 	{
-		class TriangleMesh
+		class GLASH_API TriangleMesh
 		{
 			static const size_t ROWS = 3;
 		public:
