@@ -50,9 +50,12 @@ namespace glash
 		bool m_Handled = false;
 	};
 
+	template <typename T>
+	concept EventDerived = std::derived_from<T, Event>;
 
 	class GLASH_API EventDispatcher
 	{
+
 		template <class T>
 		using EventFn = std::function<bool(T&)>;
 
@@ -60,16 +63,19 @@ namespace glash
 		EventDispatcher(Event& event)
 			: m_Event(event) { }
 
-		template <class T>
+		template <EventDerived T>
 		bool Dispatch(EventFn<T> func)
 		{
 			if (m_Event.GetEventType() == T::GetStaticEventType())
 			{
-				m_Event.m_Handled = func(reinterpret_cast<T&>(m_Event));
+				m_Event.m_Handled = func(static_cast<T&>(m_Event));
 				return true;
 			}
 			return false;
 		}
+
+		
+	
 	private: 
 
 		Event& m_Event;
