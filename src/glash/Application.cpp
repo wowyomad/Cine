@@ -11,20 +11,14 @@ namespace glash
 {
 	Application::Application()
 	{
-		
+		m_Window = std::unique_ptr<Window>(Window::Create());	
 	}
 	void Application::Run()
 	{
-		Window_OLD window(800, 600, "Window");
-		WindowFocusEvent focusEvent;
-
-		EventDispatcher dispatcher(focusEvent);
-
-		dispatcher.Dispatch<WindowFocusEvent>([](WindowFocusEvent& event) -> bool { LOG_INFO("Event dispatcher: {}", event);  return true;  }); //This works
-
-		while (!window.ShouldClose())
+		m_Running = true;
+		while (m_Running)
 		{
-			window.PollEvents();
+			m_Window->OnUpdate();
 		}
 	}
 }
