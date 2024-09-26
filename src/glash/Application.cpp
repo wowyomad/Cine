@@ -7,12 +7,14 @@
 #include "glash/events/ApplicationEvent.hpp"
 #include "glash/events/MouseEvent.hpp"
 
+#include "GLFW/glfw3.h"
 namespace glash
 {
 	Application::Application()
 		: m_Running(false)
 	{
-		m_Window = std::unique_ptr<Window>(Window::Create());	
+		m_Window = std::unique_ptr<Window>(Window::Create());
+		glClearColor(0.25, 1.0, 0.5, 1.0);
 	}
 	void Application::Run()
 	{
@@ -20,6 +22,7 @@ namespace glash
 		while (m_Running)
 		{
 			m_Window->OnUpdate();
+			glClear(GL_COLOR_BUFFER_BIT);
 		}
 	}
 }

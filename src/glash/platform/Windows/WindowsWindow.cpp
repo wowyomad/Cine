@@ -11,7 +11,6 @@ namespace glash
 		return new WindowsWindow(props);
 	}
 
-
 	WindowsWindow::WindowsWindow(const WindowProps& props)
 	{
 		Init(props);

@@ -51,8 +51,6 @@ set_target_properties(Sandbox PROPERTIES
 
 target_link_libraries(Sandbox
     PRIVATE glash 
-    PUBLIC glfw
-    PUBLIC libglew_static
     PRIVATE imgui
 )
 add_dependencies(Sandbox copy_shaders copy_textures)

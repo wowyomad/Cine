@@ -181,7 +181,7 @@ namespace glash
 			case GL_DEBUG_SEVERITY_NOTIFICATION: severityStr = "Notification"; break;
 			}
 
-			LOG_ERROR_EX("[OpenGL Debug] Source: {}, Type: {}, Severity: {}, Message: {}",
+			GLASH_CORE_ERROR("[OpenGL Debug] Source: {}, Type: {}, Severity: {}, Message: {}",
 				g_Func, g_FileName, g_Line, sourceStr, typeStr, severityStr, message);
 		}
 
