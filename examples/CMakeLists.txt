@@ -33,7 +33,6 @@ target_link_libraries(example2 PRIVATE glash imgui)
 target_include_directories(example1 PRIVATE ${imgui_SOURCE_DIR})
 target_include_directories(example2 PRIVATE ${imgui_SOURCE_DIR})
 
-
 set(GLASH_PCH_HEADER "${CMAKE_SOURCE_DIR}/src/glash/glash_pch.hpp")
 target_precompile_headers(example1 PRIVATE ${GLASH_PCH_HEADER})
 

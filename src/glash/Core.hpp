@@ -21,6 +21,14 @@
 #define BUILD_STR "STATIC BUILD"
 #endif
 
+#ifdef GLASH_ENABLE_ASSERTS
+    #define GLASH_CORE_ASSERT(x, ...) { if(!(x)) { GLASH_CORE_ERROR("Assertion failed: {}", __VA_ARGS__); DEBUG_BREAK; } }
+    #define GLASH_ASSERT(x, ...) { if(!(x)) { GLASH_ERROR("Assertion failed: {}", __VA_ARGS__); DEBUG_BREAK; } }
+#else
+    #define GLASH_CORE_ASSERT(x, ...)
+    #define GLASH_ASSERT(x, ...)
+#endif
+
 template<typename T>
 inline constexpr T BIT(T x) {
     static_assert(std::is_integral_v<T>, "BIT can only be used with integral types.");
@@ -48,7 +56,7 @@ struct fmt::formatter<glash::ClassName> {									\
 																			\
     template <typename FormatContext>										\
     auto format(const glash::ClassName& event, FormatContext& ctx) const {	\
-		if constexpr (glash::has_to_string<glash::ClassName>::value) {				 \
+		if constexpr (glash::has_to_string<glash::ClassName>::value) {		\
 			return fmt::format_to(ctx.out(), "{}", event.ToString());		\
 		}																	\
 		else {																\

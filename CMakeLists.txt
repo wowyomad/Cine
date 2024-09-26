@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Project properties
 set(GLASH_BUILD_DLL ON CACHE BOOL "Build glash as a shared library" FORCE)
-set(GLASH_BUILD_EXAMPLES ON CACHE BOOL "Build examples"  FORCE)
+set(GLASH_BUILD_EXAMPLES OFF CACHE BOOL "Build examples"  FORCE)
 set(GLASH_BUILD_TESTS ON CACHE BOOL "Build tests"  FORCE)
 
 # Might be needed for planned hot reload.
@@ -21,7 +21,7 @@ set(GLFW_BUILD_WAYLAND OFF CACHE BOOL "Enable wayland scanner" FORCE)
 
 include(FetchContent)
 FetchContent_Declare(
-    glew
+    libglew_static  #same name as the target. No reason to use shared
     GIT_REPOSITORY https://github.com/Perlmint/glew-cmake.git
     GIT_TAG glew-cmake-2.2.0
 )
@@ -47,7 +47,6 @@ FetchContent_Declare(
 )
 FetchContent_Declare(
     stb
-    stb
     GIT_REPOSITORY https://github.com/nothings/stb.git
     GIT_TAG f75e8d1cad7d90d72ef7a4661f1b994ef78b4e31
 )
@@ -56,7 +55,9 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/ocornut/imgui.git
     GIT_TAG v1.91.2
 )
-set(DEPENDENCY_TARGETS glew glfw fmt glm spdlog stb imgui)
+list(APPEND BUILD_DEPENDENCIES libglew_static glfw fmt glm spdlog imgui)
+list(APPEND HEADER_DEPENDENCIES stb)
+list(APPEND DEPENDENCY_TARGETS ${BUILD_DEPENDENCIES} ${HEADER_DEPENDENCIES})
 FetchContent_MakeAvailable(${DEPENDENCY_TARGETS})
 
 # Use vendor OpenGL 
@@ -75,11 +76,13 @@ endif()
 
 if(MSVC)
     message("Adding compile options for MSVC")
-    foreach(target ${DEPENDENCY_TARGETS})
+    foreach(target ${BUILD_DEPENDENCIES})
     if(TARGET ${target})
         target_compile_options(${target} PRIVATE /MP)
-        target_compile_options(${target} PRIVATE $<$<CONFIG:Debug>:/Zi>)
-        target_link_options(${target} PRIVATE $<$<CONFIG:Debug>:/INCREMENTAL>)
+ #       target_compile_options(${target} PRIVATE $<$<CONFIG:Debug>:/Zi>)
+ #       target_link_options(${target} PRIVATE $<$<CONFIG:Debug>:/INCREMENTAL>)
+        set_target_properties(${target} PROPERTIES FOLDER "Dependencies")
+
     else()
         message(WARNING "Target ${target} not found.")
     endif()

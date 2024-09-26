@@ -8,12 +8,9 @@
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include "spdlog/pattern_formatter.h"
 
-#ifndef ENABLE_GLASH_DEBUG //!always on only for testing purposes!//
-#define ENABLE_GLASH_DEBUG
-#endif
 namespace glash
 {
-#ifdef ENABLE_GLASH_DEBUG
+#ifdef GLASH_ENABLE_DEBUG
 	#ifdef _MSC_VER
 		#define DEBUG_BREAK __debugbreak()
 	#else
@@ -43,15 +40,14 @@ namespace glash
 		glash::Log::GetCoreLogger()->info(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
 	#define GLASH_CORE_ERROR(msg, ...)\
 		glash::Log::GetCoreLogger()->error(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
-	#define GLASH_TRACE(msg, ...)\
+	#define GLASH_LOG_TRACE(msg, ...)\
 		glash::Log::GetClientLogger()->trace(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
-	#define GLASH_DEBUG(msg, ...)\
+	#define GLASH_LOG_DEBUG(msg, ...)\
 		glash::Log::GetClientLogger()->debug(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
-	#define GLASH_INFO(msg, ...)\
+	#define GLASH_LOG_INFO(msg, ...)\
 		glash::Log::GetClientLogger()->info(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
-	#define GLASH_ERROR(msg, ...)\
+	#define GLASH_LOG_ERROR(msg, ...)\
 		glash::Log::GetClientLogger()->error(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
-	#define GLASH_MACROS_DEFINED
 	
 	#define LOG_DEBUG(msg, ...) \
 				spdlog::debug(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
@@ -78,6 +74,14 @@ namespace glash
 			spdlog::warn(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), func, filename, line)
 
 #else
+	#define GLASH_CORE_TRACE(msg, ...)
+	#define GLASH_CORE_DEBUG(msg, ...)
+	#define GLASH_CORE_INFO(msg, ...)
+	#define GLASH_CORE_ERROR(msg, ...)
+	#define GLASH_LOG_TRACE(msg, ...)
+	#define GLASH_LOG_DEBUG(msg, ...)
+	#define GLASH_LOG_INFO(msg, ...)
+	#define GLASH_LOG_ERROR(msg, ...)
 	#define DEBUG_BREAK
 	#define GLCall(x) (x)
 	#define ASSERT(x)
@@ -89,7 +93,6 @@ namespace glash
 	#define LOG_ERROR_EX(msg, func, filename, line, ...)
 	#define LOG_WARN(msg, ...)
 	#define LOG_WARN_EX(msg, func, filename, line, ...)
-	#define GLASH_MACROS_DEFINED
 #endif
 	class GLASH_API Log
 	{
@@ -184,7 +187,7 @@ namespace glash
 
 		inline void InitializeOpenGLDebug()
 		{
-#ifdef GLASH_DEBUG
+#ifdef GLASH_ENABLE_DEBUG
 			glEnable(GL_DEBUG_OUTPUT);
 			glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 			glDebugMessageCallback(GLDebugMessageCallback, nullptr);

@@ -1,6 +1,6 @@
 #include "glash/glash_pch.hpp"
 
-#include "glash/Window.hpp"
+#include "glash/Window_OLD.hpp"
 
 #include "imgui.h"
 #include "backends/imgui_impl_glfw.h"
@@ -11,7 +11,7 @@ const unsigned int SCR_HEIGHT = 600;
 
 int main()
 {
-	glash::Window window(SCR_WIDTH, SCR_HEIGHT, "Example 2");
+	glash::Window_OLD window(SCR_WIDTH, SCR_HEIGHT, "Example 2");
 
 	//Initialize imgui
 	IMGUI_CHECKVERSION();

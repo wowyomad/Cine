@@ -1,6 +1,6 @@
 #include "glash/glash_pch.hpp"
 
-#include "glash/Window.hpp"
+#include "glash/Window_OLD.hpp"
 #include "glash/Renderer.hpp"
 #include "glash/Shader.hpp"
 #include "glash/Texture.hpp"
@@ -11,7 +11,7 @@ glash::Shader* g_Shader = nullptr;
 int main(int argc, char** argv)
 {
 	try {
-		glash::Window window(800, 800, "Test Window");
+		glash::Window_OLD window(800, 800, "Test Window");
 		glash::debug::InitializeOpenGLDebug();
 		glash::Renderer renderer;
 

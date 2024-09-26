@@ -10,6 +10,7 @@
 namespace glash
 {
 	Application::Application()
+		: m_Running(false)
 	{
 		m_Window = std::unique_ptr<Window>(Window::Create());	
 	}
