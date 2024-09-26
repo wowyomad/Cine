@@ -80,3 +80,12 @@ namespace glash
 		EVENT_CLASS_TYPE(AppRender)
 	};
 }
+
+STRING_FORMAT(ApplicationEvent)
+STRING_FORMAT(WindowCloseEvent)
+STRING_FORMAT(WindowResizeEvent)
+STRING_FORMAT(WindowFocusEvent)
+STRING_FORMAT(WindowLostFocusEvent)
+STRING_FORMAT(AppTickEvent)
+STRING_FORMAT(AppUpdateEvent)
+STRING_FORMAT(AppRenderEvent)

@@ -77,15 +77,4 @@ namespace glash
 
 }
 
-template <>
-struct fmt::formatter<glash::Event> {
-	template <typename ParseContext>
-	constexpr auto parse(ParseContext& ctx) {
-		return ctx.begin();
-	}
-
-	template <typename FormatContext>
-	auto format(const glash::Event& event, FormatContext& ctx) const {
-		return fmt::format_to(ctx.out(), "{}", event.ToString());
-	}
-};
+STRING_FORMAT(Event)

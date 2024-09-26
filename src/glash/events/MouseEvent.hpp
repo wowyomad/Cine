@@ -85,3 +85,8 @@ namespace glash
 		EVENT_CLASS_TYPE(MouseButtonReleased)
 	};
 }
+
+STRING_FORMAT(MouseButtonPressedEvent)
+STRING_FORMAT(MouseButtonReleasedEvent)
+STRING_FORMAT(MouseMovedEvent)
+STRING_FORMAT(MouseScrolledEvent)

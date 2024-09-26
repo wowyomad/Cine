@@ -55,3 +55,7 @@ namespace glash
 
 	};
 }
+
+STRING_FORMAT(KeyEvent)
+STRING_FORMAT(KeyPressedEvent)
+STRING_FORMAT(KeyReleasedEvent)

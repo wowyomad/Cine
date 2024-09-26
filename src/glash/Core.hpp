@@ -21,11 +21,38 @@
 #define BUILD_STR "STATIC BUILD"
 #endif
 
-
-
 template<typename T>
 inline constexpr T BIT(T x) {
     static_assert(std::is_integral_v<T>, "BIT can only be used with integral types.");
     return T(1) << x;
 }
 
+namespace glash
+{
+    template <typename T, typename = void>
+    struct has_to_string : std::false_type {};
+
+    template <typename T>
+    struct has_to_string<T, std::void_t<decltype(std::declval<T>().ToString())>> : std::true_type {};
+}
+
+//Requires class to implement 'std::string ToString() const',
+//otherwise uses class name
+#define STRING_FORMAT(ClassName)\
+template <>																	\
+struct fmt::formatter<glash::ClassName> {									\
+    template <typename ParseContext>										\
+    constexpr auto parse(ParseContext& ctx) {								\
+        return ctx.begin();													\
+    }																		\
+																			\
+    template <typename FormatContext>										\
+    auto format(const glash::ClassName& event, FormatContext& ctx) const {	\
+		if constexpr (glash::has_to_string<glash::ClassName>::value) {				\
+			return fmt::format_to(ctx.out(), "{}", event.ToString());		\
+		}																	\
+		else {																\
+			return fmt::format_to(ctx.out(), "{}", #ClassName);				\
+		}																	\
+    }																		\
+};
