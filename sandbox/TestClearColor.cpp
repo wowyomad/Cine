@@ -6,12 +6,12 @@ namespace glash
 {
 	namespace test
 	{
-		ClearColorTest::ClearColorTest(Window& window)
+		ClearColorTest::ClearColorTest(Window_OLD& window)
 			: ClearColorTest(window, color::GRAY)
 		{
 			
 		}
-		ClearColorTest::ClearColorTest(Window& window, const Color& color)
+		ClearColorTest::ClearColorTest(Window_OLD& window, const Color& color)
 			: Test(window), m_ClearColor(color)
 		{
 

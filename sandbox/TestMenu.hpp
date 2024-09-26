@@ -2,7 +2,7 @@
 
 #include "Test.hpp"
 #include "glash/glash_pch.hpp"
-#include "glash/Window.hpp"
+#include "glash/Window_OLD.hpp"
 
 namespace glash
 {
@@ -11,10 +11,10 @@ namespace glash
 		class TestMenu : public Test
 		{
 		public:
-			TestMenu(Window& window);
+			TestMenu(Window_OLD& window);
 
 			template <class InitialTest>
-			TestMenu(Window& window, const std::string& testName)
+			TestMenu(Window_OLD& window, const std::string& testName)
 				: Test(window)
 			{
 				RegisterTest<InitialTest>(testName);

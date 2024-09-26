@@ -1,7 +1,7 @@
 #pragma once
 
 #include "glash/Core.hpp"
-#include "glash/Window.hpp"
+#include "glash/Window_OLD.hpp"
 
 namespace glash
 {
@@ -10,7 +10,7 @@ namespace glash
 		class Test
 		{
 		public:
-			Test(Window& window) : m_Window(window), m_PreviuosColor(window.GetClearColor()) { }
+			Test(Window_OLD& window) : m_Window(window), m_PreviuosColor(window.GetClearColor()) { }
 			virtual ~Test() { m_Window.SetClearColor(m_PreviuosColor);  }
 
 			virtual void OnUpdate(float deltaTime) {}
@@ -18,7 +18,7 @@ namespace glash
 			virtual void OnImGuiRender() {}
 
 		protected:
-			Window& m_Window;
+			Window_OLD& m_Window;
 			Color m_PreviuosColor;
 		};
 	}

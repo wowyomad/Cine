@@ -4,7 +4,7 @@ namespace glash
 {
 	namespace test
 	{
-		TestMenu::TestMenu(Window& window)
+		TestMenu::TestMenu(Window_OLD& window)
 			: Test(window), m_CurrentTest(this)
 		{
 			

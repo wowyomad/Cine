@@ -4,7 +4,7 @@
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
 
-ImguiWindow::ImguiWindow(const glash::Window& window)
+ImguiWindow::ImguiWindow(const glash::Window_OLD& window)
 {
 	glfwInit();
 	glfwMakeContextCurrent(window.GetPtr());

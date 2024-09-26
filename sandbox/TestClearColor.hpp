@@ -1,6 +1,6 @@
 #pragma once
 #include "Test.hpp"
-#include "glash/Window.hpp"
+#include "glash/Window_OLD.hpp"
 #include "glash/Enums.hpp"
 
 namespace glash
@@ -10,8 +10,8 @@ namespace glash
 		class ClearColorTest : public Test
 		{
 		public:
-			ClearColorTest(Window& window);
-			ClearColorTest(Window& window, const Color& color);
+			ClearColorTest(Window_OLD& window);
+			ClearColorTest(Window_OLD& window, const Color& color);
 			~ClearColorTest();
 
 			virtual void OnUpdate(float deltaTime) override;

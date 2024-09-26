@@ -1,7 +1,7 @@
 #include "Core.hpp"
 
 #include "glash/Applicatoin.hpp"
-#include "glash/Window.hpp"
+#include "glash/Window_OLD.hpp"
 #include "glash/Log.hpp"
 #include "glash/events/KeyEvent.hpp"
 #include "glash/events/ApplicationEvent.hpp"
@@ -15,7 +15,7 @@ namespace glash
 	}
 	void Application::Run()
 	{
-		Window window(800, 600, "Window");
+		Window_OLD window(800, 600, "Window");
 		WindowFocusEvent focusEvent;
 
 		EventDispatcher dispatcher(focusEvent);

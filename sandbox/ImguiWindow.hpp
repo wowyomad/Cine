@@ -1,12 +1,12 @@
 #pragma once
 
-#include "glash/Window.hpp"
+#include "glash/Window_OLD.hpp"
 #include "imgui.h"
 
 class ImguiWindow
 {
 public:
-	ImguiWindow(const glash::Window& window);
+	ImguiWindow(const glash::Window_OLD& window);
 	void NewImguiFrame();
 	void ImguiRender();
 

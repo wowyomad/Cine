@@ -4,7 +4,7 @@ namespace glash
 {
 	namespace test
 	{
-		TestTexture::TestTexture(Window& window) :
+		TestTexture::TestTexture(Window_OLD& window) :
 			Test(window),
 			m_Shader(Shader("resources/shaders/shader_with_texture.shader")),
 			m_Texture(Texture("resources/textures/face.png"))

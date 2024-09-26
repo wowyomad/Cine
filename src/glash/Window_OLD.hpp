@@ -8,17 +8,17 @@
 
 namespace glash
 {
-	class Window;
+	class Window_OLD;
 
-	class GLASH_API Window
+	class GLASH_API Window_OLD
 	{
-	static Window* s_Window;
+	static Window_OLD* s_Window;
 
 	public:
 		using KeyCallback = std::function<void(GLFWwindow* window, int key, int scancode, int action, int mods)>;
 
-		Window(int width, int height, const std::string& title, const Color& clearColor = color::GRAY);
-		~Window();
+		Window_OLD(int width, int height, const std::string& title, const Color& clearColor = color::GRAY);
+		~Window_OLD();
 
 		void PollEvents() const;
 		bool ShouldClose() const;

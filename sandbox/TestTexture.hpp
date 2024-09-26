@@ -17,7 +17,7 @@ namespace glash
 		class TestTexture : public Test
 		{
 		public: 
-			TestTexture(Window& window);
+			TestTexture(Window_OLD& window);
 
 			void OnUpdate(float deltaTime) override;
 			void OnImGuiRender() override;
