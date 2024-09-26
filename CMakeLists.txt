@@ -56,8 +56,8 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/ocornut/imgui.git
     GIT_TAG v1.91.2
 )
-
-FetchContent_MakeAvailable(glew glfw fmt glm spdlog stb imgui)
+set(DEPENDENCY_TARGETS glew glfw fmt glm spdlog stb imgui)
+FetchContent_MakeAvailable(${DEPENDENCY_TARGETS})
 
 # Use vendor OpenGL 
 if (POLICY CMP0072)
@@ -73,22 +73,26 @@ if (GLASH_BUILD_TESTS)
     add_subdirectory(sandbox)
 endif()
 
-if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+if(MSVC)
+    message("Adding compile options for MSVC")
+    foreach(target ${DEPENDENCY_TARGETS})
+    if(TARGET ${target})
+        target_compile_options(${target} PRIVATE /MP)
+        target_compile_options(${target} PRIVATE $<$<CONFIG:Debug>:/Zi>)
+        target_link_options(${target} PRIVATE $<$<CONFIG:Debug>:/INCREMENTAL>)
+    else()
+        message(WARNING "Target ${target} not found.")
+    endif()
+endforeach()
+
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     message("Adding compile options for GNU")
-    add_compile_options(-Wall -Wextra -pedantic -fexperimental-library)
-    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+
+    target_compile_options(glash PRIVATE -pthread) 
+     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
         add_compile_options(-Werror)
     elseif (CMAKE_BUILD_TYPE STREQUAL "Release")
         add_compile_options(-Wno-unused-parameter)
-    endif()
-elseif (MSVC)
-    message("Adding compile options to MSVC")
-    if (MSVC)
-    # THESE DON'T WORK (?)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /W4 /WX /ZI")
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /W3 /O2")
-    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /W3 /O2")
     endif()
 endif()
 

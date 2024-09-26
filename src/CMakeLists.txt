@@ -83,9 +83,9 @@ target_link_libraries(glash
 )
 
 if(MSVC)
+    target_compile_options(glash PRIVATE /MP)
     target_compile_options(glash PRIVATE $<$<CONFIG:Debug>:/Zi>)
     target_link_options(glash PRIVATE $<$<CONFIG:Debug>:/INCREMENTAL>)
-
 endif()
 
 set_target_properties(glash PROPERTIES
