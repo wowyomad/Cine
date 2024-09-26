@@ -1,5 +1,6 @@
+#pragma once
+#include "glash/glash_pch.hpp"
 #include "glash/Core.hpp"
-
 
 namespace glash
 {
@@ -15,23 +16,25 @@ namespace glash
 	enum EventCategory
 	{
 		None = 0,
-		EventCategoryApplication	= BIT(0),
-		EventCategoryInput			= BIT(1),
-		EventCategoryKeyboard		= BIT(2),
-		EventCategoryMouse			= BIT(3),
-		EventCategoryMouseButton	= BIT(4)
+		EventCategoryApplication = BIT(0),
+		EventCategoryInput = BIT(1),
+		EventCategoryKeyboard = BIT(2),
+		EventCategoryMouse = BIT(3),
+		EventCategoryMouseButton = BIT(4)
 	};
 
 #define EVENT_CLASS_TYPE(type)\
-	static EventType GetStaticEventType() { return EventType::##type; }\
-	EventType GetEventType() const override { return GetStaticEventType(); }\
-	virtual const char* GetName() const override { return #type; }
+	inline static EventType GetStaticEventType() { return EventType::##type; }\
+	inline EventType GetEventType() const override { return GetStaticEventType(); }\
+	inline const char* GetName() const override { return #type; }
 
 #define EVENT_CLASS_CATEGORY(category)\
-	int GetCategoryFlags() const override { return category; }
+	inline int GetCategoryFlags() const override { return category; }
 
 	class GLASH_API Event
 	{
+		friend class EventDispatcher;
+
 	public:
 		virtual EventType GetEventType() const = 0;
 		virtual const char* GetName() const = 0;
@@ -46,4 +49,43 @@ namespace glash
 	protected:
 		bool m_Handled = false;
 	};
+
+
+	class GLASH_API EventDispatcher
+	{
+		template <class T>
+		using EventFn = std::function<bool(T&)>;
+
+	public:
+		EventDispatcher(Event& event)
+			: m_Event(event) { }
+
+		template <class T>
+		bool Dispatch(EventFn<T> func)
+		{
+			if (m_Event.GetEventType() == T::GetStaticEventType())
+			{
+				m_Event.m_Handled = func(reinterpret_cast<T&>(m_Event));
+				return true;
+			}
+			return false;
+		}
+	private: 
+
+		Event& m_Event;
+	};
+
 }
+
+template <>
+struct fmt::formatter<glash::Event> {
+	template <typename ParseContext>
+	constexpr auto parse(ParseContext& ctx) {
+		return ctx.begin();
+	}
+
+	template <typename FormatContext>
+	auto format(const glash::Event& event, FormatContext& ctx) const {
+		return fmt::format_to(ctx.out(), "{}", event.ToString());
+	}
+};
