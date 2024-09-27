@@ -1,36 +1,60 @@
 # glash
 
 ## Project Overview
-OpenGL + C++ + CMake "eNgInE" for eductional purposes
+**glash** is an OpenGL + C++ + CMake "eNgInE" for educational purposes.
 
 ## Library Dependencies
-This project relies on the following external libraries, which are fetched, built and linked automatically using CMake's `FetchContent` module:
+This project relies on the following external libraries, which are fetched, built, and linked automatically using CMake's `FetchContent` module:
 
 1. **GLEW (OpenGL Extension Wrangler Library)**
    - **Repository:** [glew-cmake](https://github.com/Perlmint/glew-cmake.git)
+   - **Version:** 2.2.0
    - **Build Configuration:** Built as a static library.
 
 2. **GLFW (Graphics Library Framework)**
    - **Repository:** [glfw](https://github.com/glfw/glfw.git)
-   - **Build Configuration:** Built as a static library
+   - **Version:** 3.4
+   - **Build Configuration:** Built as a static library.
 
 3. **fmt (Formatting Library)**
    - **Repository:** [fmtlib](https://github.com/fmtlib/fmt.git)
+   - **Version:** 11.0.2
+   - **Build Configuration:** Built as a static library.
 
 4. **GLM (OpenGL Mathematics)**
-   - **Repository:** [glm](https://github.com/g-truc/glm.git
+   - **Repository:** [glm](https://github.com/g-truc/glm.git)
+   - **Version:** 1.0.1
+   - **Build Configuration:** Header-only library.
 
-5. **OpenGL**
-   - **Required Package:** OpenGL (automatically found by CMake)
-  
-## Options
-- **GLASH_BUILD_SHARED:** Controls whether `glash` is built as a shared library (default: OFF).
+5. **spdlog (Logging Library)**
+   - **Repository:** [spdlog](https://github.com/gabime/spdlog.git)
+   - **Version:** 1.14.1
+   - **Build Configuration:** Built as a static library.
+
+6. **stb (Single-file public domain libraries for C/C++)**
+   - **Repository:** [stb](https://github.com/nothings/stb.git)
+   - **Version:** Latest commit (f75e8d1cad7d90d72ef7a4661f1b994ef78b4e31)
+   - **Build Configuration:** Header-only library.
+
+7. **ImGui (Immediate Mode GUI)**
+   - **Repository:** [imgui](https://github.com/ocornut/imgui.git)
+   - **Version:** 1.91.2
+   - **Build Configuration:** Built as a static library.
+
+8. **OpenGL**
+   - **Required Package:** OpenGL (automatically found by CMake).
+
+## CMake Options
+- **GLASH_BUILD_DLL:** Controls whether `glash` is built as a DLL (dynamic library) (default: OFF). If set to `ON`, you should also define `GLASH_IMPORT` in projects that use `glash` and duplicate this setting in your project to properly link the dynamic library.
+
 - **GLASH_BUILD_EXAMPLES:** Enables building of example projects (default: ON).
 
-## Instructions
+## Build Instructions
 Ensure that you have CMake (minimum version 3.20) installed on your system. To build the project, clone the repository and run the following commands:
 
 ```bash
+git clone https://github.com/yourusername/glash.git
+cd glash
 mkdir build
 cd build
 cmake ..
