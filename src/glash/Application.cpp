@@ -8,7 +8,7 @@
 #include "glash/events/MouseEvent.hpp"
 
 
-#define BIND_EVENT_FN(x) std::bind(x, this, std::placeholders::_1)
+#define BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
 
 namespace glash
 {
@@ -17,7 +17,7 @@ namespace glash
 	{
 		m_Window = std::unique_ptr<Window>(Window::Create());
 
-		m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
+		m_Window->SetEventCallback(BIND_EVENT_FN(Application::OnEvent));
 
 		glClearColor(0.25, 1.0, 0.5, 1.0);
 	}
@@ -26,8 +26,8 @@ namespace glash
 	{
 		EventDispatcher dispatcher(event);
 
-		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowCloseEvent));
-		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(OnWindowResizeEvent));
+		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::OnWindowCloseEvent));
+		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(Application::OnWindowResizeEvent));
 
 		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
 		{
