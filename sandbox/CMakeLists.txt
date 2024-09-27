@@ -19,10 +19,6 @@ copy_files("${TEXTURE_FILES}" "${TEXTURES_OUT_DIR}" copy_textures)
 
 add_executable(Sandbox 
 Sandbox.cpp
-TestClearColor.cpp
-TestMenu.cpp
-TestTexture.cpp
-ImguiWindow.cpp
 )
 
 add_library(imgui STATIC
