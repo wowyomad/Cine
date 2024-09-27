@@ -29,7 +29,7 @@ namespace glash
 			: KeyEvent(keyCode), m_RepeatCount(repeatCount) { }
 
 		inline int GetRepeatCount() const { return m_RepeatCount; }
-		inline std::string Tostring() const
+		inline std::string ToString() const
 		{
 			return fmt::format("KeyPressedEvent: {} ({} repeats)", m_KeyCode, m_RepeatCount);
 		}
@@ -46,7 +46,7 @@ namespace glash
 		KeyReleasedEvent(int keyCode)
 			: KeyEvent(keyCode) { }
 
-		inline std::string Tostring() const
+		inline std::string ToString() const
 		{
 			return fmt::format("KeyReleasedEvent: {}", m_KeyCode);
 		}

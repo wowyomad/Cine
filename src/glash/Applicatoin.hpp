@@ -2,7 +2,8 @@
 #include "glash_pch.hpp"
 #include "glash/Core.hpp"
 
-#include "Window.hpp"
+#include "glash/events/ApplicationEvent.hpp"
+#include "glash/Window.hpp"
 
 namespace glash
 {
@@ -12,7 +13,11 @@ namespace glash
 		Application();
 		virtual ~Application() { };
 
-		virtual void Run();
+		void Run();
+		void OnEvent(Event& event);
+
+	private:
+		bool OnWindowCloseEvent(WindowCloseEvent& event);
 
 	private:
 		std::unique_ptr<Window> m_Window;

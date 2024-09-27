@@ -57,7 +57,7 @@ namespace glash
 			: m_Button(button) { }
 	};
 
-	class GLASH_API MouseButtonPressedEvent : MouseButtonEvent
+	class GLASH_API MouseButtonPressedEvent : public MouseButtonEvent
 	{
 	public:
 		MouseButtonPressedEvent(int button)

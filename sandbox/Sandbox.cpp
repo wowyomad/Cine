@@ -1,6 +1,5 @@
 #include "Sandbox.hpp"
 
-#include "glash/Core.hpp"
 #include "glash/Glash.hpp"
 
 glash::Application* glash::CreateApplication()

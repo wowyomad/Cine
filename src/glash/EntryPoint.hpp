@@ -8,7 +8,7 @@ int main(int argc, char** argv)
 {
 	glash::Log::Init();
 	GLASH_LOG_INFO(BUILD_STR);
-	auto app = glash::CreateApplication();
+	glash::Application* app = glash::CreateApplication();
 	app->Run();
 	delete app;
 }

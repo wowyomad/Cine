@@ -1,10 +1,19 @@
 #include "WindowsWindow.hpp"
 
 #include "glash/Log.hpp"
+#include "glash/events/ApplicationEvent.hpp"
+#include "glash/events/KeyEvent.hpp"
+#include "glash/events/MouseEvent.hpp"
+
 
 namespace glash
 {
 	bool WindowsWindow::s_GLFWinitialized = false;
+
+	static void GLFWErrorCallback(int error, const char* description)
+	{
+		GLASH_CORE_ERROR("GLFW error {}: {}", error, description);
+	}
 
 	Window* Window::Create(const WindowProps& props)
 	{
@@ -49,7 +58,7 @@ namespace glash
 	}
 	bool WindowsWindow::IsVSync() const
 	{
-		
+
 		return false;
 	}
 	void WindowsWindow::Init(const WindowProps& props)
@@ -64,15 +73,115 @@ namespace glash
 		{
 			int success = glfwInit();
 			GLASH_CORE_ASSERT(success, "because fuck you");
+			s_GLFWinitialized = true;
 		}
 
 		m_Window = glfwCreateWindow(static_cast<int>(m_Data.Width), static_cast<int>(m_Data.Height), m_Data.Title.c_str(), nullptr, nullptr);
 		glfwMakeContextCurrent(m_Window);
 		glfwSetWindowUserPointer(m_Window, &m_Data);
 		SetVSync(true);
+
+		InitEventCallbacks();
+
+
 	}
 	void WindowsWindow::Shutdown()
 	{
+
+	}
+	void WindowsWindow::InitEventCallbacks()
+	{
+		glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* window, int width, int height)
+			{
+				WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
+
+				data.Width = width;
+				data.Height = height;
+
+				WindowResizeEvent event(width, height);
+				data.EventCallback(event);
+			});
+		glfwSetWindowCloseCallback(m_Window, [](GLFWwindow* window)
+			{
+				WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
+
+				WindowCloseEvent event;
+				data.EventCallback(event);
+			});
+		glfwSetWindowFocusCallback(m_Window, [](GLFWwindow* window, int focus)
+			{
+				WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
+
+				if (focus)
+				{
+					WindowFocusEvent focusEvent;
+					data.EventCallback(focusEvent);
+				}
+				else
+				{
+					WindowLostFocusEvent lostFocusEvent;
+					data.EventCallback(lostFocusEvent);
+				}
+			});
+		glfwSetWindowPosCallback(m_Window, [](GLFWwindow* window, int xpos, int ypos)
+			{
+				WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
+			});
+		glfwSetKeyCallback(m_Window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
+			{
+				WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
+
+				switch (action)
+				{
+				case GLFW_RELEASE:
+				{
+					KeyReleasedEvent event(key);
+					data.EventCallback(event);
+				} break;
+				case GLFW_PRESS:
+				{
+					KeyPressedEvent event(key, 0);
+					data.EventCallback(event);
+				} break;
+				case GLFW_REPEAT:
+				{
+					KeyPressedEvent event(key, 1);
+					data.EventCallback(event);
+				} break;
+				}
+			});
+		glfwSetMouseButtonCallback(m_Window, [](GLFWwindow* window, int button, int action, int mods)
+			{
+				WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
+				
+				switch (action)
+				{
+				case GLFW_RELEASE:
+				{
+					MouseButtonReleasedEvent event(button);
+					data.EventCallback(event);
+				} break;
+				case GLFW_PRESS:
+				{
+					MouseButtonPressedEvent event(button);
+					data.EventCallback(event);
+				} break;
+				}
+			});
+		glfwSetScrollCallback(m_Window, [](GLFWwindow* window, double xoffset, double yoffset)
+			{
+				WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
+
+				MouseScrolledEvent event(static_cast<float>(xoffset), static_cast<float>(yoffset));
+				data.EventCallback(event);
+			});
+		glfwSetCursorPosCallback(m_Window, [](GLFWwindow* window, double xpos, double ypos)
+			{
+				WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
+				
+				MouseMovedEvent event(static_cast<float>(xpos), static_cast<float>(ypos));
+				data.EventCallback(event);
+			});
 
 	}
 }

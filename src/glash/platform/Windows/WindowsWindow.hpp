@@ -27,6 +27,8 @@ namespace glash
 		virtual void Init(const WindowProps& props);
 		virtual void Shutdown();
 
+		void InitEventCallbacks();
+
 		static bool s_GLFWinitialized;
 
 	protected:
