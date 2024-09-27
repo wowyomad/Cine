@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Project properties
 set(GLASH_BUILD_DLL ON CACHE BOOL "Build glash as a shared library" FORCE)
 set(GLASH_BUILD_EXAMPLES OFF CACHE BOOL "Build examples"  FORCE)
-set(GLASH_BUILD_TESTS ON CACHE BOOL "Build tests"  FORCE)
+set(GLASH_BUILD_SANDDOX ON CACHE BOOL "Build sandbox"  FORCE)
 
 # Might be needed for planned hot reload.
 set(CMAKE_POSITION_INDEPENDENT_CODE ON CACHE BOOL "" FORCE) 
@@ -70,7 +70,7 @@ add_subdirectory(src)
 if (GLASH_BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()
-if (GLASH_BUILD_TESTS)
+if (GLASH_BUILD_SANDDOX)
     add_subdirectory(sandbox)
 endif()
 
