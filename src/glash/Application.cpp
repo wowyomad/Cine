@@ -7,7 +7,8 @@
 #include "glash/events/ApplicationEvent.hpp"
 #include "glash/events/MouseEvent.hpp"
 
-#define BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
+
+#define BIND_EVENT_FN(x) std::bind(x, this, std::placeholders::_1)
 
 namespace glash
 {
@@ -26,6 +27,29 @@ namespace glash
 		EventDispatcher dispatcher(event);
 
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowCloseEvent));
+		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(OnWindowResizeEvent));
+
+		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
+		{
+			if (event.IsHandled())
+			{
+				break;
+			}
+			(*it)->OnEvent(event);
+		}
+
+	}
+
+	void Application::PushLayer(Layer* layer)
+	{
+		m_LayerStack.PushLayer(layer);
+		layer->OnAttach();
+	}
+
+	void Application::PushOverlay(Layer* overlay)
+	{
+		m_LayerStack.PushLayer(overlay);
+		overlay->OnAttach();
 	}
 
 	bool Application::OnWindowCloseEvent(WindowCloseEvent& event)
@@ -35,13 +59,23 @@ namespace glash
 		return true;
 	}
 
+	bool Application::OnWindowResizeEvent(WindowResizeEvent& event)
+	{
+		
+		return true;
+	}
+
 	void Application::Run()
 	{
 		m_Running = true;
 		while (m_Running)
 		{
+			for (Layer* layer : m_LayerStack)
+			{
+				layer->OnUpdate();
+			}
+
 			m_Window->OnUpdate();
-			glClear(GL_COLOR_BUFFER_BIT);
 		}
 	}
 	

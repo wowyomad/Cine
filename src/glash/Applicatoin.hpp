@@ -4,6 +4,7 @@
 
 #include "glash/events/ApplicationEvent.hpp"
 #include "glash/Window.hpp"
+#include "glash/LayerStack.hpp"
 
 namespace glash
 {
@@ -16,11 +17,16 @@ namespace glash
 		void Run();
 		void OnEvent(Event& event);
 
+		void PushLayer(Layer* layer);
+		void PushOverlay(Layer* overlay);
+
 	private:
 		bool OnWindowCloseEvent(WindowCloseEvent& event);
+		bool OnWindowResizeEvent(WindowResizeEvent& event);
 
 	private:
 		std::unique_ptr<Window> m_Window;
+		LayerStack m_LayerStack;
 		bool m_Running;
 	};
 	//Should be defined in Client
