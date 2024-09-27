@@ -10,7 +10,7 @@ The above copyright notice and this permission notice shall be included in all c
 
 The following additional conditions apply as this software incorporates third-party libraries, each of which is subject to its own license terms. By using this software, you agree to comply with the licenses of these dependencies:
 
-- **GLEW**: Licensed under the [MIT License](doc\licenses\GLEW\LICENSE.txt).
+- **GLEW**: Licensed under the [MIT License](doc/licenses/GLEW/LICENSE.txt).
 - **GLFW**: Licensed under the [zlib/libpng License](doc/licenses/GLFW/LICENSE.md).
 - **fmt**: Licensed under the [MIT License](doc/licenses/fmt/LICENSE).
 - **GLM**: Licensed under the [MIT License](doc/licenses/GLM/copying.txt).
