@@ -74,8 +74,6 @@ namespace glash
 		dispatcher.Dispatch<KeyReleasedEvent>(GLASH_BIND_EVENT_FN(ImGuiLayer::OnKeyReleasedEvent));
 
 		dispatcher.Dispatch<WindowResizeEvent>(GLASH_BIND_EVENT_FN(ImGuiLayer::OnWindowResizeEvent));
-		dispatcher.Dispatch<WindowFocusEvent>(GLASH_BIND_EVENT_FN(ImGuiLayer::OnWindowFocusEvent));
-		dispatcher.Dispatch<WindowLostFocusEvent>(GLASH_BIND_EVENT_FN(ImGuiLayer::OnWindowLostFocusEvent));
 	}
 
 	bool ImGuiLayer::OnMouseMovedEvent(MouseMovedEvent& event) 
@@ -150,14 +148,7 @@ namespace glash
 
 		return false;
 	}
-	bool ImGuiLayer::OnWindowFocusEvent(WindowFocusEvent& event) 
-	{
-		return false;
-	}
-	bool ImGuiLayer::OnWindowLostFocusEvent(WindowLostFocusEvent& event) 
-	{
-		return false;
-	}
+
 
 	ImGuiKey ImGuiLayer::GetImGuiKey(int keycode)
 	{

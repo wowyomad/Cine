@@ -32,8 +32,6 @@ namespace glash
 		bool OnKeyTypedEvent(KeyTypedEvent& event);
 
 		bool OnWindowResizeEvent(WindowResizeEvent& event);
-		bool OnWindowFocusEvent(WindowFocusEvent& event);
-		bool OnWindowLostFocusEvent(WindowLostFocusEvent& event);
 
 		static ImGuiKey GetImGuiKey(int keycode);
 	};
