@@ -40,7 +40,9 @@ target_precompile_headers(glash PUBLIC ${GLASH_PCH_HEADER})
 
 target_include_directories(glash
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
-    PUBLIC ${libglew_static_SOURCE_DIR}/include
+   # PUBLIC ${libglew_static_SOURCE_DIR}/include
+    PUBLIC ${glad_SOURCE_DIR}/include
+    PUBLIC ${CMAKE_SOURCE_DIR}/vendor/glad/include
     PUBLIC ${glfw_SOURCE_DIR}/include
     PUBLIC ${OPENGL_INCLUDE_DIR}
     PUBLIC ${fmt_SOURCE_DIR}/include
@@ -52,7 +54,7 @@ target_include_directories(glash
 target_link_libraries(glash
     PRIVATE OpenGL::GL
     PUBLIC glfw
-    PUBLIC libglew_static
+    PUBLIC glad
     PUBLIC fmt
     PUBLIC glm
     PUBLIC spdlog::spdlog

@@ -2,6 +2,7 @@
 #include "Window_OLD.hpp"
 
 #include "glash/Log.hpp"
+#include "glad/glad.h"
 
 namespace glash
 {
@@ -38,8 +39,8 @@ namespace glash
 		glfwSetKeyCallback(m_pWindow, MainKeyCallback);
 
 
-		GLenum err = glewInit();
-		if (GLEW_OK != err)
+		int version = gladLoadGL();
+		if (version == 0)
 		{
 			throw std::runtime_error("Failed to initialize GLEW");
 		}

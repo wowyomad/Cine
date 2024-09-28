@@ -1,5 +1,8 @@
 #include "WindowsWindow.hpp"
 
+#include "glad/glad.h"
+#include "GLFW/glfw3.h"
+
 #include "glash/Log.hpp"
 #include "glash/events/ApplicationEvent.hpp"
 #include "glash/events/KeyEvent.hpp"
@@ -78,12 +81,14 @@ namespace glash
 
 		m_Window = glfwCreateWindow(static_cast<int>(m_Data.Width), static_cast<int>(m_Data.Height), m_Data.Title.c_str(), nullptr, nullptr);
 		glfwMakeContextCurrent(m_Window);
+
+		int status = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
+		GLASH_CORE_ASSERT(status, "Coudln't load glad");
+
 		glfwSetWindowUserPointer(m_Window, &m_Data);
 		SetVSync(true);
 
 		InitEventCallbacks();
-
-
 	}
 	void WindowsWindow::Shutdown()
 	{

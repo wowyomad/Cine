@@ -1,6 +1,7 @@
 #pragma once
 #include "glash/glash_pch.hpp"
 
+#include "glad/glad.h"
 #include "GLFW/glfw3.h"
 
 #include "glash/Core.hpp"

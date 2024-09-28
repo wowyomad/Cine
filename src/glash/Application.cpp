@@ -7,7 +7,6 @@
 #include "glash/events/ApplicationEvent.hpp"
 #include "glash/events/MouseEvent.hpp"
 
-
 #define BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
 
 namespace glash
@@ -16,10 +15,8 @@ namespace glash
 		: m_Running(false)
 	{
 		m_Window = std::unique_ptr<Window>(Window::Create());
-
+		glClearColor(0.5, 0.2, 1, 1.0);
 		m_Window->SetEventCallback(BIND_EVENT_FN(Application::OnEvent));
-
-		glClearColor(0.25, 1.0, 0.5, 1.0);
 	}
 
 	void Application::OnEvent(Event& event)
@@ -61,7 +58,6 @@ namespace glash
 
 	bool Application::OnWindowResizeEvent(WindowResizeEvent& event)
 	{
-		
 		return true;
 	}
 
@@ -70,6 +66,7 @@ namespace glash
 		m_Running = true;
 		while (m_Running)
 		{
+			glClear(GL_COLOR_BUFFER_BIT);
 			for (Layer* layer : m_LayerStack)
 			{
 				layer->OnUpdate();
