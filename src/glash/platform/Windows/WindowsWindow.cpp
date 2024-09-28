@@ -78,11 +78,16 @@ namespace glash
 			GLASH_CORE_ASSERT(success, "because fuck you");
 			s_GLFWinitialized = true;
 		}
+	
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 
 		m_Window = glfwCreateWindow(static_cast<int>(m_Data.Width), static_cast<int>(m_Data.Height), m_Data.Title.c_str(), nullptr, nullptr);
 		glfwMakeContextCurrent(m_Window);
-
 		int status = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
+		GLASH_CORE_ASSERT(status, "Coudln't load glad");
+
+		status = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
 		GLASH_CORE_ASSERT(status, "Coudln't load glad");
 
 		glfwSetWindowUserPointer(m_Window, &m_Data);
@@ -155,6 +160,14 @@ namespace glash
 				} break;
 				}
 			});
+		glfwSetCharCallback(m_Window, [](GLFWwindow* window, unsigned int keycode)
+			{
+				WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
+				
+				KeyTypedEvent event(static_cast<int>(keycode));
+				data.EventCallback(event);
+			});
+
 		glfwSetMouseButtonCallback(m_Window, [](GLFWwindow* window, int button, int action, int mods)
 			{
 				WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));

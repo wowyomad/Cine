@@ -1,4 +1,5 @@
 #pragma once
+
 #include "glash/glash_pch.hpp"
 #include "glash/Core.hpp"
 
@@ -9,7 +10,7 @@ namespace glash
 		None = 0,
 		WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoved,
 		AppTick, AppUpdate, AppRender,
-		KeyPressed, KeyReleased,
+		KeyPressed, KeyReleased, KeyTyped,
 		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled
 	};
 
@@ -47,6 +48,8 @@ namespace glash
 		}
 
 		inline bool IsHandled() const { return m_Handled;  }
+
+		inline static EventType GetStaticEventType() { return EventType::None; }
 
 	protected:
 		bool m_Handled = false;

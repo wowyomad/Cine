@@ -20,6 +20,9 @@ namespace glash
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* overlay);
 
+		static Application& Get();
+		Window& GetWindow();
+
 	private:
 		bool OnWindowCloseEvent(WindowCloseEvent& event);
 		bool OnWindowResizeEvent(WindowResizeEvent& event);
@@ -28,6 +31,8 @@ namespace glash
 		std::unique_ptr<Window> m_Window;
 		LayerStack m_LayerStack;
 		bool m_Running;
+
+		static Application* s_Instance;
 	};
 	//Should be defined in Client
 	Application* CreateApplication();

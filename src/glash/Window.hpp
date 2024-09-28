@@ -14,8 +14,8 @@ namespace glash
 
 		WindowProps(
 			const std::string& title = "eNgInE",
-			unsigned int width = 800,
-			unsigned int height = 600)
+			unsigned int width = 1280,
+			unsigned int height = 720)
 			: Title(title), Width(width), Height(height) {}
 	};
 

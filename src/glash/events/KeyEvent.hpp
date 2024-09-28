@@ -54,6 +54,20 @@ namespace glash
 		EVENT_CLASS_TYPE(KeyReleased)
 
 	};
+
+	class  GLASH_API KeyTypedEvent : public KeyEvent
+	{
+	public:
+		KeyTypedEvent(int keyCode)
+			: KeyEvent(keyCode) { }
+
+		inline std::string ToString() const
+		{
+			return fmt::format("KeyTypedEvent: {}", m_KeyCode);
+		}
+
+		EVENT_CLASS_TYPE(KeyTyped)
+	};
 }
 
 STRING_FORMAT(KeyEvent)

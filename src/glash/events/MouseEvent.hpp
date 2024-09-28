@@ -15,6 +15,10 @@ namespace glash
 		MouseMovedEvent(float x, float y)
 			: m_MouseX(x), m_MouseY(y) { }
 
+		inline float GetMouseX() const { return m_MouseX; }
+		inline float GetMouseY() const { return m_MouseY; }
+
+
 		inline std::string ToString() const override
 		{
 			return fmt::format("MouseMovedEvent: {}, {}", m_MouseX, m_MouseY);
@@ -34,6 +38,9 @@ namespace glash
 		MouseScrolledEvent(float offsetX, float offsetY)
 			: m_OffsetX(offsetX), m_OffsetY(offsetY) { }
 
+		inline float GetHorizontal() const { return m_OffsetX; }
+		inline float GetVertical() const { return m_OffsetY; }
+
 		inline std::string ToString() const override
 		{
 			return fmt::format("MouseScrolledEvent: {}, {}", m_OffsetX, m_OffsetY);
@@ -49,8 +56,9 @@ namespace glash
 	class MouseButtonEvent : public Event
 	{
 	public:
-		EVENT_CLASS_CATEGORY(EventCategoryInput | EventCategoryMouse | EventCategoryMouseButton)
+		inline int GetMouseButton() const {	return m_Button; };
 
+		EVENT_CLASS_CATEGORY(EventCategoryInput | EventCategoryMouse | EventCategoryMouseButton)
 	protected:
 		int m_Button;
 		MouseButtonEvent(int button)

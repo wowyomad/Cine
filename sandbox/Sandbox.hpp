@@ -12,12 +12,12 @@ public:
 
 	void OnUpdate() override
 	{
-		GLASH_LOG_TRACE("");
+		
 	}
 
 	void OnEvent(glash::Event& event) override
 	{
-		GLASH_LOG_TRACE("{}", event);
+		
 	}
 
 
@@ -29,6 +29,7 @@ public:
 	Sandbox()
 	{
 		PushLayer(new SimpleLayer());
+		PushLayer(new glash::ImGuiLayer());
 	}
 
 	~Sandbox()

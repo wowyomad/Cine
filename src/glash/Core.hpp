@@ -23,7 +23,7 @@
 
 #ifdef GLASH_ENABLE_ASSERTS
     #define GLASH_CORE_ASSERT(x, ...) { if(!(x)) { GLASH_CORE_ERROR("Assertion failed: {}", __VA_ARGS__); DEBUG_BREAK; } }
-    #define GLASH_ASSERT(x, ...) { if(!(x)) { GLASH_ERROR("Assertion failed: {}", __VA_ARGS__); DEBUG_BREAK; } }
+    #define GLASH_ASSERT(x, ...) { if(!(x)) { GLASH_LOG_ERROR("Assertion failed: {}", __VA_ARGS__); DEBUG_BREAK; } }
 #else
     #define GLASH_CORE_ASSERT(x, ...)
     #define GLASH_ASSERT(x, ...)
@@ -64,3 +64,5 @@ struct fmt::formatter<glash::ClassName> {									\
 		}																	\
     }																		\
 };
+
+#define GLASH_BIND_EVENT_FN(fn) std::bind(&fn, this, std::placeholders::_1)
