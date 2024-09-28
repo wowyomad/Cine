@@ -1,6 +1,5 @@
 #pragma once
 #include "glash/Core.hpp"
-
 #include "glash/Window.hpp"
 
 struct GLFWwindow;
@@ -8,6 +7,44 @@ struct GLFWwindow;
 namespace glash
 {
 	class GLASH_API WindowsWindow : public Window
+	{
+	public:
+		WindowsWindow(const WindowProps& props);
+		~WindowsWindow();
+
+		// Implement the methods directly
+		void OnUpdate();
+		unsigned int Width() const { return m_Data.Width; }
+		unsigned int Height() const { return m_Data.Height; }
+
+		void SetEventCallback(const EventCallbackFn& callback);
+		void AddEventCallback(const EventCallbackFn& callback);
+
+		void SetVSync(bool enabled);
+		bool IsVSync() const;
+
+	private:
+		void Init(const WindowProps& props);
+		void Shutdown();
+		void InitEventCallbacks();
+
+		static bool s_GLFWinitialized;
+
+	protected:
+		GLFWwindow* m_Window;
+
+		struct WindowData
+		{
+			std::string Title;
+			unsigned int Width, Height;
+			bool VSync;
+
+			EventCallbackFn EventCallback;
+		};
+
+		WindowData m_Data;
+	};
+	/*class GLASH_API WindowsWindow : public Window
 	{
 	public:
 		WindowsWindow(const WindowProps& props);
@@ -45,5 +82,5 @@ namespace glash
 		};
 
 		WindowData m_Data;
-	};
+	};*/
 }

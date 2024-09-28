@@ -29,6 +29,7 @@
     #define GLASH_ASSERT(x, ...)
 #endif
 
+
 template<typename T>
 inline constexpr T BIT(T x) {
     static_assert(std::is_integral_v<T>, "BIT can only be used with integral types.");
@@ -66,3 +67,6 @@ struct fmt::formatter<glash::ClassName> {									\
 };
 
 #define GLASH_BIND_EVENT_FN(fn) std::bind(&fn, this, std::placeholders::_1)
+
+#include "glash/Log.hpp"
+#include "glash/platform/Platforms.hpp"

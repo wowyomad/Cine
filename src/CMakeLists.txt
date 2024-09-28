@@ -23,8 +23,13 @@ file(GLOB HEADERS
     "${glash_SOURCE_DIR}/utils/*.hpp"
     "${glash_SOURCE_DIR}/platform/Windows/*.hpp"
     "${glash_SOURCE_DIR}/platform/OpenGL/*.hpp"
+    "${glash_SOURCE_DIR}/platform/Platforms.hpp"
     "${glash_SOURCE_DIR}/ImGui/*.hpp"
 )
+
+if(GLASH_PLATFORM_WINDOWS)
+list(APPEND GLASH_COMPILE_DEFINITIONS GLASH_PLATFORM_WINDOWS)
+endif()
 
 list(APPEND GLASH_COMPILE_DEFINITIONS GLASH_ENABLE_ASSERTS GLASH_ENABLE_DEBUG)
 
@@ -45,7 +50,6 @@ target_precompile_headers(glash PUBLIC ${GLASH_PCH_HEADER})
 
 target_include_directories(glash
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
-   # PUBLIC ${libglew_static_SOURCE_DIR}/include
     PUBLIC ${glad_SOURCE_DIR}/include
     PUBLIC ${CMAKE_SOURCE_DIR}/vendor/glad/include
     PUBLIC ${glfw_SOURCE_DIR}/include

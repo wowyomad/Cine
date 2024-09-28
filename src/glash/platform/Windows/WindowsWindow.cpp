@@ -18,7 +18,7 @@ namespace glash
 		GLASH_CORE_ERROR("GLFW error {}: {}", error, description);
 	}
 
-	Window* Window::Create(const WindowProps& props)
+	WindowsWindow* Window::Create(const WindowProps& props)
 	{
 		return new WindowsWindow(props);
 	}

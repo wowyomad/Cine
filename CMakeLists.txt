@@ -4,16 +4,19 @@ project(glash VERSION 0.0.1 LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+include(set_undefined.cmake)
 # Project properties
-set(GLASH_BUILD_DLL ON CACHE BOOL "Build glash as a shared library" FORCE)
-set(GLASH_BUILD_EXAMPLES OFF CACHE BOOL "Build examples"  FORCE)
-set(GLASH_BUILD_SANDDOX ON CACHE BOOL "Build sandbox"  FORCE)
+set_undefined(GLASH_BUILD_DLL ON CACHE BOOL "Build glash as a shared library" FORCE)
+set_undefined(GLASH_BUILD_EXAMPLES OFF CACHE BOOL "Build examples" FORCE)
+set_undefined(GLASH_BUILD_SANDDOX ON CACHE BOOL "Build sandbox" FORCE)
+set_undefined(GLASH_PLATFORM_WINDOWS ON CACHE BOOL "Use Window implementation of a Window" FORCE)
 
 # Might be needed for planned hot reload.
 set(CMAKE_POSITION_INDEPENDENT_CODE ON CACHE BOOL "" FORCE) 
 
 # User folders to hide dependency targets
 set_property(GLOBAL PROPERTY USE_FOLDER ON)
+
 set(SPDLOG_FMT_EXTERNAL ON CACHE BOOL "Use fetched fmt instead of bundled" FORCE)
 set(GLFW_BUILD_WAYLAND OFF CACHE BOOL "Enable wayland scanner" FORCE)
 

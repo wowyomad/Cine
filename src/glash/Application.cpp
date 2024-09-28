@@ -1,7 +1,6 @@
 #include "glash/glash_pch.hpp"
 #include "glash/Applicatoin.hpp"
 
-#include "glash/Window_OLD.hpp"
 #include "glash/Log.hpp"
 #include "glash/events/KeyEvent.hpp"
 #include "glash/events/ApplicationEvent.hpp"
@@ -18,7 +17,7 @@ namespace glash
 		return *s_Instance;
 	}
 
-	Window& Application::GetWindow()
+	GLASH_WINDOW_CLASS& Application::GetWindow()
 	{
 		return *m_Window;
 	}
@@ -29,7 +28,7 @@ namespace glash
 		GLASH_CORE_ASSERT(s_Instance == nullptr, "Applicatoin should be singleton");
 		s_Instance = this;
 
-		m_Window = std::unique_ptr<Window>(Window::Create());
+		m_Window = std::unique_ptr<GLASH_WINDOW_CLASS>(Window::Create());
 		m_Window->SetEventCallback(GLASH_BIND_EVENT_FN(Application::OnEvent));
 
 		glClearColor(0.5, 0.2, 1, 1.0);
