@@ -6,9 +6,9 @@
 ## Library Dependencies
 This project relies on the following external libraries, which are fetched, built, and linked automatically using CMake's `FetchContent` module:
 
-1. **GLEW (OpenGL Extension Wrangler Library)**
-   - **Repository:** [glew-cmake](https://github.com/Perlmint/glew-cmake.git)
-   - **Version:** 2.2.0
+1. **glad (Vulkan/GL/GLES/EGL/GLX/WGL Loader-Generator based on the official specifications for multiple languages.)**
+   - **Repository:** [glad](https://github.com/Dav1dde/glad.git)
+   - **Version:** 2.0.7
    - **Build Configuration:** Built as a static library.
 
 2. **GLFW (Graphics Library Framework)**
