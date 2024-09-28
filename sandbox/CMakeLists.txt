@@ -21,16 +21,6 @@ add_executable(Sandbox
 Sandbox.cpp
 )
 
-add_library(imgui STATIC
-    ${imgui_SOURCE_DIR}/imgui.cpp
-    ${imgui_SOURCE_DIR}/imgui_draw.cpp
-    ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
-    ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
-    ${imgui_SOURCE_DIR}/imgui_widgets.cpp
-    ${imgui_SOURCE_DIR}/imgui_tables.cpp
- )
-target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR} ${glfw_SOURCE_DIR}/include)
-
 list(APPEND SANDBOX_COMPILE_DEFINITIONS GLASH_ENABLE_DEBUG)
 
 message("GLASH_BUILD_DLL in Sandbox: ${GLASH_BUILD_DLL}")

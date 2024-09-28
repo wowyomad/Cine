@@ -49,6 +49,7 @@ target_include_directories(glash
     PUBLIC ${spdlog_SOURCE_DIR}/include
     PUBLIC ${glm_SOURCE_DIR}/include
     PUBLIC ${stb_SOURCE_DIR}
+    PUBLIC ${imgui_SOURCE_DIR}
 )
 
 target_link_libraries(glash
@@ -58,6 +59,7 @@ target_link_libraries(glash
     PUBLIC fmt
     PUBLIC glm
     PUBLIC spdlog::spdlog
+    PUBLIC imgui
 )
 
 if(MSVC)
