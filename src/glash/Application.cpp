@@ -22,7 +22,7 @@ namespace glash
 		return *m_Window;
 	}
 
-	Application::Application()
+	Application::Application(int unused_paramter)
 		: m_Running(false)
 	{
 		GLASH_CORE_ASSERT(s_Instance == nullptr, "Application should be singleton");
@@ -31,7 +31,11 @@ namespace glash
 		m_Window = std::unique_ptr<GLASH_WINDOW_CLASS>(Window::Create());
 		m_Window->SetEventCallback(GLASH_BIND_EVENT_FN(Application::OnEvent));
 
-		glClearColor(0.5, 0.2, 1, 1.0);
+		glClearColor(0.5, 0.2, 1, 1.0); //Remove this
+
+		m_ImGuiLayer = new ImGuiLayer();
+
+		PushOverlay(m_ImGuiLayer);
 	}
 
 	void Application::OnEvent(Event& event)
@@ -85,12 +89,30 @@ namespace glash
 			glClear(GL_COLOR_BUFFER_BIT);
 			for (Layer* layer : m_LayerStack)
 			{
-				layer->OnUpdate();
+				layer->OnUpdate();	
 			}
+
+			m_ImGuiLayer->Begin();
+			for (Layer* layer : m_LayerStack)
+			{
+				layer->OnImGuiRender();
+			}
+			m_ImGuiLayer->End();
 
 			m_Window->OnUpdate();
 		}
 	}
+
+	ImGuiContext* Application::GetImGuiContext() const
+	{
+		return ImGui::GetCurrentContext();
+	}
+
+	void Application::GetAllocatorFunctions(ImGuiMemAllocFunc* p_alloc_func, ImGuiMemFreeFunc* p_free_func, void** p_user_data) const
+	{
+		ImGui::GetAllocatorFunctions(p_alloc_func, p_free_func, p_user_data);
+	}
+
 
 }
 

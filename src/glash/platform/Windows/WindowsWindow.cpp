@@ -1,7 +1,7 @@
 #include "WindowsWindow.hpp"
 
-#include "glad/glad.h"
-#include "GLFW/glfw3.h"
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
 #include "glash/Log.hpp"
 #include "glash/Input.hpp"

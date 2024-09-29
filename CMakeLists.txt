@@ -50,7 +50,7 @@ FetchContent_Declare(
 FetchContent_Declare(
     imgui
     GIT_REPOSITORY https://github.com/ocornut/imgui.git
-    GIT_TAG v1.91.2
+    GIT_TAG 793773209bb0fdeb8ccb756052e770457193c9f2
 )
 list(APPEND BUILD_DEPENDENCIES glfw fmt glm spdlog imgui)
 list(APPEND HEADER_DEPENDENCIES stb)

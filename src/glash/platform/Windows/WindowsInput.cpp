@@ -1,15 +1,18 @@
 #include "glash/glash_pch.hpp"
-#include "glash/Input.hpp"
+#include "glash/Core.hpp"
 
+#include "glash/Input.hpp"
 #include "glash/KeyCodes.hpp"
 #include "glash/MouseCodes.hpp"
-
 #include "glash/Applicatoin.hpp"
-#include "GLFW/glfw3.h"
+
+#include <GLFW/glfw3.h>
 
 #if defined(GLASH_PLATFORM_WINDOWS) == 1
 namespace glash
 {
+	class Input;
+
 	using PlatformKey = Input::PlatformKey;
 	using PlatformMouse = Input::PlatformMouse;
 
