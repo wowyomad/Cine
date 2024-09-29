@@ -1,5 +1,5 @@
 #include "glash/glash_pch.hpp"
-#include "glash/Applicatoin.hpp"
+#include "glash/Application.hpp"
 
 #include "glash/Log.hpp"
 #include "glash/events/KeyEvent.hpp"
@@ -25,6 +25,8 @@ namespace glash
 	Application::Application(int dummy)
 		: m_Running(false)
 	{
+		GLASH_LOG_TRACE(BUILD_STR);
+
 		(void)dummy; //get rid of unused parameter warning
 
 		GLASH_CORE_ASSERT(s_Instance == nullptr, "Application should be singleton");

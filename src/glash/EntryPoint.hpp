@@ -1,5 +1,5 @@
 #pragma once
-#include "glash/Applicatoin.hpp"
+#include "glash/Application.hpp"
 #include "glash/Log.hpp"
 
 extern glash::Application* glash::CreateApplication();

@@ -2,7 +2,7 @@
 #include "glash/Layer.hpp"
 
 #include "ImGui/ImGuiLayer.hpp"
-#include "glash/Applicatoin.hpp"
+#include "glash/Application.hpp"
 
 
 namespace glash
@@ -15,12 +15,7 @@ namespace glash
 
 	void Layer::OnAttach()
 	{
-		ImGuiContext* p_context = glash::Application::Get().GetImGuiContext();
-		ImGuiContext* this_context = ImGui::GetCurrentContext();
 
-		if (p_context) {
-			ImGui::SetCurrentContext(p_context);
-		}
 	}
 
 }

@@ -4,7 +4,7 @@
 #include "glash/Input.hpp"
 #include "glash/KeyCodes.hpp"
 #include "glash/MouseCodes.hpp"
-#include "glash/Applicatoin.hpp"
+#include "glash/Application.hpp"
 
 #include <GLFW/glfw3.h>
 

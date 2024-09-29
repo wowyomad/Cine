@@ -1,7 +1,7 @@
 #pragma once
 
 #include "glash/Core.hpp"
-#include "glash/Applicatoin.hpp"
+#include "glash/Application.hpp"
 #include "glash/Log.hpp"
 
 #include "glash/Layer.hpp"

@@ -12,7 +12,7 @@ namespace glash
 {
 	class GLASH_WINDOW_CLASS;
 
-	class GLASH_API Application
+	class Application
 	{
 	public:
 		/**
@@ -20,38 +20,40 @@ namespace glash
 		* When calling Application(0), it calls private constructor defined on library side and 
 		* sets the context for ImGui. And when back to this consructor, the ImGuiContext 
 		* pointer is passed to the client. 
-		* Otherwise, the client would have NULL in ImGui context. Too bad!
+		* Otherwise, the client would have NULL in ImGui context. That's a feature🥴
 		*/
 		Application()
 			: Application(0)
 		{
+			GLASH_LOG_TRACE(BUILD_STR);
 			ImGuiContext* p_context = GetImGuiContext();
+			ImGuiContext* this_context = ImGui::GetCurrentContext();
 
 			if (p_context != nullptr)
 			{
 				ImGui::SetCurrentContext(p_context);
 			}
 		}
-		virtual ~Application() {  };
+		GLASH_API virtual ~Application() {  };
 
-		void Run();
-		void OnEvent(Event& event);
+		GLASH_API void Run();
+		GLASH_API void OnEvent(Event& event);
 
-		void PushLayer(Layer* layer);
-		void PushOverlay(Layer* overlay);
+		GLASH_API void PushLayer(Layer* layer);
+		GLASH_API void PushOverlay(Layer* overlay);
 
-		ImGuiContext* GetImGuiContext() const;
-		void GetAllocatorFunctions(ImGuiMemAllocFunc* p_alloc_func, ImGuiMemFreeFunc* p_free_func, void** p_user_data) const;
+		GLASH_API ImGuiContext* GetImGuiContext() const;
+		GLASH_API void GetAllocatorFunctions(ImGuiMemAllocFunc* p_alloc_func, ImGuiMemFreeFunc* p_free_func, void** p_user_data) const;
 
 
-		static Application& Get();
-		GLASH_WINDOW_CLASS& GetWindow();
+		GLASH_API static Application& Get();
+		GLASH_API GLASH_WINDOW_CLASS& GetWindow();
 
 	private:
-		bool OnWindowCloseEvent(WindowCloseEvent& event);
-		bool OnWindowResizeEvent(WindowResizeEvent& event);
+		GLASH_API bool OnWindowCloseEvent(WindowCloseEvent& event);
+		GLASH_API bool OnWindowResizeEvent(WindowResizeEvent& event);
 
-		Application(int dummy);
+		GLASH_API Application(int dummy);
 
 	private:
 		std::unique_ptr<GLASH_WINDOW_CLASS> m_Window;

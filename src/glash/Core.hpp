@@ -1,14 +1,20 @@
 #pragma once
 
+#if defined(_WIN32) || defined(_WIN64)
+#define GLASH_API_EXPORT __declspec(dllexport)
+#define GLASH_API_IMPORT __declspec(dllimport)
+#endif
+
+
 #ifdef GLASH_BUILD_DLL  // This is defined when building the DLL (in glash project)
 #if defined(_WIN32) || defined(_WIN64)
 #ifdef GLASH_EXPORT  // Defined during the DLL build to export symbols
 #define BUILD_STR "DLL EXPORT"
-#define GLASH_API __declspec(dllexport)
+#define GLASH_API GLASH_API_EXPORT
 #else
 #ifdef GLASH_IMPORT // Consumers of the DLL (like Sandbox) should use dllimport
 #define BUILD_STR "DLL IMPORT"
-#define GLASH_API __declspec(dllimport)
+#define GLASH_API GLASH_API_IMPORT
 #endif
 #endif
 #else

@@ -86,3 +86,4 @@ set_target_properties(glash PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
     FOLDER "glash"
 )
+set_target_properties(glash_pch PROPERTIES FOLDER "glash")

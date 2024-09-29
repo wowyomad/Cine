@@ -34,7 +34,7 @@ set_target_properties(Sandbox PROPERTIES
 
 target_link_libraries(Sandbox
     PRIVATE glash 
-#    PRIVATE imgui
+    PRIVATE imgui
 )
 add_dependencies(Sandbox copy_shaders copy_textures)
 target_precompile_headers(Sandbox REUSE_FROM glash_pch)
@@ -44,5 +44,8 @@ if(MSVC)
     target_link_options(Sandbox PRIVATE $<$<CONFIG:Debug>:/INCREMENTAL>)
 
 endif()
+
+set_target_properties(Sandbox PROPERTIES FOLDER "glash")
+set_target_properties(copy_textures copy_shaders PROPERTIES FOLDER "glash/Sandbox Commands")
 
 
