@@ -26,7 +26,6 @@ namespace glash
 			: Application(0)
 		{
 			ImGuiContext* p_context = GetImGuiContext();
-			ImGuiContext* this_context = ImGui::GetCurrentContext();
 
 			if (p_context != nullptr)
 			{
@@ -52,7 +51,7 @@ namespace glash
 		bool OnWindowCloseEvent(WindowCloseEvent& event);
 		bool OnWindowResizeEvent(WindowResizeEvent& event);
 
-		Application(int unused_parameter);
+		Application(int dummy);
 
 	private:
 		std::unique_ptr<GLASH_WINDOW_CLASS> m_Window;

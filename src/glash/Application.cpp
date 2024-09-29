@@ -22,9 +22,11 @@ namespace glash
 		return *m_Window;
 	}
 
-	Application::Application(int unused_paramter)
+	Application::Application(int dummy)
 		: m_Running(false)
 	{
+		(void)dummy; //get rid of unused parameter warning
+
 		GLASH_CORE_ASSERT(s_Instance == nullptr, "Application should be singleton");
 		s_Instance = this;
 
