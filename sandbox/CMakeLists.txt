@@ -37,7 +37,7 @@ target_link_libraries(Sandbox
 #    PRIVATE imgui
 )
 add_dependencies(Sandbox copy_shaders copy_textures)
-target_precompile_headers(Sandbox REUSE_FROM glash)
+target_precompile_headers(Sandbox REUSE_FROM glash_pch)
 
 if(MSVC)
     target_compile_options(Sandbox PRIVATE $<$<CONFIG:Debug>:/Zi>) #ignore definitions that came from precompiled header

@@ -1,6 +1,6 @@
-set(glash_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/glash")
-set(GLASH_PCH_HEADER "${glash_SOURCE_DIR}/glash_pch.hpp")
-
+set(glash_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/glash" CACHE STRING "" FORCE)
+set(GLASH_PCH_HEADER "${glash_SOURCE_DIR}/glash_pch.hpp" CACHE STRING "" FORCE)
+set(GLASH_PCH_HEADER_CPP "${glash_SOURCE_DIR}/glash_pch.cpp" CACHE STRING "" FORCE)
 find_package(OpenGL REQUIRED)
 
 file(GLOB SOURCES
@@ -38,20 +38,28 @@ endif()
 message("Glash build type: ${GLASH_LIB_TYPE}")
 message("Glash compile definitions: ${GLASH_COMPILE_DEFINITIONS}")
 
+add_library(glash_pch STATIC ${GLASH_PCH_HEADER_CPP})
+target_include_directories(glash_pch
+PUBLIC ${glash_SOURCE_DIR}
+PUBLIC ${glad_SOURCE_DIR}/include
+PUBLIC ${fmt_SOURCE_DIR}/include
+PUBLIC ${glm_SOURCE_DIR}
+)
+target_precompile_headers(glash_pch PUBLIC ${GLASH_PCH_HEADER})
+
 add_library(glash ${GLASH_LIB_TYPE} ${SOURCES} ${HEADERS})
 target_compile_definitions(glash PRIVATE ${GLASH_COMPILE_DEFINITIONS})
 
-target_precompile_headers(glash PUBLIC ${GLASH_PCH_HEADER})
+target_precompile_headers(glash REUSE_FROM glash_pch)
 
 target_include_directories(glash
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
     PUBLIC ${glad_SOURCE_DIR}/include
-    PUBLIC ${CMAKE_SOURCE_DIR}/vendor/glad/include
     PUBLIC ${glfw_SOURCE_DIR}/include
     PUBLIC ${OPENGL_INCLUDE_DIR}
     PUBLIC ${fmt_SOURCE_DIR}/include
     PUBLIC ${spdlog_SOURCE_DIR}/include
-    PUBLIC ${glm_SOURCE_DIR}/include
+    PUBLIC ${glm_SOURCE_DIR}
     PUBLIC ${stb_SOURCE_DIR}
     PUBLIC ${imgui_SOURCE_DIR}
 )

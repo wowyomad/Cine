@@ -62,6 +62,8 @@ if (POLICY CMP0072)
     cmake_policy(SET CMP0072 NEW)
 endif()
 
+set(glad_SOURCE_DIR ${VENDOR_DIR}/glad)
+
 add_subdirectory(src)
 add_subdirectory(vendor)
 if (GLASH_BUILD_EXAMPLES)
