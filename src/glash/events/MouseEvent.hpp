@@ -5,6 +5,7 @@
 #include "glash/glash_pch.hpp"
 
 #include "glash/events/Event.hpp"
+#include "glash/Input.hpp"
 
 namespace glash
 {
@@ -60,15 +61,15 @@ namespace glash
 
 		EVENT_CLASS_CATEGORY(EventCategoryInput | EventCategoryMouse | EventCategoryMouseButton)
 	protected:
-		int m_Button;
-		MouseButtonEvent(int button)
+		MouseCode m_Button;
+		MouseButtonEvent(MouseCode button)
 			: m_Button(button) { }
 	};
 
 	class GLASH_API MouseButtonPressedEvent : public MouseButtonEvent
 	{
 	public:
-		MouseButtonPressedEvent(int button)
+		MouseButtonPressedEvent(MouseCode button)
 			: MouseButtonEvent(button) { }
 
 		inline std::string ToString() const override
@@ -82,7 +83,7 @@ namespace glash
 	class GLASH_API MouseButtonReleasedEvent : public MouseButtonEvent
 	{
 	public:
-		MouseButtonReleasedEvent(int button)
+		MouseButtonReleasedEvent(MouseCode button)
 			: MouseButtonEvent(button) { }
 
 		inline std::string ToString() const override

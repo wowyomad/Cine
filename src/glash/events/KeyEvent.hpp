@@ -11,21 +11,21 @@ namespace glash
 	class GLASH_API KeyEvent : public Event
 	{
 	public:
-		inline int GetKeyCode() const { return m_KeyCode; }
+		inline KeyCode GetKeyCode() const { return m_KeyCode; }
 
 		EVENT_CLASS_CATEGORY(EventCategoryInput | EventCategoryKeyboard)
 
 	protected:
-		KeyEvent(int keyCode)
+		KeyEvent(KeyCode keyCode)
 			: m_KeyCode(keyCode) {}
 
-		int m_KeyCode;
+		KeyCode m_KeyCode;
 	};
 
 	class  GLASH_API KeyPressedEvent : public KeyEvent
 	{
 	public:
-		KeyPressedEvent(int keyCode, int repeatCount)
+		KeyPressedEvent(KeyCode keyCode, int repeatCount)
 			: KeyEvent(keyCode), m_RepeatCount(repeatCount) { }
 
 		inline int GetRepeatCount() const { return m_RepeatCount; }
@@ -43,7 +43,7 @@ namespace glash
 	class  GLASH_API KeyReleasedEvent : public KeyEvent
 	{
 	public:
-		KeyReleasedEvent(int keyCode)
+		KeyReleasedEvent(KeyCode keyCode)
 			: KeyEvent(keyCode) { }
 
 		inline std::string ToString() const
@@ -58,7 +58,7 @@ namespace glash
 	class  GLASH_API KeyTypedEvent : public KeyEvent
 	{
 	public:
-		KeyTypedEvent(int keyCode)
+		KeyTypedEvent(KeyCode keyCode)
 			: KeyEvent(keyCode) { }
 
 		inline std::string ToString() const

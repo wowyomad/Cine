@@ -4,11 +4,12 @@
 #include "GLFW/glfw3.h"
 
 #include "glash/Log.hpp"
+#include "glash/Input.hpp"
 #include "glash/events/ApplicationEvent.hpp"
 #include "glash/events/KeyEvent.hpp"
 #include "glash/events/MouseEvent.hpp"
 
-#if defined (GLASH_WINDOWS_PLATFORM)
+#if defined(GLASH_PLATFORM_WINDOWS) == 1
 namespace glash
 {
 	bool WindowsWindow::s_GLFWinitialized = false;
@@ -91,9 +92,6 @@ namespace glash
 		int status = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
 		GLASH_CORE_ASSERT(status, "Coudln't load glad");
 
-		status = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
-		GLASH_CORE_ASSERT(status, "Coudln't load glad");
-
 		glfwSetWindowUserPointer(m_Window, &m_Data);
 		SetVSync(true);
 
@@ -141,9 +139,10 @@ namespace glash
 			{
 				WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
 			});
-		glfwSetKeyCallback(m_Window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
+		glfwSetKeyCallback(m_Window, [](GLFWwindow* window, int glfwKey, int scancode, int action, int mods)
 			{
 				WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
+				KeyCode key = Input::ToGlashKey(glfwKey);
 
 				switch (action)
 				{
@@ -172,10 +171,11 @@ namespace glash
 				data.EventCallback(event);
 			});
 
-		glfwSetMouseButtonCallback(m_Window, [](GLFWwindow* window, int button, int action, int mods)
+		glfwSetMouseButtonCallback(m_Window, [](GLFWwindow* window, int glfwButton, int action, int mods)
 			{
 				WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
-				
+				MouseCode button = Input::ToGlashMouse(glfwButton);
+
 				switch (action)
 				{
 				case GLFW_RELEASE:
