@@ -30,6 +30,13 @@ namespace glash
 		return { static_cast<float>(xpos), static_cast<float>(ypos) };
 	}
 
+	std::pair<float, float> Input::GetMouseXY()
+	{
+		const glm::vec2 position = GetMousePosition();
+		return { position.x, position.y };
+	}
+
+
 	float Input::GetMouseX()
 	{
 		return GetMousePosition().x;

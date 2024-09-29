@@ -16,8 +16,8 @@ public:
 			GLASH_LOG_INFO("Space was pressed");
 		}
 
-		glm::vec2 pos = glash::Input::GetMousePosition();
-		GLASH_CORE_TRACE("Position: {}, {}", pos.x, pos.y);
+		auto [x, y] = glash::Input::GetMouseXY();
+		GLASH_CORE_TRACE("Position: {}, {}", x, y);
 	}
 
 	void OnEvent(glash::Event& event) override
