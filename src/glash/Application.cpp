@@ -25,7 +25,7 @@ namespace glash
 	Application::Application()
 		: m_Running(false)
 	{
-		GLASH_CORE_ASSERT(s_Instance == nullptr, "Applicatoin should be singleton");
+		GLASH_CORE_ASSERT(s_Instance == nullptr, "Application should be singleton");
 		s_Instance = this;
 
 		m_Window = std::unique_ptr<GLASH_WINDOW_CLASS>(Window::Create());

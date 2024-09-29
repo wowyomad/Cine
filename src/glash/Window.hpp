@@ -28,14 +28,15 @@ namespace glash
 
 		Window() = default;
 		virtual ~Window() = default;
-		// Direct method declarations
-		void OnUpdate(); // Implement in one of the classes.
-		unsigned int Height() const; // Implement in one of the classes.
-		unsigned int Width() const; // Implement in one of the classes.
-		void SetEventCallback(const EventCallbackFn& callback); // Implement in one of the classes.
-		void AddEventCallback(const EventCallbackFn& callback); // Implement in one of the classes.
-		void SetVSync(bool enabled); // Implement in one of the classes.
-		bool IsVSync() const; // Implement in one of the classes.
+		
+		void OnUpdate();
+		unsigned int Height() const;
+		unsigned int Width() const;
+		void SetEventCallback(const EventCallbackFn& callback);
+		void AddEventCallback(const EventCallbackFn& callback);
+		void SetVSync(bool enabled);
+		bool IsVSync() const;
+		void* GetNativeWindow() const;
 
 		// Factory method to create windows
 		static GLASH_WINDOW_CLASS* Create(const WindowProps& props = WindowProps());

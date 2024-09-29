@@ -22,6 +22,8 @@ namespace glash
 
 		void SetVSync(bool enabled);
 		bool IsVSync() const;
+		void* GetNativeWindow() const;
+
 
 	private:
 		void Init(const WindowProps& props);

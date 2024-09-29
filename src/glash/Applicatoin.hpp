@@ -5,6 +5,8 @@
 #include "glash/events/ApplicationEvent.hpp"
 #include "glash/LayerStack.hpp"
 
+#include "glash/Input.hpp"
+
 namespace glash
 {
 	class GLASH_WINDOW_CLASS;
@@ -13,13 +15,14 @@ namespace glash
 	{
 	public:
 		Application();
-		virtual ~Application() { };
+		virtual ~Application() {  };
 
 		void Run();
 		void OnEvent(Event& event);
 
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* overlay);
+
 
 		static Application& Get();
 		GLASH_WINDOW_CLASS& GetWindow();

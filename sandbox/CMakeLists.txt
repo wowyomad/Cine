@@ -17,17 +17,11 @@ file(GLOB TEXTURE_FILES "${TEXTURES_DIR}/*.png" "${TEXTURES_DIR}/*.jpg")
 copy_files("${SHADER_FILES}" "${SHADERS_OUT_DIR}" copy_shaders)
 copy_files("${TEXTURE_FILES}" "${TEXTURES_OUT_DIR}" copy_textures)
 
-add_executable(Sandbox 
-Sandbox.cpp
-)
-
+add_executable(Sandbox Sandbox.cpp)
 list(APPEND SANDBOX_COMPILE_DEFINITIONS GLASH_ENABLE_DEBUG)
 
 message("GLASH_BUILD_DLL in Sandbox: ${GLASH_BUILD_DLL}")
 
-if(GLASH_PLATFORM_WINDOWS)
-    list(APPEND SANDBOX_COMPILE_DEFINITIONS GLASH_PLATFORM_WINDOWS)
-endif()
 if(GLASH_BUILD_DLL) 
     list(APPEND SANDBOX_COMPILE_DEFINITIONS GLASH_BUILD_DLL GLASH_IMPORT)
 endif()

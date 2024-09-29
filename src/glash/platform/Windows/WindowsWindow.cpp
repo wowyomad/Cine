@@ -8,7 +8,7 @@
 #include "glash/events/KeyEvent.hpp"
 #include "glash/events/MouseEvent.hpp"
 
-
+#if defined (GLASH_WINDOWS_PLATFORM)
 namespace glash
 {
 	bool WindowsWindow::s_GLFWinitialized = false;
@@ -63,6 +63,10 @@ namespace glash
 	{
 
 		return false;
+	}
+	void* WindowsWindow::GetNativeWindow() const
+	{
+		return m_Window;
 	}
 	void WindowsWindow::Init(const WindowProps& props)
 	{
@@ -203,3 +207,4 @@ namespace glash
 
 	}
 }
+#endif

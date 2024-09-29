@@ -9,7 +9,6 @@ include(set_undefined.cmake)
 set_undefined(GLASH_BUILD_DLL ON CACHE BOOL "Build glash as a shared library" FORCE)
 set_undefined(GLASH_BUILD_EXAMPLES OFF CACHE BOOL "Build examples" FORCE)
 set_undefined(GLASH_BUILD_SANDDOX ON CACHE BOOL "Build sandbox" FORCE)
-set_undefined(GLASH_PLATFORM_WINDOWS ON CACHE BOOL "Use Window implementation of a Window" FORCE)
 
 # Might be needed for planned hot reload.
 set(CMAKE_POSITION_INDEPENDENT_CODE ON CACHE BOOL "" FORCE) 
