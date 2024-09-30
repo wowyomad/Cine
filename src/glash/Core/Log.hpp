@@ -12,7 +12,7 @@
 
 namespace glash
 {
-#ifdef GLASH_ENABLE_DEBUG
+#if GLASH_ENABLE_DEBUG
 	#ifdef _MSC_VER
 		#define DEBUG_BREAK __debugbreak()
 	#else

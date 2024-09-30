@@ -17,6 +17,9 @@
 #ifndef GLASH_ENABLE_ASSERTS
     #define GLASH_ENABLE_ASSERTS 0
 #endif
+#ifndef GLASH_ENABLE_DEBUG
+    #define GLASH_ENABLE_DEBUG 0
+#endif
 
 #if GLASH_BUILD_DLL  // This is defined when building the DLL (in glash project)
     #if defined(_WIN32) || defined(_WIN64)
