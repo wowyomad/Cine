@@ -1,8 +1,10 @@
 #include "Layer.hpp"
-#include "glash/Layer.hpp"
+#include "glash/glash_pch.hpp"
 
-#include "ImGui/ImGuiLayer.hpp"
-#include "glash/Application.hpp"
+#include "glash/Core/Layer.hpp"
+#include "glash/Core/Application.hpp"
+
+#include "glash/ImGui/ImGuiLayer.hpp"
 
 
 namespace glash

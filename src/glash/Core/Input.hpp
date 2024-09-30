@@ -1,8 +1,8 @@
 #pragma once
 
-#include "glash/Core.hpp"
-#include "glash/KeyCodes.hpp"
-#include "glash/MouseCodes.hpp"
+#include "glash/Core/Core.hpp"
+#include "glash/Core/KeyCodes.hpp"
+#include "glash/Core/MouseCodes.hpp"
 
 
 namespace glash

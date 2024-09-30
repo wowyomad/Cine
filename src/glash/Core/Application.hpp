@@ -1,12 +1,14 @@
 #pragma once
-#include "glash/Core.hpp"
-#include "glash_pch.hpp"
+#include "glash/glash_pch.hpp"
+#include "glash/Core/Core.hpp"
+
+#include "glash/Core/LayerStack.hpp"
+#include "glash/Core/Window.hpp"
+#include "glash/Core/Input.hpp"
+
+#include "glash/ImGui/ImGuiLayer.hpp"
 
 #include "glash/events/ApplicationEvent.hpp"
-#include "glash/LayerStack.hpp"
-#include "glash/ImGui/ImGuiLayer.hpp"
-#include "glash/Input.hpp"
-#include "glash/Window.hpp"
 
 namespace glash
 {

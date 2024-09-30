@@ -1,13 +1,14 @@
 #include "WindowsWindow.hpp"
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
-#include "glash/Log.hpp"
-#include "glash/Input.hpp"
+#include "glash/Core/Log.hpp"
+#include "glash/Core/Input.hpp"
 #include "glash/events/ApplicationEvent.hpp"
 #include "glash/events/KeyEvent.hpp"
 #include "glash/events/MouseEvent.hpp"
+
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
 
 #if defined(GLASH_PLATFORM_WINDOWS) == 1
 namespace glash

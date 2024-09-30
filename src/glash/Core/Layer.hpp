@@ -1,6 +1,7 @@
 #pragma once
 
-#include "glash/Core.hpp"
+#include "glash/Core/Core.hpp"
+
 #include "glash/events/Event.hpp"
 
 namespace glash

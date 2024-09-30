@@ -1,14 +1,16 @@
 #include "ImGuiLayer.hpp"
 #include "glash/glash_pch.hpp"
 
+#include "glash/Core/Application.hpp"
+#include "glash/Core/Log.hpp"
+
 #include "GLFW/glfw3.h" //temp
 
 #include "imgui.h"
 #include "backends/imgui_impl_opengl3.h"
 #include "backends/imgui_impl_glfw.h"
 
-#include "glash/Application.hpp"
-#include "glash/Log.hpp"
+
 
 
 namespace glash

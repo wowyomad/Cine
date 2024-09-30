@@ -1,8 +1,8 @@
 #pragma once
 
 #include "glash/Glash.hpp"
-#include "glash/Application.hpp"
-#include "glash/Input.hpp"
+#include "glash/Core/Application.hpp"
+#include "glash/Core/Input.hpp"
 
 class SimpleLayer : public glash::Layer
 {

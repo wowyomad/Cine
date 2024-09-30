@@ -1,6 +1,6 @@
 #pragma once
 
-#include "glash/Core.hpp"
+#include "glash/Core/Core.hpp"
 #include "glash/glash_pch.hpp"
 
 #include "glash/events/Event.hpp"

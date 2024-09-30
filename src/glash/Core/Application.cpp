@@ -1,10 +1,12 @@
 #include "glash/glash_pch.hpp"
-#include "glash/Application.hpp"
+#include "glash/Core/Application.hpp"
 
-#include "glash/Log.hpp"
+#include "glash/Core/Log.hpp"
+
 #include "glash/events/KeyEvent.hpp"
 #include "glash/events/ApplicationEvent.hpp"
 #include "glash/events/MouseEvent.hpp"
+
 #include "glash/ImGui/ImGuiLayer.hpp"
 
 

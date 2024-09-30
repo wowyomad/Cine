@@ -1,6 +1,5 @@
 #include "Sandbox.hpp"
 
-#include "glash/Log.hpp"
 #include "glash/Glash.hpp"
 
 #include "imgui.h"

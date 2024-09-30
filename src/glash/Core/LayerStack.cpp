@@ -1,4 +1,4 @@
-#include "glash/LayerStack.hpp"
+#include "glash/Core/LayerStack.hpp"
 
 namespace glash
 {

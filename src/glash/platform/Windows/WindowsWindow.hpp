@@ -1,6 +1,6 @@
 #pragma once
-#include "glash/Core.hpp"
-#include "glash/Window.hpp"
+#include "glash/Core/Core.hpp"
+#include "glash/Core/Window.hpp"
 
 struct GLFWwindow;
 

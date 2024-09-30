@@ -13,6 +13,7 @@ file(GLOB SOURCES
     "${glash_SOURCE_DIR}/platform/Windows/*.cpp"
     "${glash_SOURCE_DIR}/platform/OpenGL/*.cpp"
     "${glash_SOURCE_DIR}/ImGui/*.cpp"
+    "${glash_SOURCE_DIR}/Core/*.cpp"
 
 )
 
@@ -25,6 +26,7 @@ file(GLOB HEADERS
     "${glash_SOURCE_DIR}/platform/OpenGL/*.hpp"
     "${glash_SOURCE_DIR}/platform/Platforms.hpp"
     "${glash_SOURCE_DIR}/ImGui/*.hpp"
+    "${glash_SOURCE_DIR}/Core/*.hpp"
 )
 
 list(APPEND GLASH_COMPILE_DEFINITIONS GLASH_ENABLE_ASSERTS GLASH_ENABLE_DEBUG)

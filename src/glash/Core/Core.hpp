@@ -74,5 +74,5 @@ struct fmt::formatter<glash::ClassName> {									\
 
 #define GLASH_BIND_EVENT_FN(fn) std::bind(&fn, this, std::placeholders::_1)
 
-#include "glash/Log.hpp"
+#include "glash/Core/Log.hpp"
 #include "glash/platform/Platforms.hpp"
