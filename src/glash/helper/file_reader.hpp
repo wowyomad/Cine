@@ -1,7 +1,7 @@
 #pragma once
 
 #include "glash/glash_pch.hpp"
-#include "glash/Log.hpp"
+#include "glash/Core/Log.hpp"
 #include "glash/Enums.hpp"
 
 namespace glash

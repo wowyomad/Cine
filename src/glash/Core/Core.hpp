@@ -5,29 +5,41 @@
 #define GLASH_API_IMPORT __declspec(dllimport)
 #endif
 
+#ifndef GLASH_BUILD_DLL
+    #define GLASH_BUILD_DLL 0
+#endif
+#ifndef GLASH_EXPORT
+    #define GLASH_EXPORT 0
+#endif
+#ifndef GLASH_IMPORT
+    #define GLASH_IMPORT 0
+#endif
+#ifndef GLASH_ENABLE_ASSERTS
+    #define GLASH_ENABLE_ASSERTS 0
+#endif
 
-#ifdef GLASH_BUILD_DLL  // This is defined when building the DLL (in glash project)
-#if defined(_WIN32) || defined(_WIN64)
-#ifdef GLASH_EXPORT  // Defined during the DLL build to export symbols
-#define BUILD_STR "DLL EXPORT"
-#define GLASH_API GLASH_API_EXPORT
-#else
-#ifdef GLASH_IMPORT // Consumers of the DLL (like Sandbox) should use dllimport
-#define BUILD_STR "DLL IMPORT"
-#define GLASH_API GLASH_API_IMPORT
-#endif
-#endif
-#else
+#if GLASH_BUILD_DLL  // This is defined when building the DLL (in glash project)
+    #if defined(_WIN32) || defined(_WIN64)
+        #if GLASH_EXPORT  // Defined during the DLL build to export symbols
+            #define BUILD_STR "DLL EXPORT"
+            #define GLASH_API GLASH_API_EXPORT
+        #else
+            #if GLASH_IMPORT // Consumers of the DLL (like Sandbox) should use dllimport
+                #define BUILD_STR "DLL IMPORT"
+                #define GLASH_API GLASH_API_IMPORT
+            #endif
+        #endif
+    #else
 // Non-Windows platforms (like Linux, macOS) can use default visibility
-#define GLASH_API __attribute__((visibility("default")))
-#define BUILD_STR "SHARED EXPORT"
-#endif
+        #define GLASH_API __attribute__((visibility("default")))
+        #define BUILD_STR "SHARED EXPORT"
+    #endif
 #else  // Static library or no DLL
-#define GLASH_API  // Empty macro for static builds
-#define BUILD_STR "STATIC BUILD"
+    #define GLASH_API  // Empty macro for static builds
+    #define BUILD_STR "STATIC BUILD"
 #endif
 
-#ifdef GLASH_ENABLE_ASSERTS
+#if GLASH_ENABLE_ASSERTS
     #define GLASH_CORE_ASSERT(x, ...) { if(!(x)) { GLASH_CORE_ERROR("Assertion failed: {}", __VA_ARGS__); DEBUG_BREAK; } }
     #define GLASH_ASSERT(x, ...) { if(!(x)) { GLASH_LOG_ERROR("Assertion failed: {}", __VA_ARGS__); DEBUG_BREAK; } }
 #else

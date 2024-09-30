@@ -1,10 +1,10 @@
 #include "glash/glash_pch.hpp"
-#include "glash/Core.hpp"
+#include "glash/Core/Core.hpp"
 
-#include "glash/Input.hpp"
-#include "glash/KeyCodes.hpp"
-#include "glash/MouseCodes.hpp"
-#include "glash/Application.hpp"
+#include "glash/Core/Input.hpp"
+#include "glash/Core/KeyCodes.hpp"
+#include "glash/Core/MouseCodes.hpp"
+#include "glash/Core/Application.hpp"
 
 #include <GLFW/glfw3.h>
 

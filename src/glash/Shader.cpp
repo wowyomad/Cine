@@ -1,6 +1,6 @@
 #include "glash/Shader.hpp"
 
-#include "glash/Log.hpp"
+#include "glash/Core/Log.hpp"
 #include "glash/helper/file_reader.hpp"
 
 namespace glash

@@ -1,6 +1,6 @@
 #include "glash/VertexBuffer.hpp"
 #include "glash/Enums.hpp"
-#include "glash/Log.hpp"
+#include "glash/Core/Log.hpp"
 
 namespace glash
 {

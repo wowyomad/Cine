@@ -1,5 +1,5 @@
 #pragma once
-#include "glash/Core.hpp"
+#include "glash/Core/Core.hpp"
 #include "glash/VertexArray.hpp"
 #include "glash/IndexBuffer.hpp"
 #include "glash/Shader.hpp"

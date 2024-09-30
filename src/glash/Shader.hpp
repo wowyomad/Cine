@@ -1,5 +1,5 @@
 #pragma once
-#include "glash/Core.hpp"
+#include "glash/Core/Core.hpp"
 #include "glash/Enums.hpp"
 #include "glash/glash_pch.hpp"
 

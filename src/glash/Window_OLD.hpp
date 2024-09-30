@@ -4,7 +4,7 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 
-#include "glash/Core.hpp"
+#include "glash/Core/Core.hpp"
 #include "glash/Enums.hpp"
 
 namespace glash

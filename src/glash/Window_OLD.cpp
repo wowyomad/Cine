@@ -1,7 +1,7 @@
 #include "glash/glash_pch.hpp"
 #include "Window_OLD.hpp"
 
-#include "glash/Log.hpp"
+#include "glash/Core/Log.hpp"
 #include "glad/glad.h"
 
 namespace glash

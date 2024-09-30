@@ -1,9 +1,9 @@
 #include "glash/glash_pch.hpp"
-#include "glash/Core.hpp"
+#include "glash/Core/Core.hpp"
 
 #include "glash/VertexBuffer.hpp"
 #include "glash/VertexArray.hpp"
-#include "glash/Log.hpp"
+#include "glash/Core/Log.hpp"
 
 namespace glash
 {
