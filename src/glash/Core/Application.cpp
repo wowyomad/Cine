@@ -142,6 +142,7 @@ namespace glash
 		m_Running = true;
 		while (m_Running)
 		{
+	
 			glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT);
 

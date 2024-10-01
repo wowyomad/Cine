@@ -23,5 +23,5 @@ out vec4 screenColor;
 
 void main()
 {
-	screenColor = vec4(f_Color, 1.0);
+	screenColor = vec4(f_Color, 0.25);
 }
