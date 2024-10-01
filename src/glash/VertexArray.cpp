@@ -4,28 +4,28 @@
 namespace glash
 {
 
-	VertexArray::VertexArray()
+	VertexArray_OLD::VertexArray_OLD()
 		: m_RendererID(0)
 	{
 		GLCall(glGenVertexArrays(1, &m_RendererID));
 	}
-	VertexArray::VertexArray(VertexArray&& other)
+	VertexArray_OLD::VertexArray_OLD(VertexArray_OLD&& other)
 	{
 		*this = std::move(other);
 	}
-	VertexArray::~VertexArray()
+	VertexArray_OLD::~VertexArray_OLD()
 	{
 		GLCall(glDeleteVertexArrays(1, &m_RendererID));
 	}
 
-	VertexArray& VertexArray::operator=(VertexArray&& other) noexcept
+	VertexArray_OLD& VertexArray_OLD::operator=(VertexArray_OLD&& other) noexcept
 	{
 		m_RendererID = other.m_RendererID;
 		other.m_RendererID = 0;
 		return *this;
 	}
 
-	void VertexArray::AddBuffer(const VertexBuffer& vb, const VertexBufferLayout& layout)
+	void VertexArray_OLD::AddBuffer(const VertexBuffer_OLD& vb, const VertexBufferLayout_OLD& layout)
 	{
 		Bind();
 		vb.Bind();
@@ -43,12 +43,12 @@ namespace glash
 		vb.Unbind();
 	}
 
-	void VertexArray::Bind() const
+	void VertexArray_OLD::Bind() const
 	{
 		GLCall(glBindVertexArray(m_RendererID));
 	}
 
-	void VertexArray::Unbind()
+	void VertexArray_OLD::Unbind()
 	{
 		GLCall(glBindVertexArray(0));
 	}

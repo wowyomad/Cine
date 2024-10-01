@@ -7,26 +7,26 @@
 
 namespace glash
 {
-	class GLASH_API VertexBuffer
+	class GLASH_API VertexBuffer_OLD
 	{
 
 	public:
 		template<class T>
-		 VertexBuffer(const std::vector<T>& data, GLBufferUsage usage)
-			: VertexBuffer()
+		 VertexBuffer_OLD(const std::vector<T>& data, GLBufferUsage usage)
+			: VertexBuffer_OLD()
 		{
 			GLCall(glGenBuffers(1, &m_RendererID));
 			GLCall(glBindBuffer(GL_ARRAY_BUFFER, m_RendererID));
 			GLCall(glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(T), data.data(), usage));
 		}
 
-		VertexBuffer() : m_RendererID(0) {}
-		VertexBuffer(VertexBuffer&& other) noexcept;
-		VertexBuffer(const VertexBuffer& other) = default;
-		~VertexBuffer();
+		VertexBuffer_OLD() : m_RendererID(0) {}
+		VertexBuffer_OLD(VertexBuffer_OLD&& other) noexcept;
+		VertexBuffer_OLD(const VertexBuffer_OLD& other) = default;
+		~VertexBuffer_OLD();
 
-		VertexBuffer& operator=(VertexBuffer&& other) noexcept;
-		VertexBuffer& operator=(const VertexBuffer& other) = default;
+		VertexBuffer_OLD& operator=(VertexBuffer_OLD&& other) noexcept;
+		VertexBuffer_OLD& operator=(const VertexBuffer_OLD& other) = default;
 
 		void Bind() const;
 		static void Unbind();

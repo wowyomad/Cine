@@ -5,12 +5,12 @@
 
 namespace glash
 {
-	class GLASH_API Shader
+	class GLASH_API Shader_OLD
 	{
 	public:
-		Shader();
-		Shader(const std::string& filepath);
-		~Shader();
+		Shader_OLD();
+		Shader_OLD(const std::string& filepath);
+		~Shader_OLD();
 
 		void Reload();
 
@@ -38,8 +38,8 @@ namespace glash
 
 	private:
 		std::string m_Path;
-		GLuint m_ProgramID;
-		std::unordered_map<std::string, GLint> m_UniformLocations;
-		std::unordered_map<std::string, GLenum> m_UniformTypes;
+		uint32_t m_ProgramID;
+		std::map<std::string, GLint> m_UniformLocations;
+		std::map<std::string, GLenum> m_UniformTypes;
 	};
 }

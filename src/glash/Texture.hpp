@@ -6,12 +6,12 @@
 
 namespace glash
 {
-	class GLASH_API Texture
+	class GLASH_API Texture_OLD
 	{
 	public:
-		Texture();
-		Texture(const std::string& path);
-		~Texture();
+		Texture_OLD();
+		Texture_OLD(const std::string& path);
+		~Texture_OLD();
 
 		void LoadTexture(const std::string& path);
 

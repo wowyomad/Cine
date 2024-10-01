@@ -6,9 +6,9 @@
 
 namespace glash
 {
-	class GLASH_API Renderer
+	class GLASH_API Renderer_OLD
 	{
 	public:
-		void Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const;
+		void Draw(const VertexArray_OLD& va, const IndexBuffer_OLD& ib, const Shader_OLD& m_Shader) const;
 	};
 }

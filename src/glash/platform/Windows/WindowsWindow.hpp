@@ -2,6 +2,8 @@
 #include "glash/Core/Core.hpp"
 #include "glash/Core/Window.hpp"
 
+#include "glash/Renderer/GrahpicsContext.hpp"
+
 struct GLFWwindow;
 
 namespace glash
@@ -12,7 +14,6 @@ namespace glash
 		WindowsWindow(const WindowProps& props);
 		~WindowsWindow();
 
-		// Implement the methods directly
 		void OnUpdate();
 		unsigned int Width() const { return m_Data.Width; }
 		unsigned int Height() const { return m_Data.Height; }
@@ -34,6 +35,7 @@ namespace glash
 
 	protected:
 		GLFWwindow* m_Window;
+		GraphicsContext* m_Context;
 
 		struct WindowData
 		{
@@ -45,6 +47,7 @@ namespace glash
 		};
 
 		WindowData m_Data;
+
 	};
 	/*class GLASH_API WindowsWindow : public Window
 	{

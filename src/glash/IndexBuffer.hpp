@@ -6,19 +6,19 @@
 
 namespace glash
 {
-	class GLASH_API IndexBuffer
+	class GLASH_API IndexBuffer_OLD
 	{
 	public:
 		using Index = GLuint;
 
-		IndexBuffer() : m_Count(0), m_RendererID(0) { }
-		IndexBuffer(const std::vector<Index>& data, GLBufferUsage usage = GLBufferUsage::STATIC_DRAW);
-		IndexBuffer(const IndexBuffer& other) = default;
-		IndexBuffer(IndexBuffer&& other) noexcept;
-		~IndexBuffer();
+		IndexBuffer_OLD() : m_Count(0), m_RendererID(0) { }
+		IndexBuffer_OLD(const std::vector<Index>& data, GLBufferUsage usage = GLBufferUsage::STATIC_DRAW);
+		IndexBuffer_OLD(const IndexBuffer_OLD& other) = default;
+		IndexBuffer_OLD(IndexBuffer_OLD&& other) noexcept;
+		~IndexBuffer_OLD();
 
-		IndexBuffer& operator=(IndexBuffer& other) = default;
-		IndexBuffer& operator=(IndexBuffer&& other) noexcept;
+		IndexBuffer_OLD& operator=(IndexBuffer_OLD& other) = default;
+		IndexBuffer_OLD& operator=(IndexBuffer_OLD&& other) noexcept;
 
 		void Bind() const;
 		static void Unbind();

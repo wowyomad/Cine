@@ -42,16 +42,16 @@ namespace glash
 					vertices[1 + i * 2] = colors[i];
 				}
 
-				std::vector<IndexBuffer::Index> indices{
+				std::vector<IndexBuffer_OLD::Index> indices{
 					0, 1, 2 ,
 					0, 2, 3
 				};
 
-				va = VertexArray();
+				va = VertexArray_OLD();
 				va.Bind();
-				vb = VertexBuffer(vertices, GLBufferUsage::STATIC_DRAW);
-				ib = IndexBuffer(indices, GLBufferUsage::STATIC_DRAW);
-				VertexBufferLayout layout;
+				vb = VertexBuffer_OLD(vertices, GLBufferUsage::STATIC_DRAW);
+				ib = IndexBuffer_OLD(indices, GLBufferUsage::STATIC_DRAW);
+				VertexBufferLayout_OLD layout;
 				layout.Push<float>(3);
 				layout.Push<float>(3);
 				va.AddBuffer(vb, layout);
@@ -70,9 +70,9 @@ namespace glash
 
 
 		private:
-			VertexBuffer vb;
-			IndexBuffer ib;
-			VertexArray va;
+			VertexBuffer_OLD vb;
+			IndexBuffer_OLD ib;
+			VertexArray_OLD va;
 		};
 	}
 }

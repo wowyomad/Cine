@@ -22,12 +22,12 @@ namespace glash
 					vertices[i * 2] = positions[i];
 					vertices[1 + i * 2] = colors[i];
 				}
-				vb = VertexBuffer(vertices, GLBufferUsage::STATIC_DRAW);
-				VertexBufferLayout layout;
+				vb = VertexBuffer_OLD(vertices, GLBufferUsage::STATIC_DRAW);
+				VertexBufferLayout_OLD layout;
 				layout.Push<float>(3);
 				layout.Push<float>(3);
 
-				va = VertexArray();
+				va = VertexArray_OLD();
 				va.AddBuffer(vb, layout);
 
 				vb.Unbind();
@@ -41,8 +41,8 @@ namespace glash
 				GLCall(glDrawArrays(GL_TRIANGLES, 0, 3));
 			}
 		private:
-			VertexArray va;
-			VertexBuffer vb;
+			VertexArray_OLD va;
+			VertexBuffer_OLD vb;
 		};
 
 	}

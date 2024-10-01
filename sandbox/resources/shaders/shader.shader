@@ -12,7 +12,7 @@ out vec3 fragmentColor;
 void main() 
 {
 	gl_Position = vec4(vertexPos, 1.0);
-	fragmentColor = vertexColor * brightness;
+	fragmentColor = vertexPos + 0.5;
 }
 
 #shader fragment

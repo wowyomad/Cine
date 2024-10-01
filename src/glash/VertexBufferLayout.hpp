@@ -6,7 +6,7 @@
 
 namespace glash
 {
-	struct VertexBufferElement
+	struct VertexBufferElement_OLD
 	{
 		uint32_t count;
 		GLAttributeType type;
@@ -14,11 +14,11 @@ namespace glash
 		uint32_t size;
 	};
 
-	class GLASH_API VertexBufferLayout
+	class GLASH_API VertexBufferLayout_OLD
 	{
 	public:
 
-		VertexBufferLayout()
+		VertexBufferLayout_OLD()
 			: m_Stride(0) {}
 
 
@@ -58,7 +58,7 @@ namespace glash
 			return m_Stride;
 		}
 
-		inline const std::vector<VertexBufferElement>& GetElements() const
+		inline const std::vector<VertexBufferElement_OLD>& GetElements() const
 		{
 			return m_Elements;
 		};
@@ -80,6 +80,6 @@ namespace glash
 
 	private:
 		uint32_t m_Stride;
-		std::vector<VertexBufferElement> m_Elements;
+		std::vector<VertexBufferElement_OLD> m_Elements;
 	};
 }

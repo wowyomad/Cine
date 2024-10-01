@@ -1,32 +1,32 @@
-#include "glash/VertexBuffer.hpp"
+#include "glash/VertexBuffer_OLD.hpp"
 #include "glash/Enums.hpp"
 #include "glash/Core/Log.hpp"
 
 namespace glash
 {
-	VertexBuffer::VertexBuffer(VertexBuffer&& other) noexcept
+	VertexBuffer_OLD::VertexBuffer_OLD(VertexBuffer_OLD&& other) noexcept
 	{
 		*this = std::move(other);
 	}
-	VertexBuffer::~VertexBuffer()
+	VertexBuffer_OLD::~VertexBuffer_OLD()
 	{
 		LOG_INFO("Vertex Buffer Destructor for id:{} ", m_RendererID);
 		GLCall(glDeleteBuffers(1, &m_RendererID));
 	}
 
-	VertexBuffer& VertexBuffer::operator=(VertexBuffer&& other) noexcept
+	VertexBuffer_OLD& VertexBuffer_OLD::operator=(VertexBuffer_OLD&& other) noexcept
 	{
 		m_RendererID = other.m_RendererID;
 		other.m_RendererID = 0;
 		return *this;
 	}
 
-	void VertexBuffer::Bind() const
+	void VertexBuffer_OLD::Bind() const
 	{
 		GLCall(glBindBuffer(GL_ARRAY_BUFFER, m_RendererID));
 	}
 
-	void VertexBuffer::Unbind()
+	void VertexBuffer_OLD::Unbind()
 	{
 		GLCall(glBindBuffer(GL_ARRAY_BUFFER, 0));
 	}

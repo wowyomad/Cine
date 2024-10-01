@@ -2,6 +2,7 @@
 
 #include "glash/Core/Log.hpp"
 #include "glash/Core/Input.hpp"
+
 #include "glash/events/ApplicationEvent.hpp"
 #include "glash/events/KeyEvent.hpp"
 #include "glash/events/MouseEvent.hpp"
@@ -35,11 +36,6 @@ namespace glash
 		Shutdown();
 	}
 
-	void WindowsWindow::OnUpdate()
-	{
-		glfwPollEvents();
-		glfwSwapBuffers(m_Window);
-	}
 	void WindowsWindow::SetEventCallback(const EventCallbackFn& callback)
 	{
 		m_Data.EventCallback = callback;
@@ -78,30 +74,39 @@ namespace glash
 
 		GLASH_CORE_INFO("Creating Windows window {} ({}, {})", props.Title, props.Width, props.Height);
 
+
 		if (!s_GLFWinitialized)
 		{
 			int success = glfwInit();
 			GLASH_CORE_ASSERT(success, "because fuck you");
 			s_GLFWinitialized = true;
-		}
-	
+		}	
+		glfwSetErrorCallback(GLFWErrorCallback);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 
 		m_Window = glfwCreateWindow(static_cast<int>(m_Data.Width), static_cast<int>(m_Data.Height), m_Data.Title.c_str(), nullptr, nullptr);
-		glfwMakeContextCurrent(m_Window);
-		int status = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
-		GLASH_CORE_ASSERT(status, "Coudln't load glad");
+
+		m_Context = GraphicsContext::Create(m_Window);
+		m_Context->Init();
 
 		glfwSetWindowUserPointer(m_Window, &m_Data);
 		SetVSync(true);
 
 		InitEventCallbacks();
 	}
+
+	void WindowsWindow::OnUpdate()
+	{
+		glfwPollEvents();
+		m_Context->SwapBuffers();
+	}
+
 	void WindowsWindow::Shutdown()
 	{
 
 	}
+
 	void WindowsWindow::InitEventCallbacks()
 	{
 		glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* window, int width, int height)
@@ -113,7 +118,9 @@ namespace glash
 
 				WindowResizeEvent event(width, height);
 				data.EventCallback(event);
-			});
+
+				glViewport(0, 0, width, height); //TODO: this shouldn't be here
+ 			});
 		glfwSetWindowCloseCallback(m_Window, [](GLFWwindow* window)
 			{
 				WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));

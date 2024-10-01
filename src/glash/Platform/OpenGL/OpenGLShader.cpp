@@ -1,24 +1,26 @@
-#include "glash/Shader.hpp"
+#include "glash/glash_pch.hpp"
+#include "glash/Platform/OpenGL/OpenGLShader.hpp"
 
 #include "glash/Core/Log.hpp"
 #include "glash/utils/file_reader.hpp"
 
 namespace glash
 {
-	Shader_OLD::Shader_OLD()
+	OpenGLShader::OpenGLShader()
 		:m_ProgramID(0)
 	{
+
 	}
-	Shader_OLD::Shader_OLD(const std::string& filepath)
+	OpenGLShader::OpenGLShader(const std::string& filepath)
 		: m_Path(filepath), m_ProgramID(0)
 	{
 		Reload();
 	}
-	Shader_OLD::~Shader_OLD()
+	OpenGLShader::~OpenGLShader()
 	{
 		GLCall(glDeleteProgram(m_ProgramID));
 	}
-	void Shader_OLD::Reload()
+	void OpenGLShader::Reload()
 	{
 		auto shaders = ParseShader(m_Path);
 
@@ -26,81 +28,110 @@ namespace glash
 			GLASH_CORE_ERROR("Failed to load shader from {}", m_Path);
 		}
 	}
-	void Shader_OLD::Bind() const
+	void OpenGLShader::Bind() const
 	{
 		GLCall(glUseProgram(m_ProgramID));
 	}
-	void Shader_OLD::Unbind() const
+	void OpenGLShader::Unbind() const
 	{
 		GLCall(glUseProgram(0));
 	}
 
-	bool Shader_OLD::isLinked() const
+	bool OpenGLShader::isLinked() const
 	{
 		return GLGetStatus(m_ProgramID, GLStatus::PROGRAM_LINK);
 	}
 
-	void Shader_OLD::SetUniform(const char* name, const float value)
+	void OpenGLShader::SetFloat(const std::string& name, float value)
 	{
-		GLenum type = GetUniformType(name);
+		GLenum type = GetUniformType(name.c_str());
 		if (type != GL_FLOAT)
 		{
 			GLASH_CORE_ERROR("Received type: {:0X}. Expected type {:0X}.", type, GL_FLOAT);
 			return;
 		}
-		GLint location = GetUniformLocation(name);
+		GLint location = GetUniformLocation(name.c_str());
 		GLCall(glUniform1f(location, value));
 	}
 
-	void Shader_OLD::SetUniform(const char* name, const glm::vec4& value)
+	void OpenGLShader::SetFloat2(const std::string& name, const glm::vec2& value)
 	{
-		GLenum type = GetUniformType(name);
+		GLenum type = GetUniformType(name.c_str());
+		if (type != GL_FLOAT_VEC2)
+		{
+			GLASH_CORE_ERROR("Received type: {:0X}. Expected type {:0X}.", type, GL_FLOAT_VEC2);
+			return;
+		}
+		GLint location = GetUniformLocation(name.c_str());
+		GLCall(glUniform2f(location, value.x, value.y));
+	}
+
+	void OpenGLShader::SetFloat3(const std::string& name, const glm::vec3& value)
+	{
+		GLenum type = GetUniformType(name.c_str());
+		if (type != GL_FLOAT_VEC3)
+		{
+			GLASH_CORE_ERROR("Received type: {:0X}. Expected type {:0X}.", type, GL_FLOAT_VEC3);
+			return;
+		}
+		GLint location = GetUniformLocation(name.c_str());
+		GLCall(glUniform3f(location, value.x, value.y, value.z));
+	}
+
+	void OpenGLShader::SetFloat4(const std::string& name, const glm::vec4& value)
+	{
+		GLenum type = GetUniformType(name.c_str());
 		if (type != GL_FLOAT_VEC4)
 		{
 			GLASH_CORE_ERROR("Received type: {:0X}. Expected type {:0X}.", type, GL_FLOAT_VEC4);
 			return;
 		}
-		GLint location = GetUniformLocation(name);
+		GLint location = GetUniformLocation(name.c_str());
 		GLCall(glUniform4f(location, value.x, value.y, value.z, value.w));
 	}
 
-	void Shader_OLD::SetUniform(const char* name, const int value)
+	void OpenGLShader::SetInt(const std::string& name, int value)
 	{
-		GLenum type = GetUniformType(name);
+		GLenum type = GetUniformType(name.c_str());
 		if (type != GL_INT)
 		{
 			GLASH_CORE_ERROR("Received type: {:0X}. Expected type {:0X}.", type, GL_INT);
 			return;
 		}
-		GLint location = GetUniformLocation(name);
+		GLint location = GetUniformLocation(name.c_str());
 		GLCall(glUniform1i(location, value));
 	}
 
-	void Shader_OLD::SetUniform(const char* name, const bool value)
+	void OpenGLShader::SetIntArray(const std::string& name, int* values, uint32_t count)
 	{
-		GLenum type = GetUniformType(name);
+		assert(false && "Not implemented yet");
+	}
+
+	void OpenGLShader::SetBool(const std::string& name, bool value)
+	{
+		GLenum type = GetUniformType(name.c_str());
 		if (type != GL_BOOL)
 		{
 			GLASH_CORE_ERROR("Received type: {:0X}. Expected type {:0X}.", type, GL_BOOL);
 			return;
 		}
-		GLint location = GetUniformLocation(name);
+		GLint location = GetUniformLocation(name.c_str());
 		glUniformMatrix4fv(location, 1, GL_FALSE, reinterpret_cast<const float*>(&value));
 	}
 
-	void Shader_OLD::SetUniform(const char* name, const glm::mat4& value)
+	void OpenGLShader::SetMat4(const std::string& name, const glm::mat4& value)
 	{
-		GLenum type = GetUniformType(name);
+		GLenum type = GetUniformType(name.c_str());
 		if (type != GL_FLOAT_MAT4)
 		{
 			GLASH_CORE_ERROR("Received type: {:0X}. Expected type {:0X}.", type, GL_FLOAT_MAT4);
 			return;
 		}
-		GLint location = GetUniformLocation(name);
+		GLint location = GetUniformLocation(name.c_str());
 		glUniformMatrix4fv(location, 1, GL_FALSE, reinterpret_cast<const float*>(&value));
 	}
 
-	void Shader_OLD::SetSamplerSlot(const char* name, GLSampler sampler, const int slot)
+	void OpenGLShader::SetSamplerSlot(const char* name, GLSampler sampler, const int slot)
 	{
 		GLenum type = GetUniformType(name);
 		if (type != sampler)
@@ -111,8 +142,13 @@ namespace glash
 		GLint location = GetUniformLocation(name);
 		GLCall(glUniform1i(location, slot));
 	}
-	
-	GLint Shader_OLD::GetUniformLocation(const char* name)
+
+	inline const std::string OpenGLShader::GetName() const
+	{
+		return m_Path;
+	}
+
+	GLint OpenGLShader::GetUniformLocation(const char* name)
 	{
 		if (m_UniformLocations.contains(name))
 		{
@@ -125,7 +161,7 @@ namespace glash
 		return location;
 	}
 
-	GLenum Shader_OLD::GetUniformType(const char* name)
+	GLenum OpenGLShader::GetUniformType(const char* name)
 	{
 		if (m_UniformTypes.contains(name))
 		{
@@ -141,7 +177,7 @@ namespace glash
 		return type;
 	}
 
-	bool Shader_OLD::CompileShader(const ShaderSource& shaderSource, GLuint& shaderID)
+	bool OpenGLShader::CompileShader(const ShaderSource& shaderSource, GLuint& shaderID)
 	{
 		const char* sourceCode = shaderSource.source.c_str();
 		GLCall(glShaderSource(shaderID, 1, &sourceCode, nullptr));
@@ -156,7 +192,7 @@ namespace glash
 		return true;
 	}
 
-	bool Shader_OLD::CreateShaderProgram(const std::vector<ShaderSource>& sources)
+	bool OpenGLShader::CreateShaderProgram(const std::vector<ShaderSource>& sources)
 	{
 		GLuint programID = glCreateProgram();
 		std::vector<GLuint> compiledShaders;
@@ -192,7 +228,7 @@ namespace glash
 		return true;
 	}
 
-	std::vector<ShaderSource> Shader_OLD::ParseShader(const std::string& filepath)
+	std::vector<ShaderSource> OpenGLShader::ParseShader(const std::string& filepath)
 	{
 		std::ifstream file(filepath);
 

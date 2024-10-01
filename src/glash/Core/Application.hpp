@@ -1,18 +1,23 @@
 #pragma once
 #include "glash/glash_pch.hpp"
-#include "glash/Core/Core.hpp"
 
+#include "glash/Core/Core.hpp"
 #include "glash/Core/LayerStack.hpp"
 #include "glash/Core/Window.hpp"
 #include "glash/Core/Input.hpp"
 
-#include "glash/ImGui/ImGuiLayer.hpp"
+#include "glash/Renderer/Buffer.hpp"
+#include "glash/Renderer/Shader.hpp"
 
 #include "glash/events/ApplicationEvent.hpp"
+#include "glash/ImGui/ImGuiLayer.hpp"
+
+
 
 namespace glash
 {
 	class GLASH_WINDOW_CLASS;
+	class Renderer;
 
 	class Application
 	{
@@ -60,12 +65,19 @@ namespace glash
 	private:
 		std::unique_ptr<GLASH_WINDOW_CLASS> m_Window;
 		LayerStack m_LayerStack;
-
 		ImGuiLayer* m_ImGuiLayer;
-
 		bool m_Running;
+		
+		//temp
+		unsigned int m_VertexArray;
+		Ref<Shader> m_Shader;
+		Ref<VertexBuffer> m_VertexBuffer;
+		Ref<IndexBuffer> m_IndexBuffer;
+
+		Ref<Renderer> m_Renderer;
 
 		static Application* s_Instance;
+
 	};
 	//Should be defined in Client
 	Application* CreateApplication();
