@@ -19,6 +19,7 @@ namespace glash
 
 	public:
 		using CreateVertexBufferCallback = std::function<Ref<VertexBuffer> (const float*, uint32_t size)>;
+		using CreateVertexBufferEmptyCallback = std::function<Ref<VertexBuffer>(uint32_t size)>;
 		using CreateIndexBufferCallback = std::function<Ref<IndexBuffer> (const uint32_t*, uint32_t size)>;
 
 		Renderer(RendererAPI api);
@@ -26,6 +27,7 @@ namespace glash
 
 	public:
 		CreateVertexBufferCallback CreateVertexBufferFn;
+		CreateVertexBufferEmptyCallback CreateVertexBufferEmptyFn;
 		CreateIndexBufferCallback CreateIndexBufferFn;
 
 	private:

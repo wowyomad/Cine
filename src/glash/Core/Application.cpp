@@ -45,13 +45,13 @@ namespace glash
 		PushOverlay(m_ImGuiLayer);
 
 		const uint64_t stride = 6 * sizeof(float);
-		float vertices[6 * 3] ={
-			-0.5f, -0.5f, 0.0f,	0.5f, 0.5f, 0.5f,
-			0.5f, -0.5f, 0.0f, 0.5f, 0.5f, 0.5f,
-			0.0f, 0.5f, 0.0f, 0.5f, 0.5f, 0.5f,
+		float vertices[6 * 3] = {
+			-0.5f, -0.5f, 0.0f,		1.0f, 0.5f, 0.5f,
+			 0.5f, -0.5f, 0.0f,		0.5f, 1.0f, 0.5f,
+			 0.0f,  0.5f, 0.0f,		0.5f, 0.5f, 1.0f,
 		};
 		unsigned int indices[3] = {
-			0, 1, 2 
+			0, 1, 2
 		};
 
 		glGenVertexArrays(1, &m_VertexArray);
@@ -63,14 +63,21 @@ namespace glash
 		m_VertexBuffer = VertexBuffer::Create(vertices, sizeof(vertices));
 		m_IndexBuffer = IndexBuffer::Create(indices, sizeof(indices) / sizeof(float));
 
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, false, stride, (void*)0);
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 3, GL_FLOAT, false, stride, (void*)12);
-	
+		BufferLayout layout = {
+			{ ShaderDataType::Float3, "a_Position" },
+			{ ShaderDataType::Float3, "a_Color" }
+		};
+
+		const auto& elements = layout.Elements();
+		uint32_t index = 0;
+		for (auto& element : elements)
+		{
+			glEnableVertexAttribArray(index);
+			glVertexAttribPointer(index, element.GetCount(), ShaderDataTypeToOpenGLEnumType(element.Type), element.Normalized, layout.Stride(), (void*)element.Offset);
+			index++;
+		}
 
 		m_Shader = Shader::Create("resources/shaders/shader.shader");
-
 	}
 
 	void Application::OnEvent(Event& event)
@@ -82,7 +89,7 @@ namespace glash
 			if (event.IsHandled())
 			{
 				break;
-			}	
+			}
 			(*it)->OnEvent(event);
 		}
 
@@ -130,7 +137,7 @@ namespace glash
 
 			for (Layer* layer : m_LayerStack)
 			{
-				layer->OnUpdate();	
+				layer->OnUpdate();
 			}
 
 			m_ImGuiLayer->Begin();

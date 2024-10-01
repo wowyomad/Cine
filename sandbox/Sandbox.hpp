@@ -20,21 +20,24 @@ public:
 
 	void OnEvent(glash::Event& event) override
 	{
-		
+
 	}
 
 	void OnImGuiRender() override
-	{	
-		ImGuiContext* this_context = ImGui::GetCurrentContext();
+	{
+		if (m_Show)
+		{
+			ImGui::Begin(m_Name.c_str(), &m_Show);
+			ImGui::Text("Fuck this shit");
+			ImGui::InputText("Input: ", m_Buf, sizeof(m_Buf));
+			ImGui::End();
+		}
 
-		ImGui::Begin(m_Name.c_str());
-		ImGui::Text("Fuck this shit");
-		ImGui::End();
 	}
 
 private:
 	char m_Buf[1024]{};
-
+	bool m_Show = true;
 
 };
 
@@ -49,7 +52,7 @@ public:
 
 	~Sandbox()
 	{
-			
+
 	}
 };
 

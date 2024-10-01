@@ -6,14 +6,14 @@
 
 namespace glash
 {
-	Ref<IndexBuffer> IndexBuffer::Create(const uint32_t* indices, uint32_t size)
+	Ref<VertexBuffer> glash::VertexBuffer::Create(const float* vertices, uint32_t size)
 	{
-		return Renderer::Get().CreateIndexBufferFn(indices, size);
+		return Renderer::Get().CreateVertexBufferFn(vertices, size);
 	}
 
-	Ref<VertexBuffer> glash::VertexBuffer::Create(const float* vertices, uint32_t count)
+	Ref<IndexBuffer> IndexBuffer::Create(const uint32_t* indices, uint32_t count)
 	{
-		return Renderer::Get().CreateVertexBufferFn(vertices, count);
+		return Renderer::Get().CreateIndexBufferFn(indices, count);
 	}
 
 	Ref<VertexBuffer> VertexBuffer::Create(uint32_t size)

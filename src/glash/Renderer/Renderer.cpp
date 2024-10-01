@@ -17,6 +17,10 @@ namespace glash
 	{
 		return CreateRef<OpenGLIndexBuffer>(indices, count);
 	}
+	static inline Ref<OpenGLVertexBuffer> OpenGL_CreateVertexBufferEmpty(uint32_t size)
+	{
+		return CreateRef<OpenGLVertexBuffer>(size);
+	}
 
 	Renderer::Renderer(RendererAPI api)
 	{
@@ -28,6 +32,7 @@ namespace glash
 		case RendererAPI::OpenGL:
 			CreateVertexBufferFn = OpenGL_CreateVertexBuffer;
 			CreateIndexBufferFn = OpenGL_CreateIndexBufferr;
+			CreateVertexBufferEmptyFn = OpenGL_CreateVertexBufferEmpty;
 			break;
 		case RendererAPI::None:
 			GLASH_CORE_ASSERT(false, "Shouldn't reach here");
