@@ -2,6 +2,8 @@
 #include "glash/Renderer/Renderer.hpp"
 
 #include "glash/Platform/OpenGL/OpenGLBuffer.hpp"
+#include "glash/Platform/OpenGL/OpenGLVertexArray.hpp"
+
 
 namespace glash
 {
@@ -22,6 +24,11 @@ namespace glash
 		return CreateRef<OpenGLVertexBuffer>(size);
 	}
 
+	static inline Ref<OpenGLVertexArray> OpenGL_CreateVertexArray()
+	{
+		return CreateRef<OpenGLVertexArray>();
+	}
+
 	Renderer::Renderer(RendererAPI api)
 	{
 		GLASH_ASSERT(!s_Instance, "Currently only once renderer instance supported");
@@ -30,9 +37,10 @@ namespace glash
 		switch (api)
 		{
 		case RendererAPI::OpenGL:
-			CreateVertexBufferFn = OpenGL_CreateVertexBuffer;
-			CreateIndexBufferFn = OpenGL_CreateIndexBufferr;
-			CreateVertexBufferEmptyFn = OpenGL_CreateVertexBufferEmpty;
+			CreateVertexBuffer = OpenGL_CreateVertexBuffer;
+			CreateIndexBuffer = OpenGL_CreateIndexBufferr;
+			CreateVertexBufferEmpty = OpenGL_CreateVertexBufferEmpty;
+			CreateVertexArray = OpenGL_CreateVertexArray;
 			break;
 		case RendererAPI::None:
 			GLASH_CORE_ASSERT(false, "Shouldn't reach here");

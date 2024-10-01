@@ -11,7 +11,6 @@
 
 #include "glash/ImGui/ImGuiLayer.hpp"
 
-
 namespace glash
 {
 	Application* Application::s_Instance = nullptr;
@@ -44,38 +43,53 @@ namespace glash
 
 		PushOverlay(m_ImGuiLayer);
 
-		const uint64_t stride = 6 * sizeof(float);
-		float vertices[6 * 3] = {
+		float verticesSquare[] = {
+			-0.75f, -0.75f, 0.0f,		1.0f, 0.0f, 0.0f,
+			 0.75f, -0.75f, 0.0f,		1.0f, 0.0f, 0.0f,
+			 0.75f,  0.75f, 0.0f,		1.0f, 0.0f, 0.0f,
+			-0.75f,  0.75f, 0.0f,		1.0f, 0.0f, 0.0f,
+		};
+		float verticesTriangle[] = {
 			-0.5f, -0.5f, 0.0f,		1.0f, 0.5f, 0.5f,
 			 0.5f, -0.5f, 0.0f,		0.5f, 1.0f, 0.5f,
 			 0.0f,  0.5f, 0.0f,		0.5f, 0.5f, 1.0f,
 		};
-		unsigned int indices[3] = {
-			0, 1, 2
+		unsigned int indicesSquare[] = {
+			0, 1, 2,
+			2, 3, 0
+		};
+		unsigned int indicesTriangle[] = {
+			0, 1, 2,
 		};
 
-		glGenVertexArrays(1, &m_VertexArray);
-		glBindVertexArray(m_VertexArray);
-
-
 		uint32_t vertexBuffer;
+		m_VertexArrayTriangle = VertexArray::Create();
+		m_VertexArraySquare = VertexArray::Create();
+		
+		auto SquareVertexBuffer = VertexBuffer::Create(verticesSquare, sizeof(verticesSquare));
+		auto SquareIndexBuffer = IndexBuffer::Create(indicesSquare, sizeof(indicesSquare) / sizeof(float));
 
-		m_VertexBuffer = VertexBuffer::Create(vertices, sizeof(vertices));
-		m_IndexBuffer = IndexBuffer::Create(indices, sizeof(indices) / sizeof(float));
+		auto TriangleVertexBuffer = VertexBuffer::Create(verticesTriangle, sizeof(verticesTriangle));
+		auto TriangleIndexBuffer = IndexBuffer::Create(indicesTriangle, sizeof(indicesTriangle) / sizeof(float));
 
-		BufferLayout layout = {
+		BufferLayout SquareLayout = {
+			{ ShaderDataType::Float3, "a_Position" },
+			{ ShaderDataType::Float3, "a_Color" }
+		};
+		SquareVertexBuffer->SetLayout(SquareLayout);
+	
+		BufferLayout TriangleLayout = {
 			{ ShaderDataType::Float3, "a_Position" },
 			{ ShaderDataType::Float3, "a_Color" }
 		};
 
-		const auto& elements = layout.Elements();
-		uint32_t index = 0;
-		for (auto& element : elements)
-		{
-			glEnableVertexAttribArray(index);
-			glVertexAttribPointer(index, element.GetCount(), ShaderDataTypeToOpenGLEnumType(element.Type), element.Normalized, layout.Stride(), (void*)element.Offset);
-			index++;
-		}
+		SquareVertexBuffer->SetLayout(SquareLayout);
+		TriangleVertexBuffer->SetLayout(TriangleLayout);
+
+		m_VertexArraySquare->AddVertexBuffer(SquareVertexBuffer);
+		m_VertexArraySquare->SetIndexBuffer(SquareIndexBuffer);
+		m_VertexArrayTriangle->AddVertexBuffer(TriangleVertexBuffer);
+		m_VertexArrayTriangle->SetIndexBuffer(TriangleIndexBuffer);
 
 		m_Shader = Shader::Create("resources/shaders/shader.shader");
 	}
@@ -132,8 +146,14 @@ namespace glash
 			glClear(GL_COLOR_BUFFER_BIT);
 
 			m_Shader->Bind();
-			glBindVertexArray(m_VertexArray);
-			glDrawElements(GL_TRIANGLES, m_IndexBuffer->GetCount(), GL_UNSIGNED_INT, (void*)0);
+
+			m_VertexArraySquare->Bind();
+			glDrawElements(GL_TRIANGLES, m_VertexArraySquare->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, (void*)0);
+
+			m_VertexArrayTriangle->Bind();
+			glDrawElements(GL_TRIANGLES, m_VertexArrayTriangle->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, (void*)0);
+
+			
 
 			for (Layer* layer : m_LayerStack)
 			{

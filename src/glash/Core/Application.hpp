@@ -8,11 +8,10 @@
 
 #include "glash/Renderer/Buffer.hpp"
 #include "glash/Renderer/Shader.hpp"
+#include "glash/Renderer/VertexArray.hpp"
 
 #include "glash/events/ApplicationEvent.hpp"
 #include "glash/ImGui/ImGuiLayer.hpp"
-
-
 
 namespace glash
 {
@@ -69,10 +68,9 @@ namespace glash
 		bool m_Running;
 		
 		//temp
-		unsigned int m_VertexArray;
+		Ref<VertexArray> m_VertexArrayTriangle;
+		Ref<VertexArray> m_VertexArraySquare;
 		Ref<Shader> m_Shader;
-		Ref<VertexBuffer> m_VertexBuffer;
-		Ref<IndexBuffer> m_IndexBuffer;
 
 		Ref<Renderer> m_Renderer;
 
