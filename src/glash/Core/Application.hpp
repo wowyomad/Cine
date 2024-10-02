@@ -13,10 +13,12 @@
 #include "glash/events/ApplicationEvent.hpp"
 #include "glash/ImGui/ImGuiLayer.hpp"
 
+#include "glash/Renderer/RendererAPI.hpp"
+
 namespace glash
 {
 	class GLASH_WINDOW_CLASS;
-	class RendererAPI;
+	class IRendererAPI;
 
 	class Application
 	{
@@ -52,7 +54,7 @@ namespace glash
 		GLASH_API void GetAllocatorFunctions(ImGuiMemAllocFunc* p_alloc_func, ImGuiMemFreeFunc* p_free_func, void** p_user_data) const;
 
 
-		GLASH_API static Application& GetAPI();
+		GLASH_API static Application& Get();
 		GLASH_API GLASH_WINDOW_CLASS& GetWindow();
 
 	private:
@@ -63,18 +65,18 @@ namespace glash
 
 	private:
 		std::unique_ptr<GLASH_WINDOW_CLASS> m_Window;
+		Ref<RendererAPI> m_Renderer;
 		LayerStack m_LayerStack;
 		ImGuiLayer* m_ImGuiLayer;
 		bool m_Running;
+
+		static Application* s_Instance;
 		
 		//temp
 		Ref<VertexArray> m_VertexArrayTriangle;
 		Ref<VertexArray> m_VertexArraySquare;
 		Ref<Shader> m_Shader;
 
-		Ref<RendererAPI> m_Renderer;
-
-		static Application* s_Instance;
 
 	};
 	//Should be defined in Client

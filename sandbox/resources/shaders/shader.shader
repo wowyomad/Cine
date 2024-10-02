@@ -2,12 +2,12 @@
 #version 330 core
 
 layout (location=0) in vec3 a_Position;
-layout (location=1) in vec3 a_Color;
+layout (location=1) in vec4 a_Color;
 
 uniform float brightness;
 uniform float another_uniform;
 
-out vec3 f_Color;
+out vec4 f_Color;
 
 void main() 
 {
@@ -18,10 +18,10 @@ void main()
 #shader fragment
 #version 330 core
 
-in vec3 f_Color;
+in vec4 f_Color;
 out vec4 screenColor;
 
 void main()
 {
-	screenColor = vec4(f_Color, 0.25);
+	screenColor = f_Color;
 }

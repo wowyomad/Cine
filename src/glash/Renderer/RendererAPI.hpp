@@ -9,11 +9,14 @@
 namespace glash
 {
 	class GLASH_RENDERER_API_CLASS;
+	class IRendererAPI;
 
-	class RendererAPI
+	using RendererAPI = GLASH_RENDERER_API_CLASS;
+
+	class IRendererAPI
 	{
 	public:
-
+		virtual ~IRendererAPI() = default;
 
 		virtual void Init() = 0;
 		virtual void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) = 0;
@@ -23,17 +26,19 @@ namespace glash
 		virtual void DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount = 0) = 0;
 		virtual void DrawLines(const Ref<VertexArray>& vertexArray, uint32_t vertexCount) = 0; 
 
-		static Scope<GLASH_RENDERER_API_CLASS> Create();
-		static Ref<VertexBuffer> CreateVertexBuffer(const float*, uint32_t size);
-		static Ref<VertexBuffer> CreateVertexBufferEmpty(uint32_t size);
-		static Ref<IndexBuffer> CreateIndexBuffer(const uint32_t*, uint32_t size);
-		static Ref<VertexArray> CreateVertexArray();
+		virtual void SetLineWidth(float width) = 0;
 
+		virtual Ref<VertexBuffer> CreateVertexBuffer(const float*, uint32_t size) = 0;
+		virtual Ref<VertexBuffer> CreateVertexBufferEmpty(uint32_t size) = 0;
+		virtual Ref<IndexBuffer> CreateIndexBuffer(const uint32_t*, uint32_t size) = 0;
+		virtual Ref<VertexArray> CreateVertexArray() = 0;
 
-		static inline  GLASH_RENDERER_API_CLASS& GetAPI() { return *s_Instance;  }
+		static Scope<RendererAPI> Create();
+
+		static inline RendererAPI& Get() { return *s_Instance;  }
 
 	private:
-		static Ref<GLASH_RENDERER_API_CLASS> s_Instance;
+		static Ref<RendererAPI> s_Instance;
 
 
 	};

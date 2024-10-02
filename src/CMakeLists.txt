@@ -15,8 +15,6 @@ file(GLOB SOURCES
     "${glash_SOURCE_DIR}/ImGui/*.cpp"
     "${glash_SOURCE_DIR}/Core/*.cpp"
     "${glash_SOURCE_DIR}/Renderer/*.cpp"
-    
-
 )
 
 file(GLOB HEADERS

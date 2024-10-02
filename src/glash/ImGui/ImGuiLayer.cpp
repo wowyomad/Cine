@@ -53,7 +53,7 @@ namespace glash
 
 		//From Hazel. Not implemented yet. SetDarkThemeColors();
 
-		Application& app = Application::GetAPI();
+		Application& app = Application::Get();
 		GLFWwindow* window = static_cast<GLFWwindow*>(app.GetWindow().GetNativeWindow());
 
 		// Setup Platform/Renderer bindings
@@ -71,7 +71,10 @@ namespace glash
 	void glash::ImGuiLayer::OnImGuiRender()
 	{
 		static bool show = true;
-		ImGui::ShowDemoWindow(&show);
+		if (show)
+		{
+			ImGui::ShowDemoWindow(&show);
+		}
 	}
 
 	void ImGuiLayer::Begin()
@@ -84,7 +87,7 @@ namespace glash
 	void ImGuiLayer::End()
 	{
 		ImGuiIO& io = ImGui::GetIO();
-		Application& app = Application::GetAPI();
+		Application& app = Application::Get();
 		io.DisplaySize = ImVec2((float)app.GetWindow().Width(), (float)app.GetWindow().Height());
 
 		// Rendering

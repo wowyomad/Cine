@@ -3,7 +3,8 @@
 
 #include "glash/Core/Log.hpp"
 
-#include "glash/Renderer/RendererAPI.hpp"
+#include "glash/Renderer/RenderCommand.hpp"
+#include "glash/Renderer/Renderer.hpp"
 
 #include "glash/events/KeyEvent.hpp"
 #include "glash/events/ApplicationEvent.hpp"
@@ -15,7 +16,7 @@ namespace glash
 {
 	Application* Application::s_Instance = nullptr;
 
-	Application& Application::GetAPI()
+	Application& Application::Get()
 	{
 		return *s_Instance;
 	}
@@ -36,21 +37,21 @@ namespace glash
 
 		m_Window = std::unique_ptr<GLASH_WINDOW_CLASS>(Window::Create());
 		m_Window->SetEventCallback(GLASH_BIND_EVENT_FN(Application::OnEvent));
+		RenderCommand::Init();
 
 		m_ImGuiLayer = new ImGuiLayer();
-
 		PushOverlay(m_ImGuiLayer);
 
 		float verticesSquare[] = {
-			-0.75f, -0.75f, 0.0f,		1.0f, 0.0f, 0.0f,
-			 0.75f, -0.75f, 0.0f,		1.0f, 0.0f, 0.0f,
-			 0.75f,  0.75f, 0.0f,		1.0f, 0.0f, 0.0f,
-			-0.75f,  0.75f, 0.0f,		1.0f, 0.0f, 0.0f,
+			-0.75f, -0.75f, 0.0f,		1.0f, 0.0f, 0.0f, 1.0,
+			 0.75f, -0.75f, 0.0f,		0.0f, 1.0f, 0.0f, 1.0,
+			 0.75f,  0.75f, 0.0f,		0.0f, 0.0f, 1.0f, 1.0,
+			-0.75f,  0.75f, 0.0f,		0.0f, 1.0f, 0.0f, 1.0
 		};
 		float verticesTriangle[] = {
-			-0.5f, -0.5f, 0.0f,		1.0f, 0.5f, 0.5f,
-			 0.5f, -0.5f, 0.0f,		0.5f, 1.0f, 0.5f,
-			 0.0f,  0.5f, 0.0f,		0.5f, 0.5f, 1.0f,
+			-0.5f, -0.5f, 0.0f,		1.0f, 0.5f, 0.5f, 1.0,
+			 0.5f, -0.5f, 0.0f,		0.5f, 1.0f, 0.5f, 1.0,
+			 0.0f,  0.6f, 0.0f,		0.5f, 0.5f, 1.0f, 1.0
 		};
 		unsigned int indicesSquare[] = {
 			0, 1, 2,
@@ -72,13 +73,13 @@ namespace glash
 
 		BufferLayout SquareLayout = {
 			{ ShaderDataType::Float3, "a_Position" },
-			{ ShaderDataType::Float3, "a_Color" }
+			{ ShaderDataType::Float4, "a_Color" }
 		};
 		SquareVertexBuffer->SetLayout(SquareLayout);
 	
 		BufferLayout TriangleLayout = {
 			{ ShaderDataType::Float3, "a_Position" },
-			{ ShaderDataType::Float3, "a_Color" }
+			{ ShaderDataType::Float4, "a_Color" }
 		};
 
 		SquareVertexBuffer->SetLayout(SquareLayout);
@@ -140,17 +141,19 @@ namespace glash
 		m_Running = true;
 		while (m_Running)
 		{
-	
-			glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
+			Renderer::BeginScene();
+			Renderer::Submit(m_Shader, m_VertexArraySquare);
+			Renderer::Submit(m_Shader, m_VertexArrayTriangle);
+			Renderer::EndScene();
+		/*	glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT);
 
-			m_Shader->Bind();
 
 			m_VertexArraySquare->Bind();
 			glDrawElements(GL_TRIANGLES, m_VertexArraySquare->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, (void*)0);
 
 			m_VertexArrayTriangle->Bind();
-			glDrawElements(GL_TRIANGLES, m_VertexArrayTriangle->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, (void*)0);
+			glDrawElements(GL_TRIANGLES, m_VertexArrayTriangle->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, (void*)0);*/
 
 			
 

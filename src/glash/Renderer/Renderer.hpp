@@ -5,8 +5,11 @@
 #include "glash/Renderer/RendererAPI.hpp"
 #include "glash/Renderer/Shader.hpp"
 
+#include "glash/Platform/OpenGL/OpenGLRendererAPI.hpp"
+
+
 namespace glash
-{
+{	
 	class Renderer 
 	{
 	public:
@@ -20,7 +23,7 @@ namespace glash
 
 		static void Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertexArray, const glm::mat4& transform = glm::mat4(1.0f));
 
-		static inline GLASH_RENDERER_API_CLASS& GetAPI() { return RendererAPI::GetAPI(); }
+		static inline RendererAPI& Get() { return RendererAPI::Get(); }
 	private:
 		struct SceneData
 		{
