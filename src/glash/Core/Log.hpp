@@ -3,8 +3,6 @@
 
 #include "glash/Core/Core.hpp"
 
-#include "glash/Enums.hpp"
-
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_sinks.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
@@ -196,17 +194,17 @@ namespace glash
 #endif
 		}
 	}
-	inline GLint GLGetStatus(GLuint object, GLStatus status)
+	inline GLint GLGetStatus(GLuint object, uint32_t status)
 	{
 		char log[512];
 		GLint param = 0;
 
 		switch (status)
 		{
-		case PROGRAM_LINK:
+		case GL_LINK_STATUS:
 			GLCall(glGetProgramiv(object, status, &param));
 			break;
-		case GLShaderType: case SHADER_COMPILE:
+		case GL_SHADER_TYPE: case GL_COMPILE_STATUS:
 			GLCall(glGetShaderiv(object, status, &param));
 			break;
 		default:

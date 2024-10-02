@@ -4,8 +4,6 @@
 #include <glad/glad.h>
 
 #include "glash/Renderer/Buffer.hpp"
-#include "glash/VertexArray.hpp"
-#include "glash/Renderer.hpp"
 
 namespace glash
 {

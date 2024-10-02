@@ -18,6 +18,8 @@ namespace glash
 		case ShaderDataType::Int4:     return	GL_INT;
 		case ShaderDataType::Bool:     return	GL_BOOL;
 		}
+		GLASH_CORE_ASSERT(false, "How did you get here?");
+		return 0;
 	}
 
 	OpenGLVertexArray::OpenGLVertexArray()
@@ -49,7 +51,7 @@ namespace glash
 		for (auto& element : layout)
 		{
 			glEnableVertexAttribArray(m_VertexBufferIndex);
-			glVertexAttribPointer(m_VertexBufferIndex, element.GetCount(), ShaderDataTypeToOpenGLEnumType(element.Type), element.Normalized, layout.Stride(), (void*)element.Offset);
+			glVertexAttribPointer(m_VertexBufferIndex, element.GetCount(), ShaderDataTypeToOpenGLEnumType(element.Type), element.Normalized, layout.Stride(), reinterpret_cast<const void*>(element.Offset));
 			m_VertexBufferIndex++;
 		}
 

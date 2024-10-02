@@ -1,8 +1,8 @@
 #pragma once
 #include "glash/Core/Core.hpp"
-#if defined GLASH_PLATFORM_OPENGL && GLASH_PLATFORM_OPENGL == 1
-#include "glash/Renderer/RendererAPI.hpp"
+#if GLASH_PLATFORM_OPENGL
 
+#include "glash/Renderer/RendererAPI.hpp"
 
 namespace glash
 {
