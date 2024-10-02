@@ -43,15 +43,15 @@ namespace glash
 		PushOverlay(m_ImGuiLayer);
 
 		float verticesSquare[] = {
-			-0.75f, -0.75f, 0.0f,		1.0f, 0.0f, 0.0f, 1.0,
-			 0.75f, -0.75f, 0.0f,		0.0f, 1.0f, 0.0f, 1.0,
-			 0.75f,  0.75f, 0.0f,		0.0f, 0.0f, 1.0f, 1.0,
-			-0.75f,  0.75f, 0.0f,		0.0f, 1.0f, 0.0f, 1.0
+			-0.75f, -0.75f, 0.0f,		0.8f, 0.2f, 0.3f, 1.0,
+			 0.75f, -0.75f, 0.0f,		0.2f, 0.8f, 0.3f, 1.0,
+			 0.75f,  0.75f, 0.0f,		0.2f, 0.3f, 0.8f, 1.0,
+			-0.75f,  0.75f, 0.0f,		0.2f, 0.8f, 0.3f, 1.0
 		};
 		float verticesTriangle[] = {
-			-0.5f, -0.5f, 0.0f,		1.0f, 0.5f, 0.5f, 1.0,
-			 0.5f, -0.5f, 0.0f,		0.5f, 1.0f, 0.5f, 1.0,
-			 0.0f,  0.6f, 0.0f,		0.5f, 0.5f, 1.0f, 1.0
+			-0.5f, -0.5f, 0.0f,		1.0f, 1.0f, 1.0f, 0.5f,
+			 0.5f, -0.5f, 0.0f,		1.0f, 1.0f, 1.0f, 0.25f,
+			 0.0f,  0.6f, 0.0f,		1.0f, 1.0f, 1.0f, 0.0f,
 		};
 		unsigned int indicesSquare[] = {
 			0, 1, 2,
@@ -145,17 +145,6 @@ namespace glash
 			Renderer::Submit(m_Shader, m_VertexArraySquare);
 			Renderer::Submit(m_Shader, m_VertexArrayTriangle);
 			Renderer::EndScene();
-		/*	glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
-			glClear(GL_COLOR_BUFFER_BIT);
-
-
-			m_VertexArraySquare->Bind();
-			glDrawElements(GL_TRIANGLES, m_VertexArraySquare->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, (void*)0);
-
-			m_VertexArrayTriangle->Bind();
-			glDrawElements(GL_TRIANGLES, m_VertexArrayTriangle->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, (void*)0);*/
-
-			
 
 			for (Layer* layer : m_LayerStack)
 			{

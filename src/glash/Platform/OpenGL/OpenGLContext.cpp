@@ -26,9 +26,6 @@ namespace glash
 		GLASH_CORE_INFO("OpenGL Vendor: {}", (const char*)glGetString(GL_VENDOR));
 		GLASH_CORE_INFO("OpenGL Renderer: {}", (const char*)glGetString(GL_RENDERER));
 		GLASH_CORE_INFO("OpenGL Version: {}", (const char*)glGetString(GL_VERSION));
-
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 	void OpenGLContext::SwapBuffers()
 	{
