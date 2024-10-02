@@ -51,7 +51,7 @@ namespace glash
 		for (auto& element : layout)
 		{
 			glEnableVertexAttribArray(m_VertexBufferIndex);
-			glVertexAttribPointer(m_VertexBufferIndex, element.GetCount(), ShaderDataTypeToOpenGLEnumType(element.Type), element.Normalized, layout.Stride(), reinterpret_cast<const void*>(element.Offset));
+			glVertexAttribPointer(m_VertexBufferIndex, element.GetCount(), ShaderDataTypeToOpenGLEnumType(element.Type), element.Normalized, layout.Stride(), (void*)(uintptr_t)element.Offset);
 			m_VertexBufferIndex++;
 		}
 
