@@ -1,8 +1,6 @@
 #pragma once
 #include "glash/Core/Core.hpp"
-#if defined GLASH_PLATFORM_OPENGL && GLASH_PLATFORM_OPENGL == 1
-#include "glash/Enums.hpp"
-#include "glash/glash_pch.hpp"
+#if GLASH_PLATFORM_OPENGL
 
 #include "glash/Renderer/Shader.hpp"
 
@@ -32,7 +30,7 @@ namespace glash
 		void SetFloat4(const std::string& name, const glm::vec4& value) override;
 		void SetMat4(const std::string& name, const glm::mat4& value) override;
 
-		void SetSamplerSlot(const char* name, GLSampler sampler, const int slot); //Shouldn't be here...
+		void SetSamplerSlot(const char* name, uint32_t sampler, const int slot); //Shouldn't be here...
 
 		inline const std::string GetName() const override;
 
@@ -49,6 +47,21 @@ namespace glash
 		}
 
 	private:
+		enum GLShaderType : uint32_t
+		{
+			NONE = 0,
+			VERTEX_SHADER = GL_VERTEX_SHADER,
+			FRAGMENT_SHADER = GL_FRAGMENT_SHADER
+		};
+
+		struct ShaderSource
+		{
+			enum GLShaderType type;
+			std::string source;
+		};
+
+
+
 		bool CompileShader(const ShaderSource& shaderSource, GLuint& shaderID);
 		bool CreateShaderProgram(const std::vector<ShaderSource>& sources);
 		static std::vector<ShaderSource> ParseShader(const std::string& filepath);

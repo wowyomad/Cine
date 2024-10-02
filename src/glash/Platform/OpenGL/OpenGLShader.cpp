@@ -39,7 +39,7 @@ namespace glash
 
 	bool OpenGLShader::isLinked() const
 	{
-		return GLGetStatus(m_ProgramID, GLStatus::PROGRAM_LINK);
+		return GLGetStatus(m_ProgramID, GL_LINK_STATUS);
 	}
 
 	void OpenGLShader::SetFloat(const std::string& name, float value)
@@ -131,7 +131,7 @@ namespace glash
 		glUniformMatrix4fv(location, 1, GL_FALSE, reinterpret_cast<const float*>(&value));
 	}
 
-	void OpenGLShader::SetSamplerSlot(const char* name, GLSampler sampler, const int slot)
+	void OpenGLShader::SetSamplerSlot(const char* name, uint32_t sampler, const int slot)
 	{
 		GLenum type = GetUniformType(name);
 		if (type != sampler)
@@ -183,7 +183,7 @@ namespace glash
 		GLCall(glShaderSource(shaderID, 1, &sourceCode, nullptr));
 		GLCall(glCompileShader(shaderID));
 
-		bool success = GLGetStatus(shaderID, GLStatus::SHADER_COMPILE);
+		bool success = GLGetStatus(shaderID, GL_COMPILE_STATUS);
 		if (!success) {
 			GLASH_CORE_ERROR("Shader compilation failed for type {}", static_cast<GLuint>(shaderSource.type));
 			glDeleteShader(shaderID);
@@ -210,7 +210,7 @@ namespace glash
 		}
 
 		GLCall(glLinkProgram(programID));
-		bool success = GLGetStatus(programID, GLStatus::PROGRAM_LINK);
+		bool success = GLGetStatus(programID, GL_LINK_STATUS);
 		if (!success) {
 			LOG_ERROR("Program linking failed.");
 			GLCall(glDeleteProgram(programID));
@@ -228,7 +228,7 @@ namespace glash
 		return true;
 	}
 
-	std::vector<ShaderSource> OpenGLShader::ParseShader(const std::string& filepath)
+	std::vector<OpenGLShader::ShaderSource> OpenGLShader::ParseShader(const std::string& filepath)
 	{
 		std::ifstream file(filepath);
 
