@@ -1,10 +1,13 @@
 #pragma once
-
 #include "glash/Core/Core.hpp"
+#if defined (GLASH_PLATFORM_OPENGL) == 1
+
+
 #include "glash/Enums.hpp"
 #include "glash/glash_pch.hpp"
 
 #include "glash/Renderer/Shader.hpp"
+
 
 namespace glash
 {
@@ -63,3 +66,6 @@ namespace glash
 		std::map<std::string, GLenum> m_UniformTypes;
 	};
 }
+
+
+#endif // GLASH_PLATFORM_OPENGL

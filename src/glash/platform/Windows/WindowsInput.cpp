@@ -42,21 +42,21 @@ namespace glash
 
 	bool Input::IsKeyPressed(KeyCode keyCode)
 	{
-		GLFWwindow* window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
+		GLFWwindow* window = static_cast<GLFWwindow*>(Application::GetAPI().GetWindow().GetNativeWindow());
 		int state = glfwGetKey(window, ToPlatformKey(keyCode));
 		return state == GLFW_PRESS;
 	}
 
 	bool Input::IsMouseButtonPressed(const MouseCode mouse)
 	{
-		GLFWwindow* window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
+		GLFWwindow* window = static_cast<GLFWwindow*>(Application::GetAPI().GetWindow().GetNativeWindow());
 		int state = glfwGetMouseButton(window, ToPlatformMouseButton(mouse));
 		return state == GLFW_PRESS;
 	}
 
 	glm::vec2 Input::GetMousePosition()
 	{
-		GLFWwindow* window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
+		GLFWwindow* window = static_cast<GLFWwindow*>(Application::GetAPI().GetWindow().GetNativeWindow());
 		double xpos, ypos;
 		glfwGetCursorPos(window, &xpos, &ypos);
 		return { static_cast<float>(xpos), static_cast<float>(ypos) };

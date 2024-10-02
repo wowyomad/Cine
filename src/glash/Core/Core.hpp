@@ -3,7 +3,11 @@
 #if defined(_WIN32) || defined(_WIN64)
 #define GLASH_API_EXPORT __declspec(dllexport)
 #define GLASH_API_IMPORT __declspec(dllimport)
+#else
+#define GLASH_API_EXPORT
+#define GLASH_API_IMPORT
 #endif
+
 
 #ifndef GLASH_BUILD_DLL
     #define GLASH_BUILD_DLL 0

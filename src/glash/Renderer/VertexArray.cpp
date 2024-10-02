@@ -7,6 +7,6 @@ namespace glash
 {
 	Ref<VertexArray> VertexArray::Create()
 	{
-		return Renderer::Get().CreateVertexArray();
+		return RendererAPI::CreateVertexArray();
 	}
 }

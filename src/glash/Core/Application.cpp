@@ -3,7 +3,7 @@
 
 #include "glash/Core/Log.hpp"
 
-#include "glash/Renderer/Renderer.hpp"
+#include "glash/Renderer/RendererAPI.hpp"
 
 #include "glash/events/KeyEvent.hpp"
 #include "glash/events/ApplicationEvent.hpp"
@@ -15,7 +15,7 @@ namespace glash
 {
 	Application* Application::s_Instance = nullptr;
 
-	Application& Application::Get()
+	Application& Application::GetAPI()
 	{
 		return *s_Instance;
 	}
@@ -36,8 +36,6 @@ namespace glash
 
 		m_Window = std::unique_ptr<GLASH_WINDOW_CLASS>(Window::Create());
 		m_Window->SetEventCallback(GLASH_BIND_EVENT_FN(Application::OnEvent));
-
-		m_Renderer = CreateRef<Renderer>(RendererAPI::OpenGL);
 
 		m_ImGuiLayer = new ImGuiLayer();
 

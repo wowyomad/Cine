@@ -1,6 +1,8 @@
 #pragma once
-
 #include "glash/Core/Core.hpp"
+#if defined (GLASH_PLATFORM_OPENGL) == 1
+
+
 #include "glash/Renderer/VertexArray.hpp"
 
 namespace glash
@@ -27,3 +29,5 @@ namespace glash
 		Ref<IndexBuffer> m_IndexBuffer;
 	};
 }
+
+#endif // GLASH_PLATFORM_OPENGL

@@ -1,4 +1,6 @@
 #pragma once
+#include "glash/Core/Core.hpp"
+#if defined (GLASH_PLATFORM_OPENGL) == 1
 
 #include "glash/Renderer/Buffer.hpp"
 
@@ -41,3 +43,5 @@ namespace glash
 		uint32_t m_Count;
 	};
 }
+
+#endif // GLASH_PLATFORM_OPENGL

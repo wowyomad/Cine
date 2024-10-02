@@ -1,6 +1,8 @@
 #pragma once
-
 #include "glash/Core/Core.hpp"
+#if defined (GLASH_PLATFORM_OPENGL) == 1
+
+
 #include "glash/Renderer/GrahpicsContext.hpp"
 
 struct GLFWwindow;
@@ -19,3 +21,5 @@ namespace glash
 		GLFWwindow* m_WindowHandle;
 	};
 }
+
+#endif //GLASH_PLATFORM_OPENGL

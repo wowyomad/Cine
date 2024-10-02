@@ -16,7 +16,7 @@
 namespace glash
 {
 	class GLASH_WINDOW_CLASS;
-	class Renderer;
+	class RendererAPI;
 
 	class Application
 	{
@@ -52,7 +52,7 @@ namespace glash
 		GLASH_API void GetAllocatorFunctions(ImGuiMemAllocFunc* p_alloc_func, ImGuiMemFreeFunc* p_free_func, void** p_user_data) const;
 
 
-		GLASH_API static Application& Get();
+		GLASH_API static Application& GetAPI();
 		GLASH_API GLASH_WINDOW_CLASS& GetWindow();
 
 	private:
@@ -72,7 +72,7 @@ namespace glash
 		Ref<VertexArray> m_VertexArraySquare;
 		Ref<Shader> m_Shader;
 
-		Ref<Renderer> m_Renderer;
+		Ref<RendererAPI> m_Renderer;
 
 		static Application* s_Instance;
 

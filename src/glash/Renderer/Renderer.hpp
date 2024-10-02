@@ -1,39 +1,34 @@
 #pragma once
 
-#include <functional>
-
 #include "glash/Core/Core.hpp"
-#include "glash/Renderer/Buffer.hpp"
-#include "glash/Renderer/VertexArray.hpp"
+
+#include "glash/Renderer/RendererAPI.hpp"
+#include "glash/Renderer/Shader.hpp"
 
 namespace glash
 {
-	enum class RendererAPI
+	class Renderer 
 	{
-		None = 0,
-		OpenGL,
-	};
-
-	class Renderer
-	{
-
-
 	public:
-		using CreateVertexBufferCallback = std::function<Ref<VertexBuffer> (const float*, uint32_t size)>;
-		using CreateVertexBufferEmptyCallback = std::function<Ref<VertexBuffer>(uint32_t size)>;
-		using CreateIndexBufferCallback = std::function<Ref<IndexBuffer> (const uint32_t*, uint32_t size)>;
-		using CreateVertexArrayCallback = std::function<Ref<VertexArray>()>;
+		static void Init();
+		static void Shutdown();
 
-		Renderer(RendererAPI api);
-		static const Renderer& Get();
+		static void OnWindowResize(uint32_t width, uint32_t height);
 
-	public:
-		CreateVertexBufferCallback CreateVertexBuffer;
-		CreateVertexBufferEmptyCallback CreateVertexBufferEmpty;
-		CreateIndexBufferCallback CreateIndexBuffer;
-		CreateVertexArrayCallback CreateVertexArray;
+		static void BeginScene();
+		static void EndScene();
+
+		static void Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertexArray, const glm::mat4& transform = glm::mat4(1.0f));
+
+		static inline GLASH_RENDERER_API_CLASS& GetAPI() { return RendererAPI::GetAPI(); }
+	private:
+		struct SceneData
+		{
+			glm::mat4 ViewProjectionMatrix;
+		};
+
+		static Scope<SceneData> s_SceneData;
 
 	private:
-		static Renderer* s_Instance;
 	};
 }
