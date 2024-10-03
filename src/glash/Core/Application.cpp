@@ -59,10 +59,11 @@ namespace glash
 			 0.75f,  0.75f, 0.0f,		0.2f, 0.3f, 0.8f, 1.0,
 			-0.75f,  0.75f, 0.0f,		0.2f, 0.8f, 0.3f, 1.0
 		};
+
 		float verticesTriangle[] = {
-			-0.5f, -0.5f, 0.0f,		1.0f, 1.0f, 1.0f, 0.5f,
-			 0.5f, -0.5f, 0.0f,		1.0f, 1.0f, 1.0f, 0.25f,
-			 0.0f,  0.6f, 0.0f,		1.0f, 1.0f, 1.0f, 0.0f,
+			-0.5f * cosf(3.1415 / 6.0f),		-0.5f * sinf(3.1415 / 6.0f),		0.0f,		1.0f, 1.0f, 1.0f, 0.5f,
+			 0.5f * cosf(3.1415 / 6.0f),		-0.5f * sinf(3.1415	 / 6.0f),		0.0f,		1.0f, 1.0f, 1.0f, 0.25f,
+			 0.0f,								 0.5f,								0.0f,		1.0f, 1.0f, 1.0f, 0.0f,
 		};
 		unsigned int indicesSquare[] = {
 			0, 1, 2,
@@ -157,6 +158,7 @@ namespace glash
 			auto cameraPositoin = m_Camera.GetPosition();
 			float speed = 0.01;
 			glm::vec3 translation(0.0f);
+			static float rotation = 0.0f;
 			if (Input::IsKeyPressed(Key::A))
 			{
 				translation.x -= 1;
@@ -173,16 +175,18 @@ namespace glash
 			{
 				translation.y -= 1;
 			}
+			rotation += 0.5f;
+
 			if(glm::dot(translation, translation) > 0.0)
 				translation = glm::normalize(translation) * speed;
 			m_Camera.SetPosition(cameraPositoin + translation);
 
-
-			GLASH_LOG_INFO("Projection: {}", glm::to_string(m_Camera.GetProjection()));
+			glm::mat4 transform = glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(0.0f, 0.0f, 1.0f));
+			m_Camera.SetRotation(rotation);
 
 			Renderer::BeginScene(m_Camera);
 			Renderer::Submit(m_Shader, m_VertexArraySquare);
-			Renderer::Submit(m_Shader, m_VertexArrayTriangle);
+			Renderer::Submit(m_Shader, m_VertexArrayTriangle, transform);
 			Renderer::EndScene();
 
 			for (Layer* layer : m_LayerStack)
