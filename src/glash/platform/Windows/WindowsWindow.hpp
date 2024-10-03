@@ -15,8 +15,8 @@ namespace glash
 		~WindowsWindow();
 
 		void OnUpdate();
-		unsigned int Width() const { return m_Data.Width; }
-		unsigned int Height() const { return m_Data.Height; }
+		inline unsigned int GetWidth() const { return m_Data.Width; }
+		inline unsigned int GetHeight() const { return m_Data.Height; }
 
 		void SetEventCallback(const EventCallbackFn& callback);
 		void AddEventCallback(const EventCallbackFn& callback);

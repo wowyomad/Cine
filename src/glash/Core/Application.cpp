@@ -10,7 +10,12 @@
 #include "glash/events/ApplicationEvent.hpp"
 #include "glash/events/MouseEvent.hpp"
 
+#include "glash/Core/KeyCodes.hpp"
+
 #include "glash/ImGui/ImGuiLayer.hpp"
+
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/string_cast.hpp>
 
 namespace glash
 {
@@ -27,7 +32,8 @@ namespace glash
 	}
 
 	Application::Application(int dummy)
-		: m_Running(false)
+		: m_Running(false),
+		m_Camera(-1.0f, 1.0f, -1.0f, 1.0f)
 	{
 		GLASH_LOG_TRACE(BUILD_STR);
 		(void)dummy; //get rid of unused parameter warning
@@ -37,7 +43,12 @@ namespace glash
 
 		m_Window = std::unique_ptr<GLASH_WINDOW_CLASS>(Window::Create());
 		m_Window->SetEventCallback(GLASH_BIND_EVENT_FN(Application::OnEvent));
-		RenderCommand::Init();
+
+		Renderer::Init();
+		RenderCommand::SetClearColor({ 0.15, 0.15, 0.15, 0.15 });
+
+		float ratio = (float)m_Window->GetWidth() / (float)m_Window->GetHeight();
+		m_Camera.SetProjection(-ratio, ratio, -1.0, 1.0f);
 
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverlay(m_ImGuiLayer);
@@ -64,7 +75,7 @@ namespace glash
 		uint32_t vertexBuffer;
 		m_VertexArrayTriangle = VertexArray::Create();
 		m_VertexArraySquare = VertexArray::Create();
-		
+
 		auto SquareVertexBuffer = VertexBuffer::Create(verticesSquare, sizeof(verticesSquare));
 		auto SquareIndexBuffer = IndexBuffer::Create(indicesSquare, sizeof(indicesSquare) / sizeof(float));
 
@@ -133,6 +144,8 @@ namespace glash
 
 	bool Application::OnWindowResizeEvent(WindowResizeEvent& event)
 	{
+		float ratio = (float)event.GetWidth() / (float)event.GetHeight();
+		m_Camera.SetProjection(-ratio, ratio, -1.0, 1.0f);
 		return false;
 	}
 
@@ -141,7 +154,33 @@ namespace glash
 		m_Running = true;
 		while (m_Running)
 		{
-			Renderer::BeginScene();
+			auto cameraPositoin = m_Camera.GetPosition();
+			float speed = 0.01;
+			glm::vec3 translation(0.0f);
+			if (Input::IsKeyPressed(Key::A))
+			{
+				translation.x -= 1;
+			}
+			if (Input::IsKeyPressed(Key::D))
+			{
+				translation.x += 1;
+			}
+			if (Input::IsKeyPressed(Key::W))
+			{
+				translation.y += 1;
+			}
+			if (Input::IsKeyPressed(Key::S))
+			{
+				translation.y -= 1;
+			}
+			if(glm::dot(translation, translation) > 0.0)
+				translation = glm::normalize(translation) * speed;
+			m_Camera.SetPosition(cameraPositoin + translation);
+
+
+			GLASH_LOG_INFO("Projection: {}", glm::to_string(m_Camera.GetProjection()));
+
+			Renderer::BeginScene(m_Camera);
 			Renderer::Submit(m_Shader, m_VertexArraySquare);
 			Renderer::Submit(m_Shader, m_VertexArrayTriangle);
 			Renderer::EndScene();

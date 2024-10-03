@@ -30,8 +30,8 @@ namespace glash
 		virtual ~Window() = default;
 		
 		void OnUpdate();
-		unsigned int Height() const;
-		unsigned int Width() const;
+		unsigned int GetHeight() const;
+		unsigned int GetWidth() const;
 		void SetEventCallback(const EventCallbackFn& callback);
 		void AddEventCallback(const EventCallbackFn& callback);
 		void SetVSync(bool enabled);

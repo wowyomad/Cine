@@ -17,9 +17,9 @@ namespace glash
 		ImGuiLayer();
 		~ImGuiLayer();
 
-		void OnAttach() override;
-		void OnDetach() override;
-		void OnImGuiRender() override;
+		void OnAttach() override final;
+		void OnDetach() override final;
+		void OnImGuiRender() override final;
 
 		void Begin();
 		void End();

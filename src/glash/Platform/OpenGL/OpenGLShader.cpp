@@ -128,7 +128,7 @@ namespace glash
 			return;
 		}
 		GLint location = GetUniformLocation(name.c_str());
-		glUniformMatrix4fv(location, 1, GL_FALSE, reinterpret_cast<const float*>(&value));
+		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
 	}
 
 	void OpenGLShader::SetSamplerSlot(const char* name, uint32_t sampler, const int slot)

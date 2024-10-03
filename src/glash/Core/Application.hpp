@@ -9,6 +9,7 @@
 #include "glash/Renderer/Buffer.hpp"
 #include "glash/Renderer/Shader.hpp"
 #include "glash/Renderer/VertexArray.hpp"
+#include "glash/Renderer/Camera.hpp"
 
 #include "glash/events/ApplicationEvent.hpp"
 #include "glash/ImGui/ImGuiLayer.hpp"
@@ -76,6 +77,7 @@ namespace glash
 		Ref<VertexArray> m_VertexArrayTriangle;
 		Ref<VertexArray> m_VertexArraySquare;
 		Ref<Shader> m_Shader;
+		OrthographicCamera m_Camera;
 
 
 	};
