@@ -21,9 +21,9 @@ namespace glash
 		GLASH_CORE_ERROR("GLFW error {}: {}", error, description);
 	}
 
-	WindowsWindow* Window::Create(const WindowProps& props)
+	Ref<GLASH_WINDOW_CLASS> Window::Create(const WindowProps& props)
 	{
-		return new WindowsWindow(props);
+		return CreateRef<GLASH_WINDOW_CLASS>(props);
 	}
 
 	WindowsWindow::WindowsWindow(const WindowProps& props)
@@ -166,8 +166,7 @@ namespace glash
 				} break;
 				case GLFW_REPEAT:
 				{
-					KeyPressedEvent event(key, 1);
-					data.EventCallback(event);
+					//TODO: ???
 				} break;
 				}
 			});

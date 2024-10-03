@@ -128,7 +128,7 @@ namespace glash
 			return;
 		}
 		GLint location = GetUniformLocation(name.c_str());
-		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
+		GLCall(glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value)));
 	}
 
 	void OpenGLShader::SetSamplerSlot(const char* name, uint32_t sampler, const int slot)
@@ -173,7 +173,7 @@ namespace glash
 		}
 
 		GLint numActiveUniforms;
-		glGetProgramiv(m_ProgramID, GL_ACTIVE_UNIFORMS, &numActiveUniforms);
+		GLCall(glGetProgramiv(m_ProgramID, GL_ACTIVE_UNIFORMS, &numActiveUniforms));
 
 		for (GLint i = 0; i < numActiveUniforms; ++i) {
 			char uniformName[256]; 
@@ -181,7 +181,7 @@ namespace glash
 			GLint size;
 			GLenum type;
 
-			glGetActiveUniform(m_ProgramID, i, sizeof(uniformName), &length, &size, &type, uniformName);
+			GLCall(glGetActiveUniform(m_ProgramID, i, sizeof(uniformName), &length, &size, &type, uniformName));
 
 			if (strcmp(uniformName, name) == 0) {
 				m_UniformTypes[name] = type;

@@ -39,7 +39,7 @@ namespace glash
 		void* GetNativeWindow() const;
 
 		// Factory method to create windows
-		static GLASH_WINDOW_CLASS* Create(const WindowProps& props = WindowProps());
+		static Ref<GLASH_WINDOW_CLASS> Create(const WindowProps& props = WindowProps());
 	};
 
 	/*class GLASH_API Window

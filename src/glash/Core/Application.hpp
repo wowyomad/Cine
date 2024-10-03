@@ -64,8 +64,8 @@ namespace glash
 
 		GLASH_API Application(int dummy);
 
-	private:
-		std::unique_ptr<GLASH_WINDOW_CLASS> m_Window;
+	protected:
+		Ref<GLASH_WINDOW_CLASS> m_Window;
 		Ref<RendererAPI> m_Renderer;
 		LayerStack m_LayerStack;
 		ImGuiLayer* m_ImGuiLayer;
@@ -73,14 +73,6 @@ namespace glash
 
 		static Application* s_Instance;
 		
-		//temp
-		Ref<VertexArray> m_VertexArrayTriangle;
-		Ref<VertexArray> m_VertexArraySquare;
-		Ref<Shader> m_Shader;
-		OrthographicCamera m_Camera;
-		float scale = 1.0f;
-
-
 	};
 	//Should be defined in Client
 	Application* CreateApplication();
