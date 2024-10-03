@@ -6,13 +6,18 @@ layout (location=1) in vec4 a_Color;
 
 uniform mat4 u_ViewProjection;
 uniform mat4 u_Transform;
+uniform vec4 u_Color;
+uniform int u_UseUniformColor;
 
 out vec4 f_Color;
 
 void main() 
 {
 	gl_Position = u_ViewProjection * u_Transform * vec4(a_Position, 1.0);
-	f_Color = a_Color;
+	if(u_UseUniformColor > 0)
+		f_Color = u_Color;
+	else	
+		f_Color = a_Color;
 }
 
 #shader fragment

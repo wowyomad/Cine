@@ -116,7 +116,7 @@ namespace glash
 			return;
 		}
 		GLint location = GetUniformLocation(name.c_str());
-		glUniformMatrix4fv(location, 1, GL_FALSE, reinterpret_cast<const float*>(&value));
+		GLCall(glUniformMatrix4fv(location, 1, GL_FALSE, reinterpret_cast<const float*>(&value)));
 	}
 
 	void OpenGLShader::SetMat4(const std::string& name, const glm::mat4& value)
@@ -154,10 +154,14 @@ namespace glash
 		{
 			return m_UniformLocations[name];
 		}
+
 		GLint location = glGetUniformLocation(m_ProgramID, name);
+		if (location == -1) {
+			GLASH_CORE_ERROR("Uniform '{}' not found in shader program.", name);
+			DEBUG_BREAK; // This is a placeholder for your debugging mechanism
+		}
 
 		m_UniformLocations[name] = location;
-
 		return location;
 	}
 
@@ -168,13 +172,24 @@ namespace glash
 			return m_UniformTypes[name];
 		}
 
-		GLenum type;
-		GLint size;
-		GLsizei length;
-		GLCall(glGetActiveUniform(m_ProgramID, GetUniformLocation(name), 0, &length, &size, &type, nullptr));
-		m_UniformTypes[name] = type;
+		GLint numActiveUniforms;
+		glGetProgramiv(m_ProgramID, GL_ACTIVE_UNIFORMS, &numActiveUniforms);
 
-		return type;
+		for (GLint i = 0; i < numActiveUniforms; ++i) {
+			char uniformName[256]; 
+			GLsizei length;
+			GLint size;
+			GLenum type;
+
+			glGetActiveUniform(m_ProgramID, i, sizeof(uniformName), &length, &size, &type, uniformName);
+
+			if (strcmp(uniformName, name) == 0) {
+				m_UniformTypes[name] = type;
+				return type;
+			}
+		}
+
+		return GL_NONE; // Uniform not found
 	}
 
 	bool OpenGLShader::CompileShader(const ShaderSource& shaderSource, GLuint& shaderID)

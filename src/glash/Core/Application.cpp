@@ -61,9 +61,9 @@ namespace glash
 		};
 
 		float verticesTriangle[] = {
-			-0.5f * cosf(3.1415 / 6.0f),		-0.5f * sinf(3.1415 / 6.0f),		0.0f,		1.0f, 1.0f, 1.0f, 0.5f,
-			 0.5f * cosf(3.1415 / 6.0f),		-0.5f * sinf(3.1415	 / 6.0f),		0.0f,		1.0f, 1.0f, 1.0f, 0.25f,
-			 0.0f,								 0.5f,								0.0f,		1.0f, 1.0f, 1.0f, 0.0f,
+			-0.5f * cosf(3.1415 / 6.0f),		-0.5f * sinf(3.1415 / 6.0f),		0.0f,		1.0f, 1.0f, 1.0f, 0.25f,
+			 0.5f * cosf(3.1415 / 6.0f),		-0.5f * sinf(3.1415	 / 6.0f),	0.0f,		1.0f, 1.0f, 1.0f, 0.25f,
+			 0.0f,								 0.5f,								0.0f,		1.0f, 1.0f, 1.0f, 0.25f,
 		};
 		unsigned int indicesSquare[] = {
 			0, 1, 2,
@@ -109,6 +109,18 @@ namespace glash
 	{
 		EventDispatcher dispatcher(event);
 
+		if (event.GetEventType() == EventType::MouseScrolled)
+		{
+
+		}
+
+		dispatcher.Dispatch<MouseScrolledEvent>([&](MouseScrolledEvent& event) 
+			{ 
+				scale -= 0.05f * event.GetVertical();
+				
+				return false;
+			});
+
 		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
 		{
 			if (event.IsHandled())
@@ -146,7 +158,7 @@ namespace glash
 	bool Application::OnWindowResizeEvent(WindowResizeEvent& event)
 	{
 		float ratio = (float)event.GetWidth() / (float)event.GetHeight();
-		m_Camera.SetProjection(-ratio, ratio, -1.0, 1.0f);
+		m_Camera.SetProjection(scale * -ratio, scale * ratio, scale * -1.0, scale * 1.0f);
 		return false;
 	}
 
@@ -159,6 +171,7 @@ namespace glash
 			float speed = 0.01;
 			glm::vec3 translation(0.0f);
 			static float rotation = 0.0f;
+			static glm::vec4 color(1.0f);
 			if (Input::IsKeyPressed(Key::A))
 			{
 				translation.x -= 1;
@@ -177,16 +190,28 @@ namespace glash
 			}
 			rotation += 0.5f;
 
-			if(glm::dot(translation, translation) > 0.0)
+			if (glm::dot(translation, translation) > 0.0)
+			{
 				translation = glm::normalize(translation) * speed;
-			m_Camera.SetPosition(cameraPositoin + translation);
+			}
+			m_Camera.SetPosition(cameraPositoin + -translation);
+
+			float ratio = (float)m_Window->GetWidth() / (float)m_Window->GetHeight();
+			m_Camera.SetProjection(scale * -ratio, scale * ratio, scale * -1.0, scale * 1.0f);
 
 			glm::mat4 transform = glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(0.0f, 0.0f, 1.0f));
-			m_Camera.SetRotation(rotation);
 
 			Renderer::BeginScene(m_Camera);
+
+			m_Shader->Bind();
+
+			m_Shader->SetInt("u_UseUniformColor", 0);
 			Renderer::Submit(m_Shader, m_VertexArraySquare);
+
+			m_Shader->SetInt("u_UseUniformColor", 1);
+			m_Shader->SetFloat4("u_Color", color);
 			Renderer::Submit(m_Shader, m_VertexArrayTriangle, transform);
+
 			Renderer::EndScene();
 
 			for (Layer* layer : m_LayerStack)
@@ -199,6 +224,9 @@ namespace glash
 			{
 				layer->OnImGuiRender();
 			}
+			ImGui::Begin("Debug");
+			ImGui::SliderFloat4("Color", reinterpret_cast<float*>(&color), 0.0f, 1.0f, "%.2f");
+			ImGui::End();
 			m_ImGuiLayer->End();
 
 			m_Window->OnUpdate();

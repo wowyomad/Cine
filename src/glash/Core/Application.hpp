@@ -78,6 +78,7 @@ namespace glash
 		Ref<VertexArray> m_VertexArraySquare;
 		Ref<Shader> m_Shader;
 		OrthographicCamera m_Camera;
+		float scale = 1.0f;
 
 
 	};

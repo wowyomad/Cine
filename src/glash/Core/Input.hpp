@@ -24,12 +24,12 @@ namespace glash
 		static PlatformKey ToPlatformKey(KeyCode);
 		static PlatformMouse ToPlatformMouseButton(MouseCode);
 
+		static void Init();
 		static bool IsKeyPressed(KeyCode keycode);
 		static bool IsMouseButtonPressed(MouseCode mousecode);
 		static glm::vec2 GetMousePosition();
 		static std::pair<float, float> GetMouseXY();
 		static float GetMouseX();
 		static float GetMouseY();
-		static void Init();
 	};
 }
