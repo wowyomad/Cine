@@ -1,6 +1,8 @@
 #pragma once
 
 #include "glash/Core/Core.hpp"
+#include "glash/Core/Timestep.hpp"
+
 
 #include "glash/events/Event.hpp"
 
@@ -15,7 +17,8 @@ namespace glash
 
 		virtual void OnAttach();
 		virtual void OnDetach() {}
-		virtual void OnUpdate() {}
+		virtual void OnFixedUpdate(Timestep fixedDeltaTime) {}
+		virtual void OnUpdate(Timestep deltaTime) {}
 		virtual void OnImGuiRender() {}
 		virtual void OnEvent(Event& event) {}
 

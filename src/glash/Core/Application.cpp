@@ -6,13 +6,10 @@
 #include "glash/Renderer/RenderCommand.hpp"
 #include "glash/Renderer/Renderer.hpp"
 
-#include "glash/events/KeyEvent.hpp"
-#include "glash/events/ApplicationEvent.hpp"
-#include "glash/events/MouseEvent.hpp"
-
-#include "glash/Core/KeyCodes.hpp"
-
 #include "glash/ImGui/ImGuiLayer.hpp"
+
+//remove this
+#include "GLFW/glfw3.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/string_cast.hpp>
@@ -94,11 +91,27 @@ namespace glash
 	void Application::Run()
 	{
 		m_Running = true;
+		
 		while (m_Running)
 		{
+			float time = glfwGetTime();
+			Timestep deltaTime = time - m_LastFrameTime;
+			m_LastFrameTime = time;
+
+			m_Accumulator += deltaTime;
+
+			while (m_Accumulator > m_TickTime)
+			{
+				for (Layer* layer : m_LayerStack)
+				{
+					layer->OnFixedUpdate(m_TickTime); // Call fixed update with fixed timestep
+				}
+				m_Accumulator -= m_TickTime; // Decrease the accumulator
+			}
+
 			for (Layer* layer : m_LayerStack)
 			{
-				layer->OnUpdate();
+				layer->OnUpdate(deltaTime);
 			}
 
 			m_ImGuiLayer->Begin();

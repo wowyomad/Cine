@@ -70,6 +70,9 @@ namespace glash
 		LayerStack m_LayerStack;
 		ImGuiLayer* m_ImGuiLayer;
 		bool m_Running;
+		float m_LastFrameTime = 0.0f;
+		float m_TickTime = 1.0f / 60.0f;
+		float m_Accumulator = 0.0f;
 
 		static Application* s_Instance;
 		

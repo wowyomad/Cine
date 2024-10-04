@@ -72,50 +72,62 @@ public:
 
 		m_Shader = Shader::Create("resources/shaders/shader.shader");
 	}
+	void OnFixedUpdate(Timestep fixedDeltaTime)  override
+	{
+		m_TriangleRotation += 2.0f * glm::pi<float>() * fixedDeltaTime * m_TriangleRotationSpeed;
+		m_TriangleTransform = glm::rotate(glm::mat4(1.0f), -m_TriangleRotation, glm::vec3(0.0f, 0.0f, 1.0f));
 
+		static size_t seconds = 0.0f;
+		static double secondsPassed = 0.0f;
+		secondsPassed += fixedDeltaTime.Seconds();
+		if (secondsPassed >= 1.0f)
+		{
+			GLASH_LOG_INFO("Time {}, Triangle Rotation: {}", seconds, glm::degrees<float>(m_TriangleRotation) / 360.0f);
+			secondsPassed = 0.0f;
+			seconds += 1;
+		}
+	}
 
-	void OnUpdate() override
+	void OnUpdate(Timestep deltaTime) override
 	{
 		float ratio = (float)s_Application->GetWindow().GetWidth() / (float)s_Application->GetWindow().GetHeight();
 		m_Camera.SetProjection(m_CameraScale * -ratio, m_CameraScale * ratio, m_CameraScale * -1.0, m_CameraScale * 1.0f);
 
-		auto cameraPositoin = m_Camera.GetPosition();
-		float speed = 0.01;
-		glm::vec3 translation(0.0f);
+		const auto& cameraPositoin = m_Camera.GetPosition();
+		glm::vec3 cameraTranslation(0.0f);
 
 		if (Input::IsKeyPressed(Key::A))
 		{
-			translation.x -= 1;
+			cameraTranslation.x -= 1;
 		}
 		if (Input::IsKeyPressed(Key::D))
 		{
-			translation.x += 1;
+			cameraTranslation.x += 1;
 		}
 		if (Input::IsKeyPressed(Key::W))
 		{
-			translation.y += 1;
+			cameraTranslation.y += 1;
 		}
 		if (Input::IsKeyPressed(Key::S))
 		{
-			translation.y -= 1;
+			cameraTranslation.y -= 1;
 		}
-		m_TriangleRotation += 0.5f;
 
-		if (glm::dot(translation, translation) > 0.0)
+		if (glm::dot(cameraTranslation, cameraTranslation) > 0.0)
 		{
-			translation = glm::normalize(translation) * speed;
+			cameraTranslation = glm::normalize(cameraTranslation) * m_CameraSpeed * (float)deltaTime.Seconds();
 		}
-		m_Camera.SetPosition(cameraPositoin + -translation);
-
-		glm::mat4 transform = glm::rotate(glm::mat4(1.0f), glm::radians(m_TriangleRotation), glm::vec3(0.0f, 0.0f, 1.0f));
+		m_Camera.SetPosition(cameraPositoin + cameraTranslation);
 
 		Renderer::BeginScene(m_Camera);
+		{
 			m_Shader->Bind();
 			m_Shader->SetInt("u_UseUniformColor", 0);
 			Renderer::Submit(m_Shader, m_VertexArraySquare);
 			m_Shader->SetInt("u_UseUniformColor", 1);
 			m_Shader->SetFloat4("u_Color", m_TriangleColor);
-			Renderer::Submit(m_Shader, m_VertexArrayTriangle, transform);
+			Renderer::Submit(m_Shader, m_VertexArrayTriangle, m_TriangleTransform);
+		}
 		Renderer::EndScene();
 	}
 
@@ -132,6 +144,8 @@ public:
 	{
 		ImGui::Begin("Debug");
 		ImGui::SliderFloat4("Color", glm::value_ptr(m_TriangleColor), 0.0f, 1.0f, "%.2f");
+		ImGui::SliderFloat("Scale", &m_CameraScale, 0.1f, 10.0f, "%.1f");
+		ImGui::SliderFloat("Triangle Rotation Spoeed", &m_TriangleRotationSpeed, -10.0f, 10.0f, "%.2f");
 		ImGui::End();
 	}
 
@@ -151,7 +165,11 @@ public:
 private:
 	glm::vec4 m_TriangleColor = glm::vec4(1.0f);
 	float m_TriangleRotation = 0.0f;
+	float m_TriangleRotationSpeed = 1.0f;
+	glm::mat4 m_TriangleTransform = glm::mat4(1.0f);
 	float m_CameraScale = 1.0f;
+	float m_CameraSpeed = 1.0f;
+	glm::vec3 m_CameraTranslation = glm::vec3(0.0f);
 	
 	Ref<VertexArray> m_VertexArrayTriangle;
 	Ref<VertexArray> m_VertexArraySquare;
