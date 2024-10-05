@@ -8,6 +8,8 @@
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include "spdlog/pattern_formatter.h"
 
+#include <string_view>
+
 namespace glash
 {
 #if GLASH_ENABLE_DEBUG
@@ -21,7 +23,7 @@ namespace glash
 	#endif
 
 	#ifndef __FILENAME__
-		#define __FILENAME__ std::filesystem::path(__FILE__).filename().string().c_str()
+		#define __FILENAME__ std::filesystem::path(__FILE__).filename().string()
 	#endif
 
 	#define ASSERT(x) if(!(x)) DEBUG_BREAK;
@@ -29,7 +31,7 @@ namespace glash
 			glash::debug::g_Func = __func__;\
 			glash::debug::g_Line = __LINE__;\
 			glash::debug::g_FileName = __FILENAME__;\
-			(x);\
+			x;\
 			if (glash::debug::g_HasErrorOccured) DEBUG_BREAK;\
 			glash::debug::g_HasErrorOccured = false;
 	#define GLASH_CORE_TRACE(msg, ...)\
@@ -40,6 +42,8 @@ namespace glash
 		glash::Log::GetCoreLogger()->info(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
 	#define GLASH_CORE_ERROR(msg, ...)\
 		glash::Log::GetCoreLogger()->error(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
+	#define GLASH_CORE_ERROR_EX(msg, func, filename, line, ...)\
+		glash::Log::GetCoreLogger()->error(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), func, filename, line)
 	#define GLASH_LOG_TRACE(msg, ...)\
 		glash::Log::GetClientLogger()->trace(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
 	#define GLASH_LOG_DEBUG(msg, ...)\
@@ -109,7 +113,7 @@ namespace glash
 	namespace debug
 	{
 		inline bool g_HasErrorOccured = false;
-		inline std::string g_Func = "";
+		inline std::string_view g_Func = "";
 		inline std::string g_FileName = "";
 		inline size_t g_Line = 0;
 
@@ -149,7 +153,7 @@ namespace glash
 			const GLchar* message, const void* userParam)
 		{
 			g_HasErrorOccured = true;
-			std::string sourceStr, typeStr, severityStr;
+			std::string_view sourceStr, typeStr, severityStr;
 			switch (source)
 			{
 			case GL_DEBUG_SOURCE_API:             sourceStr = "API"; break;
@@ -181,7 +185,7 @@ namespace glash
 			case GL_DEBUG_SEVERITY_NOTIFICATION: severityStr = "Notification"; break;
 			}
 
-			GLASH_CORE_ERROR("[OpenGL Debug] Source: {}, Type: {}, Severity: {}, Message: {}",
+			GLASH_CORE_ERROR_EX("[OpenGL Debug] Source: {}, Type: {}, Severity: {}, Message: {}",
 				g_Func, g_FileName, g_Line, sourceStr, typeStr, severityStr, message);
 		}
 

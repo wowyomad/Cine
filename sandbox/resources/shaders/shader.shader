@@ -1,4 +1,4 @@
-#shader vertex
+#type vertex
 #version 330 core
 
 layout (location=0) in vec3 a_Position;
@@ -15,7 +15,7 @@ void main()
 	f_Color = a_Color;
 }
 
-#shader fragment
+#type fragment
 #version 330 core
 
 in vec4 f_Color;

@@ -34,7 +34,7 @@ namespace glash
 		Application()
 			: Application(0)
 		{
-			GLASH_LOG_TRACE(BUILD_STR);
+			GLASH_CORE_TRACE(BUILD_STR);
 			ImGuiContext* p_context = GetImGuiContext();
 			ImGuiContext* this_context = ImGui::GetCurrentContext();
 

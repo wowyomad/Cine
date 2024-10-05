@@ -1,79 +1,54 @@
 #pragma once
-#include "glash/Core/Core.hpp"
-#if GLASH_PLATFORM_OPENGL
 
 #include "glash/Renderer/Shader.hpp"
+#include <GLM/glm.hpp>
 
 namespace glash
 {
-	class GLASH_API OpenGLShader : public IShader
+	class OpenGLShader : public Shader
 	{
 	public:
-		OpenGLShader();
-		OpenGLShader(const std::string& filepath);
-		~OpenGLShader();
 
-		void Reload();
+		OpenGLShader(const std::filesystem::path& filepath);
+		virtual ~OpenGLShader();
 
-		void Bind() const override final;
-		void Unbind() const override final;
+		virtual void Bind() const override final;
+		virtual void Unbind() const override final;
 
-		inline operator bool() const { return isLinked(); }
-		bool isLinked() const;
+		virtual void SetBool(const std::string& name, bool value) override final;
+		virtual void SetInt(const std::string& name, int value) override final;
+		virtual void SetIntArray(const std::string& name, int* values, uint32_t count) override final;
+		virtual void SetFloat(const std::string& name, float value) override final;
+		virtual void SetFloat2(const std::string& name, const glm::vec2& value) override final;
+		virtual void SetFloat3(const std::string& name, const glm::vec3& value) override final;
+		virtual void SetFloat4(const std::string& name, const glm::vec4& value) override final;
+		virtual void SetMat4(const std::string& name, const glm::mat4& value) override final;
+		
+		void UploadUniformBool(const std::string& name, bool value);
+		void UploadUniformInt(const std::string& name, int value);
+		void UploadUniformIntArray(const std::string& name, int* values, uint32_t count);
+		void UploadUniformFloat(const std::string& name, float value);
+		void UploadUniformFloat2(const std::string& name, const glm::vec2& value);
+		void UploadUniformFloat3(const std::string& name, const glm::vec3& value);
+		void UploadUniformFloat4(const std::string& name, const glm::vec4& value);
+		void UploadUniformMat4(const std::string& name, const glm::mat4& matrix);
 
-		void SetBool(const std::string& name, bool bValue) override final;
-		void SetInt(const std::string& name, int iValue) override final;
-		void SetIntArray(const std::string& name, int* values, uint32_t count) override final;
-		void SetFloat(const std::string& name, float fValue) override final;
-		void SetFloat2(const std::string& name, const glm::vec2& value) override final;
-		void SetFloat3(const std::string& name, const glm::vec3& value) override final;
-		void SetFloat4(const std::string& name, const glm::vec4& value) override final;
-		void SetMat4(const std::string& name, const glm::mat4& value) override final;
+		const std::string GetName() const override final;
 
-		void SetSamplerSlot(const char* name, uint32_t sampler, const int slot); //Shouldn't be here...
-
-		inline const std::string GetName() const override final;
-
-		//Temp...
-		OpenGLShader& operator=(OpenGLShader&& other) noexcept
-		{
-			this->m_Path = other.m_Path;
-			this->m_ProgramID = other.m_ProgramID;
-			this->m_UniformLocations = std::move(other.m_UniformLocations);
-			this->m_UniformTypes = std::move(other.m_UniformTypes);
-
-			other.m_ProgramID = 0;
-			return *this;
-		}
 
 	private:
-		enum GLShaderType : uint32_t
-		{
-			None = 0,
-			VERTEX_SHADER = GL_VERTEX_SHADER,
-			FRAGMENT_SHADER = GL_FRAGMENT_SHADER
-		};
+		std::string ReadFile(const std::filesystem::path& filepath);
+		std::map<int, std::string> PreProcess(const std::string& source);
 
-		struct ShaderSource
-		{
-			enum GLShaderType type;
-			std::string source;
-		};
-
-		bool CompileShader(const ShaderSource& shaderSource, GLuint& shaderID);
-		bool CreateShaderProgram(const std::vector<ShaderSource>& sources);
-		static std::vector<ShaderSource> ParseShader(const std::string& filepath);
-
-		GLint GetUniformLocation(const char* name);
-		GLenum GetUniformType(const char* name);
+		void CompileOrGetOpenGLBinaries();
+		void CreateProgram();
 
 	private:
-		std::string m_Path;
-		uint32_t m_ProgramID;
-		std::map<std::string, GLint> m_UniformLocations;
-		std::map<std::string, GLenum> m_UniformTypes;
+		uint32_t m_RendererID;
+		std::string m_FilePath;
+		std::string m_Name;
+		
+
+		std::map<int, std::string> m_OpenGLSourceCode;
 	};
 }
-
-
-#endif // GLASH_PLATFORM_OPENGL
