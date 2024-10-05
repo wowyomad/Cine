@@ -13,11 +13,21 @@ namespace glash
 		using PlatformKey = int64_t;
 		using PlatformMouse = int64_t;
 
+		enum class KeyState : uint8_t
+		{
+			Idle = 0,
+			Up = 1,
+			Down = 2
+		};
+
 		static KeyCode GlashKeys[512];
 		static MouseCode GlashMouseButtons[32];
 
 		static PlatformKey PlatformKeys[512];
 		static PlatformMouse PlatformMouseButtons[32];
+
+		static KeyState KeyStates[512];
+		static KeyState MouseButtonStates[32];
 
 		static KeyCode ToGlashKey(PlatformKey);
 		static MouseCode ToGlashMouse(PlatformMouse);
@@ -25,8 +35,16 @@ namespace glash
 		static PlatformMouse ToPlatformMouseButton(MouseCode);
 
 		static void Init();
+
 		static bool IsKeyPressed(KeyCode keycode);
+		static bool IsKeyDown(KeyCode keycode);
+		static bool IsKeyUp(KeyCode keycode);
+		static void SetKey(KeyCode keycode, KeyState state);
+
+		static void ClearKeyStates();
+
 		static bool IsMouseButtonPressed(MouseCode mousecode);
+
 		static glm::vec2 GetMousePosition();
 		static std::pair<float, float> GetMouseXY();
 		static float GetMouseX();

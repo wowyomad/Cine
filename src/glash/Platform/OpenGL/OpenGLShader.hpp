@@ -49,7 +49,7 @@ namespace glash
 	private:
 		enum GLShaderType : uint32_t
 		{
-			NONE = 0,
+			None = 0,
 			VERTEX_SHADER = GL_VERTEX_SHADER,
 			FRAGMENT_SHADER = GL_FRAGMENT_SHADER
 		};

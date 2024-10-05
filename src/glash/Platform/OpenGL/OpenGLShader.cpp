@@ -255,7 +255,7 @@ namespace glash
 
 		std::string line;
 		std::stringstream vertexShaderStream, fragmentShaderStream;
-		enum GLShaderType type = GLShaderType::NONE;
+		enum GLShaderType type = GLShaderType::None;
 
 		while (getline(file, line))
 		{

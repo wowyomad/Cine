@@ -11,9 +11,6 @@
 //remove this
 #include "GLFW/glfw3.h"
 
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtx/string_cast.hpp>
-
 namespace glash
 {
 	Application* Application::s_Instance = nullptr;
@@ -100,6 +97,8 @@ namespace glash
 
 			m_Accumulator += deltaTime;
 
+			m_Window->SetTitle(std::to_string(deltaTime.Milleseconds()));
+
 			while (m_Accumulator > m_TickTime)
 			{
 				for (Layer* layer : m_LayerStack)
@@ -108,11 +107,13 @@ namespace glash
 				}
 				m_Accumulator -= m_TickTime; // Decrease the accumulator
 			}
-
+			
 			for (Layer* layer : m_LayerStack)
 			{
 				layer->OnUpdate(deltaTime);
 			}
+
+			Input::ClearKeyStates();
 
 			m_ImGuiLayer->Begin();
 			for (Layer* layer : m_LayerStack)

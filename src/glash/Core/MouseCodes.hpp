@@ -2,7 +2,7 @@
 
 namespace glash
 {
-	using MouseCode = uint16_t;
+	using MouseCode = uint8_t;
 
 	namespace Mouse
 	{

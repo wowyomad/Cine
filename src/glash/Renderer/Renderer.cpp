@@ -43,6 +43,4 @@ namespace glash
 		vertexArray->Bind();
 		RenderCommand::DrawIndexed(vertexArray);
 	}
-
-
 }

@@ -21,6 +21,7 @@ namespace glash
 		void SetEventCallback(const EventCallbackFn& callback);
 		void AddEventCallback(const EventCallbackFn& callback);
 
+		void SetTitle(const std::string& title);
 		void SetVSync(bool enabled);
 		bool IsVSync() const;
 		void* GetNativeWindow() const;

@@ -13,12 +13,14 @@ namespace glash
 		std::string Title;
 		unsigned int Width;
 		unsigned int Height;
+		bool VSync;
 
 		WindowProps(
 			const std::string& title = "eNgInE",
 			unsigned int width = 1280,
-			unsigned int height = 720)
-			: Title(title), Width(width), Height(height) {}
+			unsigned int height = 720,
+			bool vsync = false)
+			: Title(title), Width(width), Height(height), VSync(vsync) { }
 	};
 
 	class GLASH_API Window
@@ -35,6 +37,7 @@ namespace glash
 		void SetEventCallback(const EventCallbackFn& callback);
 		void AddEventCallback(const EventCallbackFn& callback);
 		void SetVSync(bool enabled);
+		void SetTitle(const std::string& title);
 		bool IsVSync() const;
 		void* GetNativeWindow() const;
 

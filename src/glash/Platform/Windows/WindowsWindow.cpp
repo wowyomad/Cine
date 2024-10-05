@@ -44,6 +44,11 @@ namespace glash
 	{
 		SetEventCallback(callback);
 	}
+	void WindowsWindow::SetTitle(const std::string& title)
+	{
+		m_Data.Title = title;
+		glfwSetWindowTitle(m_Window, title.c_str());
+	}
 	void WindowsWindow::SetVSync(bool enabled)
 	{
 		if (enabled)
@@ -71,8 +76,9 @@ namespace glash
 		m_Data.Width = props.Width;
 		m_Data.Height = props.Height;
 		m_Data.Title = props.Title;
+		m_Data.VSync = props.VSync;
 
-		GLASH_CORE_INFO("Creating Windows window {} ({}, {})", props.Title, props.Width, props.Height);
+		GLASH_CORE_INFO("Creating Windows window {} ({}, {}), VSync: {}", props.Title, props.Width, props.Height, m_Data.VSync ? "On" : "Off");
 
 
 		if (!s_GLFWinitialized)
@@ -91,7 +97,7 @@ namespace glash
 		m_Context->Init();
 
 		glfwSetWindowUserPointer(m_Window, &m_Data);
-		SetVSync(true);
+		SetVSync(m_Data.VSync);
 
 		InitEventCallbacks();
 	}
@@ -156,11 +162,13 @@ namespace glash
 				{
 				case GLFW_RELEASE:
 				{
+					Input::SetKey(key, Input::KeyState::Up);
 					KeyReleasedEvent event(key);
 					data.EventCallback(event);
 				} break;
 				case GLFW_PRESS:
 				{
+					Input::SetKey(key, Input::KeyState::Down);
 					KeyPressedEvent event(key, 0);
 					data.EventCallback(event);
 				} break;

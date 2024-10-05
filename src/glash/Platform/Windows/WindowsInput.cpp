@@ -16,11 +16,16 @@ namespace glash
 	using PlatformKey = Input::PlatformKey;
 	using PlatformMouse = Input::PlatformMouse;
 
+
 	KeyCode Input::GlashKeys[512] {};
 	MouseCode Input::GlashMouseButtons[32]{};
 
 	Input::PlatformKey Input::PlatformKeys[512]{};
 	Input::PlatformMouse Input::PlatformMouseButtons[32]{};
+
+	Input::KeyState Input::KeyStates[512]{};
+	Input::KeyState Input::MouseButtonStates[32]{};
+
 
 	KeyCode Input::ToGlashKey(Input::PlatformKey glfwKeyCode)
 	{
@@ -40,12 +45,33 @@ namespace glash
 		return Input::PlatformMouseButtons[mouse];
 	}
 
-	bool Input::IsKeyPressed(KeyCode keyCode)
+	bool Input::IsKeyPressed(KeyCode keycode)
 	{
 		GLFWwindow* window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
-		int state = glfwGetKey(window, ToPlatformKey(keyCode));
+		int state = glfwGetKey(window, ToPlatformKey(keycode));
 		return state == GLFW_PRESS;
 	}
+
+	bool Input::IsKeyDown(KeyCode keycode)
+	{
+		return KeyStates[keycode] == KeyState::Down;
+	}
+
+	bool Input::IsKeyUp(KeyCode keycode)
+	{
+		return KeyStates[keycode] == KeyState::Up;
+	}
+
+	void Input::SetKey(KeyCode keycode, KeyState state)
+	{
+		KeyStates[keycode] = state;
+	}
+
+	void Input::ClearKeyStates()
+	{
+		std::memset(KeyStates, static_cast<int>(KeyState::Idle), sizeof(KeyStates));
+	}
+
 
 	bool Input::IsMouseButtonPressed(const MouseCode mouse)
 	{
