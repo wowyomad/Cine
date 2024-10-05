@@ -50,8 +50,6 @@ public:
 		};
 		SquareVertexBuffer->SetLayout(SquareLayout);
 
-		SquareVertexBuffer->SetLayout(SquareLayout);
-
 		m_VertexArraySquare->AddVertexBuffer(SquareVertexBuffer);
 		m_VertexArraySquare->SetIndexBuffer(SquareIndexBuffer);
 
@@ -64,22 +62,12 @@ public:
 
 	void OnUpdate(Timestep deltaTime) override
 	{
-		if (m_TargetCameraScale < m_CameraMinScale)
-		{
-			m_TargetCameraScale = m_CameraMinScale;
-		}
-		m_CameraScale = std::lerp(m_CameraScale, m_TargetCameraScale, m_CameraScaleLerpFactor);
-		if (m_CameraScale <= 0.1f)
-		{
-			m_CameraScale = 0.1f;
-		}
-		float ratio = (float)s_Application->GetWindow().GetWidth() / (float)s_Application->GetWindow().GetHeight();
-		float halfRation = ratio / 2;
-		m_Camera.SetProjection(m_CameraScale * -halfRation, m_CameraScale * halfRation, m_CameraScale * -0.5, m_CameraScale * 0.5f);
+		m_SquarePosition.x = std::lerp(m_SquarePosition.x, m_TargetSquarePosition.x,  1 - powf(m_SquareMoveLerpFactor, deltaTime));
+		m_SquarePosition.y = std::lerp(m_SquarePosition.y, m_TargetSquarePosition.y, 1 - powf(m_SquareMoveLerpFactor, deltaTime));
+		m_CameraScale = std::lerp(m_CameraScale, m_TargetCameraScale, 1 - powf(m_CameraScaleLerpFactor, deltaTime));
 
 
 		glm::vec3 squareTranslation(0.0f);
-
 		if (Input::IsKeyDown(Key::A))
 		{
 			squareTranslation.x -= 1;
@@ -97,6 +85,15 @@ public:
 			squareTranslation.y -= 1;
 		}
 
+		if (m_TargetCameraScale < m_CameraMinScale)
+		{
+			m_TargetCameraScale = m_CameraMinScale;
+		}
+
+		float ratio = (float)s_Application->GetWindow().GetWidth() / (float)s_Application->GetWindow().GetHeight();
+		float halfRation = ratio / 2;
+		m_Camera.SetProjection(m_CameraScale * -halfRation, m_CameraScale * halfRation, m_CameraScale * -0.5, m_CameraScale * 0.5f);
+
 		if (m_SquareMoveCooldwon <= 0.0f && glm::dot(squareTranslation, squareTranslation) > 0.0)
 		{
 			m_TargetSquarePosition += m_SquareSpeed * glm::normalize(squareTranslation);
@@ -106,20 +103,16 @@ public:
 		{
 			m_SquareMoveCooldwon -= deltaTime;
 		}
-		m_SquarePosition.x = std::lerp(m_SquarePosition.x, m_TargetSquarePosition.x, m_SquareMoveLerpFactor);
-		m_SquarePosition.y = std::lerp(m_SquarePosition.y, m_TargetSquarePosition.y, m_SquareMoveLerpFactor);
-
 
 		glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.25f));
-		float offset = 0.3f;
-		
+
 		Renderer::BeginScene(m_Camera);
 		{
-			for (size_t i = 0; i < 1; i++)
+			for (size_t i = 0; i < m_SquareRows; i++)
 			{
-				for (size_t j = 0; j < 1; j++)
+				for (size_t j = 0; j < m_SquareColumns; j++)
 				{
-					glm::mat4 tranform = glm::translate(glm::mat4(1.0f), m_SquarePosition + glm::vec3(i * offset, j * offset, 0.0f));
+					glm::mat4 tranform = glm::translate(glm::mat4(1.0f), m_SquarePosition + glm::vec3(i * m_SquareOffset, j * m_SquareOffset, 0.0f));
 					glm::mat4 squareTransform = tranform * scale;
 
 					Renderer::Submit(m_Shader, m_VertexArraySquare, squareTransform);
@@ -136,7 +129,6 @@ public:
 
 		dispatcher.Dispatch<MouseScrolledEvent>(GLASH_BIND_EVENT_FN(SimpleLayer::OnMouseScrolledEvent));
 		dispatcher.Dispatch<WindowResizeEvent>(GLASH_BIND_EVENT_FN(SimpleLayer::OnWindowResizeEvent));
-
 	}
 
 	void OnImGuiRender() override
@@ -144,6 +136,19 @@ public:
 		ImGui::Begin("Debug");
 		ImGui::SliderFloat("Scale", &m_TargetCameraScale, 0.1f, 10.0f, "%.1f");
 		ImGui::SliderFloat("Square Speed", &m_SquareSpeed, 0.1f, 10.0f, "%.1f");
+		ImGui::SliderInt("Rows", &m_SquareRows, 1, 128);
+		ImGui::SliderInt("Columns", &m_SquareColumns, 1, 128);
+		ImGui::DragFloat("Offset", &m_SquareOffset, 0.05f, 0.0f, 10.0f, "%.2f");
+
+		ImGui::DragFloat("Square Move Lerp Factor", &m_SquareMoveLerpFactor, 0.01, 0.01f, 1.0f, "%.2f");
+		ImGui::DragFloat("Camera Scale Lerp Factor", &m_CameraScaleLerpFactor, 0.01, 0.01f, 1.0f, "%.2f");
+
+
+		if (ImGui::Checkbox("VSync", &m_VSync))
+		{
+			s_Application->GetWindow().SetVSync(m_VSync);
+		}
+		
 		ImGui::End();
 	}
 
@@ -151,7 +156,7 @@ public:
 	{
 		m_TargetCameraScale -= m_CameraScaleSpeed * event.GetVertical();
 		return true;
-		
+
 	}
 
 	bool OnWindowResizeEvent(WindowResizeEvent& event)
@@ -166,16 +171,22 @@ private:
 
 	glm::vec3 m_SquarePosition = glm::vec3(0.0f);
 	glm::vec3 m_TargetSquarePosition = m_SquarePosition;
-	float m_SquareMoveLerpFactor = 0.025f;
+	float m_SquareMoveLerpFactor = 0.1f;
 	float m_SquareSpeed = 0.5f;
 	float m_SquareMoveWaitTime = 0.0f;
 	float m_SquareMoveCooldwon = 0.0f;
+	float m_SquareOffset = 0.25f;
+	int m_SquareRows = 1;
+	int m_SquareColumns = 1;
+
+	bool m_VSync = false;
+
 
 	float m_CameraScale = 1.0f;
 	float m_CameraMinScale = 0.1f;
 	float m_TargetCameraScale = m_CameraScale;
-	float m_CameraScaleSpeed = 0.05f;
-	float m_CameraScaleLerpFactor = 0.05f;
+	float m_CameraScaleSpeed = 0.1f;
+	float m_CameraScaleLerpFactor = 0.1f;
 
 	Ref<VertexArray> m_VertexArrayTriangle;
 	Ref<Shader> m_Shader;
@@ -188,6 +199,7 @@ class Sandbox : public glash::Application
 public:
 	Sandbox()
 	{
+		m_Window->SetVSync(false);
 		s_Application = this;
 		PushOverlay(new SimpleLayer());
 	}

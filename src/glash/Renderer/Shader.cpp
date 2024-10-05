@@ -5,7 +5,7 @@
 
 namespace glash
 {
-	Ref<Shader> Shader::Create(const std::string& filepath)
+	Ref<IShader> IShader::Create(const std::string& filepath)
 	{
 		//TODO: Choose correct render API
 

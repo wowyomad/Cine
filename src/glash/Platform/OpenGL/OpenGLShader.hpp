@@ -6,7 +6,7 @@
 
 namespace glash
 {
-	class GLASH_API OpenGLShader : public Shader
+	class GLASH_API OpenGLShader : public IShader
 	{
 	public:
 		OpenGLShader();
@@ -15,24 +15,24 @@ namespace glash
 
 		void Reload();
 
-		void Bind() const override;
-		void Unbind() const override;
+		void Bind() const override final;
+		void Unbind() const override final;
 
 		inline operator bool() const { return isLinked(); }
 		bool isLinked() const;
 
-		void SetBool(const std::string& name, bool bValue) override;
-		void SetInt(const std::string& name, int iValue) override;
-		void SetIntArray(const std::string& name, int* values, uint32_t count) override;
-		void SetFloat(const std::string& name, float fValue) override;
-		void SetFloat2(const std::string& name, const glm::vec2& value) override;
-		void SetFloat3(const std::string& name, const glm::vec3& value) override;
-		void SetFloat4(const std::string& name, const glm::vec4& value) override;
-		void SetMat4(const std::string& name, const glm::mat4& value) override;
+		void SetBool(const std::string& name, bool bValue) override final;
+		void SetInt(const std::string& name, int iValue) override final;
+		void SetIntArray(const std::string& name, int* values, uint32_t count) override final;
+		void SetFloat(const std::string& name, float fValue) override final;
+		void SetFloat2(const std::string& name, const glm::vec2& value) override final;
+		void SetFloat3(const std::string& name, const glm::vec3& value) override final;
+		void SetFloat4(const std::string& name, const glm::vec4& value) override final;
+		void SetMat4(const std::string& name, const glm::mat4& value) override final;
 
 		void SetSamplerSlot(const char* name, uint32_t sampler, const int slot); //Shouldn't be here...
 
-		inline const std::string GetName() const override;
+		inline const std::string GetName() const override final;
 
 		//Temp...
 		OpenGLShader& operator=(OpenGLShader&& other) noexcept
@@ -59,8 +59,6 @@ namespace glash
 			enum GLShaderType type;
 			std::string source;
 		};
-
-
 
 		bool CompileShader(const ShaderSource& shaderSource, GLuint& shaderID);
 		bool CreateShaderProgram(const std::vector<ShaderSource>& sources);

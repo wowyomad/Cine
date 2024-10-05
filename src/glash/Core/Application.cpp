@@ -40,6 +40,8 @@ namespace glash
 		Renderer::Init();
 		RenderCommand::SetClearColor({ 0.15, 0.15, 0.15, 0.15 });
 
+		glash::debug::InitializeOpenGLDebug();
+
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverlay(m_ImGuiLayer);
 	}
