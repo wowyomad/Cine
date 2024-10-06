@@ -25,11 +25,18 @@ public:
 		: Layer("Simple Sandbox Layer"),
 		m_Camera(-1.0f, 1.0f, -1.0f, 1.0f)
 	{
+		//float verticesSquare[] = {
+		//	-0.5f, -0.5f, 0.0f,		0.8f, 0.2f, 0.3f, 1.0,
+		//	 0.5f, -0.5f, 0.0f,		0.2f, 0.8f, 0.3f, 1.0,
+		//	 0.5f,  0.5f, 0.0f,		0.2f, 0.3f, 0.8f, 1.0,
+		//	-0.5f,  0.5f, 0.0f,		0.2f, 0.8f, 0.3f, 1.0
+		//};
+
 		float verticesSquare[] = {
-			-0.5f, -0.5f, 0.0f,		0.8f, 0.2f, 0.3f, 1.0,
-			 0.5f, -0.5f, 0.0f,		0.2f, 0.8f, 0.3f, 1.0,
-			 0.5f,  0.5f, 0.0f,		0.2f, 0.3f, 0.8f, 1.0,
-			-0.5f,  0.5f, 0.0f,		0.2f, 0.8f, 0.3f, 1.0
+			-0.5f, -0.5f, 0.0f,
+			 0.5f, -0.5f, 0.0f,
+			 0.5f,  0.5f, 0.0f,
+			-0.5f,  0.5f, 0.0f,	
 		};
 
 		unsigned int indicesSquare[] = {
@@ -46,14 +53,13 @@ public:
 
 		BufferLayout SquareLayout = {
 			{ ShaderDataType::Float3, "a_Position" },
-			{ ShaderDataType::Float4, "a_Color" }
 		};
 		SquareVertexBuffer->SetLayout(SquareLayout);
 
 		m_VertexArraySquare->AddVertexBuffer(SquareVertexBuffer);
 		m_VertexArraySquare->SetIndexBuffer(SquareIndexBuffer);
 
-		m_Shader = Shader::Create("resources/shaders/shader.shader");
+		m_Shader = Shader::Create("resources/shaders/uniform_color.shader");
 	}
 	void OnFixedUpdate(Timestep fixedDeltaTime)  override
 	{
@@ -106,7 +112,9 @@ public:
 
 		glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.25f));
 
+
 		Renderer::BeginScene(m_Camera);
+		m_Shader->Bind();
 		{
 			for (size_t i = 0; i < m_SquareRows; i++)
 			{
@@ -114,7 +122,14 @@ public:
 				{
 					glm::mat4 tranform = glm::translate(glm::mat4(1.0f), m_SquarePosition + glm::vec3(i * m_SquareOffset, j * m_SquareOffset, 0.0f));
 					glm::mat4 squareTransform = tranform * scale;
-
+					if ((i + j) % 2 == 0)
+					{
+						m_Shader->SetFloat4("u_Color", { 1.0f, 1.0f, 1.0f, 1.0f });
+					}
+					else
+					{
+						m_Shader->SetFloat4("u_Color", { 0.0f, 0.0f, 0.0f, 1.0f });
+					}
 					Renderer::Submit(m_Shader, m_VertexArraySquare, squareTransform);
 				}
 			}
