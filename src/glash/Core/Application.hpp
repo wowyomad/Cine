@@ -16,7 +16,7 @@
 
 #include "glash/Renderer/RendererAPI.hpp"
 
-namespace glash
+namespace Cine
 {
 	class GLASH_WINDOW_CLASS;
 	class IRendererAPI;

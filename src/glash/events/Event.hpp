@@ -3,7 +3,7 @@
 #include "glash/glash_pch.hpp"
 #include "glash/Core/Core.hpp"
 
-namespace glash
+namespace Cine
 {
 	enum class EventType
 	{

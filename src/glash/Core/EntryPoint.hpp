@@ -2,13 +2,13 @@
 #include "glash/Core/Application.hpp"
 #include "glash/Core/Log.hpp"
 
-extern glash::Application* glash::CreateApplication();
+extern Cine::Application* Cine::CreateApplication();
 
 int main(int argc, char** argv)
 {
-	glash::Log::Init();
-	glash::Input::Init();
-	glash::Application* app = glash::CreateApplication();
+	Cine::Log::Init();
+	Cine::Input::Init();
+	Cine::Application* app = Cine::CreateApplication();
 	app->Run();
 	delete app;
 }

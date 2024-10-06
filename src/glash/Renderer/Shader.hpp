@@ -4,7 +4,7 @@
 
 #include <glm/glm.hpp>
 
-namespace glash
+namespace Cine
 {
 	class IShader;
 

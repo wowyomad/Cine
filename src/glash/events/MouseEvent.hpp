@@ -5,7 +5,7 @@
 #include "glash/Core/Input.hpp"
 #include "glash/events/Event.hpp"
 
-namespace glash
+namespace Cine
 {
 	class GLASH_API MouseMovedEvent : public Event
 	{

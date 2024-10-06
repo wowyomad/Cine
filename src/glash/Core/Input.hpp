@@ -5,7 +5,7 @@
 #include "glash/Core/MouseCodes.hpp"
 
 
-namespace glash
+namespace Cine
 {
 	class GLASH_API Input
 	{

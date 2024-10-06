@@ -3,7 +3,7 @@
 
 #include "glash/Platform/OpenGL/OpenGLRendererAPI.hpp"
 
-namespace glash
+namespace Cine
 {
 	Scope<RendererAPI> RenderCommand::s_RendererAPI = RendererAPI::Create();
 }

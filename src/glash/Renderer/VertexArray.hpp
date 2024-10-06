@@ -3,7 +3,7 @@
 #include "glash/Core/Core.hpp"
 #include "glash/Renderer/Buffer.hpp"
 
-namespace glash
+namespace Cine
 {
 	class VertexArray
 	{

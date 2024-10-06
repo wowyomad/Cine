@@ -1,7 +1,7 @@
 #include "glash/Platform/OpenGL/OpenGLBuffer.hpp"
 #include "glash/glash_pch.hpp"
 
-namespace glash
+namespace Cine
 {
 	OpenGLVertexBuffer::OpenGLVertexBuffer(const float* vertices, uint32_t size)
 		: m_RendererID(0)

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace glash
+namespace Cine
 {
 	using MouseCode = uint8_t;
 

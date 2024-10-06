@@ -2,7 +2,7 @@
 
 #include "glash/Core/Core.hpp"
 
-namespace glash
+namespace Cine
 {
 	enum class ShaderDataType
 	{

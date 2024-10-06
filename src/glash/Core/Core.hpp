@@ -61,7 +61,7 @@ inline constexpr T BIT(T x) {
     return T(1) << x;
 }
 
-namespace glash
+namespace Cine
 {
     template <typename T, typename = void>
     struct has_to_string : std::false_type {};
@@ -74,15 +74,15 @@ namespace glash
 //otherwise uses class name
 #define STRING_FORMAT(ClassName)\
 template <>																	\
-struct fmt::formatter<glash::ClassName> {									\
+struct fmt::formatter<Cine::ClassName> {									\
     template <typename ParseContext>										\
     constexpr auto parse(ParseContext& ctx) {								\
         return ctx.begin();													\
     }																		\
 																			\
     template <typename FormatContext>										\
-    auto format(const glash::ClassName& event, FormatContext& ctx) const {	\
-		if constexpr (glash::has_to_string<glash::ClassName>::value) {		\
+    auto format(const Cine::ClassName& event, FormatContext& ctx) const {	\
+		if constexpr (Cine::has_to_string<Cine::ClassName>::value) {		\
 			return fmt::format_to(ctx.out(), "{}", event.ToString());		\
 		}																	\
 		else {																\
@@ -93,7 +93,7 @@ struct fmt::formatter<glash::ClassName> {									\
 
 #define GLASH_BIND_EVENT_FN(fn) std::bind(&fn, this, std::placeholders::_1)
 
-namespace glash
+namespace Cine
 {
     template <class T>
     using Scope = std::unique_ptr<T>;

@@ -1,6 +1,6 @@
 #include "glash/Core/LayerStack.hpp"
 
-namespace glash
+namespace Cine
 {
 	LayerStack::LayerStack()
 		: m_LayerInsertIndex(0) { }

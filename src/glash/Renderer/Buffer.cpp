@@ -5,9 +5,9 @@
 
 #include "glash/Platform/OpenGL/OpenGLRendererAPI.hpp"
 
-namespace glash
+namespace Cine
 {
-	Ref<VertexBuffer> glash::VertexBuffer::Create(const float* vertices, uint32_t size)
+	Ref<VertexBuffer> Cine::VertexBuffer::Create(const float* vertices, uint32_t size)
 	{
 		return RendererAPI::Get().CreateVertexBuffer(vertices, size);
 	}	

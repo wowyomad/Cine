@@ -1,7 +1,7 @@
 #pragma once
 #include "glash/glash_pch.hpp"
 
-namespace glash
+namespace Cine
 {
 	using KeyCode = uint16_t;
 

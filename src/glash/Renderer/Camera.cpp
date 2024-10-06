@@ -1,7 +1,7 @@
 #include "glash/glash_pch.hpp"
 #include "glash/Renderer/Camera.hpp"
 
-namespace glash
+namespace Cine
 {
 	void OrthographicCamera::RecalculateViewMatrix()
 	{

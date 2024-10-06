@@ -10,7 +10,7 @@
 
 #include <string_view>
 
-namespace glash
+namespace Cine
 {
 #if GLASH_ENABLE_DEBUG
 	#ifdef _MSC_VER
@@ -28,30 +28,30 @@ namespace glash
 
 	#define ASSERT(x) if(!(x)) DEBUG_BREAK;
 	#define GLCall(x)\
-			glash::debug::g_Func = __func__;\
-			glash::debug::g_Line = __LINE__;\
-			glash::debug::g_FileName = __FILENAME__;\
+			Cine::debug::g_Func = __func__;\
+			Cine::debug::g_Line = __LINE__;\
+			Cine::debug::g_FileName = __FILENAME__;\
 			x;\
-			if (glash::debug::g_HasErrorOccured) DEBUG_BREAK;\
-			glash::debug::g_HasErrorOccured = false;
+			if (Cine::debug::g_HasErrorOccured) DEBUG_BREAK;\
+			Cine::debug::g_HasErrorOccured = false;
 	#define GLASH_CORE_TRACE(msg, ...)\
-		glash::Log::GetCoreLogger()->trace(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
+		Cine::Log::GetCoreLogger()->trace(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
 	#define GLASH_CORE_DEBUG(msg, ...)\
-		glash::Log::GetCoreLogger()->debug(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
+		Cine::Log::GetCoreLogger()->debug(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
 	#define GLASH_CORE_INFO(msg, ...)\
-		glash::Log::GetCoreLogger()->info(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
+		Cine::Log::GetCoreLogger()->info(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
 	#define GLASH_CORE_ERROR(msg, ...)\
-		glash::Log::GetCoreLogger()->error(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
+		Cine::Log::GetCoreLogger()->error(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
 	#define GLASH_CORE_ERROR_EX(msg, func, filename, line, ...)\
-		glash::Log::GetCoreLogger()->error(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), func, filename, line)
+		Cine::Log::GetCoreLogger()->error(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), func, filename, line)
 	#define GLASH_LOG_TRACE(msg, ...)\
-		glash::Log::GetClientLogger()->trace(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
+		Cine::Log::GetClientLogger()->trace(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
 	#define GLASH_LOG_DEBUG(msg, ...)\
-		glash::Log::GetClientLogger()->debug(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
+		Cine::Log::GetClientLogger()->debug(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
 	#define GLASH_LOG_INFO(msg, ...)\
-		glash::Log::GetClientLogger()->info(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
+		Cine::Log::GetClientLogger()->info(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
 	#define GLASH_LOG_ERROR(msg, ...)\
-		glash::Log::GetClientLogger()->error(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
+		Cine::Log::GetClientLogger()->error(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
 	
 	#define LOG_DEBUG(msg, ...) \
 				spdlog::debug(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)

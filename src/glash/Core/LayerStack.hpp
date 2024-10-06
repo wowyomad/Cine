@@ -5,7 +5,7 @@
 #include "glash/Core/Core.hpp"
 #include "glash/Core/Layer.hpp"
 
-namespace glash
+namespace Cine
 {
 	class GLASH_API LayerStack
 	{

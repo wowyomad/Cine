@@ -1,6 +1,6 @@
 #pragma once
 
-namespace glash {
+namespace Cine {
 
 	class Timestep
 	{

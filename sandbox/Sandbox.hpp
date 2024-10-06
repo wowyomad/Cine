@@ -13,11 +13,11 @@
 
 #include <GLFW/glfw3.h>
 
-using namespace glash;
+using namespace Cine;
 
 static Application* s_Application = nullptr;
 
-class SimpleLayer : public glash::Layer
+class SimpleLayer : public Layer
 {
 public:
 	SimpleLayer()
@@ -35,7 +35,7 @@ public:
 			-0.5f, -0.5f, 0.0f,
 			 0.5f, -0.5f, 0.0f,
 			 0.5f,  0.5f, 0.0f,
-			-0.5f,  0.5f, 0.0f,	
+			-0.5f,  0.5f, 0.0f,
 		};
 
 		unsigned int indicesSquare[] = {
@@ -67,7 +67,7 @@ public:
 
 	void OnUpdate(Timestep deltaTime) override
 	{
-		m_SquarePosition.x = std::lerp(m_SquarePosition.x, m_TargetSquarePosition.x,  1 - powf(m_SquareMoveLerpFactor, deltaTime));
+		m_SquarePosition.x = std::lerp(m_SquarePosition.x, m_TargetSquarePosition.x, 1 - powf(m_SquareMoveLerpFactor, deltaTime));
 		m_SquarePosition.y = std::lerp(m_SquarePosition.y, m_TargetSquarePosition.y, 1 - powf(m_SquareMoveLerpFactor, deltaTime));
 		m_CameraScale = std::lerp(m_CameraScale, m_TargetCameraScale, 1 - powf(m_CameraScaleLerpFactor, deltaTime));
 
@@ -123,11 +123,11 @@ public:
 					glm::mat4 squareTransform = tranform * scale;
 					if ((i + j) % 2 == 0)
 					{
-						m_Shader->SetFloat4("u_Color", { 1.0f, 1.0f, 1.0f, 1.0f });
+						m_Shader->SetFloat4("u_Color", m_SquareColor1);
 					}
 					else
 					{
-						m_Shader->SetFloat4("u_Color", { 0.0f, 0.0f, 0.0f, 1.0f });
+						m_Shader->SetFloat4("u_Color", m_SquareColor2);
 					}
 					Renderer::Submit(m_Shader, m_VertexArraySquare, squareTransform);
 				}
@@ -137,7 +137,7 @@ public:
 
 	}
 
-	void OnEvent(glash::Event& event) override
+	void OnEvent(Event& event) override
 	{
 		EventDispatcher dispatcher(event);
 
@@ -157,12 +157,14 @@ public:
 		ImGui::DragFloat("Square Move Lerp Factor", &m_SquareMoveLerpFactor, 0.01, 0.01f, 1.0f, "%.2f");
 		ImGui::DragFloat("Camera Scale Lerp Factor", &m_CameraScaleLerpFactor, 0.01, 0.01f, 1.0f, "%.2f");
 
+		ImGui::ColorEdit3("Square 1", glm::value_ptr(m_SquareColor1));
+		ImGui::ColorEdit3("Square 2", glm::value_ptr(m_SquareColor2));
 
 		if (ImGui::Checkbox("VSync", &m_VSync))
 		{
 			s_Application->GetWindow().SetVSync(m_VSync);
 		}
-		
+
 		ImGui::End();
 	}
 
@@ -185,14 +187,15 @@ private:
 
 	glm::vec3 m_SquarePosition = glm::vec3(0.0f);
 	glm::vec3 m_TargetSquarePosition = m_SquarePosition;
-	float m_SquareMoveLerpFactor = 0.1f;
+	float m_SquareMoveLerpFactor = 0.01f;
 	float m_SquareSpeed = 0.5f;
 	float m_SquareMoveWaitTime = 0.0f;
 	float m_SquareMoveCooldwon = 0.0f;
 	float m_SquareOffset = 0.25f;
 	int m_SquareRows = 1;
 	int m_SquareColumns = 1;
-
+	glm::vec4 m_SquareColor1 = { 1.0f, 1.0f, 1.0f, 1.0f };
+	glm::vec4 m_SquareColor2 = { 0.0f, 0.0f, 0.0f, 1.0f };
 	bool m_VSync = false;
 
 
@@ -200,7 +203,7 @@ private:
 	float m_CameraMinScale = 0.1f;
 	float m_TargetCameraScale = m_CameraScale;
 	float m_CameraScaleSpeed = 0.1f;
-	float m_CameraScaleLerpFactor = 0.1f;
+	float m_CameraScaleLerpFactor = 0.01f;
 
 	Ref<VertexArray> m_VertexArrayTriangle;
 	Ref<Shader> m_Shader;
@@ -208,7 +211,7 @@ private:
 
 };
 
-class Sandbox : public glash::Application
+class Sandbox : public Application
 {
 public:
 	Sandbox()

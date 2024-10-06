@@ -7,7 +7,7 @@
 #include "glash/ImGui/ImGuiLayer.hpp"
 
 
-namespace glash
+namespace Cine
 {
 	Layer::Layer(const std::string& name)
 		: m_Name(name)

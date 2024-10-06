@@ -5,7 +5,7 @@
 
 #include "glash/Renderer/Buffer.hpp"
 
-namespace glash
+namespace Cine
 {
 	GraphicsContext* GraphicsContext::Create(void *window)
 	{

@@ -9,7 +9,7 @@
 #include <GLFW/glfw3.h>
 
 #if defined(GLASH_PLATFORM_WINDOWS) == 1
-namespace glash
+namespace Cine
 {
 	class Input;
 

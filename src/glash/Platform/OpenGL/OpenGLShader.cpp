@@ -1,7 +1,7 @@
 #include "glash/glash_pch.hpp"
 #include "glash/Platform/OpenGL/OpenGLShader.hpp"
 
-namespace glash
+namespace Cine
 {
 	namespace utils
 	{

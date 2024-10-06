@@ -13,7 +13,7 @@
 
 
 #if GLASH_PLATFORM_WINDOWS == 1
-namespace glash
+namespace Cine
 {
 	bool WindowsWindow::s_GLFWinitialized = false;
 

@@ -4,7 +4,7 @@
 
 #include "glash/Renderer/Buffer.hpp"
 
-namespace glash
+namespace Cine
 {
 	class OpenGLVertexBuffer : public VertexBuffer
 	{

@@ -1,7 +1,7 @@
 #include "glash/glash_pch.hpp"
 #include "glash/Platform/OpenGL/OpenGLVertexArray.hpp"
 
-namespace glash
+namespace Cine
 {
 	static GLenum ShaderDataTypeToOpenGLEnumType(ShaderDataType type)
 	{

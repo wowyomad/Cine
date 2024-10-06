@@ -9,7 +9,7 @@
 #include "glash/Platform/OpenGL/OpenGLRendererAPI.hpp"
 
 
-namespace glash
+namespace Cine
 {	
 	class Renderer 
 	{

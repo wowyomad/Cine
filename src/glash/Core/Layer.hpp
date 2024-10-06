@@ -6,7 +6,7 @@
 
 #include "glash/events/Event.hpp"
 
-namespace glash
+namespace Cine
 {
 	class GLASH_API Layer
 	{

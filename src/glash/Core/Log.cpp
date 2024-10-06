@@ -1,7 +1,7 @@
 #include "glash/glash_pch.hpp"
 #include "glash/Core/Log.hpp"
 
-namespace glash
+namespace Cine
 {
 	std::shared_ptr<spdlog::logger> Log::s_CoreLogger;
 	std::shared_ptr<spdlog::logger> Log::s_ClientLogger;

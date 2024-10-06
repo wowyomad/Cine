@@ -11,7 +11,7 @@
 //remove this
 #include "GLFW/glfw3.h"
 
-namespace glash
+namespace Cine
 {
 	Application* Application::s_Instance = nullptr;
 
@@ -40,7 +40,7 @@ namespace glash
 		Renderer::Init();
 		RenderCommand::SetClearColor({ 0.15, 0.15, 0.15, 0.15 });
 
-		glash::debug::InitializeOpenGLDebug();
+		Cine::debug::InitializeOpenGLDebug();
 
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverlay(m_ImGuiLayer);

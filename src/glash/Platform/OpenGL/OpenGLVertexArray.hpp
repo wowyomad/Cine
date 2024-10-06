@@ -4,7 +4,7 @@
 
 #include "glash/Renderer/VertexArray.hpp"
 
-namespace glash
+namespace Cine
 {
 	class OpenGLVertexArray : public VertexArray
 	{

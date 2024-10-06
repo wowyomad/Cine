@@ -13,7 +13,7 @@
 
 
 
-namespace glash
+namespace Cine
 {
 	ImGuiLayer::ImGuiLayer(const std::string& name)
 		: Layer(name) {}
@@ -61,14 +61,14 @@ namespace glash
 		ImGui_ImplOpenGL3_Init("#version 460");
 	}
 
-	void glash::ImGuiLayer::OnDetach()
+	void Cine::ImGuiLayer::OnDetach()
 	{
 		ImGui_ImplOpenGL3_Shutdown();
 		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();
 	}
 
-	void glash::ImGuiLayer::OnImGuiRender()
+	void Cine::ImGuiLayer::OnImGuiRender()
 	{
 		static bool show = false;
 		if (show)

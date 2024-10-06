@@ -3,7 +3,7 @@
 #include "glash/Platform/OpenGL/OpenGLVertexArray.hpp"
 #include "glash/Platform/OpenGL/OpenGLBuffer.hpp"
 
-namespace glash
+namespace Cine
 {
 	Ref<VertexBuffer> OpenGLRendererAPI::CreateVertexBuffer(const float* vertices, uint32_t size)
 	{
@@ -24,7 +24,7 @@ namespace glash
 		return CreateRef<OpenGLVertexArray>();
 	}
 
-	void glash::OpenGLRendererAPI::Init()
+	void Cine::OpenGLRendererAPI::Init()
 	{
 		//TODO: enable logging here
 

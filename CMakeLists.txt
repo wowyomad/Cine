@@ -1,5 +1,5 @@
 ﻿cmake_minimum_required(VERSION 3.20)
-project(glash VERSION 0.0.1 LANGUAGES C CXX)
+project(Cine VERSION 0.0.1 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -9,7 +9,7 @@ set(VENDOR_DIR ${CMAKE_CURRENT_SOURCE_DIR}/vendor)
 include(set_undefined.cmake)
 # Project properties
 set_undefined(GLASH_ENABLE_DEBUG ON CACHE BOOL "Enable debug logging" FORCE)
-set_undefined(GLASH_BUILD_DLL OFF CACHE BOOL "Build glash as a shared library" FORCE)
+set_undefined(GLASH_BUILD_DLL OFF CACHE BOOL "Build Cine as a shared library" FORCE)
 set_undefined(GLASH_BUILD_EXAMPLES OFF CACHE BOOL "Build examples" FORCE)
 set_undefined(GLASH_BUILD_SANDDOX ON CACHE BOOL "Build sandbox" FORCE)
 set_undefined(GLASH_ENABLE_ASSERTS ON CACHE BOOL "Enable asserts" FORCE)

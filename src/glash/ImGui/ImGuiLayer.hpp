@@ -8,7 +8,7 @@
 
 #include "imgui.h"
 
-namespace glash
+namespace Cine
 {
 	class GLASH_API ImGuiLayer : public Layer
 	{

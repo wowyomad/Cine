@@ -2,7 +2,7 @@
 #include "glash/Renderer/Renderer.hpp"
 #include "glash/Renderer/RenderCommand.hpp"
 
-namespace glash
+namespace Cine
 {
 	Scope<Renderer::SceneData> Renderer::s_SceneData = CreateScope<Renderer::SceneData>();
 

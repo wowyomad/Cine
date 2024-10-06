@@ -6,7 +6,7 @@
 
 struct GLFWwindow;
 
-namespace glash
+namespace Cine
 {
 	class GLASH_API WindowsWindow : public IWindow
 	{

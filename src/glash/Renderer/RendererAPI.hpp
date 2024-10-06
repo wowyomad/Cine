@@ -6,7 +6,7 @@
 #include "glash/Renderer/Buffer.hpp"
 #include "glash/Renderer/VertexArray.hpp"
 
-namespace glash
+namespace Cine
 {
 	class GLASH_RENDERER_API_CLASS;
 	class IRendererAPI;

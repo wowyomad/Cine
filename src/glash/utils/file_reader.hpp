@@ -3,7 +3,7 @@
 #include "glash/glash_pch.hpp"
 #include "glash/Core/Log.hpp"
 
-namespace glash
+namespace Cine
 {
 	namespace fs = std::filesystem;
 	inline fs::path ROOT_PATH = fs::path("./");

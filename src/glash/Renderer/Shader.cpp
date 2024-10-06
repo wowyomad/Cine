@@ -3,7 +3,7 @@
 
 #include "glash/Platform/OpenGL/OpenGLShader.hpp"
 
-namespace glash
+namespace Cine
 {
 	Ref<IShader> IShader::Create(const std::string& filepath)
 	{

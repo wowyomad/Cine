@@ -3,7 +3,7 @@
 #include "glash/Renderer/Shader.hpp"
 #include <GLM/glm.hpp>
 
-namespace glash
+namespace Cine
 {
 	class OpenGLShader : public Shader
 	{

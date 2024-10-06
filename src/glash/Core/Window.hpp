@@ -4,7 +4,7 @@
 #include "glash/events/Event.hpp"
 
 
-namespace glash
+namespace Cine
 {
 	class GLASH_WINDOW_CLASS;
 	class IWindow;

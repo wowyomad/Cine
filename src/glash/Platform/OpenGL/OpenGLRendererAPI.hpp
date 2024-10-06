@@ -4,7 +4,7 @@
 
 #include "glash/Renderer/RendererAPI.hpp"
 
-namespace glash
+namespace Cine
 {
 	class OpenGLRendererAPI : public IRendererAPI
 	{

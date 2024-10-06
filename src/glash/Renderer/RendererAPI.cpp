@@ -1,6 +1,6 @@
 #include "glash/Renderer/RendererAPI.hpp"
 #include "glash/Platform/OpenGL/OpenGLRendererAPI.hpp"
-namespace glash
+namespace Cine
 {
 	Ref<RendererAPI> IRendererAPI::s_Instance = nullptr;
 

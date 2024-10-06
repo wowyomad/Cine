@@ -3,7 +3,7 @@
 
 #include "glash/Renderer/Renderer.hpp"
 
-namespace glash
+namespace Cine
 {
 	Ref<VertexArray> VertexArray::Create()
 	{
