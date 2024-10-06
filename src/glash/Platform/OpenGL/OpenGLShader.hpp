@@ -37,7 +37,6 @@ namespace Cine
 
 	private:
 		std::string ReadFile(const std::filesystem::path& filepath);
-		std::map<int, std::string> PreProcess(const std::string& source);
 
 		void CompileOrGetOpenGLBinaries();
 		void CreateProgram();
@@ -47,6 +46,6 @@ namespace Cine
 		std::string m_FilePath;
 		std::string m_Name;
 		
-		std::map<int, std::string> m_OpenGLSourceCode;
+		std::string m_OpenGLSourceCode;
 	};
 }

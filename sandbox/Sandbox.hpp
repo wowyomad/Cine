@@ -34,9 +34,9 @@ public:
 
 		float verticesSquare[] = {
 			-0.5f, -0.5f, 0.0f,		0.0f, 0.0f,
-			 0.5f, -0.5f, 0.0f,		2.0f, 0.0f,
-			 0.5f,  0.5f, 0.0f,		2.0f, 2.0f,
-			-0.5f,  0.5f, 0.0f,		0.0f, 2.0f
+			 0.5f, -0.5f, 0.0f,		1.0f, 0.0f,
+			 0.5f,  0.5f, 0.0f,		1.0f, 1.0f,
+			-0.5f,  0.5f, 0.0f,		0.0f, 1.0f
 		};
 
 		unsigned int indicesSquare[] = {
@@ -60,11 +60,11 @@ public:
 		m_VertexArraySquare->AddVertexBuffer(SquareVertexBuffer);
 		m_VertexArraySquare->SetIndexBuffer(SquareIndexBuffer);
 
-		m_Shader = Shader::Create("resources/shaders/uniform_color.shader");
+		m_Shader = Shader::Create("resources/shaders/uniform_color.glsl");
 		auto specification = TextureSpecification();
 		specification.MagFilter = TextureFilter::Nearest;
 		specification.Wrap = TextureWrap::Repeat;
-		m_Texture = Texture2D::Create("resources/textures/face.png", specification);
+		m_Texture = Texture2D::Create("resources/textures/checkerboard.png", specification);
 	}
 	void OnFixedUpdate(Timestep fixedDeltaTime)  override
 	{
@@ -115,7 +115,7 @@ public:
 			m_SquareMoveCooldwon -= deltaTime;
 		}
 
-		glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.25f));
+		glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(m_SquareScale));
 
 
 		Renderer::BeginScene(m_Camera);
@@ -127,7 +127,7 @@ public:
 		{
 			for (size_t j = 0; j < m_SquareColumns; j++)
 			{
-				glm::mat4 tranform = glm::translate(glm::mat4(1.0f), m_SquarePosition + glm::vec3(i * m_SquareOffset, j * m_SquareOffset, 0.0f));
+				glm::mat4 tranform = glm::translate(glm::mat4(1.0f), m_SquarePosition + glm::vec3(i * m_SquareScale, j * m_SquareScale, 0.0f));
 				glm::mat4 squareTransform = tranform * scale;
 				if ((i + j) % 2 == 0)
 				{
@@ -157,11 +157,11 @@ public:
 	void OnImGuiRender() override
 	{
 		ImGui::Begin("Debug");
-		ImGui::SliderFloat("Scale", &m_TargetCameraScale, 0.1f, 10.0f, "%.1f");
+		ImGui::SliderFloat("Camera Scale", &m_TargetCameraScale, 0.1f, 10.0f, "%.1f");
 		ImGui::SliderFloat("Square Speed", &m_SquareSpeed, 0.1f, 10.0f, "%.1f");
 		ImGui::SliderInt("Rows", &m_SquareRows, 1, 128);
 		ImGui::SliderInt("Columns", &m_SquareColumns, 1, 128);
-		ImGui::DragFloat("Offset", &m_SquareOffset, 0.05f, 0.0f, 10.0f, "%.2f");
+		ImGui::DragFloat("Square Scale", &m_SquareScale, 0.05f, 0.0f, 10.0f, "%.2f");
 
 		ImGui::DragFloat("Square Move Lerp Factor", &m_SquareMoveLerpFactor, 0.01, 0.01f, 1.0f, "%.2f");
 		ImGui::DragFloat("Camera Scale Lerp Factor", &m_CameraScaleLerpFactor, 0.01, 0.01f, 1.0f, "%.2f");
@@ -201,9 +201,9 @@ private:
 	float m_SquareSpeed = 0.5f;
 	float m_SquareMoveWaitTime = 0.0f;
 	float m_SquareMoveCooldwon = 0.0f;
-	float m_SquareOffset = 0.25f;
+	float m_SquareScale = 1.0f;
 	int m_SquareRows = 1;
-	int m_SquareColumns = 0;
+	int m_SquareColumns = 1;
 	glm::vec4 m_SquareColor1 = { 1.0f, 1.0f, 1.0f, 1.0f };
 	glm::vec4 m_SquareColor2 = { 0.0f, 0.0f, 0.0f, 0.0f };
 	

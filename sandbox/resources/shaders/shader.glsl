@@ -1,5 +1,4 @@
-#type vertex
-#version 330 core
+#ifdef VERTEX
 
 layout (location=0) in vec3 a_Position;
 layout (location=1) in vec4 a_Color;
@@ -15,13 +14,16 @@ void main()
 	f_Color = a_Color;
 }
 
-#type fragment
-#version 330 core
+#endif
+#ifdef FRAGMENT
 
 in vec4 f_Color;
 out vec4 screenColor;
+
 
 void main()
 {
 	screenColor = f_Color;
 }
+
+#endif

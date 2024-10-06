@@ -1,5 +1,4 @@
-#type vertex
-#version 450 core
+#ifdef VERTEX
 
 layout (location=0) in vec3 a_Position;
 layout (location=1) in vec2 a_TexCoord;
@@ -18,9 +17,9 @@ void main()
 	f_Texture = a_TexCoord;
 }
 
-#type fragment
-#version 450 core
+#endif
 
+#ifdef FRAGMENT
 in vec4 f_Color;
 in vec2 f_Texture;
 
@@ -33,3 +32,5 @@ void main()
 	vec4 textureColor = texture(u_Texture, f_Texture);
 	screenColor = textureColor * f_Color;
 }
+
+#endif

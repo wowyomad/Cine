@@ -19,11 +19,9 @@ namespace Cine
 
 	OpenGLShader::OpenGLShader(const std::filesystem::path& filepath)
 	{
-		std::string source = ReadFile(filepath);
-		auto shaderSources = PreProcess(source);
-		m_OpenGLSourceCode = shaderSources;
+		m_OpenGLSourceCode = ReadFile(filepath);
 
-		CompileOrGetOpenGLBinaries();
+		CompileOrGetOpenGLBinaries(); //does nothing
 		CreateProgram();
 		
 		m_Name = filepath.filename().string();
@@ -111,31 +109,6 @@ namespace Cine
 		}
 		return result;
 	}
-	std::map<int, std::string> OpenGLShader::PreProcess(const std::string& source)
-	{
-		std::map<int, std::string> shaderSources;
-
-		const char* typeToken = "#type";
-		size_t typeTokenLength = strlen(typeToken);
-		size_t pos = source.find(typeToken, 0);
-		GLASH_CORE_ASSERT(pos != std::string::npos, "#type not found in shader file {}", source);
-		while (pos != std::string::npos)
-		{
-			size_t eol = source.find_first_of("\r\n", pos); //End of shader type declaration line
-			GLASH_CORE_ASSERT(eol != std::string::npos, "Incorrect end of line. CR-LF expected");
-			size_t begin = pos + typeTokenLength + 1; //Start of shader type name (after "#type " keyword)
-			std::string type = source.substr(begin, eol - begin);
-			int glType = utils::ShaderTypeFromString(type);
-			GLASH_CORE_ASSERT(glType, "Invalid shader type specified");
-
-			size_t nextLinePos = source.find_first_not_of("\r\n", eol); //Start of shader code after shader type declaration line
-			GLASH_CORE_ASSERT(nextLinePos != std::string::npos, "Syntax error");
-			pos = source.find(typeToken, nextLinePos); //Start of next shader type declaration line 
-
-			shaderSources[glType] = (pos == std::string::npos) ? source.substr(nextLinePos) : source.substr(nextLinePos, pos - nextLinePos);
-		}
-		return shaderSources;
-	}
 
 	void OpenGLShader::CompileOrGetOpenGLBinaries()
 	{
@@ -148,17 +121,34 @@ namespace Cine
 		GLuint program = glCreateProgram(); // Create the program
 
 		std::vector<GLuint> shaderIDs;
-
-		for (auto&& [type, source] : m_OpenGLSourceCode)
+		int types[] = { GL_VERTEX_SHADER, GL_FRAGMENT_SHADER };
+		const char* rawSource = m_OpenGLSourceCode.c_str();
+		for (int type : types)
 		{
-			const char* rawSource = source.c_str();
+			const char* shaderDefine = nullptr;
+			if (type == GL_VERTEX_SHADER) {
+				shaderDefine = "#version 450 core\n#define VERTEX\n";
+			}
+			else if (type == GL_FRAGMENT_SHADER) {
+				shaderDefine = "#version 450 core\n#define FRAGMENT\n";
+			}
+
 			GLCall(GLuint shaderID = glCreateShader(type));
-			GLCall(glShaderSource(shaderID, 1, &rawSource, nullptr));
+
+			const char* sources[] = { shaderDefine, rawSource };
+			GLCall(glShaderSource(shaderID, 2, sources, nullptr));
 			GLCall(glCompileShader(shaderID));
 
 			success = GLGetStatus(shaderID, GL_COMPILE_STATUS);
 			if (!success) {
-				GLASH_CORE_ERROR("Shader compilation failed for {}", static_cast<GLuint>(type));
+				GLint logLength;
+				glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &logLength);
+
+				if (logLength > 0) {
+					std::vector<char> errorLog(logLength);
+					glGetShaderInfoLog(shaderID, logLength, nullptr, errorLog.data());
+					GLASH_CORE_ERROR("Shader compilation failed: {}", errorLog.data());
+				}
 				DEBUG_BREAK;
 				glDeleteShader(shaderID);
 				success = false;
@@ -181,6 +171,7 @@ namespace Cine
 				DEBUG_BREAK;
 			}
 		}
+
 		for (GLuint shaderID : shaderIDs)
 		{
 			GLCall(glDetachShader(program, shaderID));

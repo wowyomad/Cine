@@ -11,8 +11,8 @@ set(RESOURCES_OUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/resources)
 set(SHADERS_OUT_DIR ${RESOURCES_OUT_DIR}/shaders)
 set(TEXTURES_OUT_DIR ${RESOURCES_OUT_DIR}/textures)
 
-file(GLOB SHADER_FILES "${SHADERS_DIR}/*.frag" "${SHADERS_DIR}/*.vert" "${SHADERS_DIR}/*.shader")
-file(GLOB TEXTURE_FILES "${TEXTURES_DIR}/*.png" "${TEXTURES_DIR}/*.jpg")
+file(GLOB SHADER_FILES "${SHADERS_DIR}/*.frag" "${SHADERS_DIR}/*.vert" "${SHADERS_DIR}/*.shader" "${SHADERS_DIR}/*.glsl")
+file(GLOB TEXTURE_FILES "${TEXTURES_DIR}/*.png" "${TEXTURES_DIR}/*.jpg" "${TEXTURES_DIR}/*.bmp")
 
 copy_files("${SHADER_FILES}" "${SHADERS_OUT_DIR}" copy_shaders)
 copy_files("${TEXTURE_FILES}" "${TEXTURES_OUT_DIR}" copy_textures)
