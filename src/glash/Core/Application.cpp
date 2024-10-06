@@ -20,7 +20,7 @@ namespace glash
 		return *s_Instance;
 	}
 
-	GLASH_WINDOW_CLASS& Application::GetWindow()
+	Window& Application::GetWindow()
 	{
 		return *m_Window;
 	}
@@ -34,7 +34,7 @@ namespace glash
 		GLASH_CORE_ASSERT(s_Instance == nullptr, "Application should be singleton");
 		s_Instance = this;
 
-		m_Window = Window::Create();
+		m_Window = IWindow::Create();
 		m_Window->SetEventCallback(GLASH_BIND_EVENT_FN(Application::OnEvent));
 
 		Renderer::Init();
@@ -96,7 +96,6 @@ namespace glash
 			float time = glfwGetTime();
 			Timestep deltaTime = time - m_LastFrameTime;
 			m_LastFrameTime = time;
-
 			m_Accumulator += deltaTime;
 
 			m_Window->SetTitle(std::to_string(deltaTime.Milleseconds()));
@@ -105,9 +104,9 @@ namespace glash
 			{
 				for (Layer* layer : m_LayerStack)
 				{
-					layer->OnFixedUpdate(m_TickTime); // Call fixed update with fixed timestep
+					layer->OnFixedUpdate(m_TickTime);
 				}
-				m_Accumulator -= m_TickTime; // Decrease the accumulator
+				m_Accumulator -= m_TickTime;
 			}
 			
 			for (Layer* layer : m_LayerStack)

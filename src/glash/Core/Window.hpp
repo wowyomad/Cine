@@ -7,6 +7,8 @@
 namespace glash
 {
 	class GLASH_WINDOW_CLASS;
+	class IWindow;
+	using Window = IWindow;
 
 	struct WindowProps
 	{
@@ -23,26 +25,27 @@ namespace glash
 			: Title(title), Width(width), Height(height), VSync(vsync) { }
 	};
 
-	class GLASH_API Window
+	class GLASH_API IWindow
 	{
 	public:
 		using EventCallbackFn = std::function<void(Event&)>;
 
-		Window() = default;
-		virtual ~Window() = default;
+		IWindow() = default;
+		virtual ~IWindow() = default;
 		
-		void OnUpdate();
-		unsigned int GetHeight() const;
-		unsigned int GetWidth() const;
-		void SetEventCallback(const EventCallbackFn& callback);
-		void AddEventCallback(const EventCallbackFn& callback);
-		void SetVSync(bool enabled);
-		void SetTitle(const std::string& title);
-		bool IsVSync() const;
-		void* GetNativeWindow() const;
+		virtual void OnUpdate() = 0;
+		virtual void SetEventCallback(const EventCallbackFn& callback) = 0;
+		virtual void AddEventCallback(const EventCallbackFn& callback) = 0;
+		virtual void SetVSync(bool enabled) = 0;
+		virtual void SetTitle(const std::string& title) = 0;
+		virtual bool IsVSync() const = 0;
+		virtual void* GetNativeWindow() const = 0;
+
+		virtual unsigned int GetWidth() const = 0;
+		virtual unsigned int GetHeight() const = 0;
 
 		// Factory method to create windows
-		static Ref<GLASH_WINDOW_CLASS> Create(const WindowProps& props = WindowProps());
+		static Ref<Window> Create(const WindowProps& props = WindowProps());
 	};
 
 	/*class GLASH_API Window

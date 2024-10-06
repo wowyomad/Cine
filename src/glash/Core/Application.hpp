@@ -56,7 +56,7 @@ namespace glash
 
 
 		GLASH_API static Application& Get();
-		GLASH_API GLASH_WINDOW_CLASS& GetWindow();
+		GLASH_API Window& GetWindow();
 
 	private:
 		GLASH_API bool OnWindowCloseEvent(WindowCloseEvent& event);
@@ -65,7 +65,7 @@ namespace glash
 		GLASH_API Application(int dummy);
 
 	protected:
-		Ref<GLASH_WINDOW_CLASS> m_Window;
+		Ref<Window> m_Window;
 		Ref<RendererAPI> m_Renderer;
 		LayerStack m_LayerStack;
 		ImGuiLayer* m_ImGuiLayer;

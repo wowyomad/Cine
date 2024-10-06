@@ -35,7 +35,6 @@ namespace glash
 
 		const std::string GetName() const override final;
 
-
 	private:
 		std::string ReadFile(const std::filesystem::path& filepath);
 		std::map<int, std::string> PreProcess(const std::string& source);
@@ -48,7 +47,6 @@ namespace glash
 		std::string m_FilePath;
 		std::string m_Name;
 		
-
 		std::map<int, std::string> m_OpenGLSourceCode;
 	};
 }

@@ -1,3 +1,4 @@
+#include "glash/glash_pch.hpp"
 #include "WindowsWindow.hpp"
 
 #include "glash/Core/Log.hpp"
@@ -11,7 +12,7 @@
 #include <GLFW/glfw3.h>
 
 
-#if defined(GLASH_PLATFORM_WINDOWS) == 1
+#if GLASH_PLATFORM_WINDOWS == 1
 namespace glash
 {
 	bool WindowsWindow::s_GLFWinitialized = false;
@@ -21,9 +22,10 @@ namespace glash
 		GLASH_CORE_ERROR("GLFW error {}: {}", error, description);
 	}
 
-	Ref<GLASH_WINDOW_CLASS> Window::Create(const WindowProps& props)
+	Ref<Window> IWindow::Create(const WindowProps& props)
 	{
-		return CreateRef<GLASH_WINDOW_CLASS>(props);
+		//TODO: Choose correct one
+		return CreateRef<WindowsWindow>(props);
 	}
 
 	WindowsWindow::WindowsWindow(const WindowProps& props)

@@ -8,23 +8,24 @@ struct GLFWwindow;
 
 namespace glash
 {
-	class GLASH_API WindowsWindow : public Window
+	class GLASH_API WindowsWindow : public IWindow
 	{
 	public:
 		WindowsWindow(const WindowProps& props);
 		~WindowsWindow();
 
 		void OnUpdate();
-		inline unsigned int GetWidth() const { return m_Data.Width; }
-		inline unsigned int GetHeight() const { return m_Data.Height; }
 
-		void SetEventCallback(const EventCallbackFn& callback);
-		void AddEventCallback(const EventCallbackFn& callback);
+		inline unsigned int GetWidth() const override final { return m_Data.Width; }
+		inline unsigned int GetHeight() const override final { return m_Data.Height; }
 
-		void SetTitle(const std::string& title);
+		void SetEventCallback(const EventCallbackFn& callback) override final;
+		void AddEventCallback(const EventCallbackFn& callback) override final;
+
+		void SetTitle(const std::string& title) override final;
 		void SetVSync(bool enabled);
-		bool IsVSync() const;
-		void* GetNativeWindow() const;
+		bool IsVSync() const override final;
+		void* GetNativeWindow() const override final;
 
 
 	private:

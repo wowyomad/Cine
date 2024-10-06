@@ -1,5 +1,4 @@
 #pragma once
-#define GLM_ENABLE_EXPERIMENTAL
 
 #include "glash/Glash.hpp"
 #include "glash/Core/Application.hpp"
