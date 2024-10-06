@@ -116,6 +116,7 @@ namespace Cine
 		inline std::string_view g_Func = "";
 		inline std::string g_FileName = "";
 		inline size_t g_Line = 0;
+		inline bool g_HasMeta = false;
 
 		inline const char* GetGLErrorString(GLenum error)
 		{
@@ -184,9 +185,16 @@ namespace Cine
 			case GL_DEBUG_SEVERITY_LOW:          severityStr = "Low"; break;
 			case GL_DEBUG_SEVERITY_NOTIFICATION: severityStr = "Notification"; break;
 			}
-
-			GLASH_CORE_ERROR_EX("[OpenGL Debug] Source: {}, Type: {}, Severity: {}, Message: {}",
-				g_Func, g_FileName, g_Line, sourceStr, typeStr, severityStr, message);
+			if (g_HasMeta)
+			{
+				GLASH_CORE_ERROR_EX("[OpenGL Debug] Source: {}, Type: {}, Severity: {}, Message: {}",
+					g_Func, g_FileName, g_Line, sourceStr, typeStr, severityStr, message);
+			}
+			else
+			{
+				GLASH_CORE_ERROR_EX("[OpenGL Debug] Source: {}, Type: {}, Severity: {}, Message: {}",
+					"-undf", "-undf", 0, sourceStr, typeStr, severityStr, message);
+			}
 		}
 
 		inline void InitializeOpenGLDebug()

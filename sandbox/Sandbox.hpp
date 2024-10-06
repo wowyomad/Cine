@@ -8,6 +8,7 @@
 #include "glash/Renderer/Buffer.hpp"
 #include "glash/Renderer/Shader.hpp"
 #include "glash/Renderer/Renderer.hpp"
+#include "glash/Renderer/Texture.hpp"
 
 #include "glash/events/Event.hpp"
 
@@ -32,10 +33,10 @@ public:
 		//};
 
 		float verticesSquare[] = {
-			-0.5f, -0.5f, 0.0f,
-			 0.5f, -0.5f, 0.0f,
-			 0.5f,  0.5f, 0.0f,
-			-0.5f,  0.5f, 0.0f,
+			-0.5f, -0.5f, 0.0f,		0.0f, 0.0f,
+			 0.5f, -0.5f, 0.0f,		2.0f, 0.0f,
+			 0.5f,  0.5f, 0.0f,		2.0f, 2.0f,
+			-0.5f,  0.5f, 0.0f,		0.0f, 2.0f
 		};
 
 		unsigned int indicesSquare[] = {
@@ -52,6 +53,7 @@ public:
 
 		BufferLayout SquareLayout = {
 			{ ShaderDataType::Float3, "a_Position" },
+			{ ShaderDataType::Float2, "a_TexCoord" }
 		};
 		SquareVertexBuffer->SetLayout(SquareLayout);
 
@@ -59,6 +61,10 @@ public:
 		m_VertexArraySquare->SetIndexBuffer(SquareIndexBuffer);
 
 		m_Shader = Shader::Create("resources/shaders/uniform_color.shader");
+		auto specification = TextureSpecification();
+		specification.MagFilter = TextureFilter::Nearest;
+		specification.Wrap = TextureWrap::Repeat;
+		m_Texture = Texture2D::Create("resources/textures/face.png", specification);
 	}
 	void OnFixedUpdate(Timestep fixedDeltaTime)  override
 	{
@@ -114,25 +120,28 @@ public:
 
 		Renderer::BeginScene(m_Camera);
 		m_Shader->Bind();
+		m_Shader->SetFloat4("u_Color", { 0.4f, 1.0f, 0.3f, 1.0f });
+		m_Texture->Bind(0);
+
+		for (size_t i = 0; i < m_SquareRows; i++)
 		{
-			for (size_t i = 0; i < m_SquareRows; i++)
+			for (size_t j = 0; j < m_SquareColumns; j++)
 			{
-				for (size_t j = 0; j < m_SquareColumns; j++)
+				glm::mat4 tranform = glm::translate(glm::mat4(1.0f), m_SquarePosition + glm::vec3(i * m_SquareOffset, j * m_SquareOffset, 0.0f));
+				glm::mat4 squareTransform = tranform * scale;
+				if ((i + j) % 2 == 0)
 				{
-					glm::mat4 tranform = glm::translate(glm::mat4(1.0f), m_SquarePosition + glm::vec3(i * m_SquareOffset, j * m_SquareOffset, 0.0f));
-					glm::mat4 squareTransform = tranform * scale;
-					if ((i + j) % 2 == 0)
-					{
-						m_Shader->SetFloat4("u_Color", m_SquareColor1);
-					}
-					else
-					{
-						m_Shader->SetFloat4("u_Color", m_SquareColor2);
-					}
-					Renderer::Submit(m_Shader, m_VertexArraySquare, squareTransform);
+					m_Shader->SetFloat4("u_Color", m_SquareColor1);
 				}
+				else
+				{
+					m_Shader->SetFloat4("u_Color", m_SquareColor2);
+				}
+				Renderer::Submit(m_Shader, m_VertexArraySquare, squareTransform);
 			}
 		}
+
+
 		Renderer::EndScene();
 
 	}
@@ -157,8 +166,8 @@ public:
 		ImGui::DragFloat("Square Move Lerp Factor", &m_SquareMoveLerpFactor, 0.01, 0.01f, 1.0f, "%.2f");
 		ImGui::DragFloat("Camera Scale Lerp Factor", &m_CameraScaleLerpFactor, 0.01, 0.01f, 1.0f, "%.2f");
 
-		ImGui::ColorEdit3("Square 1", glm::value_ptr(m_SquareColor1));
-		ImGui::ColorEdit3("Square 2", glm::value_ptr(m_SquareColor2));
+		ImGui::ColorEdit4("Square 1", glm::value_ptr(m_SquareColor1));
+		ImGui::ColorEdit4("Square 2", glm::value_ptr(m_SquareColor2));
 
 		if (ImGui::Checkbox("VSync", &m_VSync))
 		{
@@ -187,26 +196,27 @@ private:
 
 	glm::vec3 m_SquarePosition = glm::vec3(0.0f);
 	glm::vec3 m_TargetSquarePosition = m_SquarePosition;
+
 	float m_SquareMoveLerpFactor = 0.01f;
 	float m_SquareSpeed = 0.5f;
 	float m_SquareMoveWaitTime = 0.0f;
 	float m_SquareMoveCooldwon = 0.0f;
 	float m_SquareOffset = 0.25f;
 	int m_SquareRows = 1;
-	int m_SquareColumns = 1;
+	int m_SquareColumns = 0;
 	glm::vec4 m_SquareColor1 = { 1.0f, 1.0f, 1.0f, 1.0f };
-	glm::vec4 m_SquareColor2 = { 0.0f, 0.0f, 0.0f, 1.0f };
-	bool m_VSync = false;
-
-
+	glm::vec4 m_SquareColor2 = { 0.0f, 0.0f, 0.0f, 0.0f };
+	
 	float m_CameraScale = 1.0f;
 	float m_CameraMinScale = 0.1f;
 	float m_TargetCameraScale = m_CameraScale;
 	float m_CameraScaleSpeed = 0.1f;
 	float m_CameraScaleLerpFactor = 0.01f;
+	bool m_VSync = false;
 
 	Ref<VertexArray> m_VertexArrayTriangle;
 	Ref<Shader> m_Shader;
+	Ref<Texture> m_Texture;
 	OrthographicCamera m_Camera;
 
 };
