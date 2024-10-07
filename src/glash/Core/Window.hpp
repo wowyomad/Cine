@@ -6,7 +6,7 @@
 
 namespace Cine
 {
-	class GLASH_WINDOW_CLASS;
+	class CINE_WINDOW_CLASS;
 	class IWindow;
 	using Window = IWindow;
 
@@ -44,7 +44,6 @@ namespace Cine
 		virtual unsigned int GetWidth() const = 0;
 		virtual unsigned int GetHeight() const = 0;
 
-		// Factory method to create windows
 		static Ref<Window> Create(const WindowProps& props = WindowProps());
 	};
 

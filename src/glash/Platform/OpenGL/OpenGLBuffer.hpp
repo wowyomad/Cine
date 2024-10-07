@@ -1,6 +1,6 @@
 #pragma once
 #include "glash/Core/Core.hpp"
-#if GLASH_PLATFORM_OPENGL
+#if CINE_PLATFORM_OPENGL
 
 #include "glash/Renderer/Buffer.hpp"
 

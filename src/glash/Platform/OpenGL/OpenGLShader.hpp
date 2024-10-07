@@ -1,11 +1,14 @@
 #pragma once
+#include "glash/Core/Core.hpp"
+#if CINE_PLATFORM_OPENGL
 
 #include "glash/Renderer/Shader.hpp"
+
 #include <GLM/glm.hpp>
 
 namespace Cine
 {
-	class OpenGLShader : public Shader
+	class OpenGLShader : public IShader
 	{
 	public:
 
@@ -49,3 +52,5 @@ namespace Cine
 		std::string m_OpenGLSourceCode;
 	};
 }
+
+#endif

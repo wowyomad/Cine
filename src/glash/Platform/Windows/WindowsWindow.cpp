@@ -12,7 +12,7 @@
 #include <GLFW/glfw3.h>
 
 
-#if GLASH_PLATFORM_WINDOWS == 1
+#if CINE_PLATFORM_WINDOWS == 1
 namespace Cine
 {
 	bool WindowsWindow::s_GLFWinitialized = false;

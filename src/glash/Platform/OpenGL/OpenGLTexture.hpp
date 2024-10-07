@@ -1,6 +1,7 @@
 #pragma once
-
 #include "glash/Core/Core.hpp"
+#if CINE_PLATFORM_OPENGL
+
 #include "glash/Renderer/Texture.hpp"
 
 #include <filesystem>
@@ -40,3 +41,5 @@ namespace Cine
 		GLenum m_InternalFormat, m_DataFormat;
 	};
 }
+
+#endif

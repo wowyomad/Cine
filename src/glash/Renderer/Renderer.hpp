@@ -24,7 +24,7 @@ namespace Cine
 
 		static void Submit(const Ref<IShader>& shader, const Ref<VertexArray>& vertexArray, const glm::mat4& transform = glm::mat4(1.0f));
 
-		static inline RendererAPI& Get() { return RendererAPI::Get(); }
+		static inline RendererAPI& Get() { return *RendererAPI::Get(); }
 	private:
 		struct SceneData
 		{

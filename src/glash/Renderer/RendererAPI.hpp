@@ -8,10 +8,10 @@
 
 namespace Cine
 {
-	class GLASH_RENDERER_API_CLASS;
+	class CINE_RENDERER_API_CLASS;
 	class IRendererAPI;
 
-	using RendererAPI = GLASH_RENDERER_API_CLASS;
+	using RendererAPI = CINE_RENDERER_API_CLASS;
 
 	class IRendererAPI
 	{
@@ -33,13 +33,14 @@ namespace Cine
 		virtual Ref<IndexBuffer> CreateIndexBuffer(const uint32_t*, uint32_t size) = 0;
 		virtual Ref<VertexArray> CreateVertexArray() = 0;
 
-		static Scope<RendererAPI> Create();
+		static Ref<RendererAPI> Create();
 
-		static inline RendererAPI& Get() { return *s_Instance;  }
+		static inline Ref<RendererAPI> Get() { return s_Instance;  }
 
 	private:
 		static Ref<RendererAPI> s_Instance;
 
-
 	};
 }
+// this is stupid but it works (x2)
+#include "glash/Platform/OpenGL/OpenGLRendererAPI.hpp"

@@ -46,6 +46,6 @@ namespace Cine
 		}
 
 	private:
-		static Scope<RendererAPI> s_RendererAPI;
+		static Ref<RendererAPI> s_RendererAPI;
 	};
 }

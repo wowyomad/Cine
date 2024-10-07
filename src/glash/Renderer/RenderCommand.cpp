@@ -5,5 +5,5 @@
 
 namespace Cine
 {
-	Scope<RendererAPI> RenderCommand::s_RendererAPI = RendererAPI::Create();
+	Ref<RendererAPI> RenderCommand::s_RendererAPI = RendererAPI::Get();
 }

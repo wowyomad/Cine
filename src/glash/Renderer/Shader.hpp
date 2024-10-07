@@ -1,14 +1,14 @@
 #pragma once
 
 #include "glash/Core/Core.hpp"
-
 #include <glm/glm.hpp>
 
 namespace Cine
 {
+	class CINE_SHADER_CLASS;
 	class IShader;
 
-	using Shader = IShader;
+	using Shader = CINE_SHADER_CLASS;
 
 	class GLASH_API IShader
 	{
@@ -32,3 +32,5 @@ namespace Cine
 		virtual const std::string GetName() const = 0;
 	};
 }
+//ok that is stupid but it works
+#include "glash/Platform/OpenGL/OpenGLShader.hpp"

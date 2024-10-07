@@ -34,7 +34,7 @@ namespace Cine
 		GLASH_CORE_ASSERT(s_Instance == nullptr, "Application should be singleton");
 		s_Instance = this;
 
-		m_Window = IWindow::Create();
+		m_Window = Window::Create();
 		m_Window->SetEventCallback(GLASH_BIND_EVENT_FN(Application::OnEvent));
 
 		Renderer::Init();

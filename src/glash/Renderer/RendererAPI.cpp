@@ -1,12 +1,12 @@
 #include "glash/Renderer/RendererAPI.hpp"
-#include "glash/Platform/OpenGL/OpenGLRendererAPI.hpp"
 namespace Cine
 {
-	Ref<RendererAPI> IRendererAPI::s_Instance = nullptr;
+	Ref<RendererAPI> IRendererAPI::s_Instance = RendererAPI::Create();
 
 	//Temporary hard coded.
-	Scope<RendererAPI> IRendererAPI::Create()
+	Ref<RendererAPI> IRendererAPI::Create()
 	{
-		return CreateScope<OpenGLRendererAPI>();
+		return CreateRef<OpenGLRendererAPI>();
+
 	}
 }

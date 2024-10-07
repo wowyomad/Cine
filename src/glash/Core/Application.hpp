@@ -18,7 +18,7 @@
 
 namespace Cine
 {
-	class GLASH_WINDOW_CLASS;
+	class CINE_WINDOW_CLASS;
 	class IRendererAPI;
 
 	class Application

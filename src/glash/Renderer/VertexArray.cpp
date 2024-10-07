@@ -7,6 +7,6 @@ namespace Cine
 {
 	Ref<VertexArray> VertexArray::Create()
 	{
-		return RendererAPI::Get().CreateVertexArray();
+		return Renderer::Get().CreateVertexArray();
 	}
 }

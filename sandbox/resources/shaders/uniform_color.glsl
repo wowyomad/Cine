@@ -1,5 +1,4 @@
 #ifdef VERTEX
-
 layout (location=0) in vec3 a_Position;
 layout (location=1) in vec2 a_TexCoord;
 
@@ -16,7 +15,6 @@ void main()
 	f_Color = u_Color;
 	f_Texture = a_TexCoord;
 }
-
 #endif
 
 #ifdef FRAGMENT
@@ -32,5 +30,4 @@ void main()
 	vec4 textureColor = texture(u_Texture, f_Texture);
 	screenColor = textureColor * f_Color;
 }
-
 #endif
