@@ -1,30 +1,36 @@
 #ifdef VERTEX
 
-layout (location=0) in vec4 a_Position;
+in vec4 a_Position;
+in vec2 a_TexCoord;
 
-layout (location=1) uniform vec4 u_Color;
-layout (location=2) uniform mat4 u_Transform;
-layout (location=3) uniform mat4 u_ViewProjection;
+uniform vec4 u_Color;
+uniform mat4 u_Transform;
+uniform mat4 u_ViewProjection;
 
-out vec4 f_Color;
+out vec2 f_TexCoord;
 
 void main()
 {
 	gl_Position = u_ViewProjection * u_Transform * a_Position;
-	f_Color = u_Color;
+	f_TexCoord = a_TexCoord;
 }
 
 #endif
 
 #ifdef FRAGMENT
 
-in vec4 f_Color;
+in vec2 f_TexCoord;
+
+uniform sampler2D u_Texture;
+uniform vec4 u_Color;
+
 
 out vec4 outColor;
 
 void main()
 {
-	outColor = f_Color;
+	vec4 texColor = texture(u_Texture, f_TexCoord);
+	outColor = texColor * u_Color;
 }
 
 #endif

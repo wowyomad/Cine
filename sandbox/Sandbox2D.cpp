@@ -14,8 +14,8 @@ void Sandbox2D::OnUpdate(Cine::Timestep ts)
 	m_CameraController.OnUpdate(ts);
 
 	Cine::Renderer2D::BeginScene(m_CameraController.GetCamera());
-	Cine::Renderer2D::DrawQuad(m_SquarePosition + glm::vec3(1.5f, 0.5f, 0.0f), m_SquareSize * 1.5f, m_SquareColor);
-	Cine::Renderer2D::DrawQuad(m_SquarePosition, m_SquareSize, m_SquareTexture, m_SquareColor);
+	Cine::Renderer2D::DrawQuad(m_SquarePosition + glm::vec3(1.0f, 0.0f, 0.0f), m_SquareSize, m_SquareColor);
+	Cine::Renderer2D::DrawQuad(m_SquarePosition, m_SquareSize, m_SquareTexture);
 	Cine::Renderer2D::EndScene();
 
 }

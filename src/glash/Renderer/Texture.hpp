@@ -30,7 +30,7 @@ namespace Cine
 		uint32_t Width = 1;
 		uint32_t Height = 1;
 		TextureFormat Format = TextureFormat::RGBA8;
-		bool GenerateMips = true;
+		bool GenerateMips = false;
 
 		TextureWrap Wrap = TextureWrap::Repeat;
 

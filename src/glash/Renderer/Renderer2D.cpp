@@ -12,9 +12,8 @@ namespace Cine
 	{
 		Ref<VertexArray> QuadVertexArray;
 		Ref<Shader> QuadShaderColor;
-		Ref<Shader> QuadShaderTexture;
-
-		glm::mat4 ViewProjection;
+		Ref<Shader> QuadShader;
+		Ref<Texture2D> WhiteTexture;
 	};
 
 	static RendererData s_Data;
@@ -43,8 +42,12 @@ namespace Cine
 			});
 		s_Data.QuadVertexArray->AddVertexBuffer(quadVertexBuffer);
 		s_Data.QuadVertexArray->SetIndexBuffer(indexBuffer);
-		s_Data.QuadShaderColor = Shader::Create("resources/shaders/Renderer2D_Quad.glsl");
-		s_Data.QuadShaderTexture = Shader::Create("resources/shaders/Renderer2D_Quad_Texture.glsl");
+		s_Data.QuadShader = Shader::Create("resources/shaders/Renderer2D_Quad.glsl");
+		s_Data.WhiteTexture = Texture2D::Create(TextureSpecification());
+		uint32_t whiteTextureData = 0xFFFFFFFF;
+		s_Data.WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
+
+		s_Data.QuadShader->Bind();
 	}
 	void Renderer2D::Shutdown()
 	{
@@ -52,7 +55,7 @@ namespace Cine
 	void Renderer2D::BeginScene(const OrthographicCamera& camera)
 	{ 
 		RenderCommand::Clear();
-		s_Data.ViewProjection = camera.GetViewProjectionMatrix();
+		s_Data.QuadShader->SetMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
 	}
 	void Renderer2D::EndScene()
 	{
@@ -61,12 +64,12 @@ namespace Cine
 
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
 	{
-		glm::mat4 transform = glm::scale(glm::translate(glm::mat4(1.0f), position), glm::vec3(size.x, size.y, 1.0f));
+		s_Data.WhiteTexture->Bind(0);
 
-		s_Data.QuadShaderColor->Bind();
-		s_Data.QuadShaderColor->SetMat4("u_Transform", transform);
-		s_Data.QuadShaderColor->SetMat4("u_ViewProjection", s_Data.ViewProjection);
-		s_Data.QuadShaderColor->SetFloat4("u_Color", color);
+		glm::mat4 transform = glm::scale(glm::translate(glm::mat4(1.0f), position), glm::vec3(size.x, size.y, 1.0f));
+		s_Data.QuadShader->SetMat4("u_Transform", transform);
+		s_Data.QuadShader->SetFloat4("u_Color", color);
+		s_Data.QuadShader->SetInt("u_Texture", 0);
 
 		s_Data.QuadVertexArray->Bind();
 		RenderCommand::DrawIndexed(s_Data.QuadVertexArray);
@@ -79,16 +82,12 @@ namespace Cine
 
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture, const glm::vec4& colorTint)
 	{
-		glm::mat4 transform = glm::scale(glm::translate(glm::mat4(1.0f), position), glm::vec3(size.x, size.y, 1.0f));
-
 		texture->Bind(0);
 
-		s_Data.QuadShaderTexture->Bind();
-		s_Data.QuadShaderTexture->SetMat4("u_Transform", transform);
-		s_Data.QuadShaderTexture->SetMat4("u_ViewProjection", s_Data.ViewProjection);
-		s_Data.QuadShaderTexture->SetFloat4("u_Color", colorTint);
-		s_Data.QuadShaderTexture->SetInt("u_Texture", 0);
-
+		glm::mat4 transform = glm::scale(glm::translate(glm::mat4(1.0f), position), glm::vec3(size.x, size.y, 1.0f));
+		s_Data.QuadShader->SetMat4("u_Transform", transform);
+		s_Data.QuadShader->SetFloat4("u_Color", colorTint);
+		s_Data.QuadShader->SetInt("u_Texture", 0);
 
 		s_Data.QuadVertexArray->Bind();
 		RenderCommand::DrawIndexed(s_Data.QuadVertexArray);
