@@ -8,11 +8,11 @@ set(VENDOR_DIR ${CMAKE_CURRENT_SOURCE_DIR}/vendor)
 
 include(set_undefined.cmake)
 # Project properties
-set_undefined(GLASH_ENABLE_DEBUG OFF CACHE BOOL "Enable debug logging" FORCE)
+set_undefined(GLASH_ENABLE_DEBUG ON CACHE BOOL "Enable debug logging" FORCE)
 set_undefined(GLASH_BUILD_DLL OFF CACHE BOOL "Build Cine as a shared library" FORCE)
 set_undefined(GLASH_BUILD_EXAMPLES OFF CACHE BOOL "Build examples" FORCE)
 set_undefined(GLASH_BUILD_SANDDOX ON CACHE BOOL "Build sandbox" FORCE)
-set_undefined(CINE_ENABLE_ASSERTS OFF CACHE BOOL "Enable asserts" FORCE)
+set_undefined(GLASH_ENABLE_ASSERTS ON CACHE BOOL "Enable asserts" FORCE)
 
 # Might be needed for planned hot reload.
 set(CMAKE_POSITION_INDEPENDENT_CODE ON CACHE BOOL "" FORCE) 

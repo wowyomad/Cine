@@ -13,11 +13,12 @@ set(TEXTURES_OUT_DIR ${RESOURCES_OUT_DIR}/textures)
 
 file(GLOB SHADER_FILES "${SHADERS_DIR}/*.frag" "${SHADERS_DIR}/*.vert" "${SHADERS_DIR}/*.shader" "${SHADERS_DIR}/*.glsl")
 file(GLOB TEXTURE_FILES "${TEXTURES_DIR}/*.png" "${TEXTURES_DIR}/*.jpg" "${TEXTURES_DIR}/*.bmp")
+file(GLOB SANDBOX_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 
 copy_files("${SHADER_FILES}" "${SHADERS_OUT_DIR}" copy_shaders)
 copy_files("${TEXTURE_FILES}" "${TEXTURES_OUT_DIR}" copy_textures)
 
-add_executable(Sandbox Sandbox.cpp)
+add_executable(Sandbox ${SANDBOX_SOURCE_FILES})
 if(GLASH_ENABLE_DEBUG)
     list(APPEND SANDBOX_COMPILE_DEFINITIONS GLASH_ENABLE_DEBUG)
 endif()

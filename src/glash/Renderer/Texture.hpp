@@ -37,7 +37,7 @@ namespace Cine
 		TextureFilter MinFilter = TextureFilter::Nearest;
 		TextureFilter MagFilter = TextureFilter::Nearest; 
 
-		inline constexpr TextureSpecification Default2D()
+		static inline constexpr TextureSpecification Default2D()
 		{
 			return TextureSpecification();
 		}

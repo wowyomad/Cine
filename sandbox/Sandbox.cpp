@@ -1,7 +1,8 @@
 #include "Sandbox.hpp"
-#include "glash/Glash.hpp"
+#include "glash/Core/EntryPoint.hpp"
+
 
 Application* Cine::CreateApplication()
 {
-	return new Sandbox();
+	return new SandboxApp();
 }

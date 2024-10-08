@@ -1,0 +1,60 @@
+#include "Sandbox2D.hpp"
+
+void Sandbox2D::OnAttach()
+{
+	float verticesSquare[] = {
+			-0.5f, -0.5f, 0.0f,
+			 0.5f, -0.5f, 0.0f,
+			 0.5f,  0.5f, 0.0f,
+			-0.5f,  0.5f, 0.0f,
+	};
+
+	unsigned int indicesSquare[] = {
+		0, 1, 2,
+		2, 3, 0
+	};
+
+	m_SquareVertexArray = Cine::VertexArray::Create();
+
+	auto SquareVertexBuffer = Cine::VertexBuffer::Create(verticesSquare, sizeof(verticesSquare));
+	auto SquareIndexBuffer = Cine::IndexBuffer::Create(indicesSquare, sizeof(indicesSquare));
+
+	Cine::BufferLayout SquareLayout = {
+		{Cine::ShaderDataType::Float3, "a_Position"}
+	};
+	SquareVertexBuffer->SetLayout(SquareLayout);
+
+	m_SquareVertexArray->AddVertexBuffer(SquareVertexBuffer);
+	m_SquareVertexArray->SetIndexBuffer(SquareIndexBuffer);
+
+	m_SquareShader = Cine::Shader::Create("resources/shaders/uniform.glsl");
+}
+
+void Sandbox2D::OnDetach()
+{
+}
+
+void Sandbox2D::OnUpdate(Cine::Timestep ts)
+{
+	m_CameraController.OnUpdate(ts);
+
+	Cine::Renderer::BeginScene(m_CameraController.GetCamera());
+	{
+		m_SquareShader->Bind();
+		m_SquareShader->SetFloat4("u_Color", m_SquareColor);
+		Cine::Renderer::Submit(m_SquareShader, m_SquareVertexArray);
+	}
+	Cine::Renderer::EndScene();
+}
+
+void Sandbox2D::OnEvent(Cine::Event& event)
+{
+	m_CameraController.OnEvent(event);
+}
+
+void Sandbox2D::OnImGuiRender()
+{
+	ImGui::Begin("Sandbox");
+	ImGui::ColorEdit4("Square color", glm::value_ptr(m_SquareColor));
+	ImGui::End();
+}

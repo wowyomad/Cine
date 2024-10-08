@@ -1,6 +1,7 @@
 #pragma once
 
-#include "glash/Glash.hpp"
+#include "glash/Cine.hpp"
+#include "Sandbox2D.hpp"
 
 using namespace Cine;
 
@@ -26,7 +27,7 @@ public:
 		};
 
 		m_VertexArrayTriangle = VertexArray::Create();
-		m_VertexArraySquare = VertexArray::Create();
+		m_SquareVertexArray = VertexArray::Create();
 
 		auto SquareVertexBuffer = VertexBuffer::Create(verticesSquare, sizeof(verticesSquare));
 		auto SquareIndexBuffer = IndexBuffer::Create(indicesSquare, sizeof(indicesSquare) / sizeof(float));
@@ -37,10 +38,10 @@ public:
 		};
 		SquareVertexBuffer->SetLayout(SquareLayout);
 
-		m_VertexArraySquare->AddVertexBuffer(SquareVertexBuffer);
-		m_VertexArraySquare->SetIndexBuffer(SquareIndexBuffer);
+		m_SquareVertexArray->AddVertexBuffer(SquareVertexBuffer);
+		m_SquareVertexArray->SetIndexBuffer(SquareIndexBuffer);
 
-		auto specification = TextureSpecification();
+		auto specification = TextureSpecification::Default2D();
 		specification.MagFilter = TextureFilter::Nearest;
 		specification.Wrap = TextureWrap::Repeat;
 		specification.GenerateMips = false;
@@ -79,7 +80,7 @@ public:
 				{
 					m_Shader->SetFloat4("u_Color", m_SquareColor2);
 				}
-				Renderer::Submit(m_Shader, m_VertexArraySquare, squareTransform);
+				Renderer::Submit(m_Shader, m_SquareVertexArray, squareTransform);
 			}
 		}
 		Renderer::EndScene();
@@ -123,7 +124,7 @@ public:
 	}
 
 private:
-	Ref<VertexArray> m_VertexArraySquare;
+	Ref<VertexArray> m_SquareVertexArray;
 
 	glm::vec3 m_SquarePosition = glm::vec3(0.0f);
 	glm::vec3 m_TargetSquarePosition = m_SquarePosition;
@@ -152,17 +153,18 @@ private:
 	OrthograhpicCameraController m_CameraController;
 };
 
-class Sandbox : public Application
+class SandboxApp : public Application
 {
 public:
-	Sandbox()
+	SandboxApp()
 	{
 		m_Window->SetVSync(false);
 		s_Application = this;
-		PushOverlay(new SimpleLayer());
+		//PushOverlay(new SimpleLayer());
+		PushOverlay(new Sandbox2D());
 	}
 
-	~Sandbox()
+	~SandboxApp()
 	{
 
 	}

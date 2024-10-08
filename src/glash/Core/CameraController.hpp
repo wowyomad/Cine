@@ -17,6 +17,8 @@ namespace Cine
 		const Camera& GetCamera() const { return m_Camera; }
 		Camera& GetCamera() { return m_Camera; }
 
+		inline void SetAspectRatio(float aspectRatio) { m_AspectRatio = aspectRatio; }
+
 	private:
 		bool OnMouseScrolled(MouseScrolledEvent& event);
 		bool OnWindowResized(WindowResizeEvent& event);
@@ -29,7 +31,7 @@ namespace Cine
 
 	private:
 		bool m_CanRotate = false;
-		float m_AspectRatio;
+		float m_AspectRatio = 1.0f;
 
 		glm::vec3 m_CameraPosition = glm::vec3(0.0f);
 		float m_CameraZoom = 1.0f;
