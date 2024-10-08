@@ -5,6 +5,7 @@
 
 #include "glash/Renderer/RenderCommand.hpp"
 #include "glash/Renderer/Renderer.hpp"
+#include "glash/Renderer/Renderer2D.hpp"
 
 #include "glash/ImGui/ImGuiLayer.hpp"
 
@@ -38,6 +39,8 @@ namespace Cine
 		m_Window->SetEventCallback(CINE_BIND_EVENT_FN(Application::OnEvent));
 
 		Renderer::Init();
+		Renderer2D::Init();
+
 		RenderCommand::SetClearColor({ 0.15, 0.15, 0.15, 0.15 });
 
 		Cine::debug::InitializeOpenGLDebug();

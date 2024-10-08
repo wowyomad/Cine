@@ -2,7 +2,7 @@
 
 #include "glash/glash_pch.hpp"
 
-#include "glash/Core/Core.hpp"
+#include "glash/Core/Base.hpp"
 #include "glash/Core/Layer.hpp"
 
 namespace Cine

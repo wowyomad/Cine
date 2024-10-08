@@ -1,6 +1,6 @@
 #pragma once
 
-#include "glash/Core/Core.hpp"
+#include "glash/Core/Base.hpp"
 
 namespace Cine
 {

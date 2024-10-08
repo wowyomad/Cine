@@ -1,6 +1,6 @@
 #pragma once
 
-#include "glash/Core/Core.hpp"
+#include "glash/Core/Base.hpp"
 #include "glash/Core/Layer.hpp"
 #include "glash/events/MouseEvent.hpp"
 #include "glash/events/KeyEvent.hpp"

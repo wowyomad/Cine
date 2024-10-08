@@ -14,8 +14,8 @@ namespace Cine
 		void OnEvent(Event& event);
 		void OnUpdate(Timestep ts);
 
-		const Camera& GetCamera() const { return m_Camera; }
-		Camera& GetCamera() { return m_Camera; }
+		const OrthographicCamera& GetCamera() const { return m_Camera; }
+		OrthographicCamera& GetCamera() { return m_Camera; }
 
 		inline void SetAspectRatio(float aspectRatio) { m_AspectRatio = aspectRatio; }
 

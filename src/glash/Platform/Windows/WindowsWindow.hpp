@@ -1,5 +1,5 @@
 #pragma once
-#include "glash/Core/Core.hpp"
+#include "glash/Core/Base.hpp"
 #include "glash/Core/Window.hpp"
 
 #include "glash/Renderer/GrahpicsContext.hpp"

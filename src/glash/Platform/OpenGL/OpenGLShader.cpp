@@ -17,14 +17,25 @@ namespace Cine
 		}
 	}
 
+	static inline int GetUniformLocation(uint32_t rendererID, const char* name)
+	{
+		GLint location = glGetUniformLocation(rendererID, name);
+		CINE_CORE_ASSERT(location != -1, "Uniform {} not found", name);
+		return location;
+	}
+
 	OpenGLShader::OpenGLShader(const std::string& name, const std::filesystem::path& filepath)
+		: m_RendererID(0)
 	{
 		m_OpenGLSourceCode = ReadFile(filepath);
 
 		CompileOrGetOpenGLBinaries(); //does nothing
 		CreateProgram();
-		
-		m_Name = name;
+		if (m_RendererID != 0)
+		{
+			m_FilePath = filepath.string();
+			m_Name = name;
+		}
 	}
 	OpenGLShader::~OpenGLShader()
 	{
@@ -39,43 +50,43 @@ namespace Cine
 	}
 	void OpenGLShader::UploadUniformBool(const std::string& name, bool value)
 	{
-		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+		GLint location = GetUniformLocation(m_RendererID, name.c_str());
 		GLCall(glUniform1i(location, value));
 	}
 	void OpenGLShader::UploadUniformInt(const std::string& name, int value)
 	{
-		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+		GLint location = GetUniformLocation(m_RendererID, name.c_str());
 		GLCall(glUniform1i(location, value));
 	}
 	void OpenGLShader::UploadUniformIntArray(const std::string& name, int* values, uint32_t count)
 	{
-		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+		GLint location = GetUniformLocation(m_RendererID, name.c_str());
 		GLCall(glUniform1iv(location, count, values));
 	}
 	void OpenGLShader::UploadUniformFloat(const std::string& name, float value)
 	{
-		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+		GLint location = GetUniformLocation(m_RendererID, name.c_str());
 		GLCall(glUniform1f(location, value));
 	}
 	void OpenGLShader::UploadUniformFloat2(const std::string& name, const glm::vec2& value)
 	{
-		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+		GLint location = GetUniformLocation(m_RendererID, name.c_str());
 		GLCall(glUniform2f(location, value.x, value.y));
 	}
 	void OpenGLShader::UploadUniformFloat3(const std::string& name, const glm::vec3& value)
 	{
-		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+		GLint location = GetUniformLocation(m_RendererID, name.c_str());
 		GLCall(glUniform3f(location, value.x, value.y, value.z));
 
 	}
 	void OpenGLShader::UploadUniformFloat4(const std::string& name, const glm::vec4& value)
 	{
-		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+		GLint location = GetUniformLocation(m_RendererID, name.c_str());
 		GLCall(glUniform4f(location, value.x, value.y, value.z, value.w));
 	}
 	void OpenGLShader::UploadUniformMat4(const std::string& name, const glm::mat4& matrix)
 	{
-		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+		GLint location = GetUniformLocation(m_RendererID, name.c_str());
 		GLCall(glUniformMatrix4fv(location, 1, false, glm::value_ptr(matrix)));
 	}
 	const std::string OpenGLShader::GetName() const

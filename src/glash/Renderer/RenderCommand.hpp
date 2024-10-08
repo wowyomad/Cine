@@ -1,6 +1,6 @@
 #pragma once
 
-#include "glash/Core/Core.hpp"
+#include "glash/Core/Base.hpp"
 
 #include "glash/Renderer/RendererAPI.hpp"
 #include "glash/Platform/OpenGL/OpenGLRendererAPI.hpp"

@@ -2,7 +2,7 @@
 
 #include <functional>
 
-#include "glash/Core/Core.hpp"
+#include "glash/Core/Base.hpp"
 #include "glash/Renderer/Buffer.hpp"
 #include "glash/Renderer/VertexArray.hpp"
 

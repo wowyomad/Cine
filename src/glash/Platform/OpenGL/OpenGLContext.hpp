@@ -1,5 +1,5 @@
 #pragma once
-#include "glash/Core/Core.hpp"
+#include "glash/Core/Base.hpp"
 #if CINE_PLATFORM_OPENGL
 
 #include "glash/Renderer/GrahpicsContext.hpp"

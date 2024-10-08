@@ -1,7 +1,7 @@
 #pragma once
 #include "glash/glash_pch.hpp"
 
-#include "glash/Core/Core.hpp"
+#include "glash/Core/Base.hpp"
 #include "glash/Core/LayerStack.hpp"
 #include "glash/Core/Window.hpp"
 #include "glash/Core/Input.hpp"

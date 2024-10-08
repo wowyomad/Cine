@@ -27,7 +27,7 @@ void Sandbox2D::OnAttach()
 	m_SquareVertexArray->AddVertexBuffer(SquareVertexBuffer);
 	m_SquareVertexArray->SetIndexBuffer(SquareIndexBuffer);
 
-	m_SquareShader = Cine::Shader::Create("resources/shaders/uniform.glsl");
+	m_SquareShader = Cine::Shader::Create("resources/shaders/Renderer2D_Quad.glsl");
 }
 
 void Sandbox2D::OnDetach()
@@ -38,13 +38,10 @@ void Sandbox2D::OnUpdate(Cine::Timestep ts)
 {
 	m_CameraController.OnUpdate(ts);
 
-	Cine::Renderer::BeginScene(m_CameraController.GetCamera());
-	{
-		m_SquareShader->Bind();
-		m_SquareShader->SetFloat4("u_Color", m_SquareColor);
-		Cine::Renderer::Submit(m_SquareShader, m_SquareVertexArray);
-	}
-	Cine::Renderer::EndScene();
+	Cine::Renderer2D::BeginScene(m_CameraController.GetCamera());
+	Cine::Renderer2D::DrawQuad(m_SquarePosition, m_SquareSize, m_SquareColor);
+	Cine::Renderer2D::EndScene();
+
 }
 
 void Sandbox2D::OnEvent(Cine::Event& event)
@@ -56,5 +53,7 @@ void Sandbox2D::OnImGuiRender()
 {
 	ImGui::Begin("Sandbox");
 	ImGui::ColorEdit4("Square color", glm::value_ptr(m_SquareColor));
+	ImGui::DragFloat2("Square position", glm::value_ptr(m_SquarePosition), 0.1f, -10.0f, 10.0f, "%.2f");
+	ImGui::DragFloat2("Square size", glm::value_ptr(m_SquareSize), 0.1f, 0.1f, 10.0f, "%.2f");
 	ImGui::End();
 }

@@ -1,7 +1,7 @@
 #pragma once
 #include "glash/glash_pch.hpp" 
 
-#include "glash/Core/Core.hpp"
+#include "glash/Core/Base.hpp"
 
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_sinks.h"
