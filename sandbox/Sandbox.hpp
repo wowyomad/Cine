@@ -1,18 +1,6 @@
 #pragma once
 
 #include "glash/Glash.hpp"
-#include "glash/Core/Application.hpp"
-#include "glash/Core/Input.hpp"
-
-#include "glash/Renderer/VertexArray.hpp"
-#include "glash/Renderer/Buffer.hpp"
-#include "glash/Renderer/Shader.hpp"
-#include "glash/Renderer/Renderer.hpp"
-#include "glash/Renderer/Texture.hpp"
-
-#include "glash/events/Event.hpp"
-
-#include <GLFW/glfw3.h>
 
 using namespace Cine;
 
@@ -23,15 +11,8 @@ class SimpleLayer : public Layer
 public:
 	SimpleLayer()
 		: Layer("Simple Sandbox Layer"),
-		m_Camera(-1.0f, 1.0f, -1.0f, 1.0f)
+		m_CameraController(1.7778, true)
 	{
-		//float verticesSquare[] = {
-		//	-0.5f, -0.5f, 0.0f,		0.8f, 0.2f, 0.3f, 1.0,
-		//	 0.5f, -0.5f, 0.0f,		0.2f, 0.8f, 0.3f, 1.0,
-		//	 0.5f,  0.5f, 0.0f,		0.2f, 0.3f, 0.8f, 1.0,
-		//	-0.5f,  0.5f, 0.0f,		0.2f, 0.8f, 0.3f, 1.0
-		//};
-
 		float verticesSquare[] = {
 			-0.5f, -0.5f, 0.0f,		0.0f, 0.0f,
 			 0.5f, -0.5f, 0.0f,		1.0f, 0.0f,
@@ -43,7 +24,6 @@ public:
 			0, 1, 2,
 			2, 3, 0
 		};
-
 
 		m_VertexArrayTriangle = VertexArray::Create();
 		m_VertexArraySquare = VertexArray::Create();
@@ -63,6 +43,7 @@ public:
 		auto specification = TextureSpecification();
 		specification.MagFilter = TextureFilter::Nearest;
 		specification.Wrap = TextureWrap::Repeat;
+		specification.GenerateMips = false;
 		m_Texture = Texture2D::Create("resources/textures/checkerboard.png", specification);
 
 		m_ShaderLibrary.Load("Simple", "resources/shaders/uniform_color.glsl");
@@ -75,52 +56,11 @@ public:
 
 	void OnUpdate(Timestep deltaTime) override
 	{
-		m_SquarePosition.x = std::lerp(m_SquarePosition.x, m_TargetSquarePosition.x, 1 - powf(m_SquareMoveLerpFactor, deltaTime));
-		m_SquarePosition.y = std::lerp(m_SquarePosition.y, m_TargetSquarePosition.y, 1 - powf(m_SquareMoveLerpFactor, deltaTime));
-		m_CameraScale = std::lerp(m_CameraScale, m_TargetCameraScale, 1 - powf(m_CameraScaleLerpFactor, deltaTime));
-
-
-		glm::vec3 squareTranslation(0.0f);
-		if (Input::IsKeyDown(Key::A))
-		{
-			squareTranslation.x -= 1;
-		}
-		if (Input::IsKeyDown(Key::D))
-		{
-			squareTranslation.x += 1;
-		}
-		if (Input::IsKeyDown(Key::W))
-		{
-			squareTranslation.y += 1;
-		}
-		if (Input::IsKeyDown(Key::S))
-		{
-			squareTranslation.y -= 1;
-		}
-
-		if (m_TargetCameraScale < m_CameraMinScale)
-		{
-			m_TargetCameraScale = m_CameraMinScale;
-		}
-
-		float ratio = (float)s_Application->GetWindow().GetWidth() / (float)s_Application->GetWindow().GetHeight();
-		float halfRation = ratio / 2;
-		m_Camera.SetProjection(m_CameraScale * -halfRation, m_CameraScale * halfRation, m_CameraScale * -0.5, m_CameraScale * 0.5f);
-
-		if (m_SquareMoveCooldwon <= 0.0f && glm::dot(squareTranslation, squareTranslation) > 0.0)
-		{
-			m_TargetSquarePosition += m_SquareSpeed * glm::normalize(squareTranslation);
-			m_SquareMoveCooldwon = m_SquareMoveWaitTime;
-		}
-		else
-		{
-			m_SquareMoveCooldwon -= deltaTime;
-		}
+		m_CameraController.OnUpdate(deltaTime);
 
 		glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(m_SquareScale));
 
-
-		Renderer::BeginScene(m_Camera);
+		Renderer::BeginScene(m_CameraController.GetCamera());
 		m_Shader->Bind();
 		m_Shader->SetFloat4("u_Color", { 0.4f, 1.0f, 0.3f, 1.0f });
 		m_Texture->Bind(0);
@@ -142,34 +82,26 @@ public:
 				Renderer::Submit(m_Shader, m_VertexArraySquare, squareTransform);
 			}
 		}
-
-
 		Renderer::EndScene();
 
 	}
 
 	void OnEvent(Event& event) override
 	{
-		EventDispatcher dispatcher(event);
-
-		dispatcher.Dispatch<MouseScrolledEvent>(GLASH_BIND_EVENT_FN(SimpleLayer::OnMouseScrolledEvent));
-		dispatcher.Dispatch<WindowResizeEvent>(GLASH_BIND_EVENT_FN(SimpleLayer::OnWindowResizeEvent));
+		m_CameraController.OnEvent(event);
 	}
 
 	void OnImGuiRender() override
 	{
 		ImGui::Begin("Debug");
-		ImGui::SliderFloat("Camera Scale", &m_TargetCameraScale, 0.1f, 10.0f, "%.1f");
-		ImGui::SliderFloat("Square Speed", &m_SquareSpeed, 0.1f, 10.0f, "%.1f");
 		ImGui::SliderInt("Rows", &m_SquareRows, 1, 128);
 		ImGui::SliderInt("Columns", &m_SquareColumns, 1, 128);
 		ImGui::DragFloat("Square Scale", &m_SquareScale, 0.05f, 0.0f, 10.0f, "%.2f");
-
-		ImGui::DragFloat("Square Move Lerp Factor", &m_SquareMoveLerpFactor, 0.01, 0.01f, 1.0f, "%.2f");
-		ImGui::DragFloat("Camera Scale Lerp Factor", &m_CameraScaleLerpFactor, 0.01, 0.01f, 1.0f, "%.2f");
-
 		ImGui::ColorEdit4("Square 1", glm::value_ptr(m_SquareColor1));
 		ImGui::ColorEdit4("Square 2", glm::value_ptr(m_SquareColor2));
+
+		ImGui::SliderFloat("Camera Translation Speed", &m_CameraController.CameraTranslatoinSpeed, 0.1f, 10.0f);
+		ImGui::SliderFloat("Camera Rotation Speed", &m_CameraController.CameraRotationSpeed, 1.0f, 360.0f);
 
 		if (ImGui::Checkbox("VSync", &m_VSync))
 		{
@@ -181,15 +113,12 @@ public:
 
 	bool OnMouseScrolledEvent(MouseScrolledEvent& event)
 	{
-		m_TargetCameraScale -= m_CameraScaleSpeed * event.GetVertical();
-		return true;
-
+		return false;
 	}
 
 	bool OnWindowResizeEvent(WindowResizeEvent& event)
 	{
-		float ratio = (float)event.GetWidth() / (float)event.GetHeight();
-		m_Camera.SetProjection(m_CameraScale * -ratio, m_CameraScale * ratio, m_CameraScale * -1.0, m_CameraScale * 1.0f);
+
 		return false;
 	}
 
@@ -207,7 +136,7 @@ private:
 	int m_SquareRows = 1;
 	int m_SquareColumns = 1;
 	glm::vec4 m_SquareColor1 = { 1.0f, 1.0f, 1.0f, 1.0f };
-	glm::vec4 m_SquareColor2 = { 0.0f, 0.0f, 0.0f, 0.0f };
+	glm::vec4 m_SquareColor2 = { 1.0f, 1.0f, 1.0f, 1.0f };
 	
 	float m_CameraScale = 1.0f;
 	float m_CameraMinScale = 0.1f;
@@ -220,8 +149,7 @@ private:
 	Ref<Shader> m_Shader;
 	ShaderLibrary m_ShaderLibrary;
 	Ref<Texture> m_Texture;
-	OrthographicCamera m_Camera;
-
+	OrthograhpicCameraController m_CameraController;
 };
 
 class Sandbox : public Application

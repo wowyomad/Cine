@@ -23,4 +23,23 @@ namespace Cine
 		m_ViewProjectionMatrix = m_ProjectionMatrix * m_ViewMatrix;
 	}
 
+	void OrthographicCamera::SetRotation(float rotation)
+	{
+		m_Rotation = rotation;
+		RecalculateViewMatrix();
+	}
+
+	void OrthographicCamera::SetPosition(const glm::vec3& position)
+	{
+		m_Position = position;
+		RecalculateViewMatrix();
+	}
+
+	void OrthographicCamera::SetTransform(const glm::vec3& position, float rotation)
+	{
+		m_Rotation = rotation;
+		m_Position = position;
+		RecalculateViewMatrix();
+	}
+
 }

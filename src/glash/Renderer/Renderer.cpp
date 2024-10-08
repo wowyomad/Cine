@@ -26,7 +26,7 @@ namespace Cine
 	void Renderer::BeginScene(const Camera& camera)
 	{
 		RenderCommand::Clear();
-		s_SceneData->ViewProjectionMatrix = camera.GetViewProjection();
+		s_SceneData->ViewProjectionMatrix = camera.GetViewProjectionMatrix();
 	}
 
 	void Renderer::EndScene()
