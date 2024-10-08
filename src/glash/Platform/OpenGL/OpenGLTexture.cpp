@@ -14,7 +14,7 @@ namespace Cine
 			case TextureFormat::RGB8: return GL_RGB;
 			case TextureFormat::RGBA8: return GL_RGBA;
 			}
-			GLASH_CORE_ASSERT(false, "Image format not supported");
+			CINE_CORE_ASSERT(false, "Image format not supported");
 			return 0;
 		}
 
@@ -26,7 +26,7 @@ namespace Cine
 			case TextureFormat::RGBA8: return GL_RGBA8;
 			}
 
-			GLASH_CORE_ASSERT(false, "Image format not supported");
+			CINE_CORE_ASSERT(false, "Image format not supported");
 			return 0;
 		}
 		static GLenum CineTextureWrapToGL(TextureWrap wrap)
@@ -68,7 +68,7 @@ namespace Cine
 		data = stbi_load(filepath.string().c_str(), &width, &height, &channels, 0);
 		if (stbi_failure_reason())
 		{
-			GLASH_CORE_ASSERT(false, "stbi failed loading image: {}", stbi_failure_reason());
+			CINE_CORE_ASSERT(false, "stbi failed loading image: {}", stbi_failure_reason());
 		}
 
 		if (data)
@@ -93,7 +93,7 @@ namespace Cine
 			m_InternalFormat = internalFormat;
 			m_DataFormat = dataFormat;
 
-			GLASH_CORE_ASSERT(internalFormat & dataFormat, "Format not supported");
+			CINE_CORE_ASSERT(internalFormat & dataFormat, "Format not supported");
 
 			glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);
 			glTextureStorage2D(m_RendererID,
@@ -155,7 +155,7 @@ namespace Cine
 	void OpenGLTexture2D::SetData(void* data, size_t size)
 	{
 		uint32_t bpp = m_DataFormat == GL_RGBA ? 4 : 3;
-		GLASH_CORE_ASSERT(size == m_Width * m_Height * bpp, "Data must be entire texture!");
+		CINE_CORE_ASSERT(size == m_Width * m_Height * bpp, "Data must be entire texture!");
 		glTextureSubImage2D(m_RendererID, 0, 0, 0, m_Width, m_Height, m_DataFormat, GL_UNSIGNED_BYTE, data);
 	}
 	void OpenGLTexture2D::Bind(uint32_t slot) const

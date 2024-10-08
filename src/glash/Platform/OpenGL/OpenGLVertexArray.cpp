@@ -18,7 +18,7 @@ namespace Cine
 		case ShaderDataType::Int4:     return	GL_INT;
 		case ShaderDataType::Bool:     return	GL_BOOL;
 		}
-		GLASH_CORE_ASSERT(false, "How did you get here?");
+		CINE_CORE_ASSERT(false, "How did you get here?");
 		return 0;
 	}
 
@@ -46,7 +46,7 @@ namespace Cine
 
 		const auto& layout = vertexBuffer->GetLayout();
 
-		GLASH_CORE_ASSERT(layout.Elements().size() > 0, "No layout in Vertex Buffer");
+		CINE_CORE_ASSERT(layout.Elements().size() > 0, "No layout in Vertex Buffer");
 		
 		for (auto& element : layout)
 		{

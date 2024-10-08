@@ -12,19 +12,19 @@ namespace Cine
 			if (type == "fragment" || type == "pixel")
 				return GL_FRAGMENT_SHADER;
 
-			GLASH_CORE_ASSERT(false, "Unknown shader type!");
+			CINE_CORE_ASSERT(false, "Unknown shader type!");
 			return 0;
 		}
 	}
 
-	OpenGLShader::OpenGLShader(const std::filesystem::path& filepath)
+	OpenGLShader::OpenGLShader(const std::string& name, const std::filesystem::path& filepath)
 	{
 		m_OpenGLSourceCode = ReadFile(filepath);
 
 		CompileOrGetOpenGLBinaries(); //does nothing
 		CreateProgram();
 		
-		m_Name = filepath.filename().string();
+		m_Name = name;
 	}
 	OpenGLShader::~OpenGLShader()
 	{
@@ -80,7 +80,7 @@ namespace Cine
 	}
 	const std::string OpenGLShader::GetName() const
 	{
-		return std::string();
+		return m_Name;
 	}
 	std::string OpenGLShader::ReadFile(const std::filesystem::path& filepath)
 	{
@@ -120,20 +120,20 @@ namespace Cine
 		bool success = true;
 		GLuint program = glCreateProgram(); // Create the program
 
-		std::vector<GLuint> shaderIDs;
+		int shaderIDs[2];
 		int types[] = { GL_VERTEX_SHADER, GL_FRAGMENT_SHADER };
 		const char* rawSource = m_OpenGLSourceCode.c_str();
-		for (int type : types)
+		for (int i = 0; i < 2; i++)
 		{
 			const char* shaderDefine = nullptr;
-			if (type == GL_VERTEX_SHADER) {
+			if (types[i] == GL_VERTEX_SHADER) {
 				shaderDefine = "#version 450 core\n#define VERTEX\n";
 			}
-			else if (type == GL_FRAGMENT_SHADER) {
+			else if (types[i] == GL_FRAGMENT_SHADER) {
 				shaderDefine = "#version 450 core\n#define FRAGMENT\n";
 			}
 
-			GLCall(GLuint shaderID = glCreateShader(type));
+			GLCall(GLuint shaderID = glCreateShader(types[i]));
 
 			const char* sources[] = { shaderDefine, rawSource };
 			GLCall(glShaderSource(shaderID, 2, sources, nullptr));
@@ -156,7 +156,7 @@ namespace Cine
 			}
 
 			GLCall(glAttachShader(program, shaderID));
-			shaderIDs.push_back(shaderID); // Store shader ID for later deletion
+			shaderIDs[i] = shaderID;
 		}
 
 		if (success)

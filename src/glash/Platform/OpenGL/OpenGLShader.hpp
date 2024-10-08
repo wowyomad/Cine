@@ -11,8 +11,7 @@ namespace Cine
 	class OpenGLShader : public IShader
 	{
 	public:
-
-		OpenGLShader(const std::filesystem::path& filepath);
+		OpenGLShader(const std::string& name, const std::filesystem::path& filepath);
 		virtual ~OpenGLShader();
 
 		virtual void Bind() const override final;

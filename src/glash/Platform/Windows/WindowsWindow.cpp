@@ -86,7 +86,7 @@ namespace Cine
 		if (!s_GLFWinitialized)
 		{
 			int success = glfwInit();
-			GLASH_CORE_ASSERT(success, "because fuck you");
+			CINE_CORE_ASSERT(success, "because fuck you");
 			s_GLFWinitialized = true;
 		}	
 		glfwSetErrorCallback(GLFWErrorCallback);

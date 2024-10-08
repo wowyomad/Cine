@@ -9,8 +9,6 @@ namespace Cine
 		None = 0, Float, Float2, Float3, Float4, Mat4, Int, Int2, Int3, Int4, Bool
 	};
 
-	
-
 	static uint32_t ShaderDataTypeSize(ShaderDataType type)
 	{
 		switch (type)
@@ -27,7 +25,7 @@ namespace Cine
 		case ShaderDataType::Bool:     return	sizeof(bool);
 		}
 
-		GLASH_CORE_ASSERT(false, "Uknnown type: {}", (uint32_t)type);
+		CINE_CORE_ASSERT(false, "Unknown type: {}", (uint32_t)type);
 		return 0;
 	}
 
@@ -59,7 +57,7 @@ namespace Cine
 			case ShaderDataType::Bool:     return	1;
 			}
 
-			GLASH_CORE_ASSERT(false, "Uknnown type: {}", (uint32_t)Type);
+			CINE_CORE_ASSERT(false, "Uknnown type: {}", (uint32_t)Type);
 			return 0;
 		}
 

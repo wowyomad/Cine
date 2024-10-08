@@ -31,7 +31,7 @@ namespace Cine
 		GLASH_LOG_TRACE(BUILD_STR);
 		(void)dummy; //get rid of unused parameter warning
 
-		GLASH_CORE_ASSERT(s_Instance == nullptr, "Application should be singleton");
+		CINE_CORE_ASSERT(s_Instance == nullptr, "Application should be singleton");
 		s_Instance = this;
 
 		m_Window = Window::Create();
@@ -136,7 +136,5 @@ namespace Cine
 	{
 		ImGui::GetAllocatorFunctions(p_alloc_func, p_free_func, p_user_data);
 	}
-
-
 }
 

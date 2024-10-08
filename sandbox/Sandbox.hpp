@@ -60,11 +60,13 @@ public:
 		m_VertexArraySquare->AddVertexBuffer(SquareVertexBuffer);
 		m_VertexArraySquare->SetIndexBuffer(SquareIndexBuffer);
 
-		m_Shader = Shader::Create("resources/shaders/uniform_color.glsl");
 		auto specification = TextureSpecification();
 		specification.MagFilter = TextureFilter::Nearest;
 		specification.Wrap = TextureWrap::Repeat;
 		m_Texture = Texture2D::Create("resources/textures/checkerboard.png", specification);
+
+		m_ShaderLibrary.Load("Simple", "resources/shaders/uniform_color.glsl");
+		m_Shader = m_ShaderLibrary.Get("Simple");
 	}
 	void OnFixedUpdate(Timestep fixedDeltaTime)  override
 	{
@@ -216,6 +218,7 @@ private:
 
 	Ref<VertexArray> m_VertexArrayTriangle;
 	Ref<Shader> m_Shader;
+	ShaderLibrary m_ShaderLibrary;
 	Ref<Texture> m_Texture;
 	OrthographicCamera m_Camera;
 

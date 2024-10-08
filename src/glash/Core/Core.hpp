@@ -1,11 +1,11 @@
 #pragma once
 
 #if defined(_WIN32) || defined(_WIN64)
-#define GLASH_API_EXPORT __declspec(dllexport)
-#define GLASH_API_IMPORT __declspec(dllimport)
+    #define GLASH_API_EXPORT __declspec(dllexport)
+    #define GLASH_API_IMPORT __declspec(dllimport)
 #else
-#define GLASH_API_EXPORT
-#define GLASH_API_IMPORT
+    #define GLASH_API_EXPORT
+    #define GLASH_API_IMPORT
 #endif
 
 
@@ -46,12 +46,12 @@
     #define BUILD_STR "STATIC BUILD"
 #endif
 
-#if GLASH_ENABLE_ASSERTS
-    #define GLASH_CORE_ASSERT(x, ...) { if(!(x)) { GLASH_CORE_ERROR("Assertion failed: {}", __VA_ARGS__); DEBUG_BREAK; } }
-    #define GLASH_ASSERT(x, ...) { if(!(x)) { GLASH_LOG_ERROR("Assertion failed: {}", __VA_ARGS__); DEBUG_BREAK; } }
+#if CINE_ENABLE_ASSERTS
+    #define CINE_CORE_ASSERT(x, ...) { if(!(x)) { GLASH_CORE_ERROR("Assertion failed: {}", __VA_ARGS__); DEBUG_BREAK; } }
+    #define CINE_ASSERT(x, ...) { if(!(x)) { GLASH_LOG_ERROR("Assertion failed: {}", __VA_ARGS__); DEBUG_BREAK; } }
 #else
-    #define GLASH_CORE_ASSERT(x, ...)
-    #define GLASH_ASSERT(x, ...)
+    #define CINE_CORE_ASSERT(x, ...)
+    #define CINE_ASSERT(x, ...)
 #endif
 
 
