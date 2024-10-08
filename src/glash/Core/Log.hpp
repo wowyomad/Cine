@@ -82,12 +82,13 @@ namespace Cine
 	#define GLASH_CORE_DEBUG(msg, ...)
 	#define GLASH_CORE_INFO(msg, ...)
 	#define GLASH_CORE_ERROR(msg, ...)
+	#define GLASH_CORE_ERROR_EX(msg, ...)
 	#define GLASH_LOG_TRACE(msg, ...)
 	#define GLASH_LOG_DEBUG(msg, ...)
 	#define GLASH_LOG_INFO(msg, ...)
 	#define GLASH_LOG_ERROR(msg, ...)
 	#define DEBUG_BREAK
-	#define GLCall(x) (x)
+	#define GLCall(x) x
 	#define ASSERT(x)
 	#define LOG_DEBUG(msg, ...)
 	#define LOG_DEBUG_EX(msg, func, filename, line, ...)

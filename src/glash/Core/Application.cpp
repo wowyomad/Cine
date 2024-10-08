@@ -84,6 +84,14 @@ namespace Cine
 
 	 bool Application::OnWindowResizeEvent(WindowResizeEvent& event)
 	{
+		 if (event.GetWidth() == 0 && event.GetHeight() == 0)
+		 {
+			 m_Minimized = true;
+		 }
+		 else
+		 {
+			 m_Minimized = false;
+		 }
 		return false;
 	}
 
@@ -96,25 +104,28 @@ namespace Cine
 			float time = glfwGetTime();
 			Timestep deltaTime = time - m_LastFrameTime;
 			m_LastFrameTime = time;
-			m_Accumulator += deltaTime;
 
-			m_Window->SetTitle(std::to_string(deltaTime.Milleseconds()));
-
-			while (m_Accumulator > m_TickTime)
+			if (!m_Minimized)
 			{
+				m_Window->SetTitle(std::to_string(deltaTime.Milleseconds()));
+				m_TickAccumulator += deltaTime;
+
+				while (m_TickAccumulator > m_TickTime)
+				{
+					for (Layer* layer : m_LayerStack)
+					{
+						layer->OnFixedUpdate(m_TickTime);
+					}
+					m_TickAccumulator -= m_TickTime;
+				}
+
 				for (Layer* layer : m_LayerStack)
 				{
-					layer->OnFixedUpdate(m_TickTime);
+					layer->OnUpdate(deltaTime);
 				}
-				m_Accumulator -= m_TickTime;
-			}
-			
-			for (Layer* layer : m_LayerStack)
-			{
-				layer->OnUpdate(deltaTime);
-			}
 
-			Input::ClearKeyStates();
+				Input::ClearKeyStates();
+			}
 
 			m_ImGuiLayer->Begin();
 			for (Layer* layer : m_LayerStack)
