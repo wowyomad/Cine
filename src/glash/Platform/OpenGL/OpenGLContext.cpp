@@ -23,9 +23,9 @@ namespace Cine
 		glfwMakeContextCurrent(m_WindowHandle);
 		int status = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
 		CINE_CORE_ASSERT(status, "Coudln't load glad");
-		GLASH_CORE_INFO("OpenGL Vendor: {}", (const char*)glGetString(GL_VENDOR));
-		GLASH_CORE_INFO("OpenGL Renderer: {}", (const char*)glGetString(GL_RENDERER));
-		GLASH_CORE_INFO("OpenGL Version: {}", (const char*)glGetString(GL_VERSION));
+		CINE_CORE_INFO("OpenGL Vendor: {}", (const char*)glGetString(GL_VENDOR));
+		CINE_CORE_INFO("OpenGL Renderer: {}", (const char*)glGetString(GL_RENDERER));
+		CINE_CORE_INFO("OpenGL Version: {}", (const char*)glGetString(GL_VERSION));
 	}
 	void OpenGLContext::SwapBuffers()
 	{

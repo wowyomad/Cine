@@ -1,6 +1,4 @@
 #pragma once
-#include "glash/glash_pch.hpp" 
-
 #include "glash/Core/Base.hpp"
 
 #include "spdlog/spdlog.h"
@@ -12,7 +10,7 @@
 
 namespace Cine
 {
-#if GLASH_ENABLE_DEBUG
+#if GLASH_ENABLE_DEBUG && _DEBUG
 	#ifdef _MSC_VER
 		#define DEBUG_BREAK __debugbreak()
 	#else
@@ -34,23 +32,23 @@ namespace Cine
 			x;\
 			if (Cine::debug::g_HasErrorOccured) DEBUG_BREAK;\
 			Cine::debug::g_HasErrorOccured = false;
-	#define GLASH_CORE_TRACE(msg, ...)\
+	#define CINE_CORE_TRACE(msg, ...)\
 		Cine::Log::GetCoreLogger()->trace(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
-	#define GLASH_CORE_DEBUG(msg, ...)\
+	#define CINE_CORE_DEBUG(msg, ...)\
 		Cine::Log::GetCoreLogger()->debug(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
-	#define GLASH_CORE_INFO(msg, ...)\
+	#define CINE_CORE_INFO(msg, ...)\
 		Cine::Log::GetCoreLogger()->info(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
-	#define GLASH_CORE_ERROR(msg, ...)\
+	#define CINE_CORE_ERROR(msg, ...)\
 		Cine::Log::GetCoreLogger()->error(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
-	#define GLASH_CORE_ERROR_EX(msg, func, filename, line, ...)\
+	#define CINE_CORE_ERROR_EX(msg, func, filename, line, ...)\
 		Cine::Log::GetCoreLogger()->error(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), func, filename, line)
-	#define GLASH_LOG_TRACE(msg, ...)\
+	#define CINE_LOG_TRACE(msg, ...)\
 		Cine::Log::GetClientLogger()->trace(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
-	#define GLASH_LOG_DEBUG(msg, ...)\
+	#define CINE_LOG_DEBUG(msg, ...)\
 		Cine::Log::GetClientLogger()->debug(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
-	#define GLASH_LOG_INFO(msg, ...)\
+	#define CINE_LOG_INFO(msg, ...)\
 		Cine::Log::GetClientLogger()->info(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
-	#define GLASH_LOG_ERROR(msg, ...)\
+	#define CINE_LOG_ERROR(msg, ...)\
 		Cine::Log::GetClientLogger()->error(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
 	
 	#define LOG_DEBUG(msg, ...) \
@@ -78,26 +76,18 @@ namespace Cine
 			spdlog::warn(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), func, filename, line)
 
 #else
-	#define GLASH_CORE_TRACE(msg, ...)
-	#define GLASH_CORE_DEBUG(msg, ...)
-	#define GLASH_CORE_INFO(msg, ...)
-	#define GLASH_CORE_ERROR(msg, ...)
-	#define GLASH_CORE_ERROR_EX(msg, ...)
-	#define GLASH_LOG_TRACE(msg, ...)
-	#define GLASH_LOG_DEBUG(msg, ...)
-	#define GLASH_LOG_INFO(msg, ...)
-	#define GLASH_LOG_ERROR(msg, ...)
+	#define CINE_CORE_TRACE(msg, ...)
+	#define CINE_CORE_DEBUG(msg, ...)
+	#define CINE_CORE_INFO(msg, ...)
+	#define CINE_CORE_ERROR(msg, ...)
+	#define CINE_CORE_ERROR_EX(msg, ...)
+	#define CINE_LOG_TRACE(msg, ...)
+	#define CINE_LOG_DEBUG(msg, ...)
+	#define CINE_LOG_INFO(msg, ...)
+	#define CINE_LOG_ERROR(msg, ...)
 	#define DEBUG_BREAK
 	#define GLCall(x) x
 	#define ASSERT(x)
-	#define LOG_DEBUG(msg, ...)
-	#define LOG_DEBUG_EX(msg, func, filename, line, ...)
-	#define LOG_INFO(msg, ...)
-	#define LOG_INFO_EX(msg, func, filename, line, ...)
-	#define LOG_ERROR(msg, ...)
-	#define LOG_ERROR_EX(msg, func, filename, line, ...)
-	#define LOG_WARN(msg, ...)
-	#define LOG_WARN_EX(msg, func, filename, line, ...)
 #endif
 	class GLASH_API Log
 	{
@@ -188,12 +178,12 @@ namespace Cine
 			}
 			if (g_HasMeta)
 			{
-				GLASH_CORE_ERROR_EX("[OpenGL Debug] Source: {}, Type: {}, Severity: {}, Message: {}",
+				CINE_CORE_ERROR_EX("[OpenGL Debug] Source: {}, Type: {}, Severity: {}, Message: {}",
 					g_Func, g_FileName, g_Line, sourceStr, typeStr, severityStr, message);
 			}
 			else
 			{
-				GLASH_CORE_ERROR_EX("[OpenGL Debug] Source: {}, Type: {}, Severity: {}, Message: {}",
+				CINE_CORE_ERROR_EX("[OpenGL Debug] Source: {}, Type: {}, Severity: {}, Message: {}",
 					"-undf", "-undf", 0, sourceStr, typeStr, severityStr, message);
 			}
 		}
@@ -227,3 +217,6 @@ namespace Cine
 		return param;
 	}
 }
+
+
+#include "glash/Debug/Instrumentor.hpp"

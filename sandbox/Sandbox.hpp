@@ -161,7 +161,7 @@ public:
 		m_Window->SetVSync(false);
 		s_Application = this;
 		//PushOverlay(new SimpleLayer());
-		PushOverlay(new Sandbox2D());
+		PushOverlay(new Sandbox2D(this));
 	}
 
 	~SandboxApp()

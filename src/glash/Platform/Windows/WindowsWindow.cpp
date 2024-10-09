@@ -19,7 +19,7 @@ namespace Cine
 
 	static void GLFWErrorCallback(int error, const char* description)
 	{
-		GLASH_CORE_ERROR("GLFW error {}: {}", error, description);
+		CINE_CORE_ERROR("GLFW error {}: {}", error, description);
 	}
 
 	Ref<Window> IWindow::Create(const WindowProps& props)
@@ -80,7 +80,7 @@ namespace Cine
 		m_Data.Title = props.Title;
 		m_Data.VSync = props.VSync;
 
-		GLASH_CORE_INFO("Creating Windows window {} ({}, {}), VSync: {}", props.Title, props.Width, props.Height, m_Data.VSync ? "On" : "Off");
+		CINE_CORE_INFO("Creating Windows window {} ({}, {}), VSync: {}", props.Title, props.Width, props.Height, m_Data.VSync ? "On" : "Off");
 
 
 		if (!s_GLFWinitialized)

@@ -8,8 +8,6 @@
     #define GLASH_API_IMPORT
 #endif
 
-
-
 #ifndef GLASH_BUILD_DLL
     #define GLASH_BUILD_DLL 0
 #endif
@@ -114,7 +112,6 @@ namespace Cine
         return std::make_unique<T>(std::forward<Args>(args)...);
     }
 }
-
 
 #include "glash/Core/Log.hpp"
 #include "glash/platform/Platforms.hpp"

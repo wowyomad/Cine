@@ -7,13 +7,15 @@ namespace Cine
 		: m_AspectRatio(aspectRatio),
 		m_CanRotate(canRotate),
 		m_CameraZoom(1.0f),
-		m_Camera(-m_AspectRatio * m_CameraZoom, m_AspectRatio * m_CameraZoom, -m_CameraZoom, m_CameraZoom)
+		m_Camera(-m_AspectRatio * m_CameraZoom, m_AspectRatio* m_CameraZoom, -m_CameraZoom, m_CameraZoom)
 	{
 
 	}
 
 	void OrthograhpicCameraController::OnEvent(Event& event)
 	{
+		CINE_PROFILE_FUNCTION();
+
 		EventDispatcher dispatcher(event);
 		dispatcher.Dispatch<MouseScrolledEvent>(CINE_BIND_EVENT_FN(OrthograhpicCameraController::OnMouseScrolled));
 		dispatcher.Dispatch<WindowResizeEvent>(CINE_BIND_EVENT_FN(OrthograhpicCameraController::OnWindowResized));
@@ -21,6 +23,8 @@ namespace Cine
 
 	void OrthograhpicCameraController::OnUpdate(Timestep ts)
 	{
+		CINE_PROFILE_FUNCTION();
+
 		if (Input::IsKeyPressed(Key::A))
 		{
 			m_CameraPosition.x -= CameraTranslatoinSpeed * m_CameraZoom * ts;

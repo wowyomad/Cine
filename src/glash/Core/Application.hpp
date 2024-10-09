@@ -34,7 +34,7 @@ namespace Cine
 		Application()
 			: Application(0)
 		{
-			GLASH_CORE_TRACE(BUILD_STR);
+			CINE_CORE_TRACE(BUILD_STR);
 			ImGuiContext* p_context = GetImGuiContext();
 			ImGuiContext* this_context = ImGui::GetCurrentContext();
 

@@ -29,7 +29,7 @@ namespace Cine
 	Application::Application(int dummy)
 		: m_Running(false)
 	{
-		GLASH_LOG_TRACE(BUILD_STR);
+		CINE_LOG_TRACE(BUILD_STR);
 		(void)dummy; //get rid of unused parameter warning
 
 		CINE_CORE_ASSERT(s_Instance == nullptr, "Application should be singleton");

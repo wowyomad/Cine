@@ -5,11 +5,15 @@ namespace Cine
 {
 	Ref<Shader> IShader::Create(const std::filesystem::path& filepath)
 	{
+		CINE_PROFILE_FUNCTION();
+
 		//TODO: Choose correct render API
 		return CreateRef<OpenGLShader>(filepath.stem().string(), filepath);
 	}
 	Ref<Shader> IShader::Create(const std::string& name, const std::filesystem::path& filepath)
 	{
+		CINE_PROFILE_FUNCTION();
+
 		//TODO: Choose correct render API
 		return CreateRef<OpenGLShader>(name, filepath);
 	}

@@ -28,6 +28,8 @@ file(GLOB HEADERS
     "${glash_SOURCE_DIR}/ImGui/*.hpp"
     "${glash_SOURCE_DIR}/Core/*.hpp"
     "${glash_SOURCE_DIR}/Renderer/*.hpp"
+    "${glash_SOURCE_DIR}/Debug/*.hpp"
+
 )
 if(GLASH_ENABLE_DEBUG)
     list(APPEND GLASH_COMPILE_DEFINITIONS GLASH_ENABLE_DEBUG)

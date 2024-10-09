@@ -1,5 +1,8 @@
 #include "Sandbox2D.hpp"
 
+#include "glash/Core/Timer.hpp"
+#include "glash/Debug/Instrumentor.hpp"
+
 void Sandbox2D::OnAttach()
 {
 	m_SquareTexture = Cine::Texture2D::Create("resources/textures/checkerboard.png");
@@ -12,7 +15,13 @@ void Sandbox2D::OnDetach()
 
 void Sandbox2D::OnUpdate(Cine::Timestep ts)
 {
-	m_CameraController.OnUpdate(ts);
+	CINE_PROFILE_FUNCTION();
+
+	{
+		CINE_PROFILE_SCOPE("m_CameraController::OnUpdate");
+		m_CameraController.OnUpdate(ts);
+	}
+
 
 	Cine::Renderer2D::BeginScene(m_CameraController.GetCamera());
 	Cine::Renderer2D::DrawQuad(m_SquarePosition + glm::vec3(1.5f, 0.0f, 0.01f), m_SquareSize, m_SquareColor);
@@ -27,6 +36,8 @@ void Sandbox2D::OnEvent(Cine::Event& event)
 
 void Sandbox2D::OnImGuiRender()
 {
+	CINE_PROFILE_FUNCTION();
+
 	ImGui::Begin("Sandbox");
 	ImGui::ColorEdit4("Square color", glm::value_ptr(m_SquareColor));
 	ImGui::DragFloat2("Square position", glm::value_ptr(m_SquarePosition), 0.1f, -10.0f, 10.0f);

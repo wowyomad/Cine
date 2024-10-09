@@ -7,6 +7,8 @@ namespace Cine
 {
 	Ref<VertexArray> VertexArray::Create()
 	{
+		CINE_PROFILE_FUNCTION();
+
 		return Renderer::Get().CreateVertexArray();
 	}
 }

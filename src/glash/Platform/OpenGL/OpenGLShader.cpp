@@ -111,12 +111,12 @@ namespace Cine
 			}
 			else
 			{
-				GLASH_CORE_ERROR("Could not read file {}", filepath.string());
+				CINE_CORE_ERROR("Could not read file {}", filepath.string());
 			}
 		}
 		else
 		{
-			GLASH_CORE_ERROR("Could not open file {}", filepath.string());
+			CINE_CORE_ERROR("Could not open file {}", filepath.string());
 		}
 		return result;
 	}
@@ -158,7 +158,7 @@ namespace Cine
 				if (logLength > 0) {
 					std::vector<char> errorLog(logLength);
 					glGetShaderInfoLog(shaderID, logLength, nullptr, errorLog.data());
-					GLASH_CORE_ERROR("Shader compilation failed: {}", errorLog.data());
+					CINE_CORE_ERROR("Shader compilation failed: {}", errorLog.data());
 				}
 				DEBUG_BREAK;
 				glDeleteShader(shaderID);
@@ -178,7 +178,7 @@ namespace Cine
 				m_RendererID = program;
 			}
 			else {
-				GLASH_CORE_ERROR("Shader linking failed.");
+				CINE_CORE_ERROR("Shader linking failed.");
 				DEBUG_BREAK;
 			}
 		}

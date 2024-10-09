@@ -1,5 +1,12 @@
 #include "glash/Cine.hpp"
 
+
+struct ProfileResult
+{
+	const char* Name;
+	float Time;
+};
+
 class Sandbox2D : public Cine::Layer
 {
 public:
@@ -27,4 +34,6 @@ private:
 
 	bool m_VSync = false;
 	Cine::Application* s_Application = nullptr;
+
+	std::vector<ProfileResult> m_ProfileResults;
 };
