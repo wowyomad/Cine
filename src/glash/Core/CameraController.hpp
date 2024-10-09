@@ -18,6 +18,7 @@ namespace Cine
 		OrthographicCamera& GetCamera() { return m_Camera; }
 
 		inline void SetAspectRatio(float aspectRatio) { m_AspectRatio = aspectRatio; }
+		void SetTargetZoom(float targetZoom);
 
 	private:
 		bool OnMouseScrolled(MouseScrolledEvent& event);
@@ -34,10 +35,12 @@ namespace Cine
 		float m_AspectRatio = 1.0f;
 
 		glm::vec3 m_CameraPosition = glm::vec3(0.0f);
-		float m_CameraZoom = 1.0f;
 		float m_CameraRotation = 0.0f;
 
+		float m_CameraZoom = 1.0f;
 		float m_CameraZoomMax = 0.1f;
+		float m_CameraZoomTarget = m_CameraZoom;
+		float m_CameraZoomTargetTime = 0.1f;
 
 		OrthographicCamera m_Camera;
 	};

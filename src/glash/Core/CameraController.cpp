@@ -50,14 +50,22 @@ namespace Cine
 			}
 		}
 
+		float cameraZoomLerp = std::min(1.0f, ts / m_CameraZoomTargetTime);
+		m_CameraZoom = std::lerp(m_CameraZoom, m_CameraZoomTarget, cameraZoomLerp);
+		m_Camera.SetProjection(-m_AspectRatio * m_CameraZoom, m_AspectRatio * m_CameraZoom, -m_CameraZoom, m_CameraZoom);
+
 		m_Camera.SetTransform(m_CameraPosition, m_CameraRotation);
+	}
+
+	void OrthograhpicCameraController::SetTargetZoom(float targetZoom)
+	{
+		m_CameraZoomTarget = targetZoom;
 	}
 
 	bool OrthograhpicCameraController::OnMouseScrolled(MouseScrolledEvent& event)
 	{
-		m_CameraZoom -= event.GetVertical() * CameraZoomSpeed;
-		m_CameraZoom = std::max(m_CameraZoom, m_CameraZoomMax);
-		m_Camera.SetProjection(-m_AspectRatio * m_CameraZoom, m_AspectRatio * m_CameraZoom, -m_CameraZoom, m_CameraZoom);
+		m_CameraZoomTarget -= event.GetVertical() * CameraZoomSpeed;
+		m_CameraZoomTarget = std::max(m_CameraZoomTarget, m_CameraZoomMax);
 
 		return false;
 	}
