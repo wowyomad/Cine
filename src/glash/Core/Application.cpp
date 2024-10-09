@@ -51,6 +51,8 @@ namespace Cine
 
 	void Application::OnEvent(Event& event)
 	{
+		CINE_PROFILE_SCOPE("Application::OnEvent");
+
 		EventDispatcher dispatcher(event);
 
 		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
@@ -85,23 +87,23 @@ namespace Cine
 		return false;
 	}
 
-	 bool Application::OnWindowResizeEvent(WindowResizeEvent& event)
+	bool Application::OnWindowResizeEvent(WindowResizeEvent& event)
 	{
-		 if (event.GetWidth() == 0 && event.GetHeight() == 0)
-		 {
-			 m_Minimized = true;
-		 }
-		 else
-		 {
-			 m_Minimized = false;
-		 }
+		if (event.GetWidth() == 0 && event.GetHeight() == 0)
+		{
+			m_Minimized = true;
+		}
+		else
+		{
+			m_Minimized = false;
+		}
 		return false;
 	}
 
 	void Application::Run()
 	{
 		m_Running = true;
-		
+
 		while (m_Running)
 		{
 			float time = glfwGetTime();
@@ -113,29 +115,43 @@ namespace Cine
 				m_Window->SetTitle(std::to_string(deltaTime.Milleseconds()));
 				m_TickAccumulator += deltaTime;
 
-				while (m_TickAccumulator > m_TickTime)
+
 				{
-					for (Layer* layer : m_LayerStack)
+					CINE_PROFILE_SCOPE("LayerStack FixedUpdate");
+
+					while (m_TickAccumulator > m_TickTime)
 					{
-						layer->OnFixedUpdate(m_TickTime);
+						for (Layer* layer : m_LayerStack)
+						{
+							layer->OnFixedUpdate(m_TickTime);
+						}
+						m_TickAccumulator -= m_TickTime;
 					}
-					m_TickAccumulator -= m_TickTime;
 				}
 
-				for (Layer* layer : m_LayerStack)
 				{
-					layer->OnUpdate(deltaTime);
+					CINE_PROFILE_SCOPE("LayerStack Update");
+
+					for (Layer* layer : m_LayerStack)
+					{
+						layer->OnUpdate(deltaTime);
+					}
 				}
 
 				Input::ClearKeyStates();
 			}
 
-			m_ImGuiLayer->Begin();
-			for (Layer* layer : m_LayerStack)
+
 			{
-				layer->OnImGuiRender();
+				CINE_PROFILE_SCOPE("ImGui Render");
+
+				m_ImGuiLayer->Begin();
+				for (Layer* layer : m_LayerStack)
+				{
+					layer->OnImGuiRender();
+				}
+				m_ImGuiLayer->End();
 			}
-			m_ImGuiLayer->End();
 
 			m_Window->OnUpdate();
 		}

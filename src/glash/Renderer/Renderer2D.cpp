@@ -20,6 +20,7 @@ namespace Cine
 
 	void Renderer2D::Init()
 	{
+		int xxx = GLGetStatus(0, 0);
 		s_Data.QuadVertexArray = VertexArray::Create();
 
 		float quadVertices[] =
@@ -43,6 +44,7 @@ namespace Cine
 		s_Data.QuadVertexArray->AddVertexBuffer(quadVertexBuffer);
 		s_Data.QuadVertexArray->SetIndexBuffer(indexBuffer);
 		s_Data.QuadShader = Shader::Create("resources/shaders/Renderer2D_Quad.glsl");
+
 		s_Data.WhiteTexture = Texture2D::Create(TextureSpecification());
 		uint32_t whiteTextureData = 0xFFFFFFFF;
 		s_Data.WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));

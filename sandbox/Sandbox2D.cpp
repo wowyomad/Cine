@@ -18,7 +18,6 @@ void Sandbox2D::OnUpdate(Cine::Timestep ts)
 	CINE_PROFILE_FUNCTION();
 
 	{
-		CINE_PROFILE_SCOPE("m_CameraController::OnUpdate");
 		m_CameraController.OnUpdate(ts);
 	}
 

@@ -50,30 +50,6 @@ namespace Cine
 		Cine::Log::GetClientLogger()->info(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
 	#define CINE_LOG_ERROR(msg, ...)\
 		Cine::Log::GetClientLogger()->error(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
-	
-	#define LOG_DEBUG(msg, ...) \
-				spdlog::debug(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
-	
-	#define LOG_DEBUG_EX(msg, func, filename, line, ...) \
-				spdlog::debug(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), func, filename, line)
-	
-	#define LOG_INFO(msg, ...) \
-				spdlog::info(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
-	
-	#define LOG_INFO_EX(msg, func, filename, line, ...) \
-				spdlog::info(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), func, filename, line)
-	
-	#define LOG_ERROR(msg, ...) \
-				spdlog::error(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
-	
-	#define LOG_ERROR_EX(msg, func, filename, line, ...) \
-				spdlog::error(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), func, filename, line)
-	
-	#define LOG_WARN(msg, ...) \
-				spdlog::warn(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
-	
-	#define LOG_WARN_EX(msg, func, filename, line, ...) \
-			spdlog::warn(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), func, filename, line)
 
 #else
 	#define CINE_CORE_TRACE(msg, ...)
@@ -135,7 +111,7 @@ namespace Cine
 			while (GLenum error_code = glGetError())
 			{
 				const std::string error_name = GetGLErrorString(error_code);
-				LOG_ERROR_EX("[GL_ERROR 0x{:0X}: {}]", function, file, line, error_code, error_name);
+				CINE_CORE_ERROR_EX("[GL_ERROR 0x{:0X}: {}]", function, file, line, error_code, error_name);
 				hasErrorOccured = true;
 			}
 			return hasErrorOccured;
@@ -212,7 +188,7 @@ namespace Cine
 			break;
 		default:
 			param = 0;
-			LOG_DEBUG("Uknown status");
+			CINE_CORE_DEBUG("Uknown status");
 		}
 		return param;
 	}

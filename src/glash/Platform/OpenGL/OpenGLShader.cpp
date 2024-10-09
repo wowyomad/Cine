@@ -95,6 +95,8 @@ namespace Cine
 	}
 	std::string OpenGLShader::ReadFile(const std::filesystem::path& filepath)
 	{
+		CINE_PROFILE_FUNCTION();
+
 		std::string result;
 
 		std::ifstream in(filepath, std::ios::in | std::ios::binary);
@@ -128,66 +130,112 @@ namespace Cine
 
 	void OpenGLShader::CreateProgram()
 	{
+		CINE_PROFILE_FUNCTION();
+
+
+
 		bool success = true;
 		GLuint program = glCreateProgram(); // Create the program
+
+
+		int ZeroShaderID = 0;
+		int RealShaderID = program;
+
+		{
+			CINE_PROFILE_SCOPE("GLGetStatus(ZeroShaderID, GL_COMPILE_STATUS)");
+			GLGetStatus(ZeroShaderID, GL_COMPILE_STATUS);
+		}
+		{
+			CINE_PROFILE_SCOPE("GLGetStatus(RealShaderID, GL_COMPILE_STATUS)");
+			GLGetStatus(RealShaderID, GL_COMPILE_STATUS);
+		}
 
 		int shaderIDs[2];
 		int types[] = { GL_VERTEX_SHADER, GL_FRAGMENT_SHADER };
 		const char* rawSource = m_OpenGLSourceCode.c_str();
-		for (int i = 0; i < 2; i++)
+
 		{
-			const char* shaderDefine = nullptr;
-			if (types[i] == GL_VERTEX_SHADER) {
-				shaderDefine = "#version 450 core\n#define VERTEX\n";
-			}
-			else if (types[i] == GL_FRAGMENT_SHADER) {
-				shaderDefine = "#version 450 core\n#define FRAGMENT\n";
-			}
+			CINE_PROFILE_SCOPE("Compile OpenGL Shaders");
 
-			GLCall(GLuint shaderID = glCreateShader(types[i]));
+			for (int i = 0; i < 2; i++)
+			{
 
-			const char* sources[] = { shaderDefine, rawSource };
-			GLCall(glShaderSource(shaderID, 2, sources, nullptr));
-			GLCall(glCompileShader(shaderID));
-
-			success = GLGetStatus(shaderID, GL_COMPILE_STATUS);
-			if (!success) {
-				GLint logLength;
-				glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &logLength);
-
-				if (logLength > 0) {
-					std::vector<char> errorLog(logLength);
-					glGetShaderInfoLog(shaderID, logLength, nullptr, errorLog.data());
-					CINE_CORE_ERROR("Shader compilation failed: {}", errorLog.data());
+				const char* shaderDefine = nullptr;
+				if (types[i] == GL_VERTEX_SHADER) {
+					shaderDefine = "#version 450 core\n#define VERTEX\n";
 				}
-				DEBUG_BREAK;
-				glDeleteShader(shaderID);
-				success = false;
-				break;
+				else if (types[i] == GL_FRAGMENT_SHADER) {
+					shaderDefine = "#version 450 core\n#define FRAGMENT\n";
+				}
+
+				GLuint shaderID = 0;
+				{
+					CINE_PROFILE_SCOPE("Create glCreateShader");
+
+					GLCall(shaderID = glCreateShader(types[i]));
+				}
+
+				const char* sources[2] = {shaderDefine, rawSource};
+				{
+					CINE_PROFILE_SCOPE("glShaderSource & glCompileShader ");
+
+					GLCall(glShaderSource(shaderID, 2, sources, nullptr));
+					GLCall(glCompileShader(shaderID));
+				}
+
+				{
+					CINE_PROFILE_SCOPE("GLGetStatus(shaderID, GL_COMPILE_STATUS))"); //this takes over 100ms to execute first time???
+					success = GLGetStatus(shaderID, GL_COMPILE_STATUS);
+				}
+				if (!success) {
+					GLint logLength;
+					glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &logLength);
+
+					if (logLength > 0) {
+						std::vector<char> errorLog(logLength);
+						glGetShaderInfoLog(shaderID, logLength, nullptr, errorLog.data());
+						CINE_CORE_ERROR("Shader compilation failed: {}", errorLog.data());
+					}
+					DEBUG_BREAK;
+					glDeleteShader(shaderID);
+					success = false;
+					break;
+				}
+
+				{
+					CINE_PROFILE_SCOPE("glAttachShader");
+					GLCall(glAttachShader(program, shaderID));
+					shaderIDs[i] = shaderID;
+				}
 			}
-
-			GLCall(glAttachShader(program, shaderID));
-			shaderIDs[i] = shaderID;
 		}
-
-		if (success)
 		{
-			GLCall(glLinkProgram(program));
-			success = GLGetStatus(program, GL_LINK_STATUS);
-			if (success) {
-				m_RendererID = program;
-			}
-			else {
-				CINE_CORE_ERROR("Shader linking failed.");
-				DEBUG_BREAK;
-			}
-		}
+			CINE_PROFILE_SCOPE("glLinkProgram");
 
-		for (GLuint shaderID : shaderIDs)
-		{
-			GLCall(glDetachShader(program, shaderID));
-			GLCall(glDeleteShader(shaderID));
+			if (success)
+			{
+				GLCall(glLinkProgram(program));
+				success = GLGetStatus(program, GL_LINK_STATUS);
+				if (success) {
+					m_RendererID = program;
+				}
+				else {
+					CINE_CORE_ERROR("Shader linking failed.");
+					DEBUG_BREAK;
+				}
+			}
 		}
+		
+		{
+			CINE_PROFILE_SCOPE("glDetachShader & glDeleteShader");
+
+			for (GLuint shaderID : shaderIDs)
+			{
+				GLCall(glDetachShader(program, shaderID));
+				GLCall(glDeleteShader(shaderID));
+			}
+		}
+	
 
 		if (!success)
 		{

@@ -200,7 +200,6 @@ namespace Cine {
 		}
 	}
 }
-#define CINE_PROFILE 1
 #if CINE_PROFILE
 // Resolve which function signature macro will be used. Note that this only
 // is resolved when the (pre)compiler starts, so the syntax highlighting
@@ -225,7 +224,7 @@ namespace Cine {
 
 #define CINE_PROFILE_BEGIN_SESSION(name, filepath) ::Cine::Instrumentor::Get().BeginSession(name, filepath)
 #define CINE_PROFILE_END_SESSION() ::Cine::Instrumentor::Get().EndSession()
-#define CINE_PROFILE_SCOPE_LINE(name, line) constexpr auto fixedName##line = Cine::InstrumentorUtils::CleanupOutputString(name, "__cdecl ");\
+#define CINE_PROFILE_SCOPE_LINE(name, line) constexpr auto fixedName##line = ::Cine::InstrumentorUtils::CleanupOutputString(name, "__cdecl ");\
 											   ::Cine::InstrumentationTimer timer##line(fixedName##line.Data)
 #define CINE_PROFILE_SCOPE(name) CINE_PROFILE_SCOPE_LINE(name, __LINE__)
 #define CINE_PROFILE_FUNCTION() CINE_PROFILE_SCOPE(CINE_FUNC_SIG)

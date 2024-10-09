@@ -8,7 +8,6 @@ uniform mat4 u_Transform;
 uniform mat4 u_ViewProjection;
 uniform float u_Tiling;
 
-
 out vec2 f_TexCoord;
 
 void main()
