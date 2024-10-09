@@ -80,7 +80,7 @@ namespace Cine
 		DrawQuad({ position.x, position.y, 0.0f }, size, color);
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture, const glm::vec4& colorTint)
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture, const glm::vec4& colorTint, float tiling)
 	{
 		texture->Bind(0);
 
@@ -88,13 +88,14 @@ namespace Cine
 		s_Data.QuadShader->SetMat4("u_Transform", transform);
 		s_Data.QuadShader->SetFloat4("u_Color", colorTint);
 		s_Data.QuadShader->SetInt("u_Texture", 0);
+		s_Data.QuadShader->SetFloat("u_Tiling", tiling);
 
 		s_Data.QuadVertexArray->Bind();
 		RenderCommand::DrawIndexed(s_Data.QuadVertexArray);
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture2D>& texture, const glm::vec4& colorTint)
+	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture2D>& texture, const glm::vec4& colorTint, float tiling)
 	{
-		DrawQuad({ position.x, position.y, 0.0f }, size, texture, colorTint);
+		DrawQuad({ position.x, position.y, 0.0f }, size, texture, colorTint, tiling);
 	}
 }

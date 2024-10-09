@@ -3,10 +3,10 @@
 class Sandbox2D : public Cine::Layer
 {
 public:
-	Sandbox2D() : Cine::Layer("Sandbox"),
+	Sandbox2D(Cine::Application* ptr) : Cine::Layer("Sandbox"),
 		m_CameraController(1.7778)
 	{
-			
+		s_Application = ptr;
 	};
 
 	void OnAttach() override final;
@@ -25,4 +25,6 @@ private:
 	glm::vec3 m_SquarePosition = glm::vec3(0.0f);
 	Cine::Ref<Cine::Texture2D> m_SquareTexture;
 
+	bool m_VSync = false;
+	Cine::Application* s_Application = nullptr;
 };
