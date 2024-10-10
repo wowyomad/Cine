@@ -1,7 +1,7 @@
-# glash
+# Cine
 
 ## Project Overview
-**glash** is an OpenGL + C++ + CMake "eNgInE" for educational purposes.
+**Cine** is an OpenGL + C++ + CMake "eNgInE" for educational purposes.
 
 ## Library Dependencies
 This project relies on the following external libraries, which are fetched, built, and linked automatically using CMake's `FetchContent` module:
@@ -45,16 +45,16 @@ This project relies on the following external libraries, which are fetched, buil
    - **Required Package:** OpenGL (automatically found by CMake).
 
 ## CMake Options
-- **GLASH_BUILD_DLL:** Controls whether `glash` is built as a DLL (dynamic library) (default: OFF). If set to `ON`, you should also define `GLASH_IMPORT` in projects that use `glash` and duplicate this setting in your project to properly link the dynamic library.
+- **Cine_BUILD_DLL:** Controls whether `Cine` is built as a DLL (dynamic library) (default: OFF). If set to `ON`, you should also define `Cine_IMPORT` in projects that use `Cine` and duplicate this setting in your project to properly link the dynamic library.
 
-- **GLASH_BUILD_EXAMPLES:** Enables building of example projects (default: ON).
+- **Cine_BUILD_EXAMPLES:** Enables building of example projects (default: ON).
 
 ## Build Instructions
 Ensure that you have CMake (minimum version 3.20) installed on your system. To build the project, clone the repository and run the following commands:
 
 ```bash
-git clone https://github.com/yourusername/glash.git
-cd glash
+git clone https://github.com/yourusername/Cine.git
+cd Cine
 mkdir build
 cd build
 cmake ..
