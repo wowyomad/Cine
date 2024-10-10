@@ -56,6 +56,7 @@ namespace Cine
 
 		float cameraZoomLerp = std::min(1.0f, ts / m_CameraZoomTargetTime);
 		m_CameraZoom = std::lerp(m_CameraZoom, m_CameraZoomTarget, cameraZoomLerp);
+		m_CameraZoom = m_CameraZoomTarget;
 		m_Camera.SetProjection(-m_AspectRatio * m_CameraZoom, m_AspectRatio * m_CameraZoom, -m_CameraZoom, m_CameraZoom);
 
 		m_Camera.SetTransform(m_CameraPosition, m_CameraRotation);
