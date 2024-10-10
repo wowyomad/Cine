@@ -25,22 +25,32 @@ namespace Cine
 	{
 		CINE_PROFILE_FUNCTION();
 
+		glm::vec2 movement(0.0f);
+
 		if (Input::IsKeyPressed(Key::A))
 		{
-			m_CameraPosition.x -= CameraTranslatoinSpeed * m_CameraZoom * ts;
+			movement.x -= 1.0f;
 		}
 		if (Input::IsKeyPressed(Key::D))
 		{
-			m_CameraPosition.x += CameraTranslatoinSpeed * m_CameraZoom * ts;
+			movement.x += 1.0f;
 		}
 		if (Input::IsKeyPressed(Key::W))
 		{
-			m_CameraPosition.y += CameraTranslatoinSpeed * m_CameraZoom * ts;
+			movement.y += 1.0f;
 		}
 		if (Input::IsKeyPressed(Key::S))
 		{
-			m_CameraPosition.y -= CameraTranslatoinSpeed * m_CameraZoom * ts;
+			movement.y -= 1.0f;
 		}
+
+		if (glm::dot(movement, movement) > 0.0f)
+		{
+			movement = glm::normalize(movement);
+		}
+		float cos = std::cos(glm::radians(m_CameraRotation));
+		float sin = std::sin(glm::radians(m_CameraRotation));
+		m_CameraPosition += glm::vec3(movement.x * cos - movement.y * sin, movement.x * sin + movement.y * cos, 0.0f) * m_CameraZoom * ts.Seconds();
 
 		if (m_CanRotate)
 		{
@@ -56,7 +66,6 @@ namespace Cine
 
 		float cameraZoomLerp = std::min(1.0f, ts / m_CameraZoomTargetTime);
 		m_CameraZoom = std::lerp(m_CameraZoom, m_CameraZoomTarget, cameraZoomLerp);
-		m_CameraZoom = m_CameraZoomTarget;
 		m_Camera.SetProjection(-m_AspectRatio * m_CameraZoom, m_AspectRatio * m_CameraZoom, -m_CameraZoom, m_CameraZoom);
 
 		m_Camera.SetTransform(m_CameraPosition, m_CameraRotation);
@@ -65,6 +74,13 @@ namespace Cine
 	void OrthograhpicCameraController::SetTargetZoom(float targetZoom)
 	{
 		m_CameraZoomTarget = targetZoom;
+	}
+
+	void OrthograhpicCameraController::Reset()
+	{
+		m_CameraPosition = glm::vec3(0.0f);
+		m_CameraRotation = 0.0f;
+		m_CameraZoom = m_CameraZoomTarget = 1.0f;
 	}
 
 	bool OrthograhpicCameraController::OnMouseScrolled(MouseScrolledEvent& event)

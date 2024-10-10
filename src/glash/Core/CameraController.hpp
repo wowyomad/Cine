@@ -20,13 +20,15 @@ namespace Cine
 		inline void SetAspectRatio(float aspectRatio) { m_AspectRatio = aspectRatio; }
 		void SetTargetZoom(float targetZoom);
 
+		void Reset();
+
 	private:
 		bool OnMouseScrolled(MouseScrolledEvent& event);
 		bool OnWindowResized(WindowResizeEvent& event);
 
 
 	public:
-		float CameraRotationSpeed = 45.0f;
+		float CameraRotationSpeed = 90.0f;
 		float CameraTranslatoinSpeed = 2.0f;
 		float CameraZoomSpeed = 0.05f;
 

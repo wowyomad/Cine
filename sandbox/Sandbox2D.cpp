@@ -24,8 +24,8 @@ void Sandbox2D::OnUpdate(Cine::Timestep ts)
 
 
 	Cine::Renderer2D::BeginScene(m_CameraController.GetCamera());
-	Cine::Renderer2D::DrawQuad(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(1.0, 1.0f) * 500.0f, m_CheckerBoardTexture, 500.0f);
-	Cine::Renderer2D::DrawRotatedQuad(m_SquarePosition + glm::vec3(1.5f, 0.0f, 0.01f), m_SquareSize, m_SquareRotation, m_FaceTexture);
+	Cine::Renderer2D::DrawRotatedQuad(glm::vec3(0.0f, 0.0f, -0.1f), glm::vec2(1.0, 1.0f) * 500.0f, 45.0f, m_CheckerBoardTexture, 500.0f, {0.8f, 1.0f, 0.8f, 1.0f});
+	Cine::Renderer2D::DrawRotatedQuad(m_SquarePosition, m_SquareSize, m_SquareRotation, m_FaceTexture);
 	Cine::Renderer2D::EndScene();
 }
 
@@ -46,6 +46,13 @@ void Sandbox2D::OnImGuiRender()
 	if (ImGui::Checkbox("VSync", &m_VSync))
 	{
 		s_Application->GetWindow().SetVSync(m_VSync);
+	}
+	if (ImGui::Button("Reset"))
+	{
+		m_CameraController.Reset();
+		m_SquarePosition = glm::vec3(0.0f, 0.0f, 0.0f);
+		m_SquareRotation = 0.0f;
+		m_SquareSize = glm::vec2(1.0f, 1.0f);
 	}
 
 	ImGui::End();

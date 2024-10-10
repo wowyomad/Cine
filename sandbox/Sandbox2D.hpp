@@ -11,7 +11,7 @@ class Sandbox2D : public Cine::Layer
 {
 public:
 	Sandbox2D(Cine::Application* ptr) : Cine::Layer("Sandbox"),
-		m_CameraController(1.7778)
+		m_CameraController(1.7778, true)
 	{
 		s_Application = ptr;
 	};
