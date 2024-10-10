@@ -27,10 +27,13 @@ public:
 private:
 	Cine::OrthograhpicCameraController m_CameraController;
 
+	float m_SquareRotation = 0.0f;
 	glm::vec4 m_SquareColor = glm::vec4(0.4f, 0.2f, 0.7f, 1.0f);
 	glm::vec2 m_SquareSize = glm::vec2(1.0f);
 	glm::vec3 m_SquarePosition = glm::vec3(0.0f);
-	Cine::Ref<Cine::Texture2D> m_SquareTexture;
+	Cine::Ref<Cine::Texture2D> m_CheckerBoardTexture;
+	Cine::Ref<Cine::Texture2D> m_FaceTexture;
+
 
 	bool m_VSync = false;
 	Cine::Application* s_Application = nullptr;
