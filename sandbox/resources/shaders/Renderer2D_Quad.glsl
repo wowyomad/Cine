@@ -1,36 +1,34 @@
 #ifdef VERTEX
 
-in vec4 a_Position;
-in vec2 a_TexCoord;
+in layout (location=0) vec3 a_Position;
+in layout (location=1) vec4 a_Color;
+in layout (location=2) vec2 a_TexCoord;
 
-uniform vec4 u_Color;
-uniform mat4 u_Transform;
 uniform mat4 u_ViewProjection;
-uniform float u_Tiling;
 
-out vec2 f_TexCoord;
+out vec4 v_Color;
+out vec2 v_TexCoord;
 
 void main()
 {
-	gl_Position = u_ViewProjection * u_Transform * a_Position;
-	f_TexCoord = a_TexCoord * u_Tiling;
+	v_TexCoord = a_TexCoord;
+	v_Color = a_Color;
+	gl_Position = u_ViewProjection * vec4(a_Position, 1.0);
 }
 
 #endif
 
 #ifdef FRAGMENT
 
-in vec2 f_TexCoord;
+in vec4 v_Color;
+in vec2 v_TexCoord;
 
-uniform sampler2D u_Texture;
-uniform vec4 u_Color;
-
-out vec4 outColor;
+out vec4 o_Color;
 
 void main()
 {
-	vec4 texColor = texture(u_Texture, f_TexCoord);
-	outColor = texColor * u_Color;
+	// vec4 texColor = texture(u_Texture, f_TexCoord);
+	o_Color = v_Color;
 }
 
 #endif
