@@ -48,5 +48,3 @@ endif()
 
 set_target_properties(Sandbox PROPERTIES FOLDER "glash")
 set_target_properties(copy_textures copy_shaders PROPERTIES FOLDER "glash/Sandbox Commands")
-
-

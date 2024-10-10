@@ -7,7 +7,7 @@ set(GAME_ASSETS_SHADERS_DIR "${GAME_ASSETS_DIR}/shaders")
 set(GAME_ASSETS_OUT_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets")
 
 # Call the function with multiple directories and a single target
-copy_files_X("${GAME_ASSETS_OUT_DIR}" copy_game_assets "${GAME_ASSETS_TEXTURES_DIR}" "${GAME_ASSETS_SHADERS_DIR}")
+add_copy_target(copy_game_assets "${GAME_ASSETS_OUT_DIR}" "${GAME_ASSETS_TEXTURES_DIR}" "${GAME_ASSETS_SHADERS_DIR}")
 
 file(GLOB game_SOURCE "src/Game.cpp")
 
