@@ -101,7 +101,7 @@ public:
 		ImGui::ColorEdit4("Square 1", glm::value_ptr(m_SquareColor1));
 		ImGui::ColorEdit4("Square 2", glm::value_ptr(m_SquareColor2));
 
-		ImGui::SliderFloat("Camera Translation Speed", &m_CameraController.CameraTranslatoinSpeed, 0.1f, 10.0f);
+		ImGui::SliderFloat("Camera Translation Speed", &m_CameraController.CameraTranslatioSpeed, 0.1f, 10.0f);
 		ImGui::SliderFloat("Camera Rotation Speed", &m_CameraController.CameraRotationSpeed, 1.0f, 360.0f);
 
 		if (ImGui::Checkbox("VSync", &m_VSync))

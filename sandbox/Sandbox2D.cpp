@@ -36,22 +36,31 @@ void Sandbox2D::OnUpdate(Cine::Timestep ts)
 	float offsetStartY = -totalHeight / 2.0f;
 
 
-
 	Cine::Renderer2D::BeginScene(m_CameraController.GetCamera());
-	for (int y = 0; y < s_Rows; y++)
 	{
-		float offsetY = offsetStartY + y * (s_QuadSpacing + s_QuadSize);
-
-		for (int x = 0; x < s_Columns; x++)
+		CINE_PROFILE_SCOPE("Sending Quads");
+		for (int y = 0; y < s_Rows; y++)
 		{
-			float offsetX = offsetStartX + x * (s_QuadSpacing + s_QuadSize);
+			float offsetY = offsetStartY + y * (s_QuadSpacing + s_QuadSize);
 
-			float normalizedOffset = ((offsetX + offsetY) / 2.0f + (totalWidth / 2.0f + totalHeight / 2.0f)) / (totalWidth + totalHeight);
-			glm::vec4 color = glm::mix(s_ColorStart, s_ColorEnd, normalizedOffset);
+			for (int x = 0; x < s_Columns; x++)
+			{
+				float offsetX = offsetStartX + x * (s_QuadSpacing + s_QuadSize);
 
-			Cine::Renderer2D::DrawQuad({ offsetX, offsetY, 0.0f }, { s_QuadSize, s_QuadSize }, color);
+				float normalizedOffset = ((offsetX + offsetY) / 2.0f + (totalWidth / 2.0f + totalHeight / 2.0f)) / (totalWidth + totalHeight);
+				glm::vec4 color = glm::mix(s_ColorStart, s_ColorEnd, normalizedOffset);
+				if((y * s_Columns + x)  >=  s_Rows * s_Columns / 2)
+				{
+					Cine::Renderer2D::DrawQuad({ offsetX, offsetY, 0.0f }, { s_QuadSize, s_QuadSize }, color);
+				}
+				else
+				{
+					Cine::Renderer2D::DrawQuad({ offsetX, offsetY, 0.0f }, { s_QuadSize, s_QuadSize }, m_FaceTexture, 1.0f, glm::vec4(color.x + 0.25f, color.y + 0.25f, 1.0f, 1.0f));
+				}
+			}
 		}
 	}
+	
 	Cine::Renderer2D::EndScene();
 }
 
@@ -83,8 +92,10 @@ void Sandbox2D::OnImGuiRender()
 		s_QuadSize = 1.0f;
 		m_CameraController.SetTargetZoom(1.0f);
 	}
-	ImGui::Text("Draw Calls: %llu", Cine::Renderer2D::DrawCalls);
-	ImGui::Text("Quads: %llu", Cine::Renderer2D::QuadCount);
+
+	auto& stats = Cine::Renderer2D::GetStats();
+	ImGui::Text("Draw Calls: %llu", stats.DrawCalls);
+	ImGui::Text("Quads: %llu", stats.QuadCount);
 
 	ImGui::End();
 }

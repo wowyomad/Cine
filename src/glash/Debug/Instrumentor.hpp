@@ -1,3 +1,5 @@
+#define CINE_PROFILE 0
+
 #pragma once
 #include "glash/Core/Log.hpp"
 
@@ -200,6 +202,7 @@ namespace Cine {
 		}
 	}
 }
+
 #if CINE_PROFILE
 // Resolve which function signature macro will be used. Note that this only
 // is resolved when the (pre)compiler starts, so the syntax highlighting
