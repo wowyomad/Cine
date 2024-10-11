@@ -29,8 +29,8 @@ namespace Cine
 
 	public:
 		float CameraRotationSpeed = 90.0f;
-		float CameraTranslatoinSpeed = 2.0f;
-		float CameraZoomSpeed = 0.05f;
+		float CameraTranslatioSpeed = 2.0f;
+		float CameraZoomSpeed = 0.1f;
 
 	private:
 		bool m_CanRotate = false;
@@ -38,11 +38,13 @@ namespace Cine
 
 		glm::vec3 m_CameraPosition = glm::vec3(0.0f);
 		float m_CameraRotation = 0.0f;
+		float m_CameraTranslatioSpeedBoost = 10.0f;
 
 		float m_CameraZoom = 1.0f;
-		float m_CameraZoomMax = 0.1f;
+		float m_CameraZoomMin = 0.1f;
 		float m_CameraZoomTarget = m_CameraZoom;
 		float m_CameraZoomTargetTime = 0.1f;
+		float m_CameraZoomSpeedBoost = 10.0f;
 
 		OrthographicCamera m_Camera;
 	};

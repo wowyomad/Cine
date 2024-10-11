@@ -48,6 +48,12 @@ namespace Cine
 		{
 			movement = glm::normalize(movement);
 		}
+
+		if (Input::IsKeyPressed(Key::LeftShift))
+		{
+			movement *= m_CameraTranslatioSpeedBoost;
+		}
+
 		float cos = std::cos(glm::radians(m_CameraRotation));
 		float sin = std::sin(glm::radians(m_CameraRotation));
 		m_CameraPosition += glm::vec3(movement.x * cos - movement.y * sin, movement.x * sin + movement.y * cos, 0.0f) * m_CameraZoom * ts.Seconds();
@@ -85,8 +91,13 @@ namespace Cine
 
 	bool OrthograhpicCameraController::OnMouseScrolled(MouseScrolledEvent& event)
 	{
-		m_CameraZoomTarget -= event.GetVertical() * CameraZoomSpeed;
-		m_CameraZoomTarget = std::max(m_CameraZoomTarget, m_CameraZoomMax);
+		float scaleChange = -event.GetVertical() * CameraZoomSpeed;
+		if (Input::IsKeyPressed(Key::LeftShift))
+		{
+			scaleChange *= m_CameraZoomSpeedBoost;
+		}
+		m_CameraZoomTarget += scaleChange;
+		m_CameraZoomTarget = std::max(m_CameraZoomTarget, m_CameraZoomMin);
 
 		return false;
 	}
