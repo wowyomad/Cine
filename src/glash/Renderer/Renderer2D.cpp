@@ -8,6 +8,9 @@
 
 namespace Cine
 {
+	uint32_t Renderer2D::QuadCount = 0;
+	uint32_t Renderer2D::DrawCalls = 0;
+
 	struct QuadVertex
 	{
 		glm::vec3 Position;
@@ -17,9 +20,10 @@ namespace Cine
 
 	struct Renderer2DData
 	{
-		static const uint32_t MaxQuads = 20000;
+		static const uint32_t MaxQuads = 100000;
 		static const uint32_t MaxVertices = 4 * MaxQuads;
 		static const uint32_t MaxIndices = 6 * MaxQuads;
+
 
 		Ref<VertexArray> QuadVertexArray;
 		Ref<VertexBuffer> QuadVertexBuffer;
@@ -29,6 +33,7 @@ namespace Cine
 		uint32_t QuadIndexCount = 0;
 		QuadVertex* QuadVertexBufferBase;
 		QuadVertex* QuadVertexBufferPtr;
+
 	};
 
 	static Renderer2DData s_Data;
@@ -37,7 +42,7 @@ namespace Cine
 	{
 		s_Data.QuadVertexArray = VertexArray::Create();
 
-		s_Data.QuadVertexBuffer = VertexBuffer::Create(s_Data.MaxQuads * sizeof(QuadVertex));
+		s_Data.QuadVertexBuffer = VertexBuffer::Create(s_Data.MaxVertices * sizeof(QuadVertex));
 		s_Data.QuadVertexBuffer->SetLayout({
 			{ ShaderDataType::Float3, "a_Position" },
 			{ ShaderDataType::Float4, "a_Color"},
@@ -87,6 +92,9 @@ namespace Cine
 
 		s_Data.QuadIndexCount = 0;
 		s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
+
+		DrawCalls = 0;
+		QuadCount = 0;
 	}
 	void Renderer2D::EndScene()
 	{
@@ -102,6 +110,16 @@ namespace Cine
 
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
 	{
+	
+		if (s_Data.QuadIndexCount == s_Data.MaxIndices)
+		{
+			DrawCalls += 1;
+			EndScene();
+			s_Data.QuadIndexCount = 0;
+			s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
+			DrawQuad(position, size, color);
+		}
+
 		s_Data.QuadVertexBufferPtr->Position = position;
 		s_Data.QuadVertexBufferPtr->Color = color;
 		s_Data.QuadVertexBufferPtr->TexCoord = { 0.0f, 0.0 };
@@ -123,6 +141,8 @@ namespace Cine
 		s_Data.QuadVertexBufferPtr++;
 
 		s_Data.QuadIndexCount += 6;
+
+		QuadCount += 1;
 
 		return;
 

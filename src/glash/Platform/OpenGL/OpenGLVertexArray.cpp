@@ -33,7 +33,7 @@ namespace Cine
 	}
 	void OpenGLVertexArray::Bind()
 	{
-		glBindVertexArray(m_RendererID);
+		GLCall(glBindVertexArray(m_RendererID));
 	}
 	void OpenGLVertexArray::Unbind()
 	{

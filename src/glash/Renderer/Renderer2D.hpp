@@ -6,6 +6,7 @@
 
 namespace Cine
 {
+
 	class Renderer2D
 	{
 	public:
@@ -33,7 +34,9 @@ namespace Cine
 		static void DrawQuad(const glm::mat4& transform, const glm::vec4& color);
 		static void DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, float tiling = 1.0f, const glm::vec4& tintColor = glm::vec4(1.0f));
 
-
+	public:
+		static uint32_t QuadCount;
+		static uint32_t DrawCalls;
 
 	};
 }
