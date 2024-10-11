@@ -20,7 +20,7 @@ namespace Cine
 
 	struct Renderer2DData
 	{
-		static const uint32_t MaxQuads = 100000;
+		static const uint32_t MaxQuads = 20000;
 		static const uint32_t MaxVertices = 4 * MaxQuads;
 		static const uint32_t MaxIndices = 6 * MaxQuads;
 

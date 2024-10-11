@@ -5,7 +5,7 @@
 
 static int s_Rows = 10;
 static int s_Columns = 10;
-static float s_QuadSpacing = 1.25f;
+static float s_QuadSpacing = 0.1f;
 static float s_QuadSize = 1.0f;
 static glm::vec4 s_ColorStart = { 1.0f, 0.0f, 0.0f, 1.0f };
 static glm::vec4 s_ColorEnd = { 0.0f, 0.0f, 1.0f, 1.0f };
@@ -77,8 +77,11 @@ void Sandbox2D::OnImGuiRender()
 	}
 	if (ImGui::Button("Reset"))
 	{
-
+		s_Rows = 10;
+		s_Columns = 10;
+		s_QuadSpacing = 0.1f;
 		s_QuadSize = 1.0f;
+		m_CameraController.SetTargetZoom(1.0f);
 	}
 	ImGui::Text("Draw Calls: %llu", Cine::Renderer2D::DrawCalls);
 	ImGui::Text("Quads: %llu", Cine::Renderer2D::QuadCount);
