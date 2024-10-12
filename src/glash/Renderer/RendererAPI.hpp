@@ -5,6 +5,7 @@
 #include "glash/Core/Base.hpp"
 #include "glash/Renderer/Buffer.hpp"
 #include "glash/Renderer/VertexArray.hpp"
+#include "glash/Renderer/FrameBuffer.hpp"
 
 namespace Cine
 {
@@ -32,6 +33,7 @@ namespace Cine
 		virtual Ref<VertexBuffer> CreateVertexBufferEmpty(uint32_t size) = 0;
 		virtual Ref<IndexBuffer> CreateIndexBuffer(const uint32_t*, uint32_t size) = 0;
 		virtual Ref<VertexArray> CreateVertexArray() = 0;
+		virtual Ref<FrameBuffer> CreateFrameBuffer(const FrameBufferSpecification& specification) = 0;
 
 		static Ref<RendererAPI> Create();
 

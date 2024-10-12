@@ -82,7 +82,7 @@ namespace Cine
 
 	bool Application::OnWindowCloseEvent(WindowCloseEvent& event)
 	{
-		m_Running = false;
+		Close();
 
 		return false;
 	}
@@ -99,6 +99,7 @@ namespace Cine
 		}
 		return false;
 	}
+
 
 	void Application::Run()
 	{
@@ -157,6 +158,11 @@ namespace Cine
 
 			m_Window->OnUpdate();
 		}
+	}
+
+	void Application::Close()
+	{
+		m_Running = false;
 	}
 
 	ImGuiContext* Application::GetImGuiContext() const

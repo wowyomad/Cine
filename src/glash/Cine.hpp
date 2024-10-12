@@ -8,6 +8,7 @@
 #include "glash/Core/CameraController.hpp"
 #include "glash/Core/Timestep.hpp"
 
+#include "glash/Renderer/FrameBuffer.hpp"
 #include "glash/Renderer/Buffer.hpp"
 #include "glash/Renderer/Texture.hpp"
 #include "glash/Renderer/VertexArray.hpp"

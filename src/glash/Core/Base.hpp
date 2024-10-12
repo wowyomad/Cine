@@ -46,9 +46,12 @@
     #define BUILD_STR "STATIC BUILD"
 #endif
 
+#ifndef CINE_ENABLE_ASSERTS
+#define CINE_ENABLE_ASSERTS 1
+#endif
 #if CINE_ENABLE_ASSERTS
-    #define CINE_CORE_ASSERT(x, ...) { if(!(x)) { GLASH_CORE_ERROR("Assertion failed: {}", __VA_ARGS__); DEBUG_BREAK; } }
-    #define CINE_ASSERT(x, ...) { if(!(x)) { GLASH_LOG_ERROR("Assertion failed: {}", __VA_ARGS__); DEBUG_BREAK; } }
+    #define CINE_CORE_ASSERT(x, ...) { if(!(x)) { CINE_CORE_ERROR("Assertion failed: {}", __VA_ARGS__); DEBUG_BREAK; } }
+    #define CINE_ASSERT(x, ...) { if(!(x)) { CINE_LOG_ERROR("Assertion failed: {}", __VA_ARGS__); DEBUG_BREAK; } }
 #else
     #define CINE_CORE_ASSERT(x, ...)
     #define CINE_ASSERT(x, ...)

@@ -2,6 +2,7 @@
 #include "glash/Platform/OpenGL/OpenGLRendererAPI.hpp"
 #include "glash/Platform/OpenGL/OpenGLVertexArray.hpp"
 #include "glash/Platform/OpenGL/OpenGLBuffer.hpp"
+#include "glash/Platform/OpenGL/OpenGLFrameBufer.hpp"
 
 namespace Cine
 {
@@ -24,12 +25,19 @@ namespace Cine
 		return CreateRef<OpenGLVertexArray>();
 	}
 
+	Ref<FrameBuffer> OpenGLRendererAPI::CreateFrameBuffer(const FrameBufferSpecification& specification)
+	{
+		return CreateRef<OpenGLFrameBuffer>(specification);
+	}
+
 	void Cine::OpenGLRendererAPI::Init()
 	{
 		//TODO: enable logging here
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		glEnable(GL_DEPTH_TEST);
 
 		//glEnable(GL_LINE_SMOOTH);
 	}
@@ -43,6 +51,7 @@ namespace Cine
 	}
 	void OpenGLRendererAPI::Clear()
 	{
+		GLCall(glClearColor(0.15f, 0.15f, 0.15f, 1.0f));
 		GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 	}
 	void OpenGLRendererAPI::DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount)

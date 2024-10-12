@@ -58,6 +58,7 @@ namespace Cine
 
 		GLASH_API static Application& Get();
 		GLASH_API Window& GetWindow();
+		GLASH_API void Close();
 
 	private:
 		GLASH_API bool OnWindowCloseEvent(WindowCloseEvent& event);
