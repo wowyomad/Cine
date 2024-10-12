@@ -141,8 +141,9 @@ namespace Cine
 				Input::ClearKeyStates();
 			}
 
-
+#if CINE_IMGUI
 			{
+
 				CINE_PROFILE_SCOPE("ImGui Render");
 
 				m_ImGuiLayer->Begin();
@@ -152,6 +153,7 @@ namespace Cine
 				}
 				m_ImGuiLayer->End();
 			}
+#endif
 
 			m_Window->OnUpdate();
 		}

@@ -3,8 +3,8 @@
 #include "glash/Core/Timer.hpp"
 #include "glash/Debug/Instrumentor.hpp"
 
-static int s_Rows = 10;
-static int s_Columns = 10;
+static int s_Rows = 500;
+static int s_Columns = 500;
 static float s_QuadSpacing = 0.1f;
 static float s_QuadSize = 1.0f;
 static glm::vec4 s_ColorStart = { 1.0f, 0.0f, 0.0f, 1.0f };
@@ -49,14 +49,15 @@ void Sandbox2D::OnUpdate(Cine::Timestep ts)
 
 				float normalizedOffset = ((offsetX + offsetY) / 2.0f + (totalWidth / 2.0f + totalHeight / 2.0f)) / (totalWidth + totalHeight);
 				glm::vec4 color = glm::mix(s_ColorStart, s_ColorEnd, normalizedOffset);
-				if((y * s_Columns + x)  >=  s_Rows * s_Columns / 2)
+				Cine::Renderer2D::DrawQuad({ offsetX, offsetY, 0.0f }, { s_QuadSize, s_QuadSize }, color);
+				/*if((y * s_Columns + x)  >=  s_Rows * s_Columns / 2)
 				{
 					Cine::Renderer2D::DrawQuad({ offsetX, offsetY, 0.0f }, { s_QuadSize, s_QuadSize }, color);
 				}
 				else
 				{
 					Cine::Renderer2D::DrawQuad({ offsetX, offsetY, 0.0f }, { s_QuadSize, s_QuadSize }, m_FaceTexture, 1.0f, glm::vec4(color.x + 0.25f, color.y + 0.25f, 1.0f, 1.0f));
-				}
+				}*/
 			}
 		}
 	}
