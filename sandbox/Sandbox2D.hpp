@@ -33,6 +33,8 @@ private:
 	glm::vec3 m_SquarePosition = glm::vec3(0.0f);
 	Cine::Ref<Cine::Texture2D> m_CheckerBoardTexture;
 	Cine::Ref<Cine::Texture2D> m_FaceTexture;
+	Cine::Ref<Cine::Texture2D> m_SpriteSheet;
+	Cine::Ref<Cine::SubTexture2D> m_Sprite;
 
 
 	bool m_VSync = false;

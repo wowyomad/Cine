@@ -1,4 +1,5 @@
 #pragma once
+#define CINE_IMGUI 1
 #include "glash/glash_pch.hpp"
 
 #include "glash/Core/Base.hpp"

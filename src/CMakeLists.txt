@@ -29,7 +29,6 @@ file(GLOB HEADERS
     "${glash_SOURCE_DIR}/Core/*.hpp"
     "${glash_SOURCE_DIR}/Renderer/*.hpp"
     "${glash_SOURCE_DIR}/Debug/*.hpp"
-
 )
 if(GLASH_ENABLE_DEBUG)
     list(APPEND GLASH_COMPILE_DEFINITIONS GLASH_ENABLE_DEBUG)
@@ -47,7 +46,7 @@ endif()
 message("Glash build type: ${GLASH_LIB_TYPE}")
 message("Glash compile definitions: ${GLASH_COMPILE_DEFINITIONS}")
 
-add_library(glash_pch STATIC ${GLASH_PCH_HEADER_CPP})
+add_library(glash_pch STATIC ${GLASH_PCH_HEADER_CPP} )
 target_include_directories(glash_pch
 PUBLIC ${glash_SOURCE_DIR}
 PUBLIC ${glad_SOURCE_DIR}/include
@@ -56,7 +55,7 @@ PUBLIC ${glm_SOURCE_DIR}
 )
 target_precompile_headers(glash_pch PUBLIC ${GLASH_PCH_HEADER})
 
-add_library(glash ${GLASH_LIB_TYPE} ${SOURCES} ${HEADERS})
+add_library(glash ${GLASH_LIB_TYPE} ${SOURCES} ${HEADERS} )
 target_compile_definitions(glash PRIVATE ${GLASH_COMPILE_DEFINITIONS})
 
 target_precompile_headers(glash REUSE_FROM glash_pch)

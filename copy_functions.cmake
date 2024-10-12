@@ -18,11 +18,17 @@ function(add_copy_target TARGET_NAME DEST_DIR)
     set(SRC_DIRS ${ARGN})
     set(COPY_TARGETS)
 
-    # Check if the generator supports multi-configurations
+    # Determine the configuration directory based on the generator
     if(CMAKE_CONFIGURATION_TYPES)
-        # Replace $<CONFIG> with CMAKE_CFG_INTDIR for multi-config generators (e.g., MSVC)
-        string(REPLACE "$<CONFIG>" "${CMAKE_CFG_INTDIR}" DEST_DIR ${DEST_DIR})
+        # Multi-config generator (e.g., Visual Studio)
+        set(CONFIG_DIR "${CMAKE_CFG_INTDIR}")
+    else()
+        # Single-config generator (e.g., Ninja)
+        set(CONFIG_DIR "${CMAKE_BUILD_TYPE}")
     endif()
+
+    # Replace any instance of $<CONFIG> in DEST_DIR with the determined config directory
+    string(REPLACE "$<CONFIG>" "${CONFIG_DIR}" DEST_DIR ${DEST_DIR})
 
     foreach(SRC_DIR ${SRC_DIRS})
         file(GLOB_RECURSE FILE_LIST "${SRC_DIR}/*")  # Get all files from the source directory

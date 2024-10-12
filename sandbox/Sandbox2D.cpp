@@ -1,10 +1,11 @@
+
 #include "Sandbox2D.hpp"
 
 #include "glash/Core/Timer.hpp"
 #include "glash/Debug/Instrumentor.hpp"
 
-static int s_Rows = 500;
-static int s_Columns = 500;
+static int s_Rows = 10;
+static int s_Columns = 10;
 static float s_QuadSpacing = 0.1f;
 static float s_QuadSize = 1.0f;
 static glm::vec4 s_ColorStart = { 1.0f, 0.0f, 0.0f, 1.0f };
@@ -14,6 +15,8 @@ void Sandbox2D::OnAttach()
 {
 	m_CheckerBoardTexture = Cine::Texture2D::Create("resources/textures/checkerboard.png");
 	m_FaceTexture = Cine::Texture2D::Create("resources/textures/face.png");
+	m_SpriteSheet = Cine::Texture2D::Create("resources/textures/SpriteSheet_Sample.png");
+	m_Sprite = Cine::SubTexture2D::CreateFromCoords(m_SpriteSheet, { 14, 3 }, { 128, 128 });
 }
 
 void Sandbox2D::OnDetach()
@@ -38,6 +41,8 @@ void Sandbox2D::OnUpdate(Cine::Timestep ts)
 
 	Cine::Renderer2D::BeginScene(m_CameraController.GetCamera());
 	{
+		Cine::Renderer2D::DrawQuad({ 0.0f, 0.0f, 0.0f }, { s_QuadSize * 2, s_QuadSize * 2 }, m_Sprite);
+#if 0
 		CINE_PROFILE_SCOPE("Sending Quads");
 		for (int y = 0; y < s_Rows; y++)
 		{
@@ -60,6 +65,7 @@ void Sandbox2D::OnUpdate(Cine::Timestep ts)
 				}*/
 			}
 		}
+#endif
 	}
 	
 	Cine::Renderer2D::EndScene();
@@ -91,7 +97,7 @@ void Sandbox2D::OnImGuiRender()
 		s_Columns = 10;
 		s_QuadSpacing = 0.1f;
 		s_QuadSize = 1.0f;
-		m_CameraController.SetTargetZoom(1.0f);
+		m_CameraController.Reset();
 	}
 
 	auto& stats = Cine::Renderer2D::GetStats();

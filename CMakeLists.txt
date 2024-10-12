@@ -76,7 +76,6 @@ endif()
 if (GLASH_BUILD_SANDDOX)
     add_subdirectory(sandbox)
 endif()
-add_subdirectory(game)
 
 if(MSVC)
     message("Adding compile options for MSVC")
