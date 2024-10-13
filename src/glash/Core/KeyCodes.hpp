@@ -9,6 +9,7 @@ namespace Cine
 	{
 		enum : KeyCode
 		{
+			//mimic glfw keycodes
 			Space = 32,
 			Apostrophe = 39,	/* ' */
 			Comma = 44,			/* , */

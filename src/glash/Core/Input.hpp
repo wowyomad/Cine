@@ -41,12 +41,12 @@ namespace Cine
 		static bool IsKeyUp(KeyCode keycode);
 		static void SetKey(KeyCode keycode, KeyState state);
 
-		static void ClearStates();
-
 		static bool IsMouseButtonPressed(MouseCode mousecode);
 		static bool IsMouseButtonUp(MouseCode mousecode);
 		static bool IsMouseButtonDown(MouseCode mousecode);
 		static void SetMouseButton(MouseCode mousecode, KeyState state);
+
+		static void ClearStates();
 
 		static glm::vec2 GetMousePosition();
 		static std::pair<float, float> GetMouseXY();

@@ -30,8 +30,33 @@ namespace Cine
 			RenderCommand::Clear();
 			static float rotation = 0.0f;
 			rotation += ts * 15.0f;
-			Renderer2D::DrawRotatedQuad({ 0.0f, 0.0f, 0.0f }, { 10.0f, 10.0f }, glm::radians(rotation),  m_CheckerboardTexture, 25.0f);
+
+			Renderer2D::DrawRotatedQuad({ 0.0f, 0.0f, 0.0f }, { 10.0f, 10.0f }, glm::radians(rotation), m_CheckerboardTexture, 25.0f);
 			Renderer2D::DrawRotatedQuad({ 0.0f, 0.0f, 0.0f }, { 10.0f, 10.0f }, glm::radians(-rotation), m_CheckerboardTexture, 25.0f);
+
+			Renderer2D::DrawRotatedQuad({ 0.0f, 10.0f, 0.0f }, { 10.0f, 10.0f }, glm::radians(rotation), m_CheckerboardTexture, 25.0f);
+			Renderer2D::DrawRotatedQuad({ 0.0f, 10.0f, 0.0f }, { 10.0f, 10.0f }, glm::radians(-rotation), m_CheckerboardTexture, 25.0f);
+
+			Renderer2D::DrawRotatedQuad({ 10.0f, 0.0f, 0.0f }, { 10.0f, 10.0f }, glm::radians(rotation), m_CheckerboardTexture, 25.0f);
+			Renderer2D::DrawRotatedQuad({ 10.0f, 0.0f, 0.0f }, { 10.0f, 10.0f }, glm::radians(-rotation), m_CheckerboardTexture, 25.0f);
+
+			Renderer2D::DrawRotatedQuad({ 10.0f, 10.0f, 0.0f }, { 10.0f, 10.0f }, glm::radians(rotation), m_CheckerboardTexture, 25.0f);
+			Renderer2D::DrawRotatedQuad({ 10.0f, 10.0f, 0.0f }, { 10.0f, 10.0f }, glm::radians(-rotation), m_CheckerboardTexture, 25.0f);
+
+			Renderer2D::DrawRotatedQuad({ 10.0f, -10.0f, 0.0f }, { 10.0f, 10.0f }, glm::radians(rotation), m_CheckerboardTexture, 25.0f);
+			Renderer2D::DrawRotatedQuad({ 10.0f, -10.0f, 0.0f }, { 10.0f, 10.0f }, glm::radians(-rotation), m_CheckerboardTexture, 25.0f);
+
+			Renderer2D::DrawRotatedQuad({ 0.0f, -10.0f, 0.0f }, { 10.0f, 10.0f }, glm::radians(rotation), m_CheckerboardTexture, 25.0f);
+			Renderer2D::DrawRotatedQuad({ 0.0f, -10.0f, 0.0f }, { 10.0f, 10.0f }, glm::radians(-rotation), m_CheckerboardTexture, 25.0f);
+
+			Renderer2D::DrawRotatedQuad({ -10.0f, 0.0f, 0.0f }, { 10.0f, 10.0f }, glm::radians(rotation), m_CheckerboardTexture, 25.0f);
+			Renderer2D::DrawRotatedQuad({ -10.0f, 0.0f, 0.0f }, { 10.0f, 10.0f }, glm::radians(-rotation), m_CheckerboardTexture, 25.0f);
+
+			Renderer2D::DrawRotatedQuad({ -10.0f, 10.0f, 0.0f }, { 10.0f, 10.0f }, glm::radians(rotation), m_CheckerboardTexture, 25.0f);
+			Renderer2D::DrawRotatedQuad({ -10.0f, 10.0f, 0.0f }, { 10.0f, 10.0f }, glm::radians(-rotation), m_CheckerboardTexture, 25.0f);
+
+			Renderer2D::DrawRotatedQuad({ -10.0f, -10.0f, 0.0f }, { 10.0f, 10.0f }, glm::radians(rotation), m_CheckerboardTexture, 25.0f);
+			Renderer2D::DrawRotatedQuad({ -10.0f, -10.0f, 0.0f }, { 10.0f, 10.0f }, glm::radians(-rotation), m_CheckerboardTexture, 25.0f);
 
 		}
 		Renderer2D::EndScene();
