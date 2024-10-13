@@ -6,42 +6,47 @@
 ## Library Dependencies
 This project relies on the following external libraries, which are fetched, built, and linked automatically using CMake's `FetchContent` module:
 
-1. **glad (Vulkan/GL/GLES/EGL/GLX/WGL Loader-Generator based on the official specifications for multiple languages.)**
+1. **EnTT (Entity-Component-System Library for Game Development)**
+   - **Repository:** [EnTT](https://github.com/skypjack/entt.git)
+   - **Version:** 3.13.2
+   - **Build Configuration:** Header-only library.
+
+2. **glad (Vulkan/GL/GLES/EGL/GLX/WGL Loader-Generator based on the official specifications for multiple languages.)**
    - **Repository:** [glad](https://github.com/Dav1dde/glad.git)
    - **Version:** 2.0.7
    - **Build Configuration:** Built as a static library.
 
-2. **GLFW (Graphics Library Framework)**
+3. **GLFW (Graphics Library Framework)**
    - **Repository:** [glfw](https://github.com/glfw/glfw.git)
    - **Version:** 3.4
    - **Build Configuration:** Built as a static library.
 
-3. **fmt (Formatting Library)**
+4. **fmt (Formatting Library)**
    - **Repository:** [fmtlib](https://github.com/fmtlib/fmt.git)
    - **Version:** 11.0.2
    - **Build Configuration:** Built as a static library.
 
-4. **GLM (OpenGL Mathematics)**
+5. **GLM (OpenGL Mathematics)**
    - **Repository:** [glm](https://github.com/g-truc/glm.git)
    - **Version:** 1.0.1
    - **Build Configuration:** Header-only library.
 
-5. **spdlog (Logging Library)**
+6. **spdlog (Logging Library)**
    - **Repository:** [spdlog](https://github.com/gabime/spdlog.git)
    - **Version:** 1.14.1
    - **Build Configuration:** Built as a static library.
 
-6. **stb (Single-file public domain libraries for C/C++)**
+7. **stb (Single-file public domain libraries for C/C++)**
    - **Repository:** [stb](https://github.com/nothings/stb.git)
    - **Version:** Latest commit (f75e8d1cad7d90d72ef7a4661f1b994ef78b4e31)
    - **Build Configuration:** Header-only library.
 
-7. **ImGui (Immediate Mode GUI)**
+8. **ImGui (Immediate Mode GUI)**
    - **Repository:** [imgui](https://github.com/ocornut/imgui.git)
    - **Version:** 1.91.2
    - **Build Configuration:** Built as a static library.
 
-8. **OpenGL**
+9. **OpenGL**
    - **Required Package:** OpenGL (automatically found by CMake).
 
 ## CMake Options
