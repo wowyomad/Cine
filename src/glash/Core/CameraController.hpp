@@ -14,11 +14,14 @@ namespace Cine
 		void OnEvent(Event& event);
 		void OnUpdate(Timestep ts);
 
+		void OnResize(float width, float heigh);
+
 		const OrthographicCamera& GetCamera() const { return m_Camera; }
 		OrthographicCamera& GetCamera() { return m_Camera; }
 
 		inline void SetAspectRatio(float aspectRatio) { m_AspectRatio = aspectRatio; }
 		void SetTargetZoom(float targetZoom);
+
 
 		void Reset();
 

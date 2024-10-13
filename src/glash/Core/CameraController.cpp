@@ -21,6 +21,8 @@ namespace Cine
 		dispatcher.Dispatch<WindowResizeEvent>(CINE_BIND_EVENT_FN(OrthograhpicCameraController::OnWindowResized));
 	}
 
+
+
 	void OrthograhpicCameraController::OnUpdate(Timestep ts)
 	{
 		CINE_PROFILE_FUNCTION();
@@ -104,9 +106,15 @@ namespace Cine
 
 	bool OrthograhpicCameraController::OnWindowResized(WindowResizeEvent& event)
 	{
-		m_AspectRatio = (float)event.GetWidth() / (float)event.GetHeight();
-		m_Camera.SetProjection(-m_AspectRatio * m_CameraZoom, m_AspectRatio * m_CameraZoom, -m_CameraZoom, m_CameraZoom);
-
+		OnResize(event.GetWidth(), event.GetHeight());
 		return false;
 	}
+	
+	void OrthograhpicCameraController::OnResize(float width, float height)
+	{
+		m_AspectRatio = width / height;
+		m_Camera.SetProjection(-m_AspectRatio * m_CameraZoom, m_AspectRatio * m_CameraZoom, -m_CameraZoom, m_CameraZoom);
+	}
+
+
 }

@@ -43,13 +43,23 @@ namespace Cine
 
 		ImGui::Begin("Editor");
 		{
-
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0.0f, 0.0f });
 			ImGui::Begin("Viewport");
 			{
+				ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
+				glm::vec2 viewportSize = { viewportPanelSize.x, viewportPanelSize.y };
+				if (viewportSize != m_ViewportSize)
+				{
+					m_ViewportSize = viewportSize;
+					m_FrameBuffer->Resize(static_cast<uint32_t>(m_ViewportSize.x), static_cast<uint32_t>(m_ViewportSize.y));
+					m_CameraController->OnResize(m_ViewportSize.x, m_ViewportSize.y);
+				}
 				size_t id = m_FrameBuffer->GetColorAttachmentRendererID();
-				ImGui::Image(reinterpret_cast<void*>(id), { 1280, 720 }, { 0, 1 }, { 1, 0 });
+				ImGui::Image(reinterpret_cast<void*>(id), { m_ViewportSize.x, m_ViewportSize.y }, { 0, 1 }, { 1, 0 });
+
 			}
 			ImGui::End();
+			ImGui::PopStyleVar(1);
 
 			ImGui::Checkbox("Docking", &m_DockingEnabled);
 			if (ImGui::Button("Close"))
