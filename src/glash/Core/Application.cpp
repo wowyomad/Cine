@@ -113,7 +113,6 @@ namespace Cine
 
 			if (!m_Minimized)
 			{
-				m_Window->SetTitle(std::to_string(deltaTime.Milleseconds()));
 				m_TickAccumulator += deltaTime;
 
 

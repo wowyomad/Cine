@@ -32,10 +32,9 @@ namespace Cine
 		* pointer is passed to the client. 
 		* Otherwise, the client would have NULL in ImGui context. That's a feature🥴
 		*/
-		Application()
+		Application(const std::string& title = "Cine Application")
 			: Application(0)
 		{
-			CINE_CORE_TRACE(BUILD_STR);
 			ImGuiContext* p_context = GetImGuiContext();
 			ImGuiContext* this_context = ImGui::GetCurrentContext();
 
@@ -43,6 +42,7 @@ namespace Cine
 			{
 				ImGui::SetCurrentContext(p_context);
 			}
+			m_Window->SetTitle(title);
 		}
 		GLASH_API virtual ~Application() {  };
 

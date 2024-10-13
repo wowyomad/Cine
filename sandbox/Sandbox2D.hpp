@@ -28,8 +28,8 @@ private:
 	Cine::Ref<Cine::Texture2D> m_FaceTexture;
 	Cine::Ref<Cine::Texture2D> m_SpriteSheet;
 
-	Cine::Ref<Cine::FrameBuffer> m_FrameBuffer;
-
 	bool m_VSync = false;
 	Cine::Application* s_Application = nullptr;
+
+	float m_LastFrameTime = 0.0f;
 };

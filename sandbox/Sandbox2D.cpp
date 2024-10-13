@@ -14,11 +14,6 @@ static glm::vec4 s_ColorEnd = { 0.0f, 0.0f, 1.0f, 1.0f };
 
 void Sandbox2D::OnAttach()
 {
-	Cine::FrameBufferSpecification spec;
-	spec.Width = 1280;
-	spec.Height = 720;
-	m_FrameBuffer = Cine::FrameBuffer::Create(spec);
-
 	m_CheckerBoardTexture = Cine::Texture2D::Create("resources/textures/checkerboard.png");
 	m_FaceTexture = Cine::Texture2D::Create("resources/textures/face.png");
 	m_SpriteSheet = Cine::Texture2D::Create("resources/textures/SpriteSheet_Sample.png");
@@ -34,8 +29,6 @@ void Sandbox2D::OnUpdate(Cine::Timestep ts)
 	CINE_PROFILE_FUNCTION();
 
 	Cine::RenderCommand::Clear();
-	m_FrameBuffer->Bind();
-
 	Cine::Renderer2D::ResetStats();
 
 	m_CameraController.OnUpdate(ts);
@@ -45,7 +38,6 @@ void Sandbox2D::OnUpdate(Cine::Timestep ts)
 
 	float offsetStartX = -totalWidth / 2.0f + s_QuadSize / 2.0f;
 	float offsetStartY = -totalHeight / 2.0f + s_QuadSize / 2.0f;
-
 
 	Cine::Renderer2D::BeginScene(m_CameraController.GetCamera());
 	{
@@ -74,7 +66,7 @@ void Sandbox2D::OnUpdate(Cine::Timestep ts)
 	}
 	Cine::Renderer2D::EndScene();
 
-	m_FrameBuffer->Unbind();
+	m_LastFrameTime = ts;
 }
 
 void Sandbox2D::OnEvent(Cine::Event& event)
@@ -85,13 +77,6 @@ void Sandbox2D::OnEvent(Cine::Event& event)
 void Sandbox2D::OnImGuiRender()
 {
 	CINE_PROFILE_FUNCTION();
-
-	static bool dockingEnabled = true;
-
-	if (dockingEnabled)
-	{
-		ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
-	}
 
 	ImGui::Begin("Sandbox");
 	ImGui::DragInt("Rows", &s_Rows, 1.0f, 1, 100'000'000);
@@ -104,10 +89,7 @@ void Sandbox2D::OnImGuiRender()
 	{
 		s_Application->GetWindow().SetVSync(m_VSync);
 	}
-	if (ImGui::Checkbox("Docking", &dockingEnabled))
-	{
-		
-	}
+	
 	if (ImGui::Button("Reset"))
 	{
 		s_Rows = 10;
@@ -116,12 +98,11 @@ void Sandbox2D::OnImGuiRender()
 		s_QuadSize = 1.0f;
 		m_CameraController.Reset();
 	}
-	uint32_t id = m_FrameBuffer->GetColorAttachmentRendererID();
-	ImGui::Image((void*)id, ImVec2(1280, 720), {0, 1}, {1, 0});
 
 	auto& stats = Cine::Renderer2D::GetStats();
 	ImGui::Text("Draw Calls: %llu", stats.DrawCalls);
 	ImGui::Text("Quads: %llu", stats.QuadCount);
+	ImGui::Text("Frametime: %.3f", m_LastFrameTime * 1000.0f);
 
 	ImGui::End();
 }

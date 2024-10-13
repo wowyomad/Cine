@@ -70,6 +70,7 @@ set(glad_SOURCE_DIR ${VENDOR_DIR}/glad)
 
 add_subdirectory(src)
 add_subdirectory(vendor)
+add_subdirectory("Cine Editor")
 if (GLASH_BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()

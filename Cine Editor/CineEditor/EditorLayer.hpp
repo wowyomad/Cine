@@ -1,0 +1,23 @@
+#include "glash/Cine.hpp"
+
+namespace Cine
+{
+	class EditorLayer : public Layer
+	{
+	public:
+		EditorLayer() : Layer("Cine Editor") {}
+
+		void OnAttach() override;
+		void OnUpdate(Timestep ts) override;
+		void OnEvent(Event& event) override;
+		void OnImGuiRender() override;
+
+	private:
+		
+		bool m_DockingEnabled = true;
+		Ref<OrthograhpicCameraController> m_CameraController;
+
+		Ref<FrameBuffer> m_FrameBuffer;
+		Ref<Texture2D> m_CheckerboardTexture;
+	};
+}
