@@ -27,11 +27,11 @@ namespace Cine
 	Input::KeyState Input::MouseButtonStates[32]{};
 
 
-	KeyCode Input::ToGlashKey(Input::PlatformKey glfwKeyCode)
+	KeyCode Input::ToCineKey(Input::PlatformKey glfwKeyCode)
 	{
 		return Input::GlashKeys[glfwKeyCode];
 	}
-	MouseCode Input::ToGlashMouse(PlatformMouse glfwMouseCode)
+	MouseCode Input::ToCineMouse(PlatformMouse glfwMouseCode)
 	{
 		return Input::GlashMouseButtons[glfwMouseCode];
 	}
@@ -67,17 +67,32 @@ namespace Cine
 		KeyStates[keycode] = state;
 	}
 
-	void Input::ClearKeyStates()
+	void Input::ClearStates()
 	{
 		std::memset(KeyStates, static_cast<int>(KeyState::Idle), sizeof(KeyStates));
+		std::memset(MouseButtonStates, static_cast<int>(KeyState::Idle), sizeof(MouseButtonStates));
 	}
-
 
 	bool Input::IsMouseButtonPressed(const MouseCode mouse)
 	{
 		GLFWwindow* window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
 		int state = glfwGetMouseButton(window, ToPlatformMouseButton(mouse));
 		return state == GLFW_PRESS;
+	}
+
+	bool Input::IsMouseButtonUp(MouseCode mousecode)
+	{
+		return MouseButtonStates[mousecode] == KeyState::Up;
+	}
+
+	bool Input::IsMouseButtonDown(MouseCode mousecode)
+	{
+		return MouseButtonStates[mousecode] == KeyState::Down;
+	}
+
+	void Input::SetMouseButton(MouseCode mousecode, KeyState state)
+	{
+		MouseButtonStates[mousecode] = state;
 	}
 
 	glm::vec2 Input::GetMousePosition()

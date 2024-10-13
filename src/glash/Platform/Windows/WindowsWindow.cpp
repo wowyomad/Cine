@@ -158,7 +158,7 @@ namespace Cine
 		glfwSetKeyCallback(m_Window, [](GLFWwindow* window, int glfwKey, int scancode, int action, int mods)
 			{
 				WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
-				KeyCode key = Input::ToGlashKey(glfwKey);
+				KeyCode key = Input::ToCineKey(glfwKey);
 
 				switch (action)
 				{
@@ -191,17 +191,19 @@ namespace Cine
 		glfwSetMouseButtonCallback(m_Window, [](GLFWwindow* window, int glfwButton, int action, int mods)
 			{
 				WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
-				MouseCode button = Input::ToGlashMouse(glfwButton);
+				MouseCode button = Input::ToCineMouse(glfwButton);
 
 				switch (action)
 				{
 				case GLFW_RELEASE:
 				{
+					Input::SetMouseButton(button, Input::KeyState::Up);
 					MouseButtonReleasedEvent event(button);
 					data.EventCallback(event);
 				} break;
 				case GLFW_PRESS:
 				{
+					Input::SetMouseButton(button, Input::KeyState::Down);
 					MouseButtonPressedEvent event(button);
 					data.EventCallback(event);
 				} break;

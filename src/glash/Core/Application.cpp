@@ -138,7 +138,7 @@ namespace Cine
 					}
 				}
 
-				Input::ClearKeyStates();
+				Input::ClearStates();
 			}
 
 #if CINE_IMGUI
