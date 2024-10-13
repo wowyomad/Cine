@@ -47,12 +47,12 @@ namespace Cine
 			return GetCategoryFlags() & category;
 		}
 
-		inline bool IsHandled() const { return m_Handled;  }
+		inline bool IsHandled() const { return Handled;  }
 
 		inline static EventType GetStaticEventType() { return EventType::None; }
 
-	protected:
-		bool m_Handled = false;
+	public:
+		bool Handled = false;
 	};
 
 	template <typename T>
@@ -73,7 +73,7 @@ namespace Cine
 		{
 			if (m_Event.GetEventType() == T::GetStaticEventType())
 			{
-				m_Event.m_Handled |= func(static_cast<T&>(m_Event));
+				m_Event.Handled |= func(static_cast<T&>(m_Event));
 				return true;
 			}
 			return false;

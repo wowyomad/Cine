@@ -19,10 +19,14 @@ namespace Cine
 
 		void OnAttach() override final;
 		void OnDetach() override final;
-		void OnImGuiRender() override final;
+		void OnEvent(Event& e) override final;
+
+		void SetBlockEvents(bool blockEvents);
 
 		void Begin();
 		void End();
 		 
+	private:
+		bool m_BlockEvents = false;
 	};
 }

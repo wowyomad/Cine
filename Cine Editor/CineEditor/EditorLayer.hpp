@@ -21,5 +21,7 @@ namespace Cine
 		Ref<Texture2D> m_CheckerboardTexture;
 
 		glm::vec2 m_ViewportSize = { 1280.0f, 720.0f };
+		bool m_ViewportFocused = false;
+		bool m_ViewportHovered = false;
 	};
 }

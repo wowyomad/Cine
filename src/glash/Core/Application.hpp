@@ -52,6 +52,7 @@ namespace Cine
 		GLASH_API void PushLayer(Layer* layer);
 		GLASH_API void PushOverlay(Layer* overlay);
 
+		GLASH_API ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
 		GLASH_API ImGuiContext* GetImGuiContext() const;
 		GLASH_API void GetAllocatorFunctions(ImGuiMemAllocFunc* p_alloc_func, ImGuiMemFreeFunc* p_free_func, void** p_user_data) const;
 

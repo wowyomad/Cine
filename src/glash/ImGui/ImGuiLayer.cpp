@@ -68,13 +68,25 @@ namespace Cine
 		ImGui::DestroyContext();
 	}
 
-	void Cine::ImGuiLayer::OnImGuiRender()
+	void ImGuiLayer::OnEvent(Event& e)
 	{
-		static bool show = false;
-		if (show)
+		if (m_BlockEvents)
 		{
-			ImGui::ShowDemoWindow(&show);
+			ImGuiIO& io = ImGui::GetIO();
+			e.Handled |= e.IsInCategory(EventCategoryMouse) & io.WantCaptureMouse;
+			e.Handled |= e.IsInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;
+			bool handled = e.Handled;
+			if (handled)
+			{
+				CINE_CORE_INFO("Event handled by ImGui");
+			}
+
 		}
+	}
+
+	void ImGuiLayer::SetBlockEvents(bool blockEvents)
+	{
+		m_BlockEvents = blockEvents;
 	}
 
 	void ImGuiLayer::Begin()

@@ -16,14 +16,18 @@ namespace Cine
 
 	void EditorLayer::OnUpdate(Timestep ts)
 	{
-		m_CameraController->OnUpdate(ts);
+		if(m_ViewportHovered && m_ViewportFocused)
+		{
+			m_CameraController->OnUpdate(ts);
+		}
 
 		m_FrameBuffer->Bind();
 		Renderer2D::BeginScene(m_CameraController->GetCamera());
 		{
 			RenderCommand::Clear();
-
-			Renderer2D::DrawQuad({ 0.0f, 0.0f, 0.0f }, { 10.0f, 10.0f }, m_CheckerboardTexture, 25.0f);
+			static float rotation = 0.0f;
+			rotation += ts * 15.0f;
+			Renderer2D::DrawRotatedQuad({ 0.0f, 0.0f, 0.0f }, { 10.0f, 10.0f }, rotation,  m_CheckerboardTexture, 25.0f);
 		}
 		Renderer2D::EndScene();
 		m_FrameBuffer->Unbind();
@@ -31,7 +35,10 @@ namespace Cine
 
 	void EditorLayer::OnEvent(Event& event)
 	{
-		m_CameraController->OnEvent(event);
+		if(m_ViewportHovered && m_ViewportFocused)
+		{
+			m_CameraController->OnEvent(event);
+		}
 	}
 
 	void EditorLayer::OnImGuiRender()
@@ -46,6 +53,10 @@ namespace Cine
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0.0f, 0.0f });
 			ImGui::Begin("Viewport");
 			{
+				m_ViewportFocused = ImGui::IsWindowFocused();
+				m_ViewportHovered = ImGui::IsWindowHovered();
+				Application::Get().GetImGuiLayer()->SetBlockEvents(!m_ViewportFocused || !m_ViewportHovered);
+
 				ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 				glm::vec2 viewportSize = { viewportPanelSize.x, viewportPanelSize.y };
 				if (viewportSize != m_ViewportSize)
@@ -61,6 +72,7 @@ namespace Cine
 			ImGui::End();
 			ImGui::PopStyleVar(1);
 
+			ImGui::Text("Very long text for some testing of events when mouse hovered");
 			ImGui::Checkbox("Docking", &m_DockingEnabled);
 			if (ImGui::Button("Close"))
 			{
