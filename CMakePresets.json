@@ -1,4 +1,4 @@
-﻿{
+{
   "version": 3,
   "configurePresets": [
     {
@@ -39,43 +39,6 @@
       }
     },
     {
-      "name": "win32-msvc-debug",
-      "displayName": "win32 MSVC Debug",
-      "inherits": "win32-msvc",
-      "architecture": {
-        "value": "x64",
-        "strategy": "external"
-      },
-      "cacheVariables": {
-        "CMAKE_CONFIGURATION_TYPES": "Debug",
-        "CMAKE_CXX_FLAGS_DEBUG": "/DGLASH_DEBUG"
-      }
-    },
-    {
-      "name": "win32-msvc-release",
-      "displayName": "win32 MSVC Release",
-      "inherits": "win32-msvc",
-      "architecture": {
-        "value": "x64",
-        "strategy": "external"
-      },
-      "cacheVariables": {
-        "CMAKE_CONFIGURATION_TYPES": "Release"
-      }
-    },
-    {
-      "name": "win32-msvc-relwithdebinfo",
-      "displayName": "win32 MSVC RelWithDebInfo",
-      "inherits": "win32-msvc",
-      "architecture": {
-        "value": "x64",
-        "strategy": "external"
-      },
-      "cacheVariables": {
-        "CMAKE_CONFIGURATION_TYPES": "RelWithDebInfo"
-      }
-    },
-    {
       "name": "win32-ninja-debug",
       "displayName": "win32 Ninja Debug",
       "inherits": "win32-ninja-base",
@@ -95,41 +58,5 @@
         "CMAKE_BUILD_TYPE": "Release"
       }
     },
-    {
-      "name": "wsl-base",
-      "hidden": true,
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/out/build/${presetName}",
-      "installDir": "${sourceDir}/out/install/${presetName}",
-      "cacheVariables": {
-        "CMAKE_C_COMPILER": "/usr/bin/gcc",
-        "CMAKE_CXX_COMPILER": "/usr/bin/g++"
-      },
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Linux"
-      }
-    },
-    {
-      "name": "wsl-x64-debug",
-      "displayName": "WSL x64 Debug",
-      "inherits": "wsl-base",
-      "architecture": {
-        "value": "x64",
-        "strategy": "external"
-      },
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug"
-      }
-    },
-    {
-      "name": "wsl-x64-release",
-      "displayName": "WSL x64 Release",
-      "inherits": "wsl-x64-debug",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release"
-      }
-    }
   ]
 }
