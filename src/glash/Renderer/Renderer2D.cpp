@@ -115,6 +115,7 @@ namespace Cine
 		s_Data.QuadShader->SetMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
 
 		s_Data.QuadIndexCount = 0;
+
 		s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
 
 	}
@@ -125,6 +126,8 @@ namespace Cine
 		uint32_t dataSize = (uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase;
 		s_Data.QuadVertexBuffer->SetData(s_Data.QuadVertexBufferBase, dataSize);
 		Renderer2D::Flush();
+
+		s_Data.Stats.DrawCalls += 1;
 	}
 
 	void Renderer2D::Flush()
@@ -194,7 +197,6 @@ namespace Cine
 		if (s_Data.QuadIndexCount == s_Data.MaxIndices)
 		{
 			//TODO: NextBatch()
-			s_Data.Stats.DrawCalls += 1;
 			EndScene();
 			s_Data.QuadIndexCount = 0;
 			s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;

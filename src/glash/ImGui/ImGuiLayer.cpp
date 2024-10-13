@@ -75,12 +75,6 @@ namespace Cine
 			ImGuiIO& io = ImGui::GetIO();
 			e.Handled |= e.IsInCategory(EventCategoryMouse) & io.WantCaptureMouse;
 			e.Handled |= e.IsInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;
-			bool handled = e.Handled;
-			if (handled)
-			{
-				CINE_CORE_INFO("Event handled by ImGui");
-			}
-
 		}
 	}
 

@@ -23,5 +23,10 @@ namespace Cine
 		glm::vec2 m_ViewportSize = { 1280.0f, 720.0f };
 		bool m_ViewportFocused = false;
 		bool m_ViewportHovered = false;
+
+		float m_LastFrameTime = 0.0f;
+
+	private:
+		void DrawViewport();
 	};
 }
