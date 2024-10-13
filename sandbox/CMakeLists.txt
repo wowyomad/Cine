@@ -35,7 +35,6 @@ set_target_properties(Sandbox PROPERTIES
 
 target_link_libraries(Sandbox
     PRIVATE glash 
-    PRIVATE imgui
 )
 add_dependencies(Sandbox copy_shaders copy_textures)
 target_precompile_headers(Sandbox REUSE_FROM glash_pch)

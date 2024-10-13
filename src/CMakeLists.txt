@@ -70,6 +70,7 @@ target_include_directories(glash
     PUBLIC ${glm_SOURCE_DIR}
     PUBLIC ${stb_SOURCE_DIR}
     PUBLIC ${imgui_SOURCE_DIR}
+    PUBLIC ${EnTT_SOURCE_DIR}
 )
 
 target_link_libraries(glash
@@ -80,6 +81,7 @@ target_link_libraries(glash
     PUBLIC glm
     PUBLIC spdlog::spdlog
     PUBLIC imgui
+    PUBLIC EnTT::EnTT 
 )
 
 if(MSVC)

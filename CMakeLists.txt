@@ -56,7 +56,12 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/ocornut/imgui.git
     GIT_TAG 793773209bb0fdeb8ccb756052e770457193c9f2
 )
-list(APPEND BUILD_DEPENDENCIES glfw fmt glm spdlog imgui)
+FetchContent_Declare(
+    entt
+    GIT_REPOSITORY https://github.com/skypjack/entt.git
+    GIT_TAG v3.13.2
+)
+list(APPEND BUILD_DEPENDENCIES glfw fmt glm spdlog imgui entt)
 list(APPEND HEADER_DEPENDENCIES stb)
 list(APPEND DEPENDENCY_TARGETS ${BUILD_DEPENDENCIES} ${HEADER_DEPENDENCIES})
 FetchContent_MakeAvailable(${DEPENDENCY_TARGETS})
