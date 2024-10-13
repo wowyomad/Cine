@@ -20,6 +20,10 @@ namespace Cine
 		Ref<FrameBuffer> m_FrameBuffer;
 		Ref<Texture2D> m_CheckerboardTexture;
 
+		Entity m_SquareEntity;
+
+		Ref<Scene> m_ActiveScene;
+
 		glm::vec2 m_ViewportSize = { 1280.0f, 720.0f };
 		bool m_ViewportFocused = true;
 		bool m_ViewportHovered = true;

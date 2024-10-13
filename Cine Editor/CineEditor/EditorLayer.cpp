@@ -9,9 +9,15 @@ namespace Cine
 		spec.Width = 1280;
 		spec.Height = 720;
 		m_FrameBuffer = FrameBuffer::Create(spec);
+
 		m_CameraController = CreateRef<OrthograhpicCameraController>(1.7778f);
 	
 		m_CheckerboardTexture = Texture2D::Create("resources/textures/checkerboard.png");
+
+		m_ActiveScene = CreateRef<Scene>(); 
+
+		m_SquareEntity = m_ActiveScene->CreateEntity("Square");
+		m_SquareEntity.AddComponent<SpriteRendererComponent>(glm::vec4(1.0f, 0.75f, 0.75f, 1.0f));		 
 	}
 
 	void EditorLayer::OnUpdate(Timestep ts)
@@ -27,37 +33,7 @@ namespace Cine
 		m_FrameBuffer->Bind();
 		Renderer2D::BeginScene(m_CameraController->GetCamera());
 		{
-			RenderCommand::Clear();
-			static float rotation = 0.0f;
-			rotation += ts * 15.0f;
-
-			Renderer2D::DrawRotatedQuad({ 0.0f, 0.0f, 0.0f }, { 10.0f, 10.0f }, glm::radians(rotation), m_CheckerboardTexture, 25.0f);
-			Renderer2D::DrawRotatedQuad({ 0.0f, 0.0f, 0.0f }, { 10.0f, 10.0f }, glm::radians(-rotation), m_CheckerboardTexture, 25.0f);
-
-			Renderer2D::DrawRotatedQuad({ 0.0f, 10.0f, 0.0f }, { 10.0f, 10.0f }, glm::radians(rotation), m_CheckerboardTexture, 25.0f);
-			Renderer2D::DrawRotatedQuad({ 0.0f, 10.0f, 0.0f }, { 10.0f, 10.0f }, glm::radians(-rotation), m_CheckerboardTexture, 25.0f);
-
-			Renderer2D::DrawRotatedQuad({ 10.0f, 0.0f, 0.0f }, { 10.0f, 10.0f }, glm::radians(rotation), m_CheckerboardTexture, 25.0f);
-			Renderer2D::DrawRotatedQuad({ 10.0f, 0.0f, 0.0f }, { 10.0f, 10.0f }, glm::radians(-rotation), m_CheckerboardTexture, 25.0f);
-
-			Renderer2D::DrawRotatedQuad({ 10.0f, 10.0f, 0.0f }, { 10.0f, 10.0f }, glm::radians(rotation), m_CheckerboardTexture, 25.0f);
-			Renderer2D::DrawRotatedQuad({ 10.0f, 10.0f, 0.0f }, { 10.0f, 10.0f }, glm::radians(-rotation), m_CheckerboardTexture, 25.0f);
-
-			Renderer2D::DrawRotatedQuad({ 10.0f, -10.0f, 0.0f }, { 10.0f, 10.0f }, glm::radians(rotation), m_CheckerboardTexture, 25.0f);
-			Renderer2D::DrawRotatedQuad({ 10.0f, -10.0f, 0.0f }, { 10.0f, 10.0f }, glm::radians(-rotation), m_CheckerboardTexture, 25.0f);
-
-			Renderer2D::DrawRotatedQuad({ 0.0f, -10.0f, 0.0f }, { 10.0f, 10.0f }, glm::radians(rotation), m_CheckerboardTexture, 25.0f);
-			Renderer2D::DrawRotatedQuad({ 0.0f, -10.0f, 0.0f }, { 10.0f, 10.0f }, glm::radians(-rotation), m_CheckerboardTexture, 25.0f);
-
-			Renderer2D::DrawRotatedQuad({ -10.0f, 0.0f, 0.0f }, { 10.0f, 10.0f }, glm::radians(rotation), m_CheckerboardTexture, 25.0f);
-			Renderer2D::DrawRotatedQuad({ -10.0f, 0.0f, 0.0f }, { 10.0f, 10.0f }, glm::radians(-rotation), m_CheckerboardTexture, 25.0f);
-
-			Renderer2D::DrawRotatedQuad({ -10.0f, 10.0f, 0.0f }, { 10.0f, 10.0f }, glm::radians(rotation), m_CheckerboardTexture, 25.0f);
-			Renderer2D::DrawRotatedQuad({ -10.0f, 10.0f, 0.0f }, { 10.0f, 10.0f }, glm::radians(-rotation), m_CheckerboardTexture, 25.0f);
-
-			Renderer2D::DrawRotatedQuad({ -10.0f, -10.0f, 0.0f }, { 10.0f, 10.0f }, glm::radians(rotation), m_CheckerboardTexture, 25.0f);
-			Renderer2D::DrawRotatedQuad({ -10.0f, -10.0f, 0.0f }, { 10.0f, 10.0f }, glm::radians(-rotation), m_CheckerboardTexture, 25.0f);
-
+			m_ActiveScene->OnUpdate(ts);
 		}
 		Renderer2D::EndScene();
 		m_FrameBuffer->Unbind();
@@ -82,6 +58,15 @@ namespace Cine
 
 		ImGui::Begin("Editor");
 		{
+			auto&& [sprite, transform, tag] = m_SquareEntity.GetComponents<SpriteRendererComponent, TransformComponent, TagComponent>();
+			ImGui::Text("Entity: %s", tag.Tag.c_str());
+			ImGui::ColorEdit4("Entity Color", glm::value_ptr(sprite.Color));
+			ImGui::DragFloat4("m0", glm::value_ptr(transform.Transform[0]));
+			ImGui::DragFloat4("m1", glm::value_ptr(transform.Transform[1]));
+			ImGui::DragFloat4("m2", glm::value_ptr(transform.Transform[2]));
+			ImGui::DragFloat4("m3", glm::value_ptr(transform.Transform[3]));
+
+			ImGui::Separator();
 			auto stats = Renderer2D::GetStats();
 			ImGui::Text("Draw Calls: %llu", stats.DrawCalls);
 			ImGui::Text("Quads: %llu", stats.QuadCount);

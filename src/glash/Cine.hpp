@@ -24,4 +24,8 @@
 #include "glash/Events/MouseEvent.hpp"
 #include "glash/Events/KeyEvent.hpp"
 
+#include "glash/Scene/Scene.hpp"
+#include "glash/Scene/Entity.hpp"
+#include "glash/Scene/Components.hpp"
+
 #include "glash/Core/Log.hpp"

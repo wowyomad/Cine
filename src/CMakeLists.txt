@@ -14,6 +14,7 @@ file(GLOB SOURCES
     "${glash_SOURCE_DIR}/platform/OpenGL/*.cpp"
     "${glash_SOURCE_DIR}/ImGui/*.cpp"
     "${glash_SOURCE_DIR}/Core/*.cpp"
+    "${glash_SOURCE_DIR}/Scene/*.cpp"
     "${glash_SOURCE_DIR}/Renderer/*.cpp"
 )
 
@@ -28,6 +29,7 @@ file(GLOB HEADERS
     "${glash_SOURCE_DIR}/ImGui/*.hpp"
     "${glash_SOURCE_DIR}/Core/*.hpp"
     "${glash_SOURCE_DIR}/Renderer/*.hpp"
+    "${glash_SOURCE_DIR}/Scene/*.hpp"
     "${glash_SOURCE_DIR}/Debug/*.hpp"
 )
 if(GLASH_ENABLE_DEBUG)
