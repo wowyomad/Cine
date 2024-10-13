@@ -169,24 +169,24 @@ namespace Cine
 
 	void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& color)
 	{
-		glm::mat4 transform = glm::scale(glm::rotate(glm::translate(glm::mat4(1.0f), position), glm::radians(rotation), glm::vec3(0.0f, 0.0f, 1.0f)), glm::vec3(size.x, size.y, 1.0f));
+		glm::mat4 transform = glm::scale(glm::rotate(glm::translate(glm::mat4(1.0f), position), rotation, glm::vec3(0.0f, 0.0f, 1.0f)), glm::vec3(size.x, size.y, 1.0f));
 		DrawQuad(transform, color);
 	}
 
 	void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, float tiling, const glm::vec4& tintColor)
 	{
-		glm::mat4 transform = glm::scale(glm::rotate(glm::translate(glm::mat4(1.0f), position), glm::radians(rotation), glm::vec3(0.0f, 0.0f, 1.0f)), glm::vec3(size.x, size.y, 1.0f));
+		glm::mat4 transform = glm::scale(glm::rotate(glm::translate(glm::mat4(1.0f), position), rotation, glm::vec3(0.0f, 0.0f, 1.0f)), glm::vec3(size.x, size.y, 1.0f));
 		DrawQuad(transform, texture, tiling, tintColor);
 	}
 
 	void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const glm::vec4& color)
 	{
-		glm::mat4 transform = glm::scale(glm::rotate(glm::translate(glm::mat4(1.0f), glm::vec3(position.x, position.y, 1.0f)), glm::radians(rotation), glm::vec3(0.0f, 0.0f, 1.0f)), glm::vec3(size.x, size.y, 1.0f));
+		glm::mat4 transform = glm::scale(glm::rotate(glm::translate(glm::mat4(1.0f), glm::vec3(position.x, position.y, 1.0f)), rotation, glm::vec3(0.0f, 0.0f, 1.0f)), glm::vec3(size.x, size.y, 1.0f));
 		DrawQuad(transform, color);
 	}
 	void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, float tiling, const glm::vec4& tintColor)
 	{
-		glm::mat4 transform = glm::scale(glm::rotate(glm::translate(glm::mat4(1.0f), glm::vec3(position.x, position.y, 1.0f)), glm::radians(rotation), glm::vec3(0.0f, 0.0f, 1.0f)), glm::vec3(size.x, size.y, 1.0f));
+		glm::mat4 transform = glm::scale(glm::rotate(glm::translate(glm::mat4(1.0f), glm::vec3(position.x, position.y, 1.0f)),rotation, glm::vec3(0.0f, 0.0f, 1.0f)), glm::vec3(size.x, size.y, 1.0f));
 		DrawQuad(transform, texture, tiling, tintColor);
 	}
 

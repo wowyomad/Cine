@@ -29,5 +29,8 @@ namespace Cine
 
 	private:
 		void ClearBuffer();
+
+	//Shoulnd't be hardcoded
+	static uint32_t s_MaxFrameBufferSize;
 	};
 }

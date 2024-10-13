@@ -5,6 +5,9 @@
 
 namespace Cine
 {
+	//Shouldn't be hardcoded, though
+	uint32_t OpenGLFrameBuffer::s_MaxFrameBufferSize = 16384;
+
 	OpenGLFrameBuffer::OpenGLFrameBuffer(const FrameBufferSpecification& specification)
 		: m_Specification(specification)
 	{
@@ -18,6 +21,10 @@ namespace Cine
 
 	void OpenGLFrameBuffer::Resize(uint32_t width, uint32_t height)
 	{
+		if (width == 0 || height == 0 || width > s_MaxFrameBufferSize || height > s_MaxFrameBufferSize)
+		{
+			CINE_CORE_DEBUG("Tried to set framebuffer to {}x{}", width, height);
+		}
 		m_Specification.Width = width;
 		m_Specification.Height = height;
 		Invalidate();
