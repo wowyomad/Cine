@@ -2,6 +2,8 @@
 
 #include <glm/glm.hpp>
 
+#include "SceneCamera.hpp"
+
 namespace Cine
 {
 	struct TagComponent
@@ -39,4 +41,14 @@ namespace Cine
 		SpriteRendererComponent(const glm::vec4& color)
 			: Color(color) {}
 	};
+
+	//Camera is a component like in Unity
+	struct CameraComponent
+	{
+		SceneCamera Camera;
+		bool FixedAspectRatio = false;
+
+		CameraComponent() = default;
+		CameraComponent(const CameraComponent&) = default;
+	}; 
 }

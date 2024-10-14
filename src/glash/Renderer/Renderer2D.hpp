@@ -1,6 +1,7 @@
 #pragma once
 #include "glash/Core/Base.hpp"
-#include "glash/Renderer/Camera.hpp"
+#include "OrthoGraphicCamera.hpp"
+#include "Camera.hpp"
 
 #include "glash/Renderer/Texture.hpp"
 
@@ -12,6 +13,9 @@ namespace Cine
 	public:
 		static void Init();
 		static void Shutdown();
+		
+		//This can also be a system in the feature.
+		static void BeginScene(const Camera& camera, const glm::mat4& transform);
 
 		static void BeginScene(const OrthographicCamera& camera);
 		static void EndScene();

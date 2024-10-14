@@ -25,7 +25,7 @@ namespace Cine
 		Ref<VertexBuffer> CreateVertexBufferEmpty(uint32_t size) override final;
 		Ref<IndexBuffer> CreateIndexBuffer(const uint32_t*, uint32_t size) override final;
 		Ref<VertexArray> CreateVertexArray() override final;
-		Ref<FrameBuffer> CreateFrameBuffer(const FrameBufferSpecification& specification) override final;
+		Ref<FrameBuffer> CreateFrameBuffer(const FramebufferSpecification& specification) override final;
 	};
 }
 

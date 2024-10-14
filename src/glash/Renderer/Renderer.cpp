@@ -23,7 +23,7 @@ namespace Cine
 		RenderCommand::SetViewport(0, 0, width, height);
 	}
 
-	void Renderer::BeginScene(const Camera& camera)
+	void Renderer::BeginScene(const OrthographicCamera& camera)
 	{
 		RenderCommand::Clear();
 		s_SceneData->ViewProjectionMatrix = camera.GetViewProjectionMatrix();

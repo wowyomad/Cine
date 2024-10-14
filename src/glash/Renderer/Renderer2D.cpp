@@ -103,9 +103,26 @@ namespace Cine
 
 		s_Data.TextureSlots[0] = s_Data.WhiteTexture;
 	}
+
 	void Renderer2D::Shutdown()
 	{
+
 	}
+
+	//TODO: Use buffers
+	void Renderer2D::BeginScene(const Camera& camera, const glm::mat4& transform)
+	{
+		CINE_PROFILE_FUNCTION();
+
+		RenderCommand::Clear();
+		s_Data.QuadShader->SetMat4("u_ViewProjection", camera.GetProjection() * glm::inverse(transform));
+
+		s_Data.QuadIndexCount = 0;
+
+		s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
+
+	}
+
 	void Renderer2D::BeginScene(const OrthographicCamera& camera)
 	{
 		CINE_PROFILE_FUNCTION();

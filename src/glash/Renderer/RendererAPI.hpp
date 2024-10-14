@@ -33,7 +33,7 @@ namespace Cine
 		virtual Ref<VertexBuffer> CreateVertexBufferEmpty(uint32_t size) = 0;
 		virtual Ref<IndexBuffer> CreateIndexBuffer(const uint32_t*, uint32_t size) = 0;
 		virtual Ref<VertexArray> CreateVertexArray() = 0;
-		virtual Ref<FrameBuffer> CreateFrameBuffer(const FrameBufferSpecification& specification) = 0;
+		virtual Ref<FrameBuffer> CreateFrameBuffer(const FramebufferSpecification& specification) = 0;
 
 		static Ref<RendererAPI> Create();
 

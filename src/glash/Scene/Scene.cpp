@@ -10,6 +10,7 @@ namespace Cine
 {
 	
 	Scene::Scene()
+		: m_MainCamera(new Entity())
 	{
 
 	}
@@ -20,6 +21,25 @@ namespace Cine
 
 	}
 
+	void Scene::SetMainCamera(Entity cameraEntity)
+	{
+		if (cameraEntity.HasComponent<CameraComponent>())
+		{
+			*m_MainCamera = cameraEntity;
+			OnViewportResize(m_ViewportWidth, m_ViewportHeight);
+		}
+		else
+		{
+			CINE_LOG_ERROR("Tried to assign Camera entity without CameraComponent");
+		}
+	}
+
+	Entity Scene::GetMainCamera()
+	{
+		return *m_MainCamera;
+	}
+
+
 	Entity Scene::CreateEntity(const std::string& name)
 	{
 		Entity entity = Entity(m_Registry.create(), this);
@@ -29,16 +49,39 @@ namespace Cine
 		return entity;
 	}
 
+	void Scene::OnViewportResize(uint32_t width, uint32_t height)
+	{
+		m_ViewportWidth = width;
+		m_ViewportHeight = height;
+
+		auto& cameraComponent = m_MainCamera->GetComponent<CameraComponent>();
+
+		if (!cameraComponent.FixedAspectRatio)
+		{
+			cameraComponent.Camera.SetViewportSize(width, height);
+		}
+	}
+
 	void Scene::OnUpdate(Timestep ts)
 	{
-		auto group = m_Registry.group<TransformComponent, SpriteRendererComponent>();
 
-		for (auto entity : group)
+		if (*m_MainCamera)
 		{
-			auto&& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+			auto&& [cameraComponent, transformComponent] = m_MainCamera->GetComponents<CameraComponent, TransformComponent>();
+				
+			Renderer2D::BeginScene(cameraComponent.Camera, transformComponent.Transform);
 
-			Renderer2D::DrawQuad(transform, sprite.Color);
+			auto group = m_Registry.group<TransformComponent, SpriteRendererComponent>();
+			for (auto entity : group)
+			{
+				auto&& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+
+				Renderer2D::DrawQuad(transform, sprite.Color);
+			}
+
+			Renderer2D::EndScene();
 		}
+		
 	}
 }
 

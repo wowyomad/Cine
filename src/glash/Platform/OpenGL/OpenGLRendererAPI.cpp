@@ -25,7 +25,7 @@ namespace Cine
 		return CreateRef<OpenGLVertexArray>();
 	}
 
-	Ref<FrameBuffer> OpenGLRendererAPI::CreateFrameBuffer(const FrameBufferSpecification& specification)
+	Ref<FrameBuffer> OpenGLRendererAPI::CreateFrameBuffer(const FramebufferSpecification& specification)
 	{
 		return CreateRef<OpenGLFrameBuffer>(specification);
 	}

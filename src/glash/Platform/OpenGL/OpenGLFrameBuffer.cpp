@@ -8,7 +8,7 @@ namespace Cine
 	//Shouldn't be hardcoded, though
 	uint32_t OpenGLFrameBuffer::s_MaxFrameBufferSize = 16384;
 
-	OpenGLFrameBuffer::OpenGLFrameBuffer(const FrameBufferSpecification& specification)
+	OpenGLFrameBuffer::OpenGLFrameBuffer(const FramebufferSpecification& specification)
 		: m_Specification(specification)
 	{
 		Invalidate();

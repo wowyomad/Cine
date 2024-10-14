@@ -3,7 +3,7 @@
 
 namespace Cine
 {
-	struct FrameBufferSpecification
+	struct FramebufferSpecification
 	{
 		uint32_t Width, Height;
 		uint32_t Samples = 1; 
@@ -16,7 +16,7 @@ namespace Cine
 	public:
 		virtual ~FrameBuffer() = default;
 
-		virtual const FrameBufferSpecification& GetSpecifiction() const = 0;
+		virtual const FramebufferSpecification& GetSpecification() const = 0;
 		virtual uint32_t GetColorAttachmentRendererID() const = 0;
 
 		virtual void Resize(uint32_t width, uint32_t height) = 0;
@@ -24,6 +24,6 @@ namespace Cine
 		virtual void Bind() = 0;
 		virtual void Unbind() = 0;
 
-		static Ref<FrameBuffer> Create(const FrameBufferSpecification& specification);
+		static Ref<FrameBuffer> Create(const FramebufferSpecification& specification);
 	};
 }

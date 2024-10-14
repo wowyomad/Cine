@@ -5,10 +5,10 @@ namespace Cine
 {
 	void EditorLayer::OnAttach()
 	{
-		FrameBufferSpecification spec;
+		FramebufferSpecification spec;
 		spec.Width = 1280;
 		spec.Height = 720;
-		m_FrameBuffer = FrameBuffer::Create(spec);
+		m_Framebuffer = FrameBuffer::Create(spec);
 
 		m_CameraController = CreateRef<OrthograhpicCameraController>(1.7778f);
 	
@@ -16,12 +16,28 @@ namespace Cine
 
 		m_ActiveScene = CreateRef<Scene>(); 
 
+		m_FirstCamera = m_ActiveScene->CreateEntity("First Camera");
+		m_FirstCamera.AddComponent<CameraComponent>();
+		m_ActiveScene->SetMainCamera(m_FirstCamera);
+
+		m_SecondCamera = m_ActiveScene->CreateEntity("Second Camera");
+		m_SecondCamera.AddComponent<CameraComponent>();
+		m_ActiveScene->SetMainCamera(m_SecondCamera);
+
 		m_SquareEntity = m_ActiveScene->CreateEntity("Square");
 		m_SquareEntity.AddComponent<SpriteRendererComponent>(glm::vec4(1.0f, 0.75f, 0.75f, 1.0f));		 
 	}
 
 	void EditorLayer::OnUpdate(Timestep ts)
 	{
+		if (FramebufferSpecification spec = m_Framebuffer->GetSpecification();
+			m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f &&
+			(spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y))
+		{
+			m_Framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+			m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+		}
+
 		Renderer2D::ResetStats();
 		m_LastFrameTime = ts.Milleseconds();
 
@@ -30,13 +46,11 @@ namespace Cine
 			m_CameraController->OnUpdate(ts);
 		}
 
-		m_FrameBuffer->Bind();
-		Renderer2D::BeginScene(m_CameraController->GetCamera());
+		m_Framebuffer->Bind();
 		{
 			m_ActiveScene->OnUpdate(ts);
 		}
-		Renderer2D::EndScene();
-		m_FrameBuffer->Unbind();
+		m_Framebuffer->Unbind();
 	}
 
 	void EditorLayer::OnEvent(Event& event)
@@ -58,13 +72,31 @@ namespace Cine
 
 		ImGui::Begin("Editor");
 		{
-			auto&& [sprite, transform, tag] = m_SquareEntity.GetComponents<SpriteRendererComponent, TransformComponent, TagComponent>();
-			ImGui::Text("Entity: %s", tag.Tag.c_str());
-			ImGui::ColorEdit4("Entity Color", glm::value_ptr(sprite.Color));
-			ImGui::DragFloat4("m0", glm::value_ptr(transform.Transform[0]));
-			ImGui::DragFloat4("m1", glm::value_ptr(transform.Transform[1]));
-			ImGui::DragFloat4("m2", glm::value_ptr(transform.Transform[2]));
-			ImGui::DragFloat4("m3", glm::value_ptr(transform.Transform[3]));
+			auto& sprite = m_SquareEntity.GetComponent<SpriteRendererComponent>();
+			ImGui::ColorEdit4("Square Color", glm::value_ptr(sprite.Color));
+
+
+			auto mainCamera = m_ActiveScene->GetMainCamera();
+			if (ImGui::Button("Switch Camera"))
+			{
+				if (mainCamera == m_FirstCamera)
+				{
+					m_ActiveScene->SetMainCamera(m_SecondCamera);
+				}
+				else
+				{
+					m_ActiveScene->SetMainCamera(m_FirstCamera);
+				}
+			}
+
+			auto&& [cameraComponent, tagComponent] = m_ActiveScene->GetMainCamera().GetComponents<CameraComponent, TagComponent>();
+			ImGui::Text("Camera: %s", tagComponent.Tag.c_str());
+			
+			float orthoSize = cameraComponent.Camera.GetOrthographicSize();
+			if (ImGui::DragFloat("Camera Ortho", &orthoSize))
+			{
+				cameraComponent.Camera.SetOrthographicSize(orthoSize);
+			}
 
 			ImGui::Separator();
 			auto stats = Renderer2D::GetStats();
@@ -90,14 +122,9 @@ namespace Cine
 			Application::Get().GetImGuiLayer()->SetBlockEvents(!m_ViewportFocused || !m_ViewportHovered);
 
 			ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-			glm::vec2 viewportSize = { viewportPanelSize.x, viewportPanelSize.y };
-			if (viewportSize != m_ViewportSize)
-			{
-				m_ViewportSize = viewportSize;
-				m_FrameBuffer->Resize(static_cast<uint32_t>(m_ViewportSize.x), static_cast<uint32_t>(m_ViewportSize.y));
-				m_CameraController->OnResize(m_ViewportSize.x, m_ViewportSize.y);
-			}
-			size_t id = m_FrameBuffer->GetColorAttachmentRendererID();
+			m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
+				
+			size_t id = m_Framebuffer->GetColorAttachmentRendererID();
 			ImGui::Image(reinterpret_cast<void*>(id), { m_ViewportSize.x, m_ViewportSize.y }, { 0, 1 }, { 1, 0 });
 
 		}

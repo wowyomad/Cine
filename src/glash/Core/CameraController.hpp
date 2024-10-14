@@ -1,4 +1,6 @@
-#include "glash/Renderer/Camera.hpp"
+#pragma once
+
+#include "glash/Renderer/OrthographicCamera.hpp"
 #include "glash/Core/Timestep.hpp"
 
 #include "glash/Events/ApplicationEvent.hpp"

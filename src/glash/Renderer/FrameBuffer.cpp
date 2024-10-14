@@ -5,7 +5,7 @@
 
 namespace Cine
 {
-	Ref<FrameBuffer> FrameBuffer::Create(const FrameBufferSpecification& specification)
+	Ref<FrameBuffer> FrameBuffer::Create(const FramebufferSpecification& specification)
 	{
 		return RendererAPI::Get()->CreateFrameBuffer(specification);
 	}

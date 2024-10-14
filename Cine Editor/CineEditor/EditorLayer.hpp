@@ -17,14 +17,17 @@ namespace Cine
 		bool m_DockingEnabled = true;
 		Ref<OrthograhpicCameraController> m_CameraController;
 
-		Ref<FrameBuffer> m_FrameBuffer;
+		Entity m_FirstCamera;
+		Entity m_SecondCamera;
+
+		Ref<FrameBuffer> m_Framebuffer;
 		Ref<Texture2D> m_CheckerboardTexture;
 
 		Entity m_SquareEntity;
 
 		Ref<Scene> m_ActiveScene;
 
-		glm::vec2 m_ViewportSize = { 1280.0f, 720.0f };
+		glm::vec2 m_ViewportSize = { 0.0f, 0.0f };
 		bool m_ViewportFocused = true;
 		bool m_ViewportHovered = true;
 

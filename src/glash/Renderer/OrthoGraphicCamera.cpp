@@ -1,5 +1,5 @@
 #include "glash/glash_pch.hpp"
-#include "glash/Renderer/Camera.hpp"
+#include "OrthoGraphicCamera.hpp"
 
 namespace Cine
 {
@@ -41,5 +41,4 @@ namespace Cine
 		m_Position = position;
 		RecalculateViewMatrix();
 	}
-
 }
