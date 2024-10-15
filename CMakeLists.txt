@@ -25,6 +25,8 @@ set_property(GLOBAL PROPERTY USE_FOLDER ON)
 set(SPDLOG_FMT_EXTERNAL ON CACHE BOOL "Use fetched fmt instead of bundled" FORCE)
 set(GLFW_BUILD_WAYLAND OFF CACHE BOOL "Enable wayland scanner" FORCE)
 
+set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "Cames from yaml-cpp. Builds 'read' and 'parse' executables" FORCE)
+
 include(FetchContent)
 FetchContent_Declare(
     glfw
@@ -61,7 +63,12 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/skypjack/entt.git
     GIT_TAG v3.13.2
 )
-list(APPEND BUILD_DEPENDENCIES glfw fmt glm spdlog imgui entt)
+FetchContent_Declare(
+    yaml-cpp
+    GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
+    GIT_TAG 0.8.0
+)
+list(APPEND BUILD_DEPENDENCIES glfw fmt glm spdlog imgui entt yaml-cpp)
 list(APPEND HEADER_DEPENDENCIES stb)
 list(APPEND DEPENDENCY_TARGETS ${BUILD_DEPENDENCIES} ${HEADER_DEPENDENCIES})
 FetchContent_MakeAvailable(${DEPENDENCY_TARGETS})
@@ -91,7 +98,6 @@ if(MSVC)
  #       target_compile_options(${target} PRIVATE $<$<CONFIG:Debug>:/Zi>)
  #       target_link_options(${target} PRIVATE $<$<CONFIG:Debug>:/INCREMENTAL>)
         set_target_properties(${target} PROPERTIES FOLDER "Dependencies")
-
     else()
         message(WARNING "Target ${target} not found.")
     endif()

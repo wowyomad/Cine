@@ -84,6 +84,7 @@ target_link_libraries(glash
     PUBLIC spdlog::spdlog
     PUBLIC imgui
     PUBLIC EnTT::EnTT 
+    PUBLIC yaml-cpp::yaml-cpp
 )
 
 if(MSVC)
