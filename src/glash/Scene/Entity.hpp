@@ -30,7 +30,7 @@ namespace Cine
 		{
 			CINE_CORE_ASSERT(!HasComponent<Component>(), "Entity already has component {}", typeid(Component).name());
 			Component& component = m_Scene->m_Registry.emplace<Component>(m_EntityHandle, std::forward<Args>(args)...);
-			
+			m_Scene->OnComponentAdded<Component>(*this, component);
 			return component;
 		}
 
@@ -68,11 +68,14 @@ namespace Cine
 		operator entt::entity() const { return m_EntityHandle; }
 		operator uint32_t() const{ return static_cast<uint32_t>(m_EntityHandle); }
 		bool operator==(const Entity& other) const { return m_EntityHandle == other.m_EntityHandle; }
+		bool operator==(Entity&& other) const { return m_EntityHandle == other.m_EntityHandle; }
 
 
 	private:
 		Scene* m_Scene = nullptr; 
 		entt::entity m_EntityHandle = entt::null;
+
+		friend class Scene;
 	};
 }
 

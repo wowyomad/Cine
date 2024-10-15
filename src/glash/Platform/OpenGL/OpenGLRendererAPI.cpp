@@ -50,7 +50,6 @@ namespace Cine
 	}
 	void OpenGLRendererAPI::Clear()
 	{
-		GLCall(glClearColor(0.15f, 0.15f, 0.15f, 1.0f));
 		GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 	}
 	void OpenGLRendererAPI::DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount)

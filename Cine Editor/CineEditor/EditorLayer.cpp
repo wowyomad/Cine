@@ -1,31 +1,81 @@
 #include "glash/glash_pch.hpp"
 #include "EditorLayer.hpp"
 
+#include "Scene/ScriptableEntity.hpp"
+
+static Cine::Scene* s_Scene = nullptr;
+
 namespace Cine
 {
+	class CameraControllerScript : public ScriptableEntity
+	{
+	public:
+		void OnCreate() override
+		{
+
+		}
+
+		void OnDestroy() override
+		{
+
+		}
+
+		void OnUpdate(Timestep ts) override
+		{
+			if (GetEntity() == s_Scene->GetMainCamera())
+			{
+				auto& transform = GetComponent<TransformComponent>().Translation;
+
+				float speed = 5.0f;
+
+				if (Input::IsKeyPressed(Key::A))
+				{
+					transform.x -= speed * ts;
+				}
+				if (Input::IsKeyPressed(Key::D))
+				{
+					transform.x += speed * ts;
+				}
+				if (Input::IsKeyPressed(Key::W))
+				{
+					transform.y += speed * ts;
+				}
+				if (Input::IsKeyPressed(Key::S))
+				{
+					transform.y -= speed * ts;
+				}
+			}
+		}
+	};
+
 	void EditorLayer::OnAttach()
 	{
+
 		FramebufferSpecification spec;
 		spec.Width = 1280;
 		spec.Height = 720;
 		m_Framebuffer = FrameBuffer::Create(spec);
 
 		m_CameraController = CreateRef<OrthograhpicCameraController>(1.7778f);
-	
-		m_CheckerboardTexture = Texture2D::Create("resources/textures/checkerboard.png");
 
 		m_ActiveScene = CreateRef<Scene>(); 
+		s_Scene = m_ActiveScene.get();
 
 		m_FirstCamera = m_ActiveScene->CreateEntity("First Camera");
 		m_FirstCamera.AddComponent<CameraComponent>();
-		m_ActiveScene->SetMainCamera(m_FirstCamera);
+		m_FirstCamera.AddComponent<NativeScriptComponent>().Bind<CameraControllerScript>();
 
 		m_SecondCamera = m_ActiveScene->CreateEntity("Second Camera");
 		m_SecondCamera.AddComponent<CameraComponent>();
-		m_ActiveScene->SetMainCamera(m_SecondCamera);
+		m_SecondCamera.AddComponent<NativeScriptComponent>().Bind<CameraControllerScript>();
+
+		m_ActiveScene->SetMainCamera(m_FirstCamera); 
 
 		m_SquareEntity = m_ActiveScene->CreateEntity("Square");
-		m_SquareEntity.AddComponent<SpriteRendererComponent>(glm::vec4(1.0f, 0.75f, 0.75f, 1.0f));		 
+		m_FaceTexture = Texture2D::Create("resources/textures/face.png");
+		m_SquareEntity.AddComponent<SpriteRendererComponent>(glm::vec4(1.0f, 0.75f, 0.75f, 1.0f));	
+
+		m_HierarchyPanel.SetContext(m_ActiveScene);
 	}
 
 	void EditorLayer::OnUpdate(Timestep ts)
@@ -68,34 +118,21 @@ namespace Cine
 			ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
 		}
 
+		m_HierarchyPanel.OnImGuiRender();
+
 		DrawViewport();
 
 		ImGui::Begin("Editor");
 		{
-			auto& sprite = m_SquareEntity.GetComponent<SpriteRendererComponent>();
-			ImGui::ColorEdit4("Square Color", glm::value_ptr(sprite.Color));
-
-
-			auto mainCamera = m_ActiveScene->GetMainCamera();
-			if (ImGui::Button("Switch Camera"))
-			{
-				if (mainCamera == m_FirstCamera)
-				{
-					m_ActiveScene->SetMainCamera(m_SecondCamera);
-				}
-				else
-				{
-					m_ActiveScene->SetMainCamera(m_FirstCamera);
-				}
-			}
-
-			auto&& [cameraComponent, tagComponent] = m_ActiveScene->GetMainCamera().GetComponents<CameraComponent, TagComponent>();
-			ImGui::Text("Camera: %s", tagComponent.Tag.c_str());
 			
-			float orthoSize = cameraComponent.Camera.GetOrthographicSize();
-			if (ImGui::DragFloat("Camera Ortho", &orthoSize))
+			if (m_ActiveScene->GetMainCamera())
 			{
-				cameraComponent.Camera.SetOrthographicSize(orthoSize);
+				auto&& [cameraComponent, tagComponent] = m_ActiveScene->GetMainCamera().GetComponents<CameraComponent, TagComponent>();
+				ImGui::Text("Camera: %s", tagComponent.Tag.c_str());
+			}
+			else
+			{
+				ImGui::Text("Camera: %s", "None");
 			}
 
 			ImGui::Separator();

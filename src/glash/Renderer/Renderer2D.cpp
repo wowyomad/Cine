@@ -127,8 +127,6 @@ namespace Cine
 	{
 		CINE_PROFILE_FUNCTION();
 
-		RenderCommand::Clear();
-
 		s_Data.QuadShader->SetMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
 
 		s_Data.QuadIndexCount = 0;
@@ -151,11 +149,22 @@ namespace Cine
 	{
 		CINE_PROFILE_FUNCTION();
 
+		if (s_Data.QuadIndexCount == 0)
+		{
+			return;
+		}
+
 		for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++)
 		{
 			s_Data.TextureSlots[i]->Bind(i);
 		}
 		RenderCommand::DrawIndexed(s_Data.QuadVertexArray, s_Data.QuadIndexCount);
+	}
+
+	void Renderer2D::Clear()
+	{
+		RenderCommand::SetClearColor({ 0.2f, 0.2f, 0.2f, 1.0f });
+		RenderCommand::Clear();
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)

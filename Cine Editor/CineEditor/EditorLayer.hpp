@@ -1,5 +1,7 @@
 #include "glash/Cine.hpp"
 
+#include "Panels/SceneHierarchyPanel.hpp"
+
 namespace Cine
 {
 	class EditorLayer : public Layer
@@ -21,11 +23,12 @@ namespace Cine
 		Entity m_SecondCamera;
 
 		Ref<FrameBuffer> m_Framebuffer;
-		Ref<Texture2D> m_CheckerboardTexture;
+		Ref<Texture2D> m_FaceTexture;
 
 		Entity m_SquareEntity;
 
 		Ref<Scene> m_ActiveScene;
+		SceneHierarchyPanel m_HierarchyPanel;
 
 		glm::vec2 m_ViewportSize = { 0.0f, 0.0f };
 		bool m_ViewportFocused = true;

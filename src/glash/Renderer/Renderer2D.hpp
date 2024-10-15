@@ -20,7 +20,7 @@ namespace Cine
 		static void BeginScene(const OrthographicCamera& camera);
 		static void EndScene();
 		static void Flush();
-
+		static void Clear();
 		//vec2
 		static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color);
 		static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture2D>& texture, float tiling = 1.0f, const glm::vec4& tint = glm::vec4(1.0f));
