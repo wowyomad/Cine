@@ -23,6 +23,9 @@ namespace Cine
 
 		void SetBlockEvents(bool blockEvents);
 
+		void SetDarkTheme();
+		void SetLightTheme();
+
 		void Begin();
 		void End();
 		 

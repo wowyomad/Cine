@@ -113,12 +113,14 @@ namespace Cine
 
 	void EditorLayer::OnImGuiRender()
 	{
+		//ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(250, 250));
 		if (m_DockingEnabled)
 		{
 			ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
 		}
 
 		m_HierarchyPanel.OnImGuiRender();
+
 
 		DrawViewport();
 
@@ -148,6 +150,7 @@ namespace Cine
 		}
 
 		ImGui::End();
+		//ImGui::PopStyleVar();
 	}
 	void EditorLayer::DrawViewport()
 	{
