@@ -27,12 +27,14 @@ namespace Cine
 		if (cameraEntity.HasComponent<CameraComponent>())
 		{
 			*m_MainCamera = cameraEntity;
-			//make sure that when destroyed, m_MainCamera.m_EntityHandle = entt::null;
+			m_MainCamera->GetComponent<CameraComponent>().Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
 		}
 		else
 		{
 			CINE_LOG_ERROR("Tried to assign Camera entity without CameraComponent");
 		}
+		//make sure that when destroyed, m_MainCamera.m_EntityHandle = entt::null; Curerntly done primitively right inside DestroyEntity.
+
 	}
 
 	Entity Scene::GetMainCamera()

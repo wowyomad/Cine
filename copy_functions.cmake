@@ -34,8 +34,8 @@ function(add_copy_target TARGET_NAME DEST_DIR)
         file(GLOB_RECURSE FILE_LIST "${SRC_DIR}/*")  # Get all files from the source directory
 
         foreach(FILE ${FILE_LIST})
-            # Compute the relative path with respect to the common assets directory (not just SRC_DIR)
-            file(RELATIVE_PATH REL_PATH "${GAME_ASSETS_DIR}" "${FILE}")
+            # Compute the relative path with respect to the current source directory
+            file(RELATIVE_PATH REL_PATH "${SRC_DIR}" "${FILE}")
 
             # Determine the full destination path, preserving directory structure
             set(DEST_FILE "${DEST_DIR}/${REL_PATH}")
@@ -59,3 +59,4 @@ function(add_copy_target TARGET_NAME DEST_DIR)
     # Create a single target with all copied files as dependencies
     add_custom_target(${TARGET_NAME} ALL DEPENDS ${COPY_TARGETS})
 endfunction()
+
