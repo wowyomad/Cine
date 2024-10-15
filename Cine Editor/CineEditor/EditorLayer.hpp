@@ -8,24 +8,19 @@ namespace Cine
 	{
 	public:
 		EditorLayer() : Layer("Cine Editor") {}
+		
 
 		void OnAttach() override;
+		void OnDetach() override;
 		void OnUpdate(Timestep ts) override;
 		void OnEvent(Event& event) override;
 		void OnImGuiRender() override;
 
 	private:
-		
 		bool m_DockingEnabled = true;
-		Ref<OrthograhpicCameraController> m_CameraController;
-
-		Entity m_FirstCamera;
-		Entity m_SecondCamera;
 
 		Ref<FrameBuffer> m_Framebuffer;
-		Ref<Texture2D> m_FaceTexture;
 
-		Entity m_SquareEntity;
 
 		Ref<Scene> m_ActiveScene;
 		SceneHierarchyPanel m_HierarchyPanel;
@@ -35,6 +30,8 @@ namespace Cine
 		bool m_ViewportHovered = true;
 
 		float m_LastFrameTime = 0.0f;
+
+		std::filesystem::path m_ScenePath = "Assets/Scenes/Example.cine";
 
 	private:
 		void DrawViewport();

@@ -2,6 +2,7 @@
 #include "EditorLayer.hpp"
 
 #include "Scene/ScriptableEntity.hpp"
+#include "Scene/SceneSerializer.hpp"
 
 static Cine::Scene* s_Scene = nullptr;
 
@@ -56,26 +57,20 @@ namespace Cine
 		spec.Height = 720;
 		m_Framebuffer = FrameBuffer::Create(spec);
 
-		m_CameraController = CreateRef<OrthograhpicCameraController>(1.7778f);
 
 		m_ActiveScene = CreateRef<Scene>(); 
 		s_Scene = m_ActiveScene.get();
 
-		m_FirstCamera = m_ActiveScene->CreateEntity("First Camera");
-		m_FirstCamera.AddComponent<CameraComponent>();
-		m_FirstCamera.AddComponent<NativeScriptComponent>().Bind<CameraControllerScript>();
-
-		m_SecondCamera = m_ActiveScene->CreateEntity("Second Camera");
-		m_SecondCamera.AddComponent<CameraComponent>();
-		m_SecondCamera.AddComponent<NativeScriptComponent>().Bind<CameraControllerScript>();
-
-		m_ActiveScene->SetMainCamera(m_FirstCamera); 
-
-		m_SquareEntity = m_ActiveScene->CreateEntity("Square");
-		m_FaceTexture = Texture2D::Create("resources/textures/face.png");
-		m_SquareEntity.AddComponent<SpriteRendererComponent>(glm::vec4(1.0f, 0.75f, 0.75f, 1.0f));	
-
 		m_HierarchyPanel.SetContext(m_ActiveScene);
+
+		SceneSerializer serializer(m_ActiveScene);
+		serializer.Deserialize(m_ScenePath);
+	}
+
+	void EditorLayer::OnDetach()
+	{
+		SceneSerializer serializer(m_ActiveScene);
+		serializer.Serialize(m_ScenePath);
 	}
 
 	void EditorLayer::OnUpdate(Timestep ts)
@@ -93,7 +88,7 @@ namespace Cine
 
 		if(m_ViewportHovered && m_ViewportFocused)
 		{
-			m_CameraController->OnUpdate(ts);
+			
 		}
 
 		m_Framebuffer->Bind();
@@ -107,7 +102,7 @@ namespace Cine
 	{
 		if(m_ViewportHovered && m_ViewportFocused)
 		{
-			m_CameraController->OnEvent(event);
+			
 		}
 	}
 
