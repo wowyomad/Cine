@@ -73,6 +73,7 @@ target_include_directories(glash
     PUBLIC ${stb_SOURCE_DIR}
     PUBLIC ${imgui_SOURCE_DIR}
     PUBLIC ${EnTT_SOURCE_DIR}
+    PUBLIC ${yaml-cpp_SOURCE_DIR}/include
 )
 
 target_link_libraries(glash
