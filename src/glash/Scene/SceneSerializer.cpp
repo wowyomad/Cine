@@ -135,7 +135,7 @@ namespace Cine
 
 			//This would work for now. Should use UUIDs and store this 'flag' in scene, not in every camera component.
 			//TODO: Remove this
-			bool isMainCamera = m_Scene->GetMainCamera() == entity;
+			bool isMainCamera = m_Scene->GetMainCameraEntity() == entity;
 			out << YAML::Key << "IsMainCamera" << YAML::Value << isMainCamera; 
 
 			out << YAML::EndMap; //Camera Component

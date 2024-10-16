@@ -1,5 +1,7 @@
 #include "glash/Cine.hpp"
 
+#include <ImGuizmo.h>
+
 #include "Panels/SceneHierarchyPanel.hpp"
 
 namespace Cine
@@ -23,7 +25,13 @@ namespace Cine
 
 
 		Ref<Scene> m_ActiveScene;
-		SceneHierarchyPanel m_HierarchyPanel;
+		SceneHierarchyPanel m_SceneHierarchyPanel;
+
+		int32_t m_GizmoOperation = -1;
+		float m_SnapScale = 0.1f;
+		float m_SnapTranslation = 0.5f;
+		float m_SnapRotation = 5.0f;
+		float m_SnapValue = 0.0f;
 
 		glm::vec2 m_ViewportSize = { 0.0f, 0.0f };
 		bool m_ViewportFocused = true;
@@ -40,5 +48,7 @@ namespace Cine
 		void NewScene();
 		void SaveSceneAs();
 		void OpenScene();
+
+		bool IsGizmoSnapping() const;
 	};
 }

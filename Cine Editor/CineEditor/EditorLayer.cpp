@@ -5,6 +5,10 @@
 #include "Scene/SceneSerializer.hpp"
 #include "glash/Utils/PlatformUtils.hpp"
 
+#include "glash/Math/Math.hpp"
+
+#include <ImGuizmo.h>
+
 static Cine::Scene* s_Scene = nullptr;
 
 namespace Cine
@@ -24,7 +28,7 @@ namespace Cine
 
 		void OnUpdate(Timestep ts) override
 		{
-			if (GetEntity() == s_Scene->GetMainCamera())
+			if (GetEntity() == s_Scene->GetMainCameraEntity())
 			{
 				auto& transform = GetComponent<TransformComponent>().Translation;
 
@@ -61,7 +65,7 @@ namespace Cine
 		m_ActiveScene = CreateRef<Scene>();
 		s_Scene = m_ActiveScene.get();
 
-		m_HierarchyPanel.SetContext(m_ActiveScene);
+		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 	}
 
 	void EditorLayer::OnDetach()
@@ -133,9 +137,9 @@ namespace Cine
 
 		ImGui::Begin("Stats");
 		{
-			if (m_ActiveScene->GetMainCamera())
+			if (m_ActiveScene->GetMainCameraEntity())
 			{
-				auto&& [cameraComponent, tagComponent] = m_ActiveScene->GetMainCamera().GetComponents<CameraComponent, TagComponent>();
+				auto&& [cameraComponent, tagComponent] = m_ActiveScene->GetMainCameraEntity().GetComponents<CameraComponent, TagComponent>();
 				ImGui::Text("Camera: %s", tagComponent.Tag.c_str());
 			}
 			else
@@ -156,41 +160,15 @@ namespace Cine
 		}
 		ImGui::End();
 
-		m_HierarchyPanel.OnImGuiRender();
+		m_SceneHierarchyPanel.OnImGuiRender();
 
 		DrawViewport();
 
 	}
-	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
-	{
-		if (e.GetRepeatCount() > 0)
-		{
-			return false;
-		}
-		bool control = Input::IsKeyPressed(Key::LeftControl) || Input::IsKeyPressed(Key::RightControl);
-		bool shift = Input::IsKeyPressed(Key::LeftShift) || Input::IsKeyPressed(Key::RightShift);
-		switch (e.GetKeyCode())
-		{
-		case Key::N:
-		{
-			if(control)
-				NewScene();
-		} break;
-		case Key::O:
-		{
-			if(control)
-				OpenScene();
-		} break;
-		case Key::S:
-		{
-			if(control && shift)
-				SaveSceneAs();
-		} break;
-		}
-		return false;
-	}
+	
 	void EditorLayer::DrawViewport()
 	{
+
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0.0f, 0.0f });
 		ImGui::Begin("Viewport");
 		{
@@ -205,13 +183,58 @@ namespace Cine
 			ImGui::Image(reinterpret_cast<void*>(id), { m_ViewportSize.x, m_ViewportSize.y }, { 0, 1 }, { 1, 0 });
 
 		}
+
+
+		//Gizmos
+		Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
+		if (selectedEntity && m_GizmoOperation > 0)
+		{
+			ImGuizmo::SetDrawlist();
+			float windowWidth = static_cast<float>(ImGui::GetWindowWidth());
+			float windowHeight = static_cast<float>(ImGui::GetWindowHeight());
+			ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
+
+			auto cameraEntity = m_ActiveScene->GetMainCameraEntity();
+			auto& camera = cameraEntity.GetComponent<CameraComponent>();
+			auto& cameraTransform = cameraEntity.GetComponent<TransformComponent>();
+			glm::mat4 cameraView = glm::inverse(cameraTransform.GetTransform());
+			const glm::mat4& cameraProjection = camera.Camera.GetProjection();
+
+			//Entity
+			auto& tc = selectedEntity.GetComponent<TransformComponent>();
+			glm::mat4 transform = tc.GetTransform();
+
+
+			static bool isOrtho = false;
+			isOrtho = camera.Camera.GetProjectionType() == SceneCamera::ProjectionType::Orthographic;
+			ImGuizmo::SetOrthographic(isOrtho);
+
+			bool snap = IsGizmoSnapping();
+			float snapValues[3] = { m_SnapValue, m_SnapValue, m_SnapValue };
+			
+			ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
+				static_cast<ImGuizmo::OPERATION>(m_GizmoOperation), ImGuizmo::LOCAL, glm::value_ptr(transform),
+				nullptr, snap ? snapValues : nullptr);
+
+			if (ImGuizmo::IsUsing())
+			{
+				glm::vec3 translation, rotation, scale;
+				Math::DecomposeTransform(transform, translation, rotation, scale);
+
+				tc.Translation = translation;
+				tc.Rotation = rotation;
+				tc.Scale = scale;
+			}
+		}
+
+
 		ImGui::End();
 		ImGui::PopStyleVar(1);
 	}
 	void EditorLayer::NewScene()
 	{
 		m_ActiveScene = CreateRef<Scene>();
-		m_HierarchyPanel.SetContext(m_ActiveScene);
+		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 		//m_ActiveScene->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
 	}
 	void EditorLayer::SaveSceneAs()
@@ -229,11 +252,109 @@ namespace Cine
 		if (!filepath.empty())
 		{
 			m_ActiveScene = CreateRef<Scene>();
-			m_HierarchyPanel.SetContext(m_ActiveScene);
+			m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 			//m_ActiveScene->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
 
 			SceneSerializer serializer(m_ActiveScene);
 			serializer.Deserialize(filepath);
+		}
+	}
+
+	bool EditorLayer::IsGizmoSnapping() const
+	{
+		return Input::IsKeyPressed(Key::LeftControl);
+	}
+
+	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
+	{
+		if (e.GetRepeatCount() > 0)
+		{
+			return false;
+		}
+		bool control = Input::IsKeyPressed(Key::LeftControl) || Input::IsKeyPressed(Key::RightControl);
+		bool shift = Input::IsKeyPressed(Key::LeftShift) || Input::IsKeyPressed(Key::RightShift);
+		
+		//Shortcuts
+		switch (e.GetKeyCode())
+		{
+		case Key::N:
+		{
+			if (control)
+				NewScene();
+		} break;
+		case Key::O:
+		{
+			if (control)
+				OpenScene();
+		} break;
+		case Key::S:
+		{
+			if (control && shift)
+				SaveSceneAs();
+		} break;
+		}
+		//Gizmos
+		switch (e.GetKeyCode())
+		{
+		case Key::Q:
+			m_GizmoOperation = -1;
+			break;
+
+		case Key::W:
+			m_GizmoOperation = ImGuizmo::OPERATION::TRANSLATE;
+			m_SnapValue = m_SnapTranslation;
+			break;
+
+		case Key::E:
+			m_GizmoOperation = ImGuizmo::OPERATION::ROTATE;
+			m_SnapValue = m_SnapRotation;
+			break;
+
+		case Key::R:
+			m_GizmoOperation = ImGuizmo::OPERATION::SCALE;
+			m_SnapValue = m_SnapScale;
+			break;
+
+		case Key::X:
+		case Key::Y:
+		case Key::Z:
+		{
+			if (m_GizmoOperation < 0) break;
+			ImGuizmo::OPERATION baseOperation = ImGuizmo::OPERATION::TRANSLATE | ImGuizmo::OPERATION::ROTATE | ImGuizmo::OPERATION::SCALE;
+			ImGuizmo::OPERATION currentOperation = static_cast<ImGuizmo::OPERATION>(m_GizmoOperation);
+
+			if ((currentOperation & baseOperation) != 0)
+			{
+				if (currentOperation & ImGuizmo::OPERATION::TRANSLATE)
+				{
+					m_GizmoOperation = (Key::X == e.GetKeyCode()) ? static_cast<int>(ImGuizmo::OPERATION::TRANSLATE_X) :
+						(Key::Y == e.GetKeyCode()) ? static_cast<int>(ImGuizmo::OPERATION::TRANSLATE_Y) :
+						static_cast<int>(ImGuizmo::OPERATION::TRANSLATE_Z);
+				}
+				else if (currentOperation & ImGuizmo::OPERATION::ROTATE)
+				{
+					m_GizmoOperation = (Key::X == e.GetKeyCode()) ? static_cast<int>(ImGuizmo::OPERATION::ROTATE_X) :
+						(Key::Y == e.GetKeyCode()) ? static_cast<int>(ImGuizmo::OPERATION::ROTATE_Y) :
+						static_cast<int>(ImGuizmo::OPERATION::ROTATE_Z);
+				}
+				else if (currentOperation & ImGuizmo::OPERATION::SCALE)
+				{
+					m_GizmoOperation = (Key::X == e.GetKeyCode()) ? static_cast<int>(ImGuizmo::OPERATION::SCALE_X) :
+						(Key::Y == e.GetKeyCode()) ? static_cast<int>(ImGuizmo::OPERATION::SCALE_Y) :
+						static_cast<int>(ImGuizmo::OPERATION::SCALE_Z);
+				}
+			}
+			else
+			{
+				m_GizmoOperation = (Key::X == e.GetKeyCode()) ? static_cast<int>(ImGuizmo::OPERATION::TRANSLATE_X) :
+					(Key::Y == e.GetKeyCode()) ? static_cast<int>(ImGuizmo::OPERATION::TRANSLATE_Y) :
+					(Key::Z == e.GetKeyCode()) ? static_cast<int>(ImGuizmo::OPERATION::TRANSLATE_Z) : m_GizmoOperation;
+			}
+		}
+		break;
+
+		default:
+			break;
 		}
 	}
 }

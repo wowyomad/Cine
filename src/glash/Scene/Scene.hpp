@@ -20,7 +20,7 @@ namespace Cine
 		void DestroyEntity(Entity entity);
 
 		void SetMainCamera(Entity cameraEntity);
-		Entity GetMainCamera();
+		Entity GetMainCameraEntity();
 
 		void OnViewportResize(uint32_t width, uint32_t height);
 		

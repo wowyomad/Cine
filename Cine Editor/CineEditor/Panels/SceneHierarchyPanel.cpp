@@ -201,6 +201,11 @@ namespace Cine
 		ImGui::End();
 	}
 
+	Entity SceneHierarchyPanel::GetSelectedEntity() const
+	{
+		return m_Context.Selection;
+	}
+
 	void SceneHierarchyPanel::DisplayEntityNode(Entity entity)
 	{
 		auto& tag = m_Context.Scene->m_Registry.get<TagComponent>(entity).Tag;
@@ -355,7 +360,7 @@ namespace Cine
 					ImGui::EndCombo();
 				}
 
-				bool isMainCamera = entity == m_Context.Scene->GetMainCamera();
+				bool isMainCamera = entity == m_Context.Scene->GetMainCameraEntity();
 				if (ImGui::Checkbox("Main Camera", &isMainCamera))
 				{
 					m_Context.Scene->SetMainCamera(entity);

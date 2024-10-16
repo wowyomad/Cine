@@ -28,6 +28,8 @@ namespace Cine
 
 		void OnImGuiRender();
 
+		Entity GetSelectedEntity() const;
+
 	private:
 		Context m_Context;
 

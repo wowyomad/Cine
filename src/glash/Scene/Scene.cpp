@@ -37,7 +37,7 @@ namespace Cine
 
 	}
 
-	Entity Scene::GetMainCamera()
+	Entity Scene::GetMainCameraEntity()
 	{
 		return *m_MainCamera;
 	}
