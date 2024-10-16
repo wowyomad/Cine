@@ -174,7 +174,7 @@ namespace Cine
 		{
 			m_ViewportFocused = ImGui::IsWindowFocused();
 			m_ViewportHovered = ImGui::IsWindowHovered();
-			Application::Get().GetImGuiLayer()->SetBlockEvents(!m_ViewportFocused || !m_ViewportHovered);
+			Application::Get().GetImGuiLayer()->SetBlockEvents(!m_ViewportFocused && !m_ViewportHovered);
 
 			ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 			m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
@@ -235,7 +235,7 @@ namespace Cine
 	{
 		m_ActiveScene = CreateRef<Scene>();
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
-		//m_ActiveScene->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
+		m_ActiveScene->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
 	}
 	void EditorLayer::SaveSceneAs()
 	{
@@ -253,10 +253,10 @@ namespace Cine
 		{
 			m_ActiveScene = CreateRef<Scene>();
 			m_SceneHierarchyPanel.SetContext(m_ActiveScene);
-			//m_ActiveScene->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
 
 			SceneSerializer serializer(m_ActiveScene);
 			serializer.Deserialize(filepath);
+			m_ActiveScene->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
 		}
 	}
 
@@ -294,67 +294,70 @@ namespace Cine
 		} break;
 		}
 		//Gizmos
-		switch (e.GetKeyCode())
+		if (m_ViewportFocused || m_ViewportHovered)
 		{
-		case Key::Q:
-			m_GizmoOperation = -1;
-			break;
-
-		case Key::W:
-			m_GizmoOperation = ImGuizmo::OPERATION::TRANSLATE;
-			m_SnapValue = m_SnapTranslation;
-			break;
-
-		case Key::E:
-			m_GizmoOperation = ImGuizmo::OPERATION::ROTATE;
-			m_SnapValue = m_SnapRotation;
-			break;
-
-		case Key::R:
-			m_GizmoOperation = ImGuizmo::OPERATION::SCALE;
-			m_SnapValue = m_SnapScale;
-			break;
-
-		case Key::X:
-		case Key::Y:
-		case Key::Z:
-		{
-			if (m_GizmoOperation < 0) break;
-			ImGuizmo::OPERATION baseOperation = ImGuizmo::OPERATION::TRANSLATE | ImGuizmo::OPERATION::ROTATE | ImGuizmo::OPERATION::SCALE;
-			ImGuizmo::OPERATION currentOperation = static_cast<ImGuizmo::OPERATION>(m_GizmoOperation);
-
-			if ((currentOperation & baseOperation) != 0)
+			switch (e.GetKeyCode())
 			{
-				if (currentOperation & ImGuizmo::OPERATION::TRANSLATE)
+			case Key::Q:
+				m_GizmoOperation = -1;
+				break;
+
+			case Key::W:
+				m_GizmoOperation = ImGuizmo::OPERATION::TRANSLATE;
+				m_SnapValue = m_SnapTranslation;
+				break;
+
+			case Key::E:
+				m_GizmoOperation = ImGuizmo::OPERATION::ROTATE;
+				m_SnapValue = m_SnapRotation;
+				break;
+
+			case Key::R:
+				m_GizmoOperation = ImGuizmo::OPERATION::SCALE;
+				m_SnapValue = m_SnapScale;
+				break;
+
+			case Key::X:
+			case Key::Y:
+			case Key::Z:
+			{
+				if (m_GizmoOperation < 0) break;
+				ImGuizmo::OPERATION baseOperation = ImGuizmo::OPERATION::TRANSLATE | ImGuizmo::OPERATION::ROTATE | ImGuizmo::OPERATION::SCALE;
+				ImGuizmo::OPERATION currentOperation = static_cast<ImGuizmo::OPERATION>(m_GizmoOperation);
+
+				if ((currentOperation & baseOperation) != 0)
+				{
+					if (currentOperation & ImGuizmo::OPERATION::TRANSLATE)
+					{
+						m_GizmoOperation = (Key::X == e.GetKeyCode()) ? static_cast<int>(ImGuizmo::OPERATION::TRANSLATE_X) :
+							(Key::Y == e.GetKeyCode()) ? static_cast<int>(ImGuizmo::OPERATION::TRANSLATE_Y) :
+							static_cast<int>(ImGuizmo::OPERATION::TRANSLATE_Z);
+					}
+					else if (currentOperation & ImGuizmo::OPERATION::ROTATE)
+					{
+						m_GizmoOperation = (Key::X == e.GetKeyCode()) ? static_cast<int>(ImGuizmo::OPERATION::ROTATE_X) :
+							(Key::Y == e.GetKeyCode()) ? static_cast<int>(ImGuizmo::OPERATION::ROTATE_Y) :
+							static_cast<int>(ImGuizmo::OPERATION::ROTATE_Z);
+					}
+					else if (currentOperation & ImGuizmo::OPERATION::SCALE)
+					{
+						m_GizmoOperation = (Key::X == e.GetKeyCode()) ? static_cast<int>(ImGuizmo::OPERATION::SCALE_X) :
+							(Key::Y == e.GetKeyCode()) ? static_cast<int>(ImGuizmo::OPERATION::SCALE_Y) :
+							static_cast<int>(ImGuizmo::OPERATION::SCALE_Z);
+					}
+				}
+				else
 				{
 					m_GizmoOperation = (Key::X == e.GetKeyCode()) ? static_cast<int>(ImGuizmo::OPERATION::TRANSLATE_X) :
 						(Key::Y == e.GetKeyCode()) ? static_cast<int>(ImGuizmo::OPERATION::TRANSLATE_Y) :
-						static_cast<int>(ImGuizmo::OPERATION::TRANSLATE_Z);
-				}
-				else if (currentOperation & ImGuizmo::OPERATION::ROTATE)
-				{
-					m_GizmoOperation = (Key::X == e.GetKeyCode()) ? static_cast<int>(ImGuizmo::OPERATION::ROTATE_X) :
-						(Key::Y == e.GetKeyCode()) ? static_cast<int>(ImGuizmo::OPERATION::ROTATE_Y) :
-						static_cast<int>(ImGuizmo::OPERATION::ROTATE_Z);
-				}
-				else if (currentOperation & ImGuizmo::OPERATION::SCALE)
-				{
-					m_GizmoOperation = (Key::X == e.GetKeyCode()) ? static_cast<int>(ImGuizmo::OPERATION::SCALE_X) :
-						(Key::Y == e.GetKeyCode()) ? static_cast<int>(ImGuizmo::OPERATION::SCALE_Y) :
-						static_cast<int>(ImGuizmo::OPERATION::SCALE_Z);
+						(Key::Z == e.GetKeyCode()) ? static_cast<int>(ImGuizmo::OPERATION::TRANSLATE_Z) : m_GizmoOperation;
 				}
 			}
-			else
-			{
-				m_GizmoOperation = (Key::X == e.GetKeyCode()) ? static_cast<int>(ImGuizmo::OPERATION::TRANSLATE_X) :
-					(Key::Y == e.GetKeyCode()) ? static_cast<int>(ImGuizmo::OPERATION::TRANSLATE_Y) :
-					(Key::Z == e.GetKeyCode()) ? static_cast<int>(ImGuizmo::OPERATION::TRANSLATE_Z) : m_GizmoOperation;
-			}
-		}
-		break;
-
-		default:
 			break;
+
+			default:
+				break;
+			}
 		}
 	}
 }
