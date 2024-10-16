@@ -5,8 +5,6 @@
 #include "Scene/SceneSerializer.hpp"
 #include "glash/Utils/PlatformUtils.hpp"
 
-#include <ImGuizmo.h>
-
 static Cine::Scene* s_Scene = nullptr;
 
 namespace Cine

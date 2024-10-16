@@ -74,6 +74,7 @@ target_include_directories(glash
     PUBLIC ${imgui_SOURCE_DIR}
     PUBLIC ${EnTT_SOURCE_DIR}
     PUBLIC ${yaml-cpp_SOURCE_DIR}/include
+    PUBLIC ${imguizmo_SOURCE_DIR}
 )
 
 target_link_libraries(glash
@@ -86,6 +87,7 @@ target_link_libraries(glash
     PUBLIC imgui
     PUBLIC EnTT::EnTT 
     PUBLIC yaml-cpp::yaml-cpp
+    PUBLIC ImGuizmo
 )
 
 if(MSVC)
