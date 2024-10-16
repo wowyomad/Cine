@@ -13,6 +13,7 @@
 #include <array>
 #include <string>
 #include <cstdint>
+#include <stack>
 #include <map>
 #include <unordered_map>
 #include <set>

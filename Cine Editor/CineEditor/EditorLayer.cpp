@@ -120,6 +120,50 @@ namespace Cine
 	void EditorLayer::OnImGuiRender()
 	{
 		ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
+
+		static int MAX = 10;
+		static std::deque <glm::vec3> state_stack;
+		static glm::vec3 value(1.0f);
+		static glm::vec3 oldValue = value;
+		static bool isEdited = false;
+
+		ImGui::Begin("Test");
+		{
+			bool currentEdited = ImGui::DragFloat3("Value", &value.x);
+			bool active = ImGui::IsItemActive();
+			isEdited |= currentEdited;
+
+			if (!active && isEdited && value != oldValue)
+			{
+				state_stack.push_front(oldValue); 
+				oldValue = value;
+				isEdited = false;
+				if (state_stack.size() > 10)
+				{
+					state_stack.pop_back();
+				}
+			}
+
+			if (ImGui::Button("Undo"))
+			{
+				if (!state_stack.empty())
+				{
+					value = state_stack.front();
+					state_stack.pop_front();
+					oldValue = value;
+				}
+			}
+
+			for (auto value : state_stack)
+			{
+				ImGui::Text("%f %f %f", value.x, value.y, value.z);
+			}
+		}
+		ImGui::End();
+
+
+		static bool show = true;
+		ImGui::ShowDemoWindow(&show);
 		
 		if (ImGui::BeginMainMenuBar())
 		{
@@ -157,7 +201,6 @@ namespace Cine
 			ImGui::Text("Draw Calls: %llu", stats.DrawCalls);
 			ImGui::Text("Quads: %llu", stats.QuadCount);
 			ImGui::Text("FrameTime: %.3fms", m_LastFrameTime);
-			ImGui::Checkbox("Docking", &m_DockingEnabled);
 			if (ImGui::Button("Close"))
 			{
 				Application::Get().Close();
