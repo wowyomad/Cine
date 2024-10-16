@@ -291,6 +291,7 @@ namespace Cine
 
 	void SceneHierarchyPanel::DisplayTransformComponent(Entity entity)
 	{
+		ImGui::IsItemDeactivated();
 		DisplayComponent<TransformComponent>(entity, "Transform", [](TransformComponent& tc)
 			{
 				auto& translation = tc.Translation;

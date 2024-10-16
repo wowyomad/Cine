@@ -119,11 +119,8 @@ namespace Cine
 
 	void EditorLayer::OnImGuiRender()
 	{
-		if (m_DockingEnabled)
-		{
-			ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
-		}
-
+		ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
+		
 		if (ImGui::BeginMainMenuBar())
 		{
 			if (ImGui::BeginMenu("File"))
@@ -191,7 +188,6 @@ namespace Cine
 			ImGui::Image(reinterpret_cast<void*>(id), { m_ViewportSize.x, m_ViewportSize.y }, { 0, 1 }, { 1, 0 });
 
 		}
-
 
 		//Gizmos
 		Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();

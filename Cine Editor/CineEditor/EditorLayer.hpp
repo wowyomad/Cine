@@ -19,7 +19,6 @@ namespace Cine
 		void OnImGuiRender() override;
 
 	private:
-		bool m_DockingEnabled = true;
 
 		Ref<FrameBuffer> m_Framebuffer;
 		Ref<Scene> m_ActiveScene;

@@ -38,7 +38,6 @@ namespace Cine
 				CINE_CORE_TRACE("Added Camera Component to {}", m_Registry.get<TagComponent>(entity).Tag);
 			}
 		}
-	
 
 	private:
 		entt::registry m_Registry;
@@ -50,7 +49,5 @@ namespace Cine
 		friend class Entity;
 		friend class SceneHierarchyPanel;
 		friend class SceneSerializer;
-
-
 	};
 }
