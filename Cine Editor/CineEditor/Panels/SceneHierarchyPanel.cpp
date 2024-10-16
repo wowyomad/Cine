@@ -135,6 +135,8 @@ namespace Cine
 	void SceneHierarchyPanel::SetContext(const Ref<Scene>& scene)
 	{
 		m_Context.Scene = scene;
+		m_Context.Selection = {};
+		m_Context.Properties = {};
 	}
 
 	void SceneHierarchyPanel::OnImGuiRender()
@@ -160,7 +162,8 @@ namespace Cine
 		{
 			if (ImGui::MenuItem("Create Empty Entity"))
 			{
-				m_Context.Scene->CreateEntity("Empty Entity");
+				Entity newEntity = m_Context.Scene->CreateEntity("Empty Entity");
+				m_Context.Properties = newEntity;
 			}
 			ImGui::EndPopup();
 		}

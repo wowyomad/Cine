@@ -3,6 +3,7 @@
 
 #include "Scene/ScriptableEntity.hpp"
 #include "Scene/SceneSerializer.hpp"
+#include "glash/Utils/PlatformUtils.hpp"
 
 static Cine::Scene* s_Scene = nullptr;
 
@@ -58,19 +59,15 @@ namespace Cine
 		m_Framebuffer = FrameBuffer::Create(spec);
 
 
-		m_ActiveScene = CreateRef<Scene>(); 
+		m_ActiveScene = CreateRef<Scene>();
 		s_Scene = m_ActiveScene.get();
 
 		m_HierarchyPanel.SetContext(m_ActiveScene);
-
-		SceneSerializer serializer(m_ActiveScene);
-		serializer.Deserialize(m_ScenePath);
 	}
 
 	void EditorLayer::OnDetach()
 	{
-		SceneSerializer serializer(m_ActiveScene);
-		serializer.Serialize(m_ScenePath);
+
 	}
 
 	void EditorLayer::OnUpdate(Timestep ts)
@@ -86,9 +83,9 @@ namespace Cine
 		Renderer2D::ResetStats();
 		m_LastFrameTime = ts.Milleseconds();
 
-		if(m_ViewportHovered && m_ViewportFocused)
+		if (m_ViewportHovered && m_ViewportFocused)
 		{
-			
+
 		}
 
 		m_Framebuffer->Bind();
@@ -100,28 +97,44 @@ namespace Cine
 
 	void EditorLayer::OnEvent(Event& event)
 	{
-		if(m_ViewportHovered && m_ViewportFocused)
+		if (m_ViewportHovered && m_ViewportFocused)
 		{
-			
+
 		}
+
+		EventDispatcher dispatcher(event);
+		dispatcher.Dispatch<KeyPressedEvent>(CINE_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
 	}
 
 	void EditorLayer::OnImGuiRender()
 	{
-		//ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(250, 250));
+
 		if (m_DockingEnabled)
 		{
 			ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
 		}
 
-		m_HierarchyPanel.OnImGuiRender();
-
-
-		DrawViewport();
-
-		ImGui::Begin("Editor");
+		if (ImGui::BeginMainMenuBar())
 		{
-			
+			if (ImGui::BeginMenu("File"))
+			{
+				if (ImGui::MenuItem("New", "Ctrl+N"))
+					NewScene();
+
+				if (ImGui::MenuItem("Open...", "Ctrl+O"))
+					OpenScene();
+
+				if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S"))
+					SaveSceneAs();
+
+				ImGui::EndMenu();
+			}
+			ImGui::EndMainMenuBar();
+		}
+
+
+		ImGui::Begin("Stats");
+		{
 			if (m_ActiveScene->GetMainCamera())
 			{
 				auto&& [cameraComponent, tagComponent] = m_ActiveScene->GetMainCamera().GetComponents<CameraComponent, TagComponent>();
@@ -143,9 +156,40 @@ namespace Cine
 				Application::Get().Close();
 			}
 		}
-
 		ImGui::End();
-		//ImGui::PopStyleVar();
+
+		m_HierarchyPanel.OnImGuiRender();
+
+		DrawViewport();
+
+	}
+	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
+	{
+		if (e.GetRepeatCount() > 0)
+		{
+			return false;
+		}
+		bool control = Input::IsKeyPressed(Key::LeftControl) || Input::IsKeyPressed(Key::RightControl);
+		bool shift = Input::IsKeyPressed(Key::LeftShift) || Input::IsKeyPressed(Key::RightShift);
+		switch (e.GetKeyCode())
+		{
+		case Key::N:
+		{
+			if(control)
+				NewScene();
+		} break;
+		case Key::O:
+		{
+			if(control)
+				OpenScene();
+		} break;
+		case Key::S:
+		{
+			if(control && shift)
+				SaveSceneAs();
+		} break;
+		}
+		return false;
 	}
 	void EditorLayer::DrawViewport()
 	{
@@ -158,12 +202,40 @@ namespace Cine
 
 			ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 			m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
-				
+
 			size_t id = m_Framebuffer->GetColorAttachmentRendererID();
 			ImGui::Image(reinterpret_cast<void*>(id), { m_ViewportSize.x, m_ViewportSize.y }, { 0, 1 }, { 1, 0 });
 
 		}
 		ImGui::End();
 		ImGui::PopStyleVar(1);
+	}
+	void EditorLayer::NewScene()
+	{
+		m_ActiveScene = CreateRef<Scene>();
+		m_HierarchyPanel.SetContext(m_ActiveScene);
+		//m_ActiveScene->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
+	}
+	void EditorLayer::SaveSceneAs()
+	{
+		std::filesystem::path filepath = FileDialogs::SaveFile("Cine Scene (*.cine)\0*.cine\0");
+		if (!filepath.empty())
+		{
+			SceneSerializer serializer(m_ActiveScene);
+			serializer.Serialize(filepath);
+		}
+	}
+	void EditorLayer::OpenScene()
+	{
+		std::filesystem::path filepath = FileDialogs::OpenFile("Cine Scene (*.cine)\0*.cine\0");
+		if (!filepath.empty())
+		{
+			m_ActiveScene = CreateRef<Scene>();
+			m_HierarchyPanel.SetContext(m_ActiveScene);
+			//m_ActiveScene->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
+
+			SceneSerializer serializer(m_ActiveScene);
+			serializer.Deserialize(filepath);
+		}
 	}
 }

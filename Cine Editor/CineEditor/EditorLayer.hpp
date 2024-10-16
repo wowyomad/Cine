@@ -34,6 +34,11 @@ namespace Cine
 		std::filesystem::path m_ScenePath = "Assets/Scenes/Example.cine";
 
 	private:
+		bool OnKeyPressed(KeyPressedEvent& e);
 		void DrawViewport();
+
+		void NewScene();
+		void SaveSceneAs();
+		void OpenScene();
 	};
 }

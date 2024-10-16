@@ -176,7 +176,8 @@ namespace Cine
 				} break;
 				case GLFW_REPEAT:
 				{
-					//TODO: ???
+					KeyPressedEvent event(key, 1);
+					data.EventCallback(event);
 				} break;
 				}
 			});
