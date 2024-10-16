@@ -22,10 +22,9 @@ namespace Cine
 		bool m_DockingEnabled = true;
 
 		Ref<FrameBuffer> m_Framebuffer;
-
-
 		Ref<Scene> m_ActiveScene;
 		SceneHierarchyPanel m_SceneHierarchyPanel;
+		EditorCamera m_EditorCamera;
 
 		int32_t m_GizmoOperation = -1;
 		float m_SnapScale = 0.1f;

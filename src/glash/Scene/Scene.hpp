@@ -1,6 +1,7 @@
 #pragma once
 #include "glash/Core/Base.hpp"
 #include "glash/Core/Timestep.hpp"
+#include "glash/Renderer/EditorCamera.hpp"
 
 #include "glash/Scene/Components.hpp"
 
@@ -24,7 +25,8 @@ namespace Cine
 
 		void OnViewportResize(uint32_t width, uint32_t height);
 		
-		void OnUpdate(Timestep ts);
+		void OnUpdateRuntime(Timestep ts);
+		void OnUpdateEditor(Timestep ts, EditorCamera& editorCamera);
 
 	private:
 		template <class Component>

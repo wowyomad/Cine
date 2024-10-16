@@ -81,7 +81,28 @@ namespace Cine
 		}
 	}
 
-	void Scene::OnUpdate(Timestep ts)
+	void Scene::OnUpdateEditor(Timestep ts, EditorCamera& editorCamera)
+	{
+		Renderer2D::Clear();
+		if (*m_MainCamera)
+		{
+			auto&& [cameraComponent, transformComponent] = m_MainCamera->GetComponents<CameraComponent, TransformComponent>();
+
+			Renderer2D::BeginScene(editorCamera);
+
+			auto group = m_Registry.group<TransformComponent, SpriteRendererComponent>();
+			for (auto entity : group)
+			{
+				auto&& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+
+				Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color);
+			}
+
+			Renderer2D::EndScene();
+		}
+	}
+
+	void Scene::OnUpdateRuntime(Timestep ts)
 	{
 		m_Registry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc)
 			{
@@ -114,6 +135,7 @@ namespace Cine
 
 			Renderer2D::EndScene();
 		}
+		
 	}
 
 }

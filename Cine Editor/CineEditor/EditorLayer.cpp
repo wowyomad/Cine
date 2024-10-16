@@ -66,6 +66,8 @@ namespace Cine
 		s_Scene = m_ActiveScene.get();
 
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+
+		m_EditorCamera = EditorCamera(30.0f, 16.0f / 9.0f, 0.01f, 1000.0f);
 	}
 
 	void EditorLayer::OnDetach()
@@ -80,8 +82,11 @@ namespace Cine
 			(spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y))
 		{
 			m_Framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+			m_EditorCamera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
 			m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 		}
+
+		m_EditorCamera.OnUpdate(ts);
 
 		Renderer2D::ResetStats();
 		m_LastFrameTime = ts.Milleseconds();
@@ -93,13 +98,15 @@ namespace Cine
 
 		m_Framebuffer->Bind();
 		{
-			m_ActiveScene->OnUpdate(ts);
+			m_ActiveScene->OnUpdateEditor(ts, m_EditorCamera);
 		}
 		m_Framebuffer->Unbind();
 	}
 
 	void EditorLayer::OnEvent(Event& event)
 	{
+		m_EditorCamera.OnEvent(event);
+
 		if (m_ViewportHovered && m_ViewportFocused)
 		{
 
@@ -107,6 +114,7 @@ namespace Cine
 
 		EventDispatcher dispatcher(event);
 		dispatcher.Dispatch<KeyPressedEvent>(CINE_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
+
 	}
 
 	void EditorLayer::OnImGuiRender()
@@ -193,12 +201,9 @@ namespace Cine
 			float windowWidth = static_cast<float>(ImGui::GetWindowWidth());
 			float windowHeight = static_cast<float>(ImGui::GetWindowHeight());
 			ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
-
-			auto cameraEntity = m_ActiveScene->GetMainCameraEntity();
-			auto& camera = cameraEntity.GetComponent<CameraComponent>();
-			auto& cameraTransform = cameraEntity.GetComponent<TransformComponent>();
-			glm::mat4 cameraView = glm::inverse(cameraTransform.GetTransform());
-			const glm::mat4& cameraProjection = camera.Camera.GetProjection();
+;
+			const glm::mat4& cameraProjection = m_EditorCamera.GetProjection();
+			const glm::mat4& cameraView = m_EditorCamera.GetViewMatrix();
 
 			//Entity
 			auto& tc = selectedEntity.GetComponent<TransformComponent>();
@@ -206,7 +211,6 @@ namespace Cine
 
 
 			static bool isOrtho = false;
-			isOrtho = camera.Camera.GetProjectionType() == SceneCamera::ProjectionType::Orthographic;
 			ImGuizmo::SetOrthographic(isOrtho);
 
 			bool snap = IsGizmoSnapping();
@@ -359,5 +363,6 @@ namespace Cine
 				break;
 			}
 		}
+		return false;
 	}
 }

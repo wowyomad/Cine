@@ -34,7 +34,7 @@ namespace Cine
 
 	public:
 		float CameraRotationSpeed = 90.0f;
-		float CameraTranslatioSpeed = 2.0f;
+		float CameraTranslationSpeed = 2.0f;
 		float CameraZoomSpeed = 0.1f;
 
 	private:
