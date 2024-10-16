@@ -1,7 +1,6 @@
 #include "glash/glash_pch.hpp"
 #include "glash/Core/EntryPoint.hpp"
 
-
 #include "EditorLayer.hpp"
 
 namespace Cine

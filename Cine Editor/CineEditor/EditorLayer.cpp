@@ -5,6 +5,8 @@
 #include "Scene/SceneSerializer.hpp"
 #include "glash/Utils/PlatformUtils.hpp"
 
+#include <ImGuizmo.h>
+
 static Cine::Scene* s_Scene = nullptr;
 
 namespace Cine
@@ -52,7 +54,6 @@ namespace Cine
 
 	void EditorLayer::OnAttach()
 	{
-
 		FramebufferSpecification spec;
 		spec.Width = 1280;
 		spec.Height = 720;
@@ -108,7 +109,6 @@ namespace Cine
 
 	void EditorLayer::OnImGuiRender()
 	{
-
 		if (m_DockingEnabled)
 		{
 			ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());

@@ -68,6 +68,13 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
     GIT_TAG 0.8.0
 )
+FetchContent_Declare(
+    ImGuizmo
+    GIT_REPOSITORY https://github.com/CedricGuillemet/ImGuizmo.git
+    GIT_TAG 6d588209f99b1324a608783d1f52faa518886c29 # 24.09.2024
+)
+FetchContent_MakeAvailable(ImGuizmo) #It's special
+
 list(APPEND BUILD_DEPENDENCIES glfw fmt glm spdlog imgui entt yaml-cpp)
 list(APPEND HEADER_DEPENDENCIES stb)
 list(APPEND DEPENDENCY_TARGETS ${BUILD_DEPENDENCIES} ${HEADER_DEPENDENCIES})
