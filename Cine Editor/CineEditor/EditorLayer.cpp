@@ -103,16 +103,14 @@ namespace Cine
 			m_EditorCamera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
 			m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 		}
-
-		m_EditorCamera.OnUpdate(ts);
+		if (m_ViewportHovered)
+		{
+			m_EditorCamera.OnUpdate(ts);
+		}
 
 		Renderer2D::ResetStats();
 		m_LastFrameTime = ts.Milleseconds();
 
-		if (m_ViewportHovered && m_ViewportFocused)
-		{
-
-		}
 
 		m_Framebuffer->Bind();
 		{
@@ -123,10 +121,9 @@ namespace Cine
 
 	void EditorLayer::OnEvent(Event& event)
 	{
-		m_EditorCamera.OnEvent(event);
-
-		if (m_ViewportHovered && m_ViewportFocused)
+		if (m_ViewportHovered)
 		{
+			m_EditorCamera.OnEvent(event);
 
 		}
 

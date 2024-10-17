@@ -334,15 +334,16 @@ namespace Cine
 	{
 		DisplayComponent<SpriteSheetComponent>(entity, "Sprite Sheet", [&entity](SpriteSheetComponent& sheet)
 			{
+				constexpr float step = 32.0f;
 				for (size_t i = 0; i < sheet.Frames.size(); ++i) {
 					auto& frame = sheet.Frames[i];
 					ImGui::PushID(static_cast<int>(i));
 
 					ImGui::Text("Frame %d", static_cast<int>(i));
-					ImGui::DragInt("X", &frame.x, 1.0f, 0, sheet.Texture->GetWidth());
-					ImGui::DragInt("Y", &frame.y, 1.0f, 0, sheet.Texture->GetHeight());
-					ImGui::DragInt("Width", &frame.width, 1.0f, 0, sheet.Texture->GetWidth());
-					ImGui::DragInt("Height", &frame.height, 1.0f, 0, sheet.Texture->GetHeight());
+					ImGui::DragInt("X", &frame.x, step, 0, sheet.Texture->GetWidth());
+					ImGui::DragInt("Y", &frame.y, step, 0, sheet.Texture->GetHeight());
+					ImGui::DragInt("Width", &frame.width, step, 0, sheet.Texture->GetWidth());
+					ImGui::DragInt("Height", &frame.height, step, 0, sheet.Texture->GetHeight());
 
 					if (ImGui::Button("Remove Frame")) {
 						sheet.Frames.erase(sheet.Frames.begin() + i);
@@ -364,13 +365,12 @@ namespace Cine
 
 		DisplayComponent<SpriteRendererComponent>(entity, "Sprite Renderer", [&entity](SpriteRendererComponent& sc)
 			{
-				bool hasSpriteSheet = entity.HasComponent<SpriteSheetComponent>();
-				if (hasSpriteSheet)
+				auto& color = sc.Color;
+				ImGui::ColorEdit4("Color", glm::value_ptr(color));
+
+				if (entity.HasComponent<SpriteSheetComponent>())
 				{
 					auto& spriteSheet = entity.GetComponent<SpriteSheetComponent>();
-					auto& color = sc.Color;
-					ImGui::ColorEdit4("Color", glm::value_ptr(color));
-
 					bool& useSprite = sc.UseSprite;
 					bool enableUseSprite = !spriteSheet.Frames.empty();
 					ImGui::BeginDisabled(!enableUseSprite);
@@ -382,7 +382,10 @@ namespace Cine
 						int& spriteSheetIndex = sc.SpriteSheetIndex;
 						int min = 0;
 						int max = spriteSheet.Frames.size() - 1;
-						ImGui::InputInt("Sprite Sheet Index", &spriteSheetIndex, min, max);
+						ImGui::SetNextItemWidth(64.0f);
+						ImGui::InputInt("##SpriteSheetIndex", &spriteSheetIndex, min, max);
+						ImGui::SameLine();
+						ImGui::Text("Sprite Sheet Index");
 					}
 				}
 				

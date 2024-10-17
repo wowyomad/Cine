@@ -101,12 +101,13 @@ namespace Cine
 		for (auto entity : group)
 		{
 			auto&& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
-			if (sprite.UseSprite)
+			bool hasSpriteSheet = m_Registry.all_of<SpriteSheetComponent>(entity);
+			if (sprite.UseSprite && hasSpriteSheet)
 			{
 				auto& spriteSheet = m_Registry.get<SpriteSheetComponent>(entity);
 				if (sprite.SpriteSheetIndex >= 0 && sprite.SpriteSheetIndex < spriteSheet.Frames.size())
 				{
-					Renderer2D::DrawSprite(transform.GetTransform(), spriteSheet, sprite.SpriteSheetIndex);
+					Renderer2D::DrawSprite(transform.GetTransform(), spriteSheet, sprite.SpriteSheetIndex, 1.0f, sprite.Color);
 				}
 				else
 				{
