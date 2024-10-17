@@ -28,4 +28,6 @@
 #include "glash/Scene/Entity.hpp"
 #include "glash/Scene/Components.hpp"
 
+#include "glash/Utils/PlatformUtils.hpp"
+
 #include "glash/Core/Log.hpp"

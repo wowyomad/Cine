@@ -1,6 +1,7 @@
 #include "glash/glash_pch.hpp"
 #include "EditorLayer.hpp"
 
+#include "Scene/Components.hpp"
 #include "Scene/ScriptableEntity.hpp"
 #include "Scene/SceneSerializer.hpp"
 #include "glash/Utils/PlatformUtils.hpp"
@@ -13,7 +14,7 @@ static Cine::Scene* s_Scene = nullptr;
 
 namespace Cine
 {
-	class CameraControllerScript : public ScriptableEntity
+	class ControllerScript : public ScriptableEntity
 	{
 	public:
 		void OnCreate() override
@@ -28,29 +29,28 @@ namespace Cine
 
 		void OnUpdate(Timestep ts) override
 		{
-			if (GetEntity() == s_Scene->GetMainCameraEntity())
+
+			auto& transform = GetComponent<TransformComponent>().Translation;
+
+			float speed = 5.0f;
+
+			if (Input::IsKeyPressed(Key::A))
 			{
-				auto& transform = GetComponent<TransformComponent>().Translation;
-
-				float speed = 5.0f;
-
-				if (Input::IsKeyPressed(Key::A))
-				{
-					transform.x -= speed * ts;
-				}
-				if (Input::IsKeyPressed(Key::D))
-				{
-					transform.x += speed * ts;
-				}
-				if (Input::IsKeyPressed(Key::W))
-				{
-					transform.y += speed * ts;
-				}
-				if (Input::IsKeyPressed(Key::S))
-				{
-					transform.y -= speed * ts;
-				}
+				transform.x -= speed * ts;
 			}
+			if (Input::IsKeyPressed(Key::D))
+			{
+				transform.x += speed * ts;
+			}
+			if (Input::IsKeyPressed(Key::W))
+			{
+				transform.y += speed * ts;
+			}
+			if (Input::IsKeyPressed(Key::S))
+			{
+				transform.y -= speed * ts;
+			}
+
 		}
 	};
 
@@ -67,8 +67,30 @@ namespace Cine
 
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 
-		m_EditorCamera = EditorCamera(30.0f, 16.0f / 9.0f, 0.01f, 1000.0f);
+		m_EditorCamera = EditorCamera(45.0f, 16.0f / 9.0f, 0.01f, 1000.0f);
+
+		auto entity = m_ActiveScene->CreateEntity("Sprite Test");
+
+		m_TextureLibrary.LoadTexture2D("Thing", "Assets/Textures/SpriteSheet.png");
+
+
+		auto& sr = entity.AddComponent<SpriteRendererComponent>();
+		auto& sheet = entity.AddComponent<SpriteSheetComponent>();
+		auto& controller = entity.AddComponent<ControllerScript>();
+
+
+
+
+		sheet.Texture = m_TextureLibrary.GetTexture2D("Thing");
+		Sprite::Frame frame = { 0, 129, 128, 128 * 2 };
+		auto& tr = entity.GetComponent<TransformComponent>();
+		tr.Scale.y = frame.height / frame.width;
+		sheet.Frames.push_back(frame);
+		sr.SpriteSheetIndex = 0;
+		sr.UseSprite = true;
 	}
+
+
 
 	void EditorLayer::OnDetach()
 	{
@@ -85,30 +107,28 @@ namespace Cine
 			m_EditorCamera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
 			m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 		}
-
-		m_EditorCamera.OnUpdate(ts);
+		if (m_ViewportHovered)
+		{
+			m_EditorCamera.OnUpdate(ts);
+		}
 
 		Renderer2D::ResetStats();
 		m_LastFrameTime = ts.Milleseconds();
 
-		if (m_ViewportHovered && m_ViewportFocused)
-		{
-
-		}
 
 		m_Framebuffer->Bind();
 		{
-			m_ActiveScene->OnUpdateEditor(ts, m_EditorCamera);
+			//m_ActiveScene->OnUpdateEditor(ts, m_EditorCamera);
+			m_ActiveScene->OnUpdateRuntime(ts);
 		}
 		m_Framebuffer->Unbind();
 	}
 
 	void EditorLayer::OnEvent(Event& event)
 	{
-		m_EditorCamera.OnEvent(event);
-
-		if (m_ViewportHovered && m_ViewportFocused)
+		if (m_ViewportHovered)
 		{
+			m_EditorCamera.OnEvent(event);
 
 		}
 
@@ -119,10 +139,51 @@ namespace Cine
 
 	void EditorLayer::OnImGuiRender()
 	{
-		if (m_DockingEnabled)
+		ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
+
+		static int MAX = 10;
+		static std::deque <glm::vec3> state_stack;
+		static glm::vec3 value(1.0f);
+		static glm::vec3 oldValue = value;
+		static bool isEdited = false;
+
+		ImGui::Begin("Test");
 		{
-			ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
+			bool currentEdited = ImGui::DragFloat3("Value", &value.x);
+			bool active = ImGui::IsItemActive();
+			isEdited |= currentEdited;
+
+			if (!active && isEdited && value != oldValue)
+			{
+				state_stack.push_front(oldValue);
+				oldValue = value;
+				isEdited = false;
+				if (state_stack.size() > 10)
+				{
+					state_stack.pop_back();
+				}
+			}
+
+			if (ImGui::Button("Undo"))
+			{
+				if (!state_stack.empty())
+				{
+					value = state_stack.front();
+					state_stack.pop_front();
+					oldValue = value;
+				}
+			}
+
+			for (auto value : state_stack)
+			{
+				ImGui::Text("%f %f %f", value.x, value.y, value.z);
+			}
 		}
+		ImGui::End();
+
+
+		static bool show = true;
+		ImGui::ShowDemoWindow(&show);
 
 		if (ImGui::BeginMainMenuBar())
 		{
@@ -160,7 +221,6 @@ namespace Cine
 			ImGui::Text("Draw Calls: %llu", stats.DrawCalls);
 			ImGui::Text("Quads: %llu", stats.QuadCount);
 			ImGui::Text("FrameTime: %.3fms", m_LastFrameTime);
-			ImGui::Checkbox("Docking", &m_DockingEnabled);
 			if (ImGui::Button("Close"))
 			{
 				Application::Get().Close();
@@ -173,7 +233,7 @@ namespace Cine
 		DrawViewport();
 
 	}
-	
+
 	void EditorLayer::DrawViewport()
 	{
 
@@ -192,7 +252,6 @@ namespace Cine
 
 		}
 
-
 		//Gizmos
 		Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
 		if (selectedEntity && m_GizmoOperation > 0)
@@ -201,7 +260,7 @@ namespace Cine
 			float windowWidth = static_cast<float>(ImGui::GetWindowWidth());
 			float windowHeight = static_cast<float>(ImGui::GetWindowHeight());
 			ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
-;
+			;
 			const glm::mat4& cameraProjection = m_EditorCamera.GetProjection();
 			const glm::mat4& cameraView = m_EditorCamera.GetViewMatrix();
 
@@ -215,7 +274,7 @@ namespace Cine
 
 			bool snap = IsGizmoSnapping();
 			float snapValues[3] = { m_SnapValue, m_SnapValue, m_SnapValue };
-			
+
 			ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
 				static_cast<ImGuizmo::OPERATION>(m_GizmoOperation), ImGuizmo::LOCAL, glm::value_ptr(transform),
 				nullptr, snap ? snapValues : nullptr);
@@ -277,7 +336,7 @@ namespace Cine
 		}
 		bool control = Input::IsKeyPressed(Key::LeftControl) || Input::IsKeyPressed(Key::RightControl);
 		bool shift = Input::IsKeyPressed(Key::LeftShift) || Input::IsKeyPressed(Key::RightShift);
-		
+
 		//Shortcuts
 		switch (e.GetKeyCode())
 		{

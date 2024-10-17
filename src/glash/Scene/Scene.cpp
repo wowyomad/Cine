@@ -2,6 +2,7 @@
 #include "Scene.hpp"
 
 #include "Components.hpp"
+#include "Systems.hpp"
 #include "Entity.hpp"
 #include "ScriptableEntity.hpp"
 
@@ -15,7 +16,6 @@ namespace Cine
 	{
 
 	}
-
 
 	Scene::~Scene()
 	{
@@ -83,39 +83,65 @@ namespace Cine
 
 	void Scene::OnUpdateEditor(Timestep ts, EditorCamera& editorCamera)
 	{
-		Renderer2D::Clear();
-		if (*m_MainCamera)
+		auto spriteAnimtionView = m_Registry.view<SpriteAnimationComponent, SpriteSheetComponent, SpriteRendererComponent>();
+		for (auto entity : spriteAnimtionView)
 		{
-			auto&& [cameraComponent, transformComponent] = m_MainCamera->GetComponents<CameraComponent, TransformComponent>();
+			auto&& [spriteAnimationComponent, spriteSheetComponent] = spriteAnimtionView.get<SpriteAnimationComponent, SpriteSheetComponent>(entity);
+			SpriteAnimationSystem::Update(ts, spriteAnimationComponent, spriteSheetComponent);
+			auto&& spriteRenderer = spriteAnimtionView.get<SpriteRendererComponent>(entity);
+			spriteRenderer.SpriteSheetIndex = SpriteAnimationSystem::GetCurrentSpriteIndex(spriteAnimationComponent, spriteSheetComponent);
+		}
 
-			Renderer2D::BeginScene(editorCamera);
+		Renderer2D::Clear();
 
-			auto group = m_Registry.group<TransformComponent, SpriteRendererComponent>();
-			for (auto entity : group)
+		Renderer2D::BeginScene(editorCamera);
+
+		auto group = m_Registry.group<TransformComponent, SpriteRendererComponent>();
+		for (auto entity : group)
+		{
+			auto&& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+			bool hasSpriteSheet = m_Registry.all_of<SpriteSheetComponent>(entity);
+			if (sprite.UseSprite && hasSpriteSheet)
 			{
-				auto&& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
-
+				auto& spriteSheet = m_Registry.get<SpriteSheetComponent>(entity);
+				if (sprite.SpriteSheetIndex >= 0 && sprite.SpriteSheetIndex < spriteSheet.Frames.size())
+				{
+					Renderer2D::DrawSprite(transform.GetTransform(), spriteSheet, sprite.SpriteSheetIndex, 1.0f, sprite.Color);
+				}
+				else
+				{
+					sprite.UseSprite = false;
+					sprite.SpriteSheetIndex = 0;
+				}
+			}
+			else
+			{
 				Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color);
 			}
-
-			Renderer2D::EndScene();
 		}
+
+		Renderer2D::EndScene();
+
 	}
 
 	void Scene::OnUpdateRuntime(Timestep ts)
 	{
-		m_Registry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc)
+		m_Registry.view<NativeScriptComponent>().each([=](auto entity, NativeScriptComponent& nsc)
 			{
-				if (nsc.Instance)
+				for (auto& script : nsc.Scripts)
 				{
-					nsc.Instance->OnUpdate(ts);
+					if (script.Instance)
+					{
+						script.Instance->OnUpdate(ts);
+					}
+					else
+					{
+						script.Instance = script.InstantiateScript();
+						script.Instance->m_Entity = Entity(entity, this);
+						script.Instance->OnCreate();
+					}
 				}
-				else
-				{
-					nsc.Instance = nsc.InstantiateScript();
-					nsc.Instance->m_Entity = Entity(entity, this);
-					nsc.Instance->OnCreate();
-				}
+				
 			});
 
 		Renderer2D::Clear();
@@ -135,7 +161,7 @@ namespace Cine
 
 			Renderer2D::EndScene();
 		}
-		
+
 	}
 
 }

@@ -25,24 +25,23 @@
     #define GLASH_ENABLE_DEBUG 0
 #endif
 
-#if GLASH_BUILD_DLL  // This is defined when building the DLL (in glash project)
+#if GLASH_BUILD_DLL 
     #if defined(_WIN32) || defined(_WIN64)
-        #if GLASH_EXPORT  // Defined during the DLL build to export symbols
+        #if GLASH_EXPORT
             #define BUILD_STR "DLL EXPORT"
             #define GLASH_API GLASH_API_EXPORT
         #else
-            #if GLASH_IMPORT // Consumers of the DLL (like Sandbox) should use dllimport
+            #if GLASH_IMPORT
                 #define BUILD_STR "DLL IMPORT"
                 #define GLASH_API GLASH_API_IMPORT
             #endif
         #endif
     #else
-// Non-Windows platforms (like Linux, macOS) can use default visibility
         #define GLASH_API __attribute__((visibility("default")))
         #define BUILD_STR "SHARED EXPORT"
     #endif
-#else  // Static library or no DLL
-    #define GLASH_API  // Empty macro for static builds
+#else
+    #define GLASH_API
     #define BUILD_STR "STATIC BUILD"
 #endif
 
@@ -73,8 +72,7 @@ namespace Cine
     struct has_to_string<T, std::void_t<decltype(std::declval<T>().ToString())>> : std::true_type {};
 }
 
-//Requires class to implement 'std::string ToString() const',
-//otherwise uses class name
+
 #define STRING_FORMAT(ClassName)\
 template <>																	\
 struct fmt::formatter<Cine::ClassName> {									\

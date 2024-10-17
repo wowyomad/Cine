@@ -1,4 +1,5 @@
 #include "SceneHierarchyPanel.hpp"
+#include "glash/Cine.hpp"
 
 #include "glash/Scene/Components.hpp"
 
@@ -285,12 +286,18 @@ namespace Cine
 
 		if (entity.HasComponent<SpriteRendererComponent>())
 		{
-			DisplaySpriteRenderer(entity);
+			DisplaySpriteRendererComponent(entity);
+		}
+
+		if (entity.HasComponent<SpriteSheetComponent>())
+		{
+			DisplaySpriteSheetComponent(entity);
 		}
 	}
 
 	void SceneHierarchyPanel::DisplayTransformComponent(Entity entity)
 	{
+		ImGui::IsItemDeactivated();
 		DisplayComponent<TransformComponent>(entity, "Transform", [](TransformComponent& tc)
 			{
 				auto& translation = tc.Translation;
@@ -323,12 +330,65 @@ namespace Cine
 			});
 	}
 
-	void SceneHierarchyPanel::DisplaySpriteRenderer(Entity entity)
+	void SceneHierarchyPanel::DisplaySpriteSheetComponent(Entity entity)
 	{
-		DisplayComponent<SpriteRendererComponent>(entity, "Sprite Renderer", [](SpriteRendererComponent& spriteRendererComponent)
+		DisplayComponent<SpriteSheetComponent>(entity, "Sprite Sheet", [&entity](SpriteSheetComponent& sheet)
 			{
-				auto& color = spriteRendererComponent.Color;
+				constexpr float step = 32.0f;
+				for (size_t i = 0; i < sheet.Frames.size(); ++i) {
+					auto& frame = sheet.Frames[i];
+					ImGui::PushID(static_cast<int>(i));
+
+					ImGui::Text("Frame %d", static_cast<int>(i));
+					ImGui::DragInt("X", &frame.x, step, 0, sheet.Texture->GetWidth());
+					ImGui::DragInt("Y", &frame.y, step, 0, sheet.Texture->GetHeight());
+					ImGui::DragInt("Width", &frame.width, step, 0, sheet.Texture->GetWidth());
+					ImGui::DragInt("Height", &frame.height, step, 0, sheet.Texture->GetHeight());
+
+					if (ImGui::Button("Remove Frame")) {
+						sheet.Frames.erase(sheet.Frames.begin() + i);
+						--i;
+					}
+
+					ImGui::PopID();
+					ImGui::Separator();
+				}
+
+				if (ImGui::Button("Add New Frame")) {
+					sheet.Frames.push_back({ 0, 0, 64, 64 });
+				}
+			});
+	}
+
+	void SceneHierarchyPanel::DisplaySpriteRendererComponent(Entity entity)
+	{
+
+		DisplayComponent<SpriteRendererComponent>(entity, "Sprite Renderer", [&entity](SpriteRendererComponent& sc)
+			{
+				auto& color = sc.Color;
 				ImGui::ColorEdit4("Color", glm::value_ptr(color));
+
+				if (entity.HasComponent<SpriteSheetComponent>())
+				{
+					auto& spriteSheet = entity.GetComponent<SpriteSheetComponent>();
+					bool& useSprite = sc.UseSprite;
+					bool enableUseSprite = !spriteSheet.Frames.empty();
+					ImGui::BeginDisabled(!enableUseSprite);
+					ImGui::Checkbox("Use Sprite", &useSprite);
+					ImGui::EndDisabled();
+
+					if (useSprite)
+					{
+						int& spriteSheetIndex = sc.SpriteSheetIndex;
+						int min = 0;
+						int max = spriteSheet.Frames.size() - 1;
+						ImGui::SetNextItemWidth(64.0f);
+						ImGui::InputInt("##SpriteSheetIndex", &spriteSheetIndex, min, max);
+						ImGui::SameLine();
+						ImGui::Text("Sprite Sheet Index");
+					}
+				}
+				
 			});
 	}
 

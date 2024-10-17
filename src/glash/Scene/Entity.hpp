@@ -71,7 +71,7 @@ namespace Cine
 		bool operator==(Entity&& other) const { return (*this) == other; }
 
 
-	private:
+	public:
 		Scene* m_Scene = nullptr; 
 		entt::entity m_EntityHandle = entt::null;
 

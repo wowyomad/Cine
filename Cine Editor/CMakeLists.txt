@@ -3,7 +3,16 @@ set(CineEditor_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 include(${CMAKE_SOURCE_DIR}/copy_functions.cmake)
 
-add_copy_target(copy_assets "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Assets/Fonts/JetBrainsMono/ttf" "${CMAKE_CURRENT_SOURCE_DIR}/Assets/Fonts/JetBrainsMono/ttf")
+file(GLOB EDITOR_TEXTURES "${CineEditor_SOURCE_DIR}/Assets/Textures/*")
+file(GLOB EDITOR_FONTS "${CineEditor_SOURCE_DIR}/Assets/Fonts/JetBrainsMono/ttf/*")
+set(EDITOR_TEXTURES_OUT "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Assets/Textures")
+set(EDITOR_FONTS_OUT "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Assets/Fonts")
+
+
+message ("EDITOR OUT DIRS ${EDITOR_TEXTURES_OUT} ${EDITOR_FONTS_OUT}")
+copy_files("${EDITOR_TEXTURES}" "${EDITOR_TEXTURES_OUT}" editor_copy_textures)
+copy_files("${EDITOR_FONTS}" "${EDITOR_FONTS_OUT}" editor_copy_fonts)
+
 
 file(GLOB SOURCES
 	${CineEditor_SOURCE_DIR}/CineEditor/*
@@ -20,4 +29,4 @@ target_include_directories(${CineEditor}
 )
 target_precompile_headers(${CineEditor} REUSE_FROM glash_pch)
 
-add_dependencies(${CineEditor} copy_assets)
+add_dependencies(${CineEditor} editor_copy_textures editor_copy_fonts)

@@ -1,8 +1,6 @@
 #pragma once
 
 #include "Entity.hpp"
-#include "Scene.hpp"
-
 #include "glash/Core/Timestep.hpp"
 
 namespace Cine
@@ -10,6 +8,7 @@ namespace Cine
 	class ScriptableEntity
 	{
 	public:
+		ScriptableEntity() = default;
 		virtual ~ScriptableEntity() {}
 
 		template <class T>
@@ -20,13 +19,12 @@ namespace Cine
 
 		const Entity GetEntity() const { return m_Entity; }
 
-	protected:
+	public:
 		virtual void OnCreate() {}
 		virtual void OnDestroy() {}
 		virtual void OnUpdate(Timestep ts) {}
 
-	private:
+	public:
 		Entity m_Entity;
-		friend class Scene;
 	};
 }
