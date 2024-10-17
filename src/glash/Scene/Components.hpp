@@ -82,22 +82,39 @@ namespace Cine
 
 		CameraComponent() = default;
 		CameraComponent(const CameraComponent&) = default;
-	}; 
+	};
 
 	class ScriptableEntity;
 
 	struct NativeScriptComponent
 	{
-		ScriptableEntity* Instance = nullptr;
 
-		ScriptableEntity* (*InstantiateScript)();
-		void (*DestroyScript)(NativeScriptComponent*);
+
+		struct Data
+		{
+			size_t Number;
+			ScriptableEntity* Instance = nullptr;
+
+			ScriptableEntity* (*InstantiateScript)();
+			void (*DestroyScript)(NativeScriptComponent*);
+		};
+
+		static const size_t MaxScripts = 16;
+		std::vector<Data> Scripts;
 
 		template <class T>
 		void Bind()
 		{
-			InstantiateScript = []() { return static_cast<ScriptableEntity*>(new T()); };
-			DestroyScript = [](NativeScriptComponent* nsc) { delete nsc->Instance; nsc->Instance = nullptr; };
+			if (Scripts.size() < MaxScripts)
+			{
+				Data data;
+				data.Number = m_ScriptCounter++;
+				data.InstantiateScript = []() { return static_cast<ScriptableEntity*>(new T()); };
+				Scripts.push_back(data);
+			}
 		}
+	private:
+		size_t m_ScriptCounter = 0;
+
 	};
 }

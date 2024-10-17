@@ -17,7 +17,6 @@ namespace Cine
 
 	}
 
-
 	Scene::~Scene()
 	{
 
@@ -127,18 +126,22 @@ namespace Cine
 
 	void Scene::OnUpdateRuntime(Timestep ts)
 	{
-		m_Registry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc)
+		m_Registry.view<NativeScriptComponent>().each([=](auto entity, NativeScriptComponent& nsc)
 			{
-				if (nsc.Instance)
+				for (auto& script : nsc.Scripts)
 				{
-					nsc.Instance->OnUpdate(ts);
+					if (script.Instance)
+					{
+						script.Instance->OnUpdate(ts);
+					}
+					else
+					{
+						script.Instance = script.InstantiateScript();
+						script.Instance->m_Entity = Entity(entity, this);
+						script.Instance->OnCreate();
+					}
 				}
-				else
-				{
-					nsc.Instance = nsc.InstantiateScript();
-					nsc.Instance->m_Entity = Entity(entity, this);
-					nsc.Instance->OnCreate();
-				}
+				
 			});
 
 		Renderer2D::Clear();

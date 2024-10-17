@@ -4,12 +4,13 @@
 #include "glash/Renderer/EditorCamera.hpp"
 
 #include "glash/Scene/Components.hpp"
-
 #include <entt/entt.hpp>
+
 
 namespace Cine
 {
 	class Entity;
+	class ScriptableEntity;
 
 	class Scene
 	{
@@ -24,18 +25,48 @@ namespace Cine
 		Entity GetMainCameraEntity();
 
 		void OnViewportResize(uint32_t width, uint32_t height);
-		
+
 		void OnUpdateRuntime(Timestep ts);
 		void OnUpdateEditor(Timestep ts, EditorCamera& editorCamera);
 
 	private:
+
 		template <class Component>
 		void OnComponentAdded(Entity entity, Component& component)
 		{
 			if constexpr (std::is_same<Component, CameraComponent>::value)
 			{
+				if (m_Registry.all_of<NativeScriptComponent>(entity))
+				{
+					CINE_ASSERT(false, "xyu");
+				}
 				component.Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
 				CINE_CORE_TRACE("Added Camera Component to {}", m_Registry.get<TagComponent>(entity).Tag);
+			}
+
+			if constexpr (std::is_base_of<ScriptableEntity, Component>::value)
+			{
+				if (m_Registry.all_of<NativeScriptComponent>(entity))
+				{
+					CINE_CORE_TRACE("Script added to {}", static_cast<unsigned int>(entity));
+					auto& nsc = m_Registry.get<NativeScriptComponent>(entity);
+					nsc.Bind<Component>();
+				}
+				else
+				{
+					CINE_CORE_TRACE("NativeScripteComponent added to {}", static_cast<unsigned int>(entity));
+					auto& nsc = m_Registry.emplace<NativeScriptComponent>(entity);
+					nsc.Bind<Component>();
+				}
+				//auto& nsc = m_Registry.get<NativeScriptComponent>(entity);
+				//nsc.Bind<Component>();
+				//if (!entity.HasComponent<NativeScriptComponent>())
+				//{
+				//	entity.AddComponent<NativeScriptComponent>();
+				//}
+				//auto& nsc = entity.GetComponent<NativeScriptComponent>();
+				//nsc.Bind<Component>();
+				
 			}
 		}
 

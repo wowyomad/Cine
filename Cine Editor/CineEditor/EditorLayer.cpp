@@ -14,7 +14,7 @@ static Cine::Scene* s_Scene = nullptr;
 
 namespace Cine
 {
-	class CameraControllerScript : public ScriptableEntity
+	class ControllerScript : public ScriptableEntity
 	{
 	public:
 		void OnCreate() override
@@ -29,29 +29,28 @@ namespace Cine
 
 		void OnUpdate(Timestep ts) override
 		{
-			if (GetEntity() == s_Scene->GetMainCameraEntity())
+
+			auto& transform = GetComponent<TransformComponent>().Translation;
+
+			float speed = 5.0f;
+
+			if (Input::IsKeyPressed(Key::A))
 			{
-				auto& transform = GetComponent<TransformComponent>().Translation;
-
-				float speed = 5.0f;
-
-				if (Input::IsKeyPressed(Key::A))
-				{
-					transform.x -= speed * ts;
-				}
-				if (Input::IsKeyPressed(Key::D))
-				{
-					transform.x += speed * ts;
-				}
-				if (Input::IsKeyPressed(Key::W))
-				{
-					transform.y += speed * ts;
-				}
-				if (Input::IsKeyPressed(Key::S))
-				{
-					transform.y -= speed * ts;
-				}
+				transform.x -= speed * ts;
 			}
+			if (Input::IsKeyPressed(Key::D))
+			{
+				transform.x += speed * ts;
+			}
+			if (Input::IsKeyPressed(Key::W))
+			{
+				transform.y += speed * ts;
+			}
+			if (Input::IsKeyPressed(Key::S))
+			{
+				transform.y -= speed * ts;
+			}
+
 		}
 	};
 
@@ -74,8 +73,13 @@ namespace Cine
 
 		m_TextureLibrary.LoadTexture2D("Thing", "Assets/Textures/SpriteSheet.png");
 
+
 		auto& sr = entity.AddComponent<SpriteRendererComponent>();
 		auto& sheet = entity.AddComponent<SpriteSheetComponent>();
+		auto& controller = entity.AddComponent<ControllerScript>();
+
+
+
 
 		sheet.Texture = m_TextureLibrary.GetTexture2D("Thing");
 		Sprite::Frame frame = { 0, 129, 128, 128 * 2 };
@@ -114,7 +118,8 @@ namespace Cine
 
 		m_Framebuffer->Bind();
 		{
-			m_ActiveScene->OnUpdateEditor(ts, m_EditorCamera);
+			//m_ActiveScene->OnUpdateEditor(ts, m_EditorCamera);
+			m_ActiveScene->OnUpdateRuntime(ts);
 		}
 		m_Framebuffer->Unbind();
 	}
