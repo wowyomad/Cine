@@ -38,6 +38,8 @@ namespace Cine
 		Cine::Log::GetCoreLogger()->debug(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
 	#define CINE_CORE_INFO(msg, ...)\
 		Cine::Log::GetCoreLogger()->info(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
+	#define CINE_CORE_WARN(msg, ...)\
+		Cine::Log::GetCoreLogger()->warn(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
 	#define CINE_CORE_ERROR(msg, ...)\
 		Cine::Log::GetCoreLogger()->error(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
 	#define CINE_CORE_ERROR_EX(msg, func, filename, line, ...)\
@@ -48,8 +50,12 @@ namespace Cine
 		Cine::Log::GetClientLogger()->debug(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
 	#define CINE_LOG_INFO(msg, ...)\
 		Cine::Log::GetClientLogger()->info(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
+	#define CINE_LOG_WARN(msg, ...)\
+		Cine::Log::GetCoreLogger()->warn(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
 	#define CINE_LOG_ERROR(msg, ...)\
 		Cine::Log::GetClientLogger()->error(FORMAT_DEBUG_MESSAGE, fmt::format(msg, ##__VA_ARGS__), __func__, __FILENAME__, __LINE__)
+
+
 
 #else
 	#define CINE_CORE_TRACE(msg, ...)
