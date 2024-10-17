@@ -3,6 +3,7 @@
 #include <ImGuizmo.h>
 
 #include "Panels/SceneHierarchyPanel.hpp"
+#include "glash/Renderer/Texture.hpp"
 
 namespace Cine
 {
@@ -38,6 +39,8 @@ namespace Cine
 		float m_LastFrameTime = 0.0f;
 
 		std::filesystem::path m_ScenePath = "Assets/Scenes/Example.cine";
+		TextureLibrary m_TextureLibrary;
+
 
 	private:
 		bool OnKeyPressed(KeyPressedEvent& e);

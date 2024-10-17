@@ -72,4 +72,49 @@ namespace Cine
 		static Ref<Texture2D> Create(const std::filesystem::path& filepath);
 		static Ref<Texture2D> Create(const std::filesystem::path& filepath, const TextureSpecification& specification);
 	};
+
+	class TextureLibrary {
+	private:
+		std::unordered_map<std::string, Ref<Texture2D>> m_TextureMap;
+
+	public:
+		Ref<Texture2D> LoadTexture2D(const std::string& name, const std::filesystem::path& filepath) {
+			auto it = m_TextureMap.find(name);
+			if (it != m_TextureMap.end()) {
+				return it->second;
+			}
+
+			Ref<Texture2D> texture = Texture2D::Create(filepath);
+			if (texture) {
+				m_TextureMap[name] = texture;
+			}
+			return texture;
+		}
+
+		Ref<Texture2D> GetTexture2D(const std::string& name) const {
+			auto it = m_TextureMap.find(name);
+			if (it != m_TextureMap.end()) {
+				return it->second;
+			}
+			return nullptr;
+		}
+
+		Ref<Texture2D> LoadTexture2DWithSpec(const std::string& name, const std::filesystem::path& filepath, const TextureSpecification& specification) {
+			auto it = m_TextureMap.find(name);
+			if (it != m_TextureMap.end()) {
+				return it->second;
+			}
+
+
+			Ref<Texture2D> texture = Texture2D::Create(filepath, specification);
+			if (texture) {
+				m_TextureMap[name] = texture;
+			}
+			return texture;
+		}
+
+		void RemoveTexture2D(const std::string& name) {
+			m_TextureMap.erase(name);
+		}
+	};
 }

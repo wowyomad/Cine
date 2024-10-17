@@ -235,7 +235,7 @@ namespace Cine
 		{
 			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[i];
 			s_Data.QuadVertexBufferPtr->Color = color;
-			s_Data.QuadVertexBufferPtr->TexCoord = textureCoord[i]; //worth it to initialize in Init?
+			s_Data.QuadVertexBufferPtr->TexCoord = textureCoord[i];
 			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
 			s_Data.QuadVertexBufferPtr->Tiling = tiling;
 			s_Data.QuadVertexBufferPtr++;
@@ -288,7 +288,7 @@ namespace Cine
 		{
 			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[i];
 			s_Data.QuadVertexBufferPtr->Color = tintColor;
-			s_Data.QuadVertexBufferPtr->TexCoord = textureCoord[i]; //worth it to initialize in Init?
+			s_Data.QuadVertexBufferPtr->TexCoord = textureCoord[i];
 			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
 			s_Data.QuadVertexBufferPtr->Tiling = tiling;
 			s_Data.QuadVertexBufferPtr++;
@@ -298,6 +298,60 @@ namespace Cine
 
 		s_Data.Stats.QuadCount++;
 	}
+
+	void Renderer2D::DrawSprite(const glm::mat4& transform, const Ref<Sprite> sprite, float tiling, const glm::vec4& tintColor)
+	{
+		CINE_PROFILE_FUNCTION();
+
+		if (s_Data.QuadIndexCount == s_Data.MaxIndices)
+		{
+			//TODO: NextBatch()
+			s_Data.Stats.DrawCalls += 1;
+			EndScene();
+			s_Data.QuadIndexCount = 0;
+			s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
+			DrawSprite(transform, sprite, tiling, tintColor);
+		}
+
+		constexpr size_t quadVertexCount = 4;
+		constexpr glm::vec2 textureCoord[] = { {0.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f} };
+
+		float textureIndex = 0.0f;
+		for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
+		{
+			if (*s_Data.TextureSlots[i] == *sprite->Texture)
+			{
+				textureIndex = static_cast<float>(i);
+				break;
+			}
+		}
+		if (textureIndex == 0.0f)
+		{
+			if (s_Data.TextureSlotIndex >= s_Data.MaxTextureSlots)
+			{
+				//TODO: NextBatch();
+				DEBUG_BREAK;
+			}
+			textureIndex = static_cast<float>(s_Data.TextureSlotIndex);
+			s_Data.TextureSlots[s_Data.TextureSlotIndex] = sprite->Texture;
+			s_Data.TextureSlotIndex++;
+		}
+
+		for (size_t i = 0; i < quadVertexCount; i++)
+		{
+			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[i];
+			s_Data.QuadVertexBufferPtr->Color = tintColor;
+			s_Data.QuadVertexBufferPtr->TexCoord = sprite->TexCoords[i];
+			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
+			s_Data.QuadVertexBufferPtr->Tiling = tiling;
+			s_Data.QuadVertexBufferPtr++;
+		}
+
+		s_Data.QuadIndexCount += 6;
+
+		s_Data.Stats.QuadCount++;
+	}
+
 
 	void Renderer2D::ResetStats()
 	{

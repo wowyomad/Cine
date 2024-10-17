@@ -2,6 +2,7 @@
 #include "Scene.hpp"
 
 #include "Components.hpp"
+#include "Systems.hpp"
 #include "Entity.hpp"
 #include "ScriptableEntity.hpp"
 
@@ -83,23 +84,36 @@ namespace Cine
 
 	void Scene::OnUpdateEditor(Timestep ts, EditorCamera& editorCamera)
 	{
-		Renderer2D::Clear();
-		if (*m_MainCamera)
+		auto spriteAnimtionView = m_Registry.view<SpriteAnimationComponent, SpriteSheetComponent, SpriteRendererComponent>();
+		for (auto entity : spriteAnimtionView)
 		{
-			auto&& [cameraComponent, transformComponent] = m_MainCamera->GetComponents<CameraComponent, TransformComponent>();
+			auto&& [spriteAnimationComponent, spriteSheetComponent] = spriteAnimtionView.get<SpriteAnimationComponent, SpriteSheetComponent>(entity);
+			SpriteAnimationSystem::Update(ts, spriteAnimationComponent, spriteSheetComponent);
+			auto&& spriteRenderer = spriteAnimtionView.get<SpriteRendererComponent>(entity);
+			spriteRenderer.Sprite = SpriteAnimationSystem::GetCurrentSprite(spriteAnimationComponent, spriteSheetComponent);
+		}
 
-			Renderer2D::BeginScene(editorCamera);
+		Renderer2D::Clear();
 
-			auto group = m_Registry.group<TransformComponent, SpriteRendererComponent>();
-			for (auto entity : group)
+		Renderer2D::BeginScene(editorCamera);
+
+		auto group = m_Registry.group<TransformComponent, SpriteRendererComponent>();
+		for (auto entity : group)
+		{
+			auto&& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+			if (sprite.UseSprite)
 			{
-				auto&& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+				Renderer2D::DrawSprite(transform.GetTransform(), sprite.Sprite);
 
+			}
+			else
+			{
 				Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color);
 			}
-
-			Renderer2D::EndScene();
 		}
+
+		Renderer2D::EndScene();
+
 	}
 
 	void Scene::OnUpdateRuntime(Timestep ts)
@@ -135,7 +149,7 @@ namespace Cine
 
 			Renderer2D::EndScene();
 		}
-		
+
 	}
 
 }

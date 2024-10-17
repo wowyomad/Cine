@@ -1,4 +1,5 @@
 #include "SceneHierarchyPanel.hpp"
+#include "glash/Cine.hpp"
 
 #include "glash/Scene/Components.hpp"
 
@@ -326,10 +327,12 @@ namespace Cine
 
 	void SceneHierarchyPanel::DisplaySpriteRenderer(Entity entity)
 	{
-		DisplayComponent<SpriteRendererComponent>(entity, "Sprite Renderer", [](SpriteRendererComponent& spriteRendererComponent)
+		DisplayComponent<SpriteRendererComponent>(entity, "Sprite Renderer", [](SpriteRendererComponent& sc)
 			{
-				auto& color = spriteRendererComponent.Color;
+				auto& color = sc.Color;
 				ImGui::ColorEdit4("Color", glm::value_ptr(color));
+				bool& useSprite = sc.UseSprite;
+				ImGui::Checkbox("Use Sprite", &useSprite);
 			});
 	}
 

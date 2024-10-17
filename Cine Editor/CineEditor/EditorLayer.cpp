@@ -1,6 +1,7 @@
 #include "glash/glash_pch.hpp"
 #include "EditorLayer.hpp"
 
+#include "Scene/Components.hpp"
 #include "Scene/ScriptableEntity.hpp"
 #include "Scene/SceneSerializer.hpp"
 #include "glash/Utils/PlatformUtils.hpp"
@@ -67,8 +68,23 @@ namespace Cine
 
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 
-		m_EditorCamera = EditorCamera(30.0f, 16.0f / 9.0f, 0.01f, 1000.0f);
+		m_EditorCamera = EditorCamera(45.0f, 16.0f / 9.0f, 0.01f, 1000.0f);
+
+		m_TextureLibrary.LoadTexture2D("Thing", "Assets/Textures/SpriteSheet.png");
+
+		auto entity = m_ActiveScene->CreateEntity("Sprite Test");
+		auto& sr = entity.AddComponent<SpriteRendererComponent>();
+		auto& sheet = entity.AddComponent<SpriteSheetComponent>();
+		sheet.Texture = m_TextureLibrary.GetTexture2D("Thing");
+		Sprite::Frame frame = { 0, 129, 128, 128 * 2 };
+		auto& tr = entity.GetComponent<TransformComponent>();
+		tr.Scale.y = frame.height / frame.width;
+		sheet.Frames.push_back(frame);
+		sr.Sprite = CreateRef<Sprite>(sheet.Texture, sheet.Frames[0]);
+		sr.UseSprite = true;
 	}
+
+
 
 	void EditorLayer::OnDetach()
 	{
@@ -135,7 +151,7 @@ namespace Cine
 
 			if (!active && isEdited && value != oldValue)
 			{
-				state_stack.push_front(oldValue); 
+				state_stack.push_front(oldValue);
 				oldValue = value;
 				isEdited = false;
 				if (state_stack.size() > 10)
@@ -164,7 +180,7 @@ namespace Cine
 
 		static bool show = true;
 		ImGui::ShowDemoWindow(&show);
-		
+
 		if (ImGui::BeginMainMenuBar())
 		{
 			if (ImGui::BeginMenu("File"))
@@ -213,7 +229,7 @@ namespace Cine
 		DrawViewport();
 
 	}
-	
+
 	void EditorLayer::DrawViewport()
 	{
 
@@ -240,7 +256,7 @@ namespace Cine
 			float windowWidth = static_cast<float>(ImGui::GetWindowWidth());
 			float windowHeight = static_cast<float>(ImGui::GetWindowHeight());
 			ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
-;
+			;
 			const glm::mat4& cameraProjection = m_EditorCamera.GetProjection();
 			const glm::mat4& cameraView = m_EditorCamera.GetViewMatrix();
 
@@ -254,7 +270,7 @@ namespace Cine
 
 			bool snap = IsGizmoSnapping();
 			float snapValues[3] = { m_SnapValue, m_SnapValue, m_SnapValue };
-			
+
 			ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
 				static_cast<ImGuizmo::OPERATION>(m_GizmoOperation), ImGuizmo::LOCAL, glm::value_ptr(transform),
 				nullptr, snap ? snapValues : nullptr);
@@ -316,7 +332,7 @@ namespace Cine
 		}
 		bool control = Input::IsKeyPressed(Key::LeftControl) || Input::IsKeyPressed(Key::RightControl);
 		bool shift = Input::IsKeyPressed(Key::LeftShift) || Input::IsKeyPressed(Key::RightShift);
-		
+
 		//Shortcuts
 		switch (e.GetKeyCode())
 		{
