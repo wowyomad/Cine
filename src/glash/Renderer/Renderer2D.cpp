@@ -352,6 +352,14 @@ namespace Cine
 		s_Data.Stats.QuadCount++;
 	}
 
+	void Renderer2D::DrawSprite(const glm::mat4& transform, const SpriteSheetComponent& spriteSheet, uint32_t spriteIndex, float tiling, const glm::vec4& tintColor)
+	{
+		CINE_PROFILE_FUNCTION();
+
+		auto& frame = spriteSheet.Frames[spriteIndex];
+		Ref<Sprite> sprite = CreateRef<Sprite>(spriteSheet.Texture, frame);
+		DrawSprite(transform, sprite, tiling, tintColor);
+	}
 
 	void Renderer2D::ResetStats()
 	{

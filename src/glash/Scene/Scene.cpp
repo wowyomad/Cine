@@ -90,7 +90,7 @@ namespace Cine
 			auto&& [spriteAnimationComponent, spriteSheetComponent] = spriteAnimtionView.get<SpriteAnimationComponent, SpriteSheetComponent>(entity);
 			SpriteAnimationSystem::Update(ts, spriteAnimationComponent, spriteSheetComponent);
 			auto&& spriteRenderer = spriteAnimtionView.get<SpriteRendererComponent>(entity);
-			spriteRenderer.Sprite = SpriteAnimationSystem::GetCurrentSprite(spriteAnimationComponent, spriteSheetComponent);
+			spriteRenderer.SpriteSheetIndex = SpriteAnimationSystem::GetCurrentSpriteIndex(spriteAnimationComponent, spriteSheetComponent);
 		}
 
 		Renderer2D::Clear();
@@ -103,8 +103,16 @@ namespace Cine
 			auto&& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
 			if (sprite.UseSprite)
 			{
-				Renderer2D::DrawSprite(transform.GetTransform(), sprite.Sprite);
-
+				auto& spriteSheet = m_Registry.get<SpriteSheetComponent>(entity);
+				if (sprite.SpriteSheetIndex >= 0 && sprite.SpriteSheetIndex < spriteSheet.Frames.size())
+				{
+					Renderer2D::DrawSprite(transform.GetTransform(), spriteSheet, sprite.SpriteSheetIndex);
+				}
+				else
+				{
+					sprite.UseSprite = false;
+					sprite.SpriteSheetIndex = 0;
+				}
 			}
 			else
 			{

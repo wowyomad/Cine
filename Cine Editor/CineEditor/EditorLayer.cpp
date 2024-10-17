@@ -70,17 +70,19 @@ namespace Cine
 
 		m_EditorCamera = EditorCamera(45.0f, 16.0f / 9.0f, 0.01f, 1000.0f);
 
+		auto entity = m_ActiveScene->CreateEntity("Sprite Test");
+
 		m_TextureLibrary.LoadTexture2D("Thing", "Assets/Textures/SpriteSheet.png");
 
-		auto entity = m_ActiveScene->CreateEntity("Sprite Test");
 		auto& sr = entity.AddComponent<SpriteRendererComponent>();
 		auto& sheet = entity.AddComponent<SpriteSheetComponent>();
+
 		sheet.Texture = m_TextureLibrary.GetTexture2D("Thing");
 		Sprite::Frame frame = { 0, 129, 128, 128 * 2 };
 		auto& tr = entity.GetComponent<TransformComponent>();
 		tr.Scale.y = frame.height / frame.width;
 		sheet.Frames.push_back(frame);
-		sr.Sprite = CreateRef<Sprite>(sheet.Texture, sheet.Frames[0]);
+		sr.SpriteSheetIndex = 0;
 		sr.UseSprite = true;
 	}
 

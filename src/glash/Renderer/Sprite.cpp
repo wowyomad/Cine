@@ -21,7 +21,7 @@ namespace Cine
 		: Texture(texture)
 	{
 		float uMin = static_cast<float>(frame.x) / texture->GetWidth();
-		float vMin = static_cast<float>(frame.x) / texture->GetHeight();
+		float vMin = static_cast<float>(frame.y) / texture->GetHeight();
 		float uMax = static_cast<float>(frame.x + frame.width) / texture->GetWidth();
 		float vMax = static_cast<float>(frame.y + frame.height) / texture->GetHeight();
 

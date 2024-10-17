@@ -31,16 +31,16 @@ namespace Cine
 			}
 		}
 
-		static const Ref<Sprite> GetCurrentSprite(const SpriteAnimationComponent& animationComp, const SpriteSheetComponent& spriteSheetComp) {
+		static const uint32_t GetCurrentSpriteIndex(const SpriteAnimationComponent& animationComp, const SpriteSheetComponent& spriteSheetComp) {
 			auto it = animationComp.Animations.find(animationComp.CurrentAnimation);
 			CINE_CORE_ASSERT(it != animationComp.Animations.end(), "Animation {0} not present", animationComp.CurrentAnimation);
 
 			const auto& animation = animationComp.Animations.at(animationComp.CurrentAnimation);
-			int spriteIndex = animation->Frames[animationComp.CurrentFrame].SpriteIndex;
-			int maxIndex = static_cast<int>(animation->Frames.size() - 1);
+			uint32_t spriteIndex = animation->Frames[animationComp.CurrentFrame].SpriteIndex;
+			uint32_t maxIndex = static_cast<int>(animation->Frames.size() - 1);
 			CINE_CORE_ASSERT(spriteIndex >= 0 && spriteIndex <= maxIndex, "Sprite index {0} out of range 0-{1}", spriteIndex, maxIndex);
 
-			return CreateRef<Sprite>(spriteSheetComp.Texture, spriteSheetComp.Frames[spriteIndex]);
+			return spriteIndex;
 		}
 	};
 }

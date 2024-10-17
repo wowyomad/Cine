@@ -46,7 +46,7 @@ namespace Cine
 	struct SpriteRendererComponent
 	{
 		glm::vec4 Color = glm::vec4(1.0f);
-		Ref<Sprite> Sprite;
+		int SpriteSheetIndex = -1;
 		bool UseSprite = false;
 
 		SpriteRendererComponent() = default;
