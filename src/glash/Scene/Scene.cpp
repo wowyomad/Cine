@@ -10,6 +10,7 @@
 
 namespace Cine
 {
+	std::unordered_map<std::string, std::function<NativeScript* ()>> Scene::s_RegisteredScripts;
 
 	Scene::Scene()
 		: m_MainCamera(new Entity())
@@ -83,6 +84,26 @@ namespace Cine
 
 	void Scene::OnUpdateEditor(Timestep ts, EditorCamera& editorCamera)
 	{
+		//Scripts
+		m_Registry.view<NativeScriptComponent>().each([=](auto entity, NativeScriptComponent& nsc)
+			{
+				for (auto& script : nsc.Scripts)
+				{
+					if (script.Instance)
+					{
+						script.Instance->OnUpdate(ts);
+					}
+					else
+					{
+						script.Instance = script.InstantiateScript();
+						script.Instance->m_Entity = Entity(entity, this);
+						script.Instance->OnCreate();
+					}
+				}
+
+			});
+
+		//Animation
 		auto spriteAnimtionView = m_Registry.view<SpriteAnimationComponent, SpriteSheetComponent, SpriteRendererComponent>();
 		for (auto entity : spriteAnimtionView)
 		{
@@ -93,40 +114,36 @@ namespace Cine
 		}
 
 		Renderer2D::Clear();
-
 		Renderer2D::BeginScene(editorCamera);
 
-		auto group = m_Registry.group<TransformComponent, SpriteRendererComponent>();
-		for (auto entity : group)
+		//Draw
+		m_Registry.view<TransformComponent, SpriteRendererComponent>().each([&](auto entity, TransformComponent& transform, SpriteRendererComponent& spriteRenderer)
 		{
-			auto&& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
-			bool hasSpriteSheet = m_Registry.all_of<SpriteSheetComponent>(entity);
-			if (sprite.UseSprite && hasSpriteSheet)
-			{
-				auto& spriteSheet = m_Registry.get<SpriteSheetComponent>(entity);
-				if (sprite.SpriteSheetIndex >= 0 && sprite.SpriteSheetIndex < spriteSheet.Frames.size())
+				bool hasSpriteSheet = m_Registry.all_of<SpriteSheetComponent>(entity);
+				if (spriteRenderer.UseSprite && hasSpriteSheet)
 				{
-					Renderer2D::DrawSprite(transform.GetTransform(), spriteSheet, sprite.SpriteSheetIndex, 1.0f, sprite.Color);
+					auto& spriteSheet = m_Registry.get<SpriteSheetComponent>(entity);
+					if (spriteRenderer.SpriteSheetIndex >= 0 && spriteRenderer.SpriteSheetIndex < spriteSheet.Frames.size())
+					{
+						Renderer2D::DrawSprite(transform.GetTransform(), spriteSheet, spriteRenderer.SpriteSheetIndex, 1.0f, spriteRenderer.Color);
+					}
+					else
+					{
+						spriteRenderer.UseSprite = false;
+						spriteRenderer.SpriteSheetIndex = 0;
+					}
 				}
 				else
 				{
-					sprite.UseSprite = false;
-					sprite.SpriteSheetIndex = 0;
+					Renderer2D::DrawQuad(transform.GetTransform(), spriteRenderer.Color);
 				}
-			}
-			else
-			{
-				Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color);
-			}
-		}
-
+		});
 		Renderer2D::EndScene();
-
 	}
 
 	void Scene::OnUpdateRuntime(Timestep ts)
 	{
-		m_Registry.view<NativeScriptComponent>().each([=](auto entity, NativeScriptComponent& nsc)
+		m_Registry.view<NativeScriptComponent>().each([&](auto entity, NativeScriptComponent& nsc)
 			{
 				for (auto& script : nsc.Scripts)
 				{
@@ -162,6 +179,21 @@ namespace Cine
 			Renderer2D::EndScene();
 		}
 
+	}
+
+	NativeScript* Scene::CreateScriptInstance(const std::string& name)
+	{
+		auto it = s_RegisteredScripts.find(name);
+		if (it != s_RegisteredScripts.end())
+		{
+			// Call the factory function to create an instance
+			return it->second();
+		}
+		else
+		{
+			CINE_CORE_WARN("Script {} is not registered.", name);
+			return nullptr;
+		}
 	}
 
 }

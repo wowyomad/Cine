@@ -84,7 +84,7 @@ namespace Cine
 		CameraComponent(const CameraComponent&) = default;
 	};
 
-	class ScriptableEntity;
+	class NativeScript;
 
 	struct NativeScriptComponent
 	{
@@ -93,9 +93,9 @@ namespace Cine
 		struct Data
 		{
 			size_t Number;
-			ScriptableEntity* Instance = nullptr;
+			NativeScript* Instance = nullptr;
 
-			ScriptableEntity* (*InstantiateScript)();
+			NativeScript* (*InstantiateScript)();
 			void (*DestroyScript)(NativeScriptComponent*);
 		};
 
@@ -109,7 +109,7 @@ namespace Cine
 			{
 				Data data;
 				data.Number = m_ScriptCounter++;
-				data.InstantiateScript = []() { return static_cast<ScriptableEntity*>(new T()); };
+				data.InstantiateScript = []() { return static_cast<NativeScript*>(new T()); };
 				Scripts.push_back(data);
 			}
 		}

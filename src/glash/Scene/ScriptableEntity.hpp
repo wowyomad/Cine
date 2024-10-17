@@ -5,11 +5,11 @@
 
 namespace Cine
 {
-	class ScriptableEntity
+	class NativeScript
 	{
 	public:
-		ScriptableEntity() = default;
-		virtual ~ScriptableEntity() {}
+		NativeScript() = default;
+		virtual ~NativeScript() {}
 
 		template <class T>
 		T& GetComponent()

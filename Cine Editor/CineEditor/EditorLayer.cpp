@@ -5,6 +5,7 @@
 #include "Scene/ScriptableEntity.hpp"
 #include "Scene/SceneSerializer.hpp"
 #include "glash/Utils/PlatformUtils.hpp"
+#include "glash/Core/Timer.hpp"
 
 #include "glash/Math/Math.hpp"
 
@@ -14,24 +15,34 @@ static Cine::Scene* s_Scene = nullptr;
 
 namespace Cine
 {
-	class ColorScript : public ScriptableEntity
+	class ColorScript : public NativeScript
 	{
 	public:
 		void OnCreate() override
 		{
 			auto& component = GetComponent<SpriteRendererComponent>();
 			m_SpriteRendererComponent = &component;
+			m_Timer.Start();
 		}
 
 		void OnUpdate(Timestep ts) override
 		{
-			m_SpriteRendererComponent->Color.a = (float)(rand() % 101) / 100.0f;
+			m_Timer.OnUpdate(ts);
+
+			float time = m_Timer.GetElapsed();
+			m_SpriteRendererComponent->Color.r = 0.5f * sin(time) + 0.5f;
+			m_SpriteRendererComponent->Color.g = 0.5f * sin(time + 2.0f) + 0.5f;
+			m_SpriteRendererComponent->Color.b = 0.5f * sin(time + 4.0f) + 0.5f;
 		}
+	public:
+		std::string String = "String from Color Script";
+
 	private:
 		SpriteRendererComponent* m_SpriteRendererComponent;
+		Timer m_Timer;
 	};
 
-	class ControllerScript : public ScriptableEntity
+	class ControllerScript : public NativeScript
 	{
 	public:
 		void OnCreate() override
@@ -90,14 +101,11 @@ namespace Cine
 
 		m_TextureLibrary.LoadTexture2D("Thing", "Assets/Textures/SpriteSheet.png");
 
-
 		auto& sr = entity.AddComponent<SpriteRendererComponent>();
 		auto& sheet = entity.AddComponent<SpriteSheetComponent>();
+
 		entity.AddComponent<ControllerScript>();
 		entity.AddComponent<ColorScript>();
-
-
-
 
 		sheet.Texture = m_TextureLibrary.GetTexture2D("Thing");
 		Sprite::Frame frame = { 0, 129, 128, 128 * 2 };
@@ -136,8 +144,8 @@ namespace Cine
 
 		m_Framebuffer->Bind();
 		{
-			//m_ActiveScene->OnUpdateEditor(ts, m_EditorCamera);
-			m_ActiveScene->OnUpdateRuntime(ts);
+			m_ActiveScene->OnUpdateEditor(ts, m_EditorCamera);
+			//m_ActiveScene->OnUpdateRuntime(ts);
 		}
 		m_Framebuffer->Unbind();
 	}
