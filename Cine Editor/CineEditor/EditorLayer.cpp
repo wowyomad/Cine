@@ -11,6 +11,46 @@
 
 #include <ImGuizmo.h>
 
+struct Health {
+	int value;
+};
+
+struct Position {
+	float x, y;
+};
+
+struct Name {
+	std::string value;
+};
+
+using ComponentAdder = void(*)(entt::registry&, entt::entity);
+
+std::unordered_map<std::string, ComponentAdder> s_ComponentRegistry;
+
+template<typename Component>
+void registerComponent(const std::string& componentName) {
+	s_ComponentRegistry[componentName] = [](entt::registry& registry, entt::entity entity) {
+		registry.emplace<Component>(entity);
+		};
+}
+
+void registerComponents() {
+	registerComponent<Health>("Health");
+	registerComponent<Position>("Position");
+	registerComponent<Name>("Name");
+}
+
+void addComponentByName(entt::registry& registry, entt::entity entity, const std::string& componentName) {
+	auto it = s_ComponentRegistry.find(componentName);
+	if (it != s_ComponentRegistry.end()) {
+		it->second(registry, entity);
+		std::cout << "Added component: " << componentName << std::endl;
+	}
+	else {
+		std::cout << "Component not found: " << componentName << std::endl;
+	}
+}
+
 static Cine::Scene* s_Scene = nullptr;
 
 namespace Cine
@@ -104,8 +144,12 @@ namespace Cine
 		auto& sr = entity.AddComponent<SpriteRendererComponent>();
 		auto& sheet = entity.AddComponent<SpriteSheetComponent>();
 
-		entity.AddComponent<ControllerScript>();
-		entity.AddComponent<ColorScript>();
+		s_Scene->RegisterComponent<ControllerScript>();
+		s_Scene->RegisterComponent<ColorScript>();
+
+		entity.AddComponentByName("ColorScript");
+		entity.AddComponentByName("ControllerScript");
+
 
 		sheet.Texture = m_TextureLibrary.GetTexture2D("Thing");
 		Sprite::Frame frame = { 0, 129, 128, 128 * 2 };
@@ -114,6 +158,7 @@ namespace Cine
 		sheet.Frames.push_back(frame);
 		sr.SpriteSheetIndex = 0;
 		sr.UseSprite = true;
+
 	}
 
 

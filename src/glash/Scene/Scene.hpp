@@ -16,6 +16,9 @@ namespace Cine
 	class Entity;
 	class NativeScript;
 
+	using ComponentAdder = std::function<void(entt::registry&, entt::entity)>;
+
+
 	class Scene
 	{
 	public:
@@ -38,8 +41,28 @@ namespace Cine
 		template <class T>
 		bool IsScriptRegistered()
 		{
-			std::string name = Utils::GetReadableTypeName<T>();
+			std::string name = Utils::GetClassTypename<T>();
 			return s_RegisteredScripts.contains(name);
+		}
+
+		template<typename Component>
+		void RegisterComponent() {
+			std::string componentName = Utils::GetClassTypename<Component>();
+			s_ComponentRegistry[componentName] = [&](entt::registry& registry, entt::entity entity) {
+				auto& component = registry.emplace<Component>(entity);
+				OnComponentAdded<Component>(entity, component);
+				};
+		}
+
+		void AddComponentByName(entt::entity entity, const std::string& componentName) {
+			auto it = s_ComponentRegistry.find(componentName);
+			if (it != s_ComponentRegistry.end()) {
+				it->second(m_Registry, entity);
+				std::cout << "Added component: " << componentName << std::endl;
+			}
+			else {
+				std::cout << "Component not found: " << componentName << std::endl;
+			}
 		}
 
 		template <class T>
@@ -47,7 +70,7 @@ namespace Cine
 		{
 			static_assert(std::is_base_of<NativeScript, T>::value, "T must be a derived class of ScriptableEntity");
 
-			std::string name = Utils::GetReadableTypeName<T>();
+			std::string name = Utils::GetClassTypename<T>();
 			
 			if (s_RegisteredScripts.contains(name))
 			{
@@ -65,7 +88,7 @@ namespace Cine
 	private:
 
 		template <class Component>
-		void OnComponentAdded(Entity entity, Component& component)
+		void OnComponentAdded(entt::entity entity, Component& component)
 		{
 			if constexpr (std::is_same<Component, CameraComponent>::value)
 			{
@@ -93,6 +116,7 @@ namespace Cine
 
 	private:
 		static std::unordered_map<std::string, std::function<NativeScript* ()>> s_RegisteredScripts;
+		std::unordered_map<std::string, ComponentAdder> s_ComponentRegistry;
 		entt::registry m_Registry;
 		Entity* m_MainCamera;
 

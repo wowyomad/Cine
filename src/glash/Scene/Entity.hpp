@@ -34,6 +34,12 @@ namespace Cine
 			return component;
 		}
 
+		void AddComponentByName(const std::string& name)
+		{
+			m_Scene->AddComponentByName(m_EntityHandle, name);
+
+		}
+
 		template <class Component, class... Args>
 		Component& AddOrReplaceComponent(Args&&... args)
 		{
