@@ -46,21 +46,20 @@ namespace Cine
 
 			if constexpr (std::is_base_of<ScriptableEntity, Component>::value)
 			{
-				if (m_Registry.all_of<NativeScriptComponent>(entity))
-				{
-					CINE_CORE_TRACE("Script added to {}", static_cast<unsigned int>(entity));
-					auto& nsc = m_Registry.get<NativeScriptComponent>(entity);
-					nsc.Bind<Component>();
-				}
-				else
+				bool hasNativeScriptComponent = m_Registry.all_of<NativeScriptComponent>(entity);
+				if (!hasNativeScriptComponent)
 				{
 					CINE_CORE_TRACE("NativeScripteComponent added to {}", static_cast<unsigned int>(entity));
-					auto& nsc = m_Registry.emplace<NativeScriptComponent>(entity);
-					nsc.Bind<Component>();
+					m_Registry.emplace<NativeScriptComponent>(entity);
 				}
-				
+				CINE_CORE_TRACE("Script added to {}", static_cast<unsigned int>(entity));
+				auto& nsc = m_Registry.get<NativeScriptComponent>(entity);
+				nsc.Bind<Component>();
+
 			}
 		}
+
+
 
 	private:
 		entt::registry m_Registry;
