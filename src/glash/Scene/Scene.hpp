@@ -58,14 +58,6 @@ namespace Cine
 					auto& nsc = m_Registry.emplace<NativeScriptComponent>(entity);
 					nsc.Bind<Component>();
 				}
-				//auto& nsc = m_Registry.get<NativeScriptComponent>(entity);
-				//nsc.Bind<Component>();
-				//if (!entity.HasComponent<NativeScriptComponent>())
-				//{
-				//	entity.AddComponent<NativeScriptComponent>();
-				//}
-				//auto& nsc = entity.GetComponent<NativeScriptComponent>();
-				//nsc.Bind<Component>();
 				
 			}
 		}

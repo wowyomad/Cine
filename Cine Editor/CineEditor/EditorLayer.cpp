@@ -14,6 +14,23 @@ static Cine::Scene* s_Scene = nullptr;
 
 namespace Cine
 {
+	class ColorScript : public ScriptableEntity
+	{
+	public:
+		void OnCreate() override
+		{
+			auto& component = GetComponent<SpriteRendererComponent>();
+			m_SpriteRendererComponent = &component;
+		}
+
+		void OnUpdate(Timestep ts) override
+		{
+			m_SpriteRendererComponent->Color.a = (float)(rand() % 101) / 100.0f;
+		}
+	private:
+		SpriteRendererComponent* m_SpriteRendererComponent;
+	};
+
 	class ControllerScript : public ScriptableEntity
 	{
 	public:
@@ -76,7 +93,8 @@ namespace Cine
 
 		auto& sr = entity.AddComponent<SpriteRendererComponent>();
 		auto& sheet = entity.AddComponent<SpriteSheetComponent>();
-		auto& controller = entity.AddComponent<ControllerScript>();
+		entity.AddComponent<ControllerScript>();
+		entity.AddComponent<ColorScript>();
 
 
 

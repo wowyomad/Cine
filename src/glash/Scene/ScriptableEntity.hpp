@@ -17,6 +17,12 @@ namespace Cine
 			return m_Entity.GetComponent<T>();
 		}
 
+		template <class T>
+		bool HasComponent()
+		{
+			return m_Entity.HasComponent<T>();
+		}
+
 		const Entity GetEntity() const { return m_Entity; }
 
 	public:
