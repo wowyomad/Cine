@@ -129,7 +129,7 @@ namespace Cine
 
 		//Draw
 		m_Registry.view<TransformComponent, SpriteRendererComponent>().each([&](auto entity, TransformComponent& transform, SpriteRendererComponent& spriteRenderer)
-		{
+			{
 				bool hasSpriteSheet = m_Registry.all_of<SpriteSheetComponent>(entity);
 				if (spriteRenderer.UseSprite && hasSpriteSheet)
 				{
@@ -148,7 +148,7 @@ namespace Cine
 				{
 					Renderer2D::DrawQuad(transform.GetTransform(), spriteRenderer.Color);
 				}
-		});
+			});
 		Renderer2D::EndScene();
 	}
 
@@ -158,19 +158,17 @@ namespace Cine
 			{
 				for (auto& script : nsc.Scripts)
 				{
-					if (script.Instance)
-					{
-						script.Instance->OnUpdate(ts);
-					}
-					else
+					if (!script.Instance)
 					{
 						script.Instance = script.InstantiateScript();
 						script.Instance->m_Entity = Entity(entity, this);
 						script.Instance->OnCreate();
 					}
 				}
-				
+
 			});
+
+		UpdateScripts(ts);
 
 		Renderer2D::Clear();
 		if (*m_MainCamera)
@@ -202,9 +200,18 @@ namespace Cine
 			Renderer2D::EndScene();
 
 		}
-		
+
 		DestroyMarkedEntities();
 	}
+
+	void Scene::UpdateScripts(Timestep ts)
+	{
+		for (auto& [componentName, updateCall] : m_UpdateRegistry)
+		{
+			updateCall(m_Registry, ts);
+		}
+	}
+
 	void Scene::DestroyMarkedEntities()
 	{
 		for (auto entity : m_ToDestroyEntities)
@@ -217,7 +224,7 @@ namespace Cine
 					script.Instance->OnDestroy();
 				}
 			}
-			
+
 			m_Registry.destroy(entity);
 		}
 		m_ToDestroyEntities.clear();

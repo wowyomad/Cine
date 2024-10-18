@@ -19,7 +19,10 @@ void Sandbox2D::OnAttach()
 	auto& transform = m_Player.GetComponent<Cine::TransformComponent>();
 	transform.Scale = { 5.0f, 5.0f, 1.0f };
 
-	m_Player.AddComponent<ControllerScript>();
+	m_Scene->RegisterComponent<ControllerScript>();
+
+	auto& controller = m_Player.AddComponent<ControllerScript>();
+	controller.Speed = 5.0f;
 
 	auto camera = m_Scene->CreateEntity("Camera");
 	auto& cameraComponent = camera.AddComponent<Cine::CameraComponent>();

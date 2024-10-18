@@ -17,7 +17,7 @@ namespace Cine
 	class NativeScript;
 
 	using ComponentAdder = std::function<void(entt::registry&, entt::entity)>;
-
+	using ComponentUpdater = std::function<void(entt::registry&, Timestep)>;
 
 	class Scene
 	{
@@ -48,6 +48,18 @@ namespace Cine
 					OnComponentAdded<Component>(entity, component);
 					return component;
 				};
+
+			if constexpr (std::is_base_of<NativeScript, Component>::value)
+			{
+				m_UpdateRegistry[componentName] = [&](entt::registry& registry, Timestep ts) {
+					auto view = registry.view<Component>();
+					view.each([&](auto entity, Component& component)
+						{
+							component.OnUpdate(ts);
+						});
+					};
+			}
+
 		}
 
 		void AddComponentByName(entt::entity entity, const std::string& componentName) {
@@ -89,7 +101,6 @@ namespace Cine
 				CINE_CORE_TRACE("Script added to {}", static_cast<unsigned int>(entity));
 				auto& nsc = m_Registry.get<NativeScriptComponent>(entity);
 				auto instantiateScript = [&, entity]() -> NativeScript* {
-					// Retrieve the component from the registry and cast to NativeScript
 					return reinterpret_cast<NativeScript*>(&m_Registry.get<Component>(entity));
 					};
 				nsc.Bind<Component>(instantiateScript);
@@ -98,6 +109,8 @@ namespace Cine
 
 	private:
 		std::unordered_map<std::string, ComponentAdder> m_ComponentRegistry;
+		std::unordered_map<std::string, ComponentUpdater> m_UpdateRegistry;
+
 		std::vector<entt::entity> m_ToDestroyEntities;
 		entt::registry m_Registry;
 		Entity* m_MainCamera;
@@ -110,5 +123,6 @@ namespace Cine
 		friend class SceneSerializer;
 
 		void DestroyMarkedEntities();
+		void UpdateScripts(Timestep ts);
 	};
 }
