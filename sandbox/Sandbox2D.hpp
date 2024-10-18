@@ -3,10 +3,9 @@
 class Sandbox2D : public Cine::Layer
 {
 public:
-	Sandbox2D(Cine::Application* ptr) : Cine::Layer("Sandbox"),
-		m_CameraController(1.7778, true)
+	Sandbox2D(Cine::Application* ptr) : Cine::Layer("Sandbox")
 	{
-		s_Application = ptr;
+
 	};
 
 	void OnAttach() override final;
@@ -16,20 +15,19 @@ public:
 	void OnEvent(Cine::Event& event) override final;
 	void OnImGuiRender() override final;
 
-
 private:
-	Cine::OrthograhpicCameraController m_CameraController;
 
-	float m_SquareRotation = 0.0f;
-	glm::vec4 m_SquareColor = glm::vec4(0.4f, 0.2f, 0.7f, 1.0f);
-	glm::vec2 m_SquareSize = glm::vec2(1.0f);
-	glm::vec3 m_SquarePosition = glm::vec3(0.0f);
-	Cine::Ref<Cine::Texture2D> m_CheckerBoardTexture;
-	Cine::Ref<Cine::Texture2D> m_FaceTexture;
-	Cine::Ref<Cine::Texture2D> m_SpriteSheet;
+	bool OnWindowResize(Cine::WindowResizeEvent& e);
+private:
 
-	bool m_VSync = false;
-	Cine::Application* s_Application = nullptr;
+	Cine::Ref<Cine::Scene> m_Scene;
+	Cine::TextureLibrary m_TextureLibrary;
+	struct WindowData
+	{
+		uint32_t width = 0, height = 0;
+	};
+	WindowData m_WindowSize = {};
+	WindowData m_ResizeWindowSize = {};
 
-	float m_LastFrameTime = 0.0f;
+	Cine::Entity m_Player;
 };

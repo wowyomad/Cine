@@ -7,6 +7,7 @@
 #include "glash/Core/Input.hpp"
 #include "glash/Core/CameraController.hpp"
 #include "glash/Core/Timestep.hpp"
+#include "glash/Core/Timer.hpp"
 
 #include "glash/Renderer/FrameBuffer.hpp"
 #include "glash/Renderer/Buffer.hpp"
@@ -27,6 +28,7 @@
 #include "glash/Scene/Scene.hpp"
 #include "glash/Scene/Entity.hpp"
 #include "glash/Scene/Components.hpp"
+#include "glash/Scene/NativeScript.hpp"
 
 #include "glash/Utils/PlatformUtils.hpp"
 

@@ -8,8 +8,7 @@ class SandboxApp : public Cine::Application
 public:
 	SandboxApp() : Application("Sandbox2D")
 	{
-		m_Window->SetVSync(false);
-		PushOverlay(new Sandbox2D(this));
+		PushLayer(new Sandbox2D(this));
 	}
 };
 

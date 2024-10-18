@@ -70,6 +70,12 @@ namespace Cine
 			m_Scene->m_Registry.remove<Component>(m_EntityHandle);
 		}
 
+		void Destroy()
+		{
+			m_Scene->DestroyEntity(*this);
+			m_EntityHandle = entt::null;
+		}
+
 		operator bool() const { return m_EntityHandle != entt::null && m_Scene; }
 		operator entt::entity() const { return m_EntityHandle; }
 		operator uint32_t() const{ return static_cast<uint32_t>(m_EntityHandle); }

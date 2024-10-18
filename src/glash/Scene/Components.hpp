@@ -46,8 +46,8 @@ namespace Cine
 	struct SpriteRendererComponent
 	{
 		glm::vec4 Color = glm::vec4(1.0f);
-		int SpriteSheetIndex = -1;
-		bool UseSprite = false;
+		int SpriteSheetIndex = 0;
+		bool UseSprite = true;
 
 		SpriteRendererComponent() = default;
 		SpriteRendererComponent(const SpriteRendererComponent&) = default;
@@ -63,7 +63,9 @@ namespace Cine
 		SpriteSheetComponent() = default;
 		SpriteSheetComponent(const SpriteSheetComponent&) = default;
 		SpriteSheetComponent(const Ref<Texture2D>& texture)
-			: Texture(texture) {}
+			: Texture(texture) {
+			Frames.push_back(Sprite::Frame(0, 0, texture->GetWidth(), texture->GetHeight()));
+		}
 	};
 
 	struct SpriteAnimationComponent
@@ -94,7 +96,6 @@ namespace Cine
 			NativeScript* Instance = nullptr;
 
 			std::function<NativeScript*()> InstantiateScript;
-			void (*DestroyScript)(NativeScriptComponent*);
 		};
 
 		static const size_t MaxScripts = 16;
@@ -109,8 +110,6 @@ namespace Cine
 				Data data;
 				data.Index = ScriptID;
 				data.InstantiateScript = instantiateScript;
-
-				//auto it = std::find_if(Scripts.begin(), Scripts.end(), [ScriptID](const Data& d) { d.Index == ScriptID; }); don't look at this...
 
 				Scripts.push_back(data);
 

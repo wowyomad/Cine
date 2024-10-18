@@ -58,7 +58,7 @@ namespace Cine
 	class Timer
 	{
 	public:
-		Timer() : m_Started(false), m_ElapsedTime(0.0f) {}
+		Timer(bool start = false) : m_Started(start), m_ElapsedTime(0.0f) {}
 
 		void Start()
 		{

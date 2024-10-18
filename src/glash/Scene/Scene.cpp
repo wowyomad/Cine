@@ -4,14 +4,12 @@
 #include "Components.hpp"
 #include "Systems.hpp"
 #include "Entity.hpp"
-#include "ScriptableEntity.hpp"
+#include "NativeScript.hpp"
 
 #include "glash/Renderer/Renderer2D.hpp"
 
 namespace Cine
 {
-	std::unordered_map<std::string, std::function<NativeScript* ()>> Scene::s_RegisteredScripts;
-
 	Scene::Scene()
 		: m_MainCamera(new Entity())
 	{
@@ -53,9 +51,22 @@ namespace Cine
 		return entity;
 	}
 
+	Entity Scene::GetEntity(const std::string& name)
+	{
+		auto view = m_Registry.view<TagComponent>();
+		for (auto entity : view)
+		{
+			if (view.get<TagComponent>(entity).Tag == name)
+			{
+				return Entity(entity, this);
+			}
+		}
+		return Entity(entt::null, this);
+	}
+
 	void Scene::DestroyEntity(Entity entity)
 	{
-		m_Registry.destroy(entity);
+		m_ToDestroyEntities.push_back(entity);
 
 		//There should be a better way.
 		if (entity == *m_MainCamera)
@@ -165,36 +176,54 @@ namespace Cine
 		if (*m_MainCamera)
 		{
 			auto&& [cameraComponent, transformComponent] = m_MainCamera->GetComponents<CameraComponent, TransformComponent>();
-
 			Renderer2D::BeginScene(cameraComponent.Camera, transformComponent.GetTransform());
 
-			auto group = m_Registry.group<TransformComponent, SpriteRendererComponent>();
-			for (auto entity : group)
-			{
-				auto&& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
-
-				Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color);
-			}
-
+			m_Registry.view<TransformComponent, SpriteRendererComponent>().each([&](auto entity, TransformComponent& transform, SpriteRendererComponent& spriteRenderer)
+				{
+					bool hasSpriteSheet = m_Registry.all_of<SpriteSheetComponent>(entity);
+					if (spriteRenderer.UseSprite && hasSpriteSheet)
+					{
+						auto& spriteSheet = m_Registry.get<SpriteSheetComponent>(entity);
+						if (spriteRenderer.SpriteSheetIndex >= 0 && spriteRenderer.SpriteSheetIndex < spriteSheet.Frames.size())
+						{
+							Renderer2D::DrawSprite(transform.GetTransform(), spriteSheet, spriteRenderer.SpriteSheetIndex, 1.0f, spriteRenderer.Color);
+						}
+						else
+						{
+							spriteRenderer.UseSprite = false;
+							spriteRenderer.SpriteSheetIndex = static_cast<int>(spriteSheet.Frames.size()) - 1;
+						}
+					}
+					else
+					{
+						Renderer2D::DrawQuad(transform.GetTransform(), spriteRenderer.Color);
+					}
+				});
 			Renderer2D::EndScene();
+
 		}
-
+		
+		DestroyMarkedEntities();
 	}
-
-	NativeScript* Scene::CreateScriptInstance(const std::string& name)
+	void Scene::DestroyMarkedEntities()
 	{
-		auto it = s_RegisteredScripts.find(name);
-		if (it != s_RegisteredScripts.end())
+		for (auto entity : m_ToDestroyEntities)
 		{
-			// Call the factory function to create an instance
-			return it->second();
+			if (m_Registry.all_of<NativeScriptComponent>(entity))
+			{
+				auto& nsc = m_Registry.get<NativeScriptComponent>(entity);
+				for (auto& script : nsc.Scripts)
+				{
+					script.Instance->OnDestroy();
+				}
+			}
+			
+			m_Registry.destroy(entity);
 		}
-		else
-		{
-			CINE_CORE_WARN("Script {} is not registered.", name);
-			return nullptr;
-		}
+		m_ToDestroyEntities.clear();
 	}
+
+
 
 }
 

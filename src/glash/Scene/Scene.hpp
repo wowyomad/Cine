@@ -26,6 +26,7 @@ namespace Cine
 		~Scene();
 
 		Entity CreateEntity(const std::string& name = std::string());
+		Entity GetEntity(const std::string& name);
 		void DestroyEntity(Entity entity);
 
 		void SetMainCamera(Entity cameraEntity);
@@ -38,17 +39,10 @@ namespace Cine
 
 		NativeScript* CreateScriptInstance(const std::string& name);
 
-		template <class T>
-		bool IsScriptRegistered()
-		{
-			std::string name = Utils::GetClassTypename<T>();
-			return s_RegisteredScripts.contains(name);
-		}
-
 		template<typename Component>
 		void RegisterComponent() {
 			std::string componentName = Utils::GetClassTypename<Component>();
-			s_ComponentRegistry[componentName] = [&](entt::registry& registry, entt::entity entity)
+			m_ComponentRegistry[componentName] = [&](entt::registry& registry, entt::entity entity)
 				{
 					auto& component = registry.emplace<Component>(entity);
 					OnComponentAdded<Component>(entity, component);
@@ -56,8 +50,8 @@ namespace Cine
 		}
 
 		void AddComponentByName(entt::entity entity, const std::string& componentName) {
-			auto it = s_ComponentRegistry.find(componentName);
-			if (it != s_ComponentRegistry.end()) {
+			auto it = m_ComponentRegistry.find(componentName);
+			if (it != m_ComponentRegistry.end()) {
 				it->second(m_Registry, entity);
 				std::cout << "Added component: " << componentName << std::endl;
 			}
@@ -66,24 +60,10 @@ namespace Cine
 			}
 		}
 
-		template <class T>
-		void RegisterScript()
+		template <class Component>
+		void OnEntityDestroyed()
 		{
-			static_assert(std::is_base_of<NativeScript, T>::value, "T must be a derived class of ScriptableEntity");
-
-			std::string name = Utils::GetClassTypename<T>();
-
-			if (s_RegisteredScripts.contains(name))
-			{
-				CINE_CORE_WARN("Script {} is already registered.", name);
-			}
-
-			s_RegisteredScripts[name] = []() -> NativeScript*
-				{
-					return new T;
-				};
-
-			CINE_CORE_TRACE("Registered script {} with type {}", name, typeid(T).name());
+			CINE_LOG_TRACE("Removed '{}' from '{}'", Utils::GetClassTypename(Component));
 		}
 
 	private:
@@ -116,8 +96,8 @@ namespace Cine
 		}
 
 	private:
-		static std::unordered_map<std::string, std::function<NativeScript* ()>> s_RegisteredScripts;
-		std::unordered_map<std::string, ComponentAdder> s_ComponentRegistry;
+		std::unordered_map<std::string, ComponentAdder> m_ComponentRegistry;
+		std::vector<entt::entity> m_ToDestroyEntities;
 		entt::registry m_Registry;
 		Entity* m_MainCamera;
 
@@ -127,5 +107,7 @@ namespace Cine
 		friend class Entity;
 		friend class SceneHierarchyPanel;
 		friend class SceneSerializer;
+
+		void DestroyMarkedEntities();
 	};
 }

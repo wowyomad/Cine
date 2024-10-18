@@ -9,7 +9,9 @@ namespace Cine
 	{
 	public:
 		NativeScript() = default;
-		virtual ~NativeScript() {}
+		NativeScript(const NativeScript&) = default;
+		NativeScript(NativeScript&&) = default;
+		virtual ~NativeScript() { }
 
 		template <class T>
 		T& GetComponent()
