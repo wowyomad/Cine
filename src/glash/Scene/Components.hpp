@@ -95,26 +95,22 @@ namespace Cine
 			size_t Index;
 			NativeScript* Instance = nullptr;
 
-			std::function<NativeScript*()> InstantiateScript;
+			std::function<NativeScript* ()> InstantiateScript;
 		};
 
-		static const size_t MaxScripts = 16;
 		std::vector<Data> Scripts;
 
 		template <class T>
 		void Bind(std::function<NativeScript* ()> instantiateScript)
 		{
-			if (Scripts.size() < MaxScripts)
-			{
-				size_t ScriptID = m_ScriptCounter;
-				Data data;
-				data.Index = ScriptID;
-				data.InstantiateScript = instantiateScript;
+			size_t ScriptID = m_ScriptCounter;
+			Data data;
+			data.Index = ScriptID;
+			data.InstantiateScript = instantiateScript;
 
-				Scripts.push_back(data);
+			Scripts.push_back(data);
 
-				++m_ScriptCounter;
-			}
+			++m_ScriptCounter;
 		}
 	private:
 		size_t m_ScriptCounter = 0;

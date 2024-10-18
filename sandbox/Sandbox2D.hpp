@@ -13,7 +13,8 @@ public:
 
 	void OnUpdate(Cine::Timestep ts) override final;
 	void OnEvent(Cine::Event& event) override final;
-	void OnImGuiRender() override final;
+
+	void RegisterComponents();
 
 private:
 
