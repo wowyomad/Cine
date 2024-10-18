@@ -1,12 +1,9 @@
 #pragma once
 #include "glash/Core/Base.hpp"
 #include "glash/Core/Timestep.hpp"
-
 #include "glash/Renderer/EditorCamera.hpp"
-
-#include "glash/Scene/Components.hpp"
-
 #include "glash/Utils/StringUtils.hpp"
+#include "Components.hpp"
 
 #include <entt/entt.hpp>
 
@@ -126,5 +123,6 @@ namespace Cine
 
 		void DestroyMarkedEntities();
 		void UpdateScripts(Timestep ts);
+		void InstantiateScripts();
 	};
 }

@@ -1,3 +1,4 @@
+#include "glash/glash_pch.hpp"
 #include "SceneHierarchyPanel.hpp"
 #include "glash/Cine.hpp"
 
@@ -293,6 +294,11 @@ namespace Cine
 		{
 			DisplaySpriteSheetComponent(entity);
 		}
+
+		if (entity.HasComponent<SpriteComponent>())
+		{
+			DisplaySpriteComponent(entity);
+		}
 	}
 
 	void SceneHierarchyPanel::DisplayTransformComponent(Entity entity)
@@ -329,6 +335,17 @@ namespace Cine
 				}
 			});
 	}
+
+	void SceneHierarchyPanel::DisplaySpriteComponent(Entity entity)
+	{
+		DisplayComponent<SpriteComponent>(entity, "Sprite", [&entity](SpriteComponent& sprite)
+			{
+				int32_t maxIndex = entity.GetComponent<SpriteSheetComponent>().Frames.size() - 1;
+				ImGui::SliderInt("Sprite Sheet Index", &sprite.SpriteFrameIndex, 0, maxIndex);
+			});
+
+	}
+
 
 	void SceneHierarchyPanel::DisplaySpriteSheetComponent(Entity entity)
 	{
@@ -376,19 +393,7 @@ namespace Cine
 					ImGui::BeginDisabled(!enableUseSprite);
 					ImGui::Checkbox("Use Sprite", &useSprite);
 					ImGui::EndDisabled();
-
-					if (useSprite)
-					{
-						int& spriteSheetIndex = sc.SpriteSheetIndex;
-						int min = 0;
-						int max = spriteSheet.Frames.size() - 1;
-						ImGui::SetNextItemWidth(64.0f);
-						ImGui::InputInt("##SpriteSheetIndex", &spriteSheetIndex, min, max);
-						ImGui::SameLine();
-						ImGui::Text("Sprite Sheet Index");
-					}
 				}
-				
 			});
 	}
 

@@ -10,19 +10,6 @@
 
 #include <ImGuizmo.h>
 
-struct Health {
-	int value;
-};
-
-struct Position {
-	float x, y;
-};
-
-struct Name {
-	std::string value;
-};
-
-
 static Cine::Scene* s_Scene = nullptr;
 
 namespace Cine
@@ -105,6 +92,12 @@ namespace Cine
 
 	void EditorLayer::OnAttach()
 	{
+		m_ActiveScene = CreateRef<Scene>();
+		s_Scene = m_ActiveScene.get();
+
+		s_Scene->RegisterComponent<ControllerScript>();
+		s_Scene->RegisterComponent<ColorScript>();
+
 		FramebufferSpecification spec;
 		spec.Width = 1280;
 		spec.Height = 720;
@@ -124,21 +117,11 @@ namespace Cine
 
 		auto& sr = entity.AddComponent<SpriteRendererComponent>();
 		auto& sheet = entity.AddComponent<SpriteSheetComponent>();
-
-		s_Scene->RegisterComponent<ControllerScript>();
-		s_Scene->RegisterComponent<ColorScript>();
-
-		entity.AddComponentByName("ColorScript");
-		entity.AddComponentByName("ControllerScript");
-
+		auto& sprite = entity.AddComponent<SpriteComponent>();
 
 		sheet.Texture = m_TextureLibrary.GetTexture2D("Thing");
-		Sprite::Frame frame = { 0, 129, 128, 128 * 2 };
-		auto& tr = entity.GetComponent<TransformComponent>();
-		tr.Scale.y = frame.height / frame.width;
-		sheet.Frames.push_back(frame);
-		sr.SpriteSheetIndex = 0;
-		sr.UseSprite = true;
+		sheet.Frames.push_back({ 0, 128, 128, 256 });
+		sprite.SpriteFrameIndex = 0;
 
 	}
 
@@ -285,6 +268,13 @@ namespace Cine
 		DrawViewport();
 
 	}
+
+	void EditorLayer::SetupCustom()
+	{
+		
+
+
+	}	
 
 	void EditorLayer::DrawViewport()
 	{

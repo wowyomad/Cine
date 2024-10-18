@@ -6,6 +6,8 @@
 #include "glash/Renderer/Buffer.hpp"
 #include "glash/Renderer/Shader.hpp"
 
+#include "glash/Scene/Components.hpp"
+
 namespace Cine
 {
 	struct QuadVertex
@@ -299,7 +301,7 @@ namespace Cine
 		s_Data.Stats.QuadCount++;
 	}
 
-	void Renderer2D::DrawSprite(const glm::mat4& transform, const Ref<Sprite> sprite, float tiling, const glm::vec4& tintColor)
+	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, glm::vec2* texCoord, const glm::vec4& tintColor)
 	{
 		CINE_PROFILE_FUNCTION();
 
@@ -310,7 +312,7 @@ namespace Cine
 			EndScene();
 			s_Data.QuadIndexCount = 0;
 			s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
-			DrawSprite(transform, sprite, tiling, tintColor);
+			DrawQuad(transform, texture, texCoord, tintColor);
 		}
 
 		constexpr size_t quadVertexCount = 4;
@@ -319,7 +321,7 @@ namespace Cine
 		float textureIndex = 0.0f;
 		for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
 		{
-			if (*s_Data.TextureSlots[i] == *sprite->Texture)
+			if (*s_Data.TextureSlots[i] == *texture)
 			{
 				textureIndex = static_cast<float>(i);
 				break;
@@ -333,7 +335,7 @@ namespace Cine
 				DEBUG_BREAK;
 			}
 			textureIndex = static_cast<float>(s_Data.TextureSlotIndex);
-			s_Data.TextureSlots[s_Data.TextureSlotIndex] = sprite->Texture;
+			s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
 			s_Data.TextureSlotIndex++;
 		}
 
@@ -341,9 +343,9 @@ namespace Cine
 		{
 			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[i];
 			s_Data.QuadVertexBufferPtr->Color = tintColor;
-			s_Data.QuadVertexBufferPtr->TexCoord = sprite->TexCoords[i];
+			s_Data.QuadVertexBufferPtr->TexCoord = texCoord[i];
 			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
-			s_Data.QuadVertexBufferPtr->Tiling = tiling;
+			s_Data.QuadVertexBufferPtr->Tiling = 1.0f;
 			s_Data.QuadVertexBufferPtr++;
 		}
 
@@ -352,14 +354,23 @@ namespace Cine
 		s_Data.Stats.QuadCount++;
 	}
 
-	void Renderer2D::DrawSprite(const glm::mat4& transform, const SpriteSheetComponent& spriteSheet, uint32_t spriteIndex, float tiling, const glm::vec4& tintColor)
+	void Renderer2D::DrawSprite(const glm::mat4& transform, const SpriteSheetComponent& spriteSheet, uint32_t spriteIndex, const glm::vec4& tintColor)
 	{
-		CINE_PROFILE_FUNCTION();
+		float width = spriteSheet.Texture->GetWidth();
+		float height = spriteSheet.Texture->GetHeight();
+		SpriteSheetComponent::Frame frame = spriteSheet.Frames[spriteIndex];
 
-		auto& frame = spriteSheet.Frames[spriteIndex];
-		Ref<Sprite> sprite = CreateRef<Sprite>(spriteSheet.Texture, frame);
-		DrawSprite(transform, sprite, tiling, tintColor);
+		glm::vec2 texCoords[4] =
+		{
+			{ frame.x / width, frame.y / height },
+			{ (frame.x + frame.width) / width, frame.y / height },
+			{ (frame.x + frame.width) / width, (frame.y + frame.height) / height},
+			{ frame.x / width, (frame.y + frame.height) / height }
+
+		};
+		DrawQuad(transform, spriteSheet.Texture, texCoords, tintColor);
 	}
+
 
 	void Renderer2D::ResetStats()
 	{

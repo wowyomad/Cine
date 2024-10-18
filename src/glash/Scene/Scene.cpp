@@ -95,140 +95,76 @@ namespace Cine
 
 	void Scene::OnUpdateEditor(Timestep ts, EditorCamera& editorCamera)
 	{
-		//Scripts
-		m_Registry.view<NativeScriptComponent>().each([=](auto entity, NativeScriptComponent& nsc)
-			{
-				for (auto& script : nsc.Scripts)
-				{
-					if (script.Instance)
-					{
-						script.Instance->OnUpdate(ts);
-					}
-					else
-					{
-						script.Instance = script.InstantiateScript();
-						script.Instance->m_Entity = Entity(entity, this);
-						script.Instance->OnCreate();
-					}
-				}
-
-			});
-
-		//Animation
-		auto spriteAnimtionView = m_Registry.view<SpriteAnimationComponent, SpriteSheetComponent, SpriteRendererComponent>();
-		for (auto entity : spriteAnimtionView)
-		{
-			auto&& [spriteAnimationComponent, spriteSheetComponent] = spriteAnimtionView.get<SpriteAnimationComponent, SpriteSheetComponent>(entity);
-			SpriteAnimationSystem::Update(ts, spriteAnimationComponent, spriteSheetComponent);
-			auto&& spriteRenderer = spriteAnimtionView.get<SpriteRendererComponent>(entity);
-			spriteRenderer.SpriteSheetIndex = SpriteAnimationSystem::GetCurrentSpriteIndex(spriteAnimationComponent, spriteSheetComponent);
-		}
-
-		Renderer2D::Clear();
-		Renderer2D::BeginScene(editorCamera);
-
-		//Draw
-		m_Registry.view<TransformComponent, SpriteRendererComponent>().each([&](auto entity, TransformComponent& transform, SpriteRendererComponent& spriteRenderer)
-			{
-				bool hasSpriteSheet = m_Registry.all_of<SpriteSheetComponent>(entity);
-				if (spriteRenderer.UseSprite && hasSpriteSheet)
-				{
-					auto& spriteSheet = m_Registry.get<SpriteSheetComponent>(entity);
-					if (spriteRenderer.SpriteSheetIndex >= 0 && spriteRenderer.SpriteSheetIndex < spriteSheet.Frames.size())
-					{
-						Renderer2D::DrawSprite(transform.GetTransform(), spriteSheet, spriteRenderer.SpriteSheetIndex, 1.0f, spriteRenderer.Color);
-					}
-					else
-					{
-						spriteRenderer.UseSprite = false;
-						spriteRenderer.SpriteSheetIndex = 0;
-					}
-				}
-				else
-				{
-					Renderer2D::DrawQuad(transform.GetTransform(), spriteRenderer.Color);
-				}
-			});
-		Renderer2D::EndScene();
-	}
-
-	void Scene::OnUpdateRuntime(Timestep ts)
-	{
-		m_Registry.view<NativeScriptComponent>().each([&](auto entity, NativeScriptComponent& nsc)
-			{
-				for (auto& script : nsc.Scripts)
-				{
-					if (!script.Instance)
-					{
-						script.Instance = script.InstantiateScript();
-						script.Instance->m_Entity = Entity(entity, this);
-						script.Instance->OnCreate();
-					}
-				}
-
-			});
-
+		InstantiateScripts();
 		UpdateScripts(ts);
 
 		Renderer2D::Clear();
-		if (*m_MainCamera)
-		{
-			auto&& [cameraComponent, transformComponent] = m_MainCamera->GetComponents<CameraComponent, TransformComponent>();
-			Renderer2D::BeginScene(cameraComponent.Camera, transformComponent.GetTransform());
-
-			m_Registry.view<TransformComponent, SpriteRendererComponent>().each([&](auto entity, TransformComponent& transform, SpriteRendererComponent& spriteRenderer)
-				{
-					bool hasSpriteSheet = m_Registry.all_of<SpriteSheetComponent>(entity);
-					if (spriteRenderer.UseSprite && hasSpriteSheet)
-					{
-						auto& spriteSheet = m_Registry.get<SpriteSheetComponent>(entity);
-						if (spriteRenderer.SpriteSheetIndex >= 0 && spriteRenderer.SpriteSheetIndex < spriteSheet.Frames.size())
-						{
-							Renderer2D::DrawSprite(transform.GetTransform(), spriteSheet, spriteRenderer.SpriteSheetIndex, 1.0f, spriteRenderer.Color);
-						}
-						else
-						{
-							spriteRenderer.UseSprite = false;
-							spriteRenderer.SpriteSheetIndex = static_cast<int>(spriteSheet.Frames.size()) - 1;
-						}
-					}
-					else
-					{
-						Renderer2D::DrawQuad(transform.GetTransform(), spriteRenderer.Color);
-					}
-				});
-			Renderer2D::EndScene();
-
-		}
+		Renderer2D::BeginScene(editorCamera);
+		SpriteRendererSystem::Update(m_Registry);
+		Renderer2D::EndScene();
 
 		DestroyMarkedEntities();
 	}
 
-	void Scene::UpdateScripts(Timestep ts)
+
+void Scene::OnUpdateRuntime(Timestep ts)
+{
+	InstantiateScripts();
+	UpdateScripts(ts);
+
+	Renderer2D::Clear();
+	if (*m_MainCamera)
 	{
-		for (auto& [componentName, updateCall] : m_UpdateRegistry)
-		{
-			updateCall(m_Registry, ts);
-		}
+		auto&& [cameraComponent, transformComponent] = m_MainCamera->GetComponents<CameraComponent, TransformComponent>();
+		Renderer2D::BeginScene(cameraComponent.Camera, transformComponent.GetTransform());
+		SpriteRendererSystem::Update(m_Registry);
+		Renderer2D::EndScene();
 	}
 
-	void Scene::DestroyMarkedEntities()
-	{
-		for (auto entity : m_ToDestroyEntities)
+	DestroyMarkedEntities();
+}
+
+void Scene::InstantiateScripts()
+{
+	m_Registry.view<NativeScriptComponent>().each([&](auto entity, NativeScriptComponent& nsc)
 		{
-			if (m_Registry.all_of<NativeScriptComponent>(entity))
+			for (auto& script : nsc.Scripts)
 			{
-				auto& nsc = m_Registry.get<NativeScriptComponent>(entity);
-				for (auto& script : nsc.Scripts)
+				if (!script.Instance)
 				{
-					script.Instance->OnDestroy();
+					script.Instance = script.InstantiateScript();
+					script.Instance->m_Entity = Entity(entity, this);
+					script.Instance->OnCreate();
 				}
 			}
+		});
+}
 
-			m_Registry.destroy(entity);
-		}
-		m_ToDestroyEntities.clear();
+void Scene::UpdateScripts(Timestep ts)
+{
+	for (auto& [componentName, updateCall] : m_UpdateRegistry)
+	{
+		updateCall(m_Registry, ts);
 	}
+}
+
+void Scene::DestroyMarkedEntities()
+{
+	for (auto entity : m_ToDestroyEntities)
+	{
+		if (m_Registry.all_of<NativeScriptComponent>(entity))
+		{
+			auto& nsc = m_Registry.get<NativeScriptComponent>(entity);
+			for (auto& script : nsc.Scripts)
+			{
+				script.Instance->OnDestroy();
+			}
+		}
+
+		m_Registry.destroy(entity);
+	}
+	m_ToDestroyEntities.clear();
+}
 
 
 

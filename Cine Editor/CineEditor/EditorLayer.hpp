@@ -19,6 +19,8 @@ namespace Cine
 		void OnEvent(Event& event) override;
 		void OnImGuiRender() override;
 
+		void SetupCustom();
+
 	private:
 
 		Ref<FrameBuffer> m_Framebuffer;

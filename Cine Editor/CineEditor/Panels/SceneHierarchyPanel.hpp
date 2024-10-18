@@ -42,6 +42,7 @@ namespace Cine
 		void DisplayTagComponent(Entity entity);
 		void DisplaySpriteRendererComponent(Entity entity);
 		void DisplaySpriteSheetComponent(Entity entity);
+		void DisplaySpriteComponent(Entity entity);
 		void DisplayCameraComponent(Entity entity);
 
 	};

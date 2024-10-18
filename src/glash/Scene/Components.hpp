@@ -3,10 +3,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/quaternion.hpp>
 
-#include "glash/Renderer/Sprite.hpp"
-#include "glash/Renderer/SpriteAnimation2D.hpp"
-
 #include "SceneCamera.hpp"
+#include "glash/Renderer/Texture.hpp"
 
 namespace Cine
 {
@@ -46,8 +44,7 @@ namespace Cine
 	struct SpriteRendererComponent
 	{
 		glm::vec4 Color = glm::vec4(1.0f);
-		int SpriteSheetIndex = 0;
-		bool UseSprite = true;
+		bool UseSprite = false;
 
 		SpriteRendererComponent() = default;
 		SpriteRendererComponent(const SpriteRendererComponent&) = default;
@@ -57,23 +54,17 @@ namespace Cine
 
 	struct SpriteSheetComponent
 	{
+		struct Frame
+		{
+			int32_t x, y, width, height;
+		};
 		Ref<Texture2D> Texture;
-		std::vector<Sprite::Frame> Frames;
-
-		SpriteSheetComponent() = default;
-		SpriteSheetComponent(const SpriteSheetComponent&) = default;
-		SpriteSheetComponent(const Ref<Texture2D>& texture)
-			: Texture(texture) {
-			Frames.push_back(Sprite::Frame(0, 0, texture->GetWidth(), texture->GetHeight()));
-		}
+		std::vector<Frame> Frames;
 	};
 
-	struct SpriteAnimationComponent
+	struct SpriteComponent
 	{
-		std::unordered_map<std::string, Ref<SpriteAnimation>> Animations;
-		std::string CurrentAnimation;
-		float ElapsedTime = 0.0f;
-		int CurrentFrame = 0;
+		int32_t SpriteFrameIndex = 0;
 	};
 
 	//Camera is a component like in Unity

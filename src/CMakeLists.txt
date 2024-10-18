@@ -17,6 +17,7 @@ file(GLOB SOURCES
     "${glash_SOURCE_DIR}/Scene/*.cpp"
     "${glash_SOURCE_DIR}/Renderer/*.cpp"
     "${glash_SOURCE_DIR}/Math/*.cpp"
+    "${glash_SOURCE_DIR}/Animation/*.cpp"
 )
 
 file(GLOB HEADERS
@@ -33,6 +34,7 @@ file(GLOB HEADERS
     "${glash_SOURCE_DIR}/Scene/*.hpp"
     "${glash_SOURCE_DIR}/Debug/*.hpp"
     "${glash_SOURCE_DIR}/Math/*.hpp"
+     "${glash_SOURCE_DIR}/Animation/*.hpp"
 )
 if(GLASH_ENABLE_DEBUG)
     list(APPEND GLASH_COMPILE_DEFINITIONS GLASH_ENABLE_DEBUG)
