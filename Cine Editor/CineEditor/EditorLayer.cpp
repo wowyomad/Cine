@@ -58,8 +58,14 @@ namespace Cine
 	class ColorScript : public NativeScript
 	{
 	public:
+		ColorScript()
+		{
+			++counter;
+			CINE_LOG_INFO("ColorScript Counter: {}", counter);
+		}
 		void OnCreate() override
 		{
+			counter = 0;
 			auto& component = GetComponent<SpriteRendererComponent>();
 			m_SpriteRendererComponent = &component;
 			m_Timer.Start();
@@ -80,7 +86,10 @@ namespace Cine
 	private:
 		SpriteRendererComponent* m_SpriteRendererComponent;
 		Timer m_Timer;
+		static int counter;
 	};
+
+	int ColorScript::counter = 0;
 
 	class ControllerScript : public NativeScript
 	{

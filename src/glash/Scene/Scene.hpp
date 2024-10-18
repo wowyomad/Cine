@@ -48,9 +48,10 @@ namespace Cine
 		template<typename Component>
 		void RegisterComponent() {
 			std::string componentName = Utils::GetClassTypename<Component>();
-			s_ComponentRegistry[componentName] = [&](entt::registry& registry, entt::entity entity) {
-				auto& component = registry.emplace<Component>(entity);
-				OnComponentAdded<Component>(entity, component);
+			s_ComponentRegistry[componentName] = [&](entt::registry& registry, entt::entity entity)
+				{
+					auto& component = registry.emplace<Component>(entity);
+					OnComponentAdded<Component>(entity, component);
 				};
 		}
 
@@ -71,7 +72,7 @@ namespace Cine
 			static_assert(std::is_base_of<NativeScript, T>::value, "T must be a derived class of ScriptableEntity");
 
 			std::string name = Utils::GetClassTypename<T>();
-			
+
 			if (s_RegisteredScripts.contains(name))
 			{
 				CINE_CORE_WARN("Script {} is already registered.", name);
@@ -92,10 +93,6 @@ namespace Cine
 		{
 			if constexpr (std::is_same<Component, CameraComponent>::value)
 			{
-				if (m_Registry.all_of<NativeScriptComponent>(entity))
-				{
-					CINE_ASSERT(false, "xyu");
-				}
 				component.Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
 				CINE_CORE_TRACE("Added Camera Component to {}", m_Registry.get<TagComponent>(entity).Tag);
 			}
@@ -110,7 +107,11 @@ namespace Cine
 				}
 				CINE_CORE_TRACE("Script added to {}", static_cast<unsigned int>(entity));
 				auto& nsc = m_Registry.get<NativeScriptComponent>(entity);
-				nsc.Bind<Component>();
+				auto instantiateScript = [&, entity]() -> NativeScript* {
+					// Retrieve the component from the registry and cast to NativeScript
+					return static_cast<NativeScript*>(&m_Registry.get<Component>(entity));
+					};
+				nsc.Bind<Component>(instantiateScript);
 			}
 		}
 

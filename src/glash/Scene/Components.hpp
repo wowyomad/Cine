@@ -88,14 +88,12 @@ namespace Cine
 
 	struct NativeScriptComponent
 	{
-
-
 		struct Data
 		{
-			size_t Number;
+			size_t Index;
 			NativeScript* Instance = nullptr;
 
-			NativeScript* (*InstantiateScript)();
+			std::function<NativeScript*()> InstantiateScript;
 			void (*DestroyScript)(NativeScriptComponent*);
 		};
 
@@ -103,14 +101,20 @@ namespace Cine
 		std::vector<Data> Scripts;
 
 		template <class T>
-		void Bind()
+		void Bind(std::function<NativeScript* ()> instantiateScript)
 		{
 			if (Scripts.size() < MaxScripts)
 			{
+				size_t ScriptID = m_ScriptCounter;
 				Data data;
-				data.Number = m_ScriptCounter++;
-				data.InstantiateScript = []() { return static_cast<NativeScript*>(new T()); };
+				data.Index = ScriptID;
+				data.InstantiateScript = instantiateScript;
+
+				//auto it = std::find_if(Scripts.begin(), Scripts.end(), [ScriptID](const Data& d) { d.Index == ScriptID; }); don't look at this...
+
 				Scripts.push_back(data);
+
+				++m_ScriptCounter;
 			}
 		}
 	private:
