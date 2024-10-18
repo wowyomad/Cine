@@ -32,7 +32,9 @@ namespace Cine
 		virtual void OnDestroy() {}
 		virtual void OnUpdate(Timestep ts) {}
 
-	public:
+	private:
 		Entity m_Entity;
+
+		friend class Scene;
 	};
 }

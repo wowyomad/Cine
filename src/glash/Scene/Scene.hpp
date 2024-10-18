@@ -42,23 +42,24 @@ namespace Cine
 		template<typename Component>
 		void RegisterComponent() {
 			std::string componentName = Utils::GetClassTypename<Component>();
-			m_ComponentRegistry[componentName] = [&](entt::registry& registry, entt::entity entity)
+			m_ComponentRegistry[componentName] = [&](entt::registry& registry, entt::entity entity) -> Component&
 				{
 					auto& component = registry.emplace<Component>(entity);
 					OnComponentAdded<Component>(entity, component);
+					return component;
 				};
 		}
 
 		void AddComponentByName(entt::entity entity, const std::string& componentName) {
 			auto it = m_ComponentRegistry.find(componentName);
 			if (it != m_ComponentRegistry.end()) {
-				it->second(m_Registry, entity);
 				std::cout << "Added component: " << componentName << std::endl;
+				it->second(m_Registry, entity);
 			}
-			else {
-				std::cout << "Component not found: " << componentName << std::endl;
-			}
+
+			std::cout << "Component not found: " << componentName << std::endl;
 		}
+
 
 		template <class Component>
 		void OnEntityDestroyed()
@@ -89,7 +90,7 @@ namespace Cine
 				auto& nsc = m_Registry.get<NativeScriptComponent>(entity);
 				auto instantiateScript = [&, entity]() -> NativeScript* {
 					// Retrieve the component from the registry and cast to NativeScript
-					return static_cast<NativeScript*>(&m_Registry.get<Component>(entity));
+					return reinterpret_cast<NativeScript*>(&m_Registry.get<Component>(entity));
 					};
 				nsc.Bind<Component>(instantiateScript);
 			}

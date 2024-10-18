@@ -2,6 +2,7 @@
 #include "Sandbox2D.hpp"
 
 #include "Scripts/ColorScript.hpp"
+#include "Scripts/ControllerScript.hpp"
 
 void Sandbox2D::OnAttach()
 {
@@ -10,11 +11,15 @@ void Sandbox2D::OnAttach()
 	m_Player = m_Scene->CreateEntity("Player");
 	m_Player.AddComponent<Cine::SpriteRendererComponent>();
 
-	m_Scene->RegisterComponent<ColorScript>();
-	m_Player.AddComponentByName("ColorScript");
+	m_Player.AddComponent<ColorScript>();
 
 	auto texture = m_TextureLibrary.LoadTexture2D("Face.png", "Assets/Textures/Face.png");
 	auto& sheet = m_Player.AddComponent<Cine::SpriteSheetComponent>(texture);
+
+	auto& transform = m_Player.GetComponent<Cine::TransformComponent>();
+	transform.Scale = { 5.0f, 5.0f, 1.0f };
+
+	m_Player.AddComponent<ControllerScript>();
 
 	auto camera = m_Scene->CreateEntity("Camera");
 	auto& cameraComponent = camera.AddComponent<Cine::CameraComponent>();
@@ -27,7 +32,6 @@ void Sandbox2D::OnDetach()
 {
 
 }
-
 
 void Sandbox2D::OnUpdate(Cine::Timestep ts)
 {

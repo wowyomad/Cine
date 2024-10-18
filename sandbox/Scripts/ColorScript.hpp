@@ -22,15 +22,8 @@ public:
 		CINE_LOG_WARN("Destroyed ColorScript");
 	}
 
-	void OnUpdate(Cine::Timestep ts) override
-	{
-		m_Timer.OnUpdate(ts);
-
-		float time = m_Timer.GetElapsed();
-		m_SpriteRendererComponent->Color.r = 0.5f * sin(time) + 0.5f;
-		m_SpriteRendererComponent->Color.g = 0.5f * sin(time + 2.0f) + 0.5f;
-		m_SpriteRendererComponent->Color.b = 0.5f * sin(time + 4.0f) + 0.5f;
-	}
+	void OnUpdate(Cine::Timestep ts) override;
+	
 public:
 	std::string String = "String from Color Script";
 

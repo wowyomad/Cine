@@ -2,7 +2,6 @@
 #include "EditorLayer.hpp"
 
 #include "Scene/Components.hpp"
-#include "Scene/ScriptableEntity.hpp"
 #include "Scene/SceneSerializer.hpp"
 #include "glash/Utils/PlatformUtils.hpp"
 #include "glash/Core/Timer.hpp"
@@ -23,33 +22,6 @@ struct Name {
 	std::string value;
 };
 
-using ComponentAdder = void(*)(entt::registry&, entt::entity);
-
-std::unordered_map<std::string, ComponentAdder> s_ComponentRegistry;
-
-template<typename Component>
-void registerComponent(const std::string& componentName) {
-	s_ComponentRegistry[componentName] = [](entt::registry& registry, entt::entity entity) {
-		registry.emplace<Component>(entity);
-		};
-}
-
-void registerComponents() {
-	registerComponent<Health>("Health");
-	registerComponent<Position>("Position");
-	registerComponent<Name>("Name");
-}
-
-void addComponentByName(entt::registry& registry, entt::entity entity, const std::string& componentName) {
-	auto it = s_ComponentRegistry.find(componentName);
-	if (it != s_ComponentRegistry.end()) {
-		it->second(registry, entity);
-		std::cout << "Added component: " << componentName << std::endl;
-	}
-	else {
-		std::cout << "Component not found: " << componentName << std::endl;
-	}
-}
 
 static Cine::Scene* s_Scene = nullptr;
 

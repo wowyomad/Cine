@@ -37,7 +37,6 @@ namespace Cine
 		void AddComponentByName(const std::string& name)
 		{
 			m_Scene->AddComponentByName(m_EntityHandle, name);
-
 		}
 
 		template <class Component, class... Args>
