@@ -60,6 +60,8 @@ namespace Cine
 
 		virtual bool IsLoaded() const = 0;
 		virtual bool operator==(const Texture& other) const = 0;
+
+		virtual const std::filesystem::path& GetPath() const = 0;
 	};
 
 	class Texture2D : public Texture

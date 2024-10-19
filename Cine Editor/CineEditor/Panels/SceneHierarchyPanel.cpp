@@ -174,8 +174,6 @@ namespace Cine
 		ImGui::End();
 
 
-
-
 		ImGui::Begin("Properties");
 		if (m_Context.Properties)
 		{
@@ -342,7 +340,7 @@ namespace Cine
 		DisplayComponent<SpriteComponent>(entity, "Sprite", [&entity](SpriteComponent& sprite)
 			{
 				int32_t maxIndex = entity.GetComponent<SpriteSheetComponent>().Frames.size() - 1;
-				ImGui::SliderInt("Sprite Sheet Index", &sprite.SpriteFrameIndex, 0, maxIndex);
+				ImGui::SliderInt("Sprite Sheet Index", &sprite.SpriteIndex, 0, maxIndex);
 			});
 
 	}
@@ -460,9 +458,6 @@ namespace Cine
 
 		DisplayComponent<SpriteRendererComponent>(entity, "Sprite Renderer", [&entity](SpriteRendererComponent& sc)
 			{
-				auto& color = sc.Color;
-				ImGui::ColorEdit4("Color", glm::value_ptr(color));
-
 				if (entity.HasComponent<SpriteSheetComponent>())
 				{
 					auto& spriteSheet = entity.GetComponent<SpriteSheetComponent>();

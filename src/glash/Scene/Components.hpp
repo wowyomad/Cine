@@ -43,13 +43,10 @@ namespace Cine
 
 	struct SpriteRendererComponent
 	{
-		glm::vec4 Color = glm::vec4(1.0f);
 		bool UseSprite = false;
 
 		SpriteRendererComponent() = default;
 		SpriteRendererComponent(const SpriteRendererComponent&) = default;
-		SpriteRendererComponent(const glm::vec4& color)
-			: Color(color) {}
 	};
 
 	struct SpriteSheetComponent
@@ -64,7 +61,8 @@ namespace Cine
 
 	struct SpriteComponent
 	{
-		int32_t SpriteFrameIndex = 0;
+		glm::vec4 Color = glm::vec4(1.0f);
+		int32_t SpriteIndex = 0;
 	};
 
 	//Camera is a component like in Unity

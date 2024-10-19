@@ -24,12 +24,14 @@ namespace Cine
 		uint32_t GetWidth() const override final { return m_Width; }
 		uint32_t GetHeight() const override final { return m_Height;  }
 		inline uint32_t GetRendererID() const override final { return m_RendererID; }
-		virtual bool IsLoaded() const override final { return m_IsLoaded; }
+		bool IsLoaded() const override final { return m_IsLoaded; }
 
-		virtual bool operator==(const Texture& other) const override final
+		bool operator==(const Texture& other) const override final
 		{
 			return m_RendererID == other.GetRendererID();
 		}
+
+		const std::filesystem::path& GetPath() const override;
 
 	private:
 		uint32_t m_RendererID;

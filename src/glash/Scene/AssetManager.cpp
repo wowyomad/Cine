@@ -5,9 +5,18 @@
 
 namespace Cine
 {
-    SpriteSheetComponent AssetManager::LoadSpriteSheet(std::string name, const std::filesystem::path& path)
+    AssetManager* AssetManager::s_Instance = nullptr;
+
+    void AssetManager::Init()
     {
-        Ref<Texture2D> texture = m_TextureLibrary.LoadTexture2D(name, path);
+        s_Instance = new AssetManager();
+    }
+
+    SpriteSheetComponent AssetManager::LoadSpriteSheet(std::string name, const std::filesystem::path& relativePath, bool defaultFrame)
+    {
+        std::filesystem::path path = "Assets" / relativePath;
+
+        Ref<Texture2D> texture = s_Instance->m_TextureLibrary.LoadTexture2D(name, path);
 
         SpriteSheetComponent spriteSheet;
         spriteSheet.Texture = texture;
@@ -23,13 +32,13 @@ namespace Cine
                 CINE_LOG_WARN("Meta file {} not found", metaFilePath.filename().string());
             }
         }
-        else
+        else if(defaultFrame)
         {
             SpriteSheetComponent::Frame defaultFrame;
-            defaultFrame.Coords[0] = { 0.0f, 0.0f }; // Bottom-left
-            defaultFrame.Coords[1] = { 1.0f, 0.0f }; // Bottom-right
-            defaultFrame.Coords[2] = { 1.0f, 1.0f }; // Top-right
-            defaultFrame.Coords[3] = { 0.0f, 1.0f }; // Top-left
+            defaultFrame.Coords[0] = { 0.0f, 0.0f };
+            defaultFrame.Coords[1] = { 1.0f, 0.0f };
+            defaultFrame.Coords[2] = { 1.0f, 1.0f };
+            defaultFrame.Coords[3] = { 0.0f, 1.0f };
 
             spriteSheet.Frames.push_back(defaultFrame);
         }

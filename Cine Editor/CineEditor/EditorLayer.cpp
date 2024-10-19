@@ -25,8 +25,8 @@ namespace Cine
 		void OnCreate() override
 		{
 			counter = 0;
-			auto& component = GetComponent<SpriteRendererComponent>();
-			m_SpriteRendererComponent = &component;
+			auto& component = GetComponent<SpriteComponent>();
+			m_SpriteComponent = &component;
 			m_Timer.Start();
 		}
 
@@ -35,15 +35,15 @@ namespace Cine
 			m_Timer.OnUpdate(ts);
 
 			float time = m_Timer.GetElapsed();
-			m_SpriteRendererComponent->Color.r = 0.5f * sin(time) + 0.5f;
-			m_SpriteRendererComponent->Color.g = 0.5f * sin(time + 2.0f) + 0.5f;
-			m_SpriteRendererComponent->Color.b = 0.5f * sin(time + 4.0f) + 0.5f;
+			m_SpriteComponent->Color.r = 0.5f * sin(time) + 0.5f;
+			m_SpriteComponent->Color.g = 0.5f * sin(time + 2.0f) + 0.5f;
+			m_SpriteComponent->Color.b = 0.5f * sin(time + 4.0f) + 0.5f;
 		}
 	public:
 		std::string String = "String from Color Script";
 
 	private:
-		SpriteRendererComponent* m_SpriteRendererComponent;
+		SpriteComponent* m_SpriteComponent;
 		Timer m_Timer;
 		static int counter;
 	};
@@ -116,7 +116,7 @@ namespace Cine
 		auto& sr = entity.AddComponent<SpriteRendererComponent>();
 		auto& sheet = entity.AddComponent<SpriteSheetComponent>();
 		auto& sprite = entity.AddComponent<SpriteComponent>();
-		sheet = m_AssetManager.LoadSpriteSheet("Hero", "Assets/Textures/Woman_Sheet.png");
+		sheet = AssetManager::LoadSpriteSheet("Hero", "Textures/Woman_Sheet.png");
 		sr.UseSprite = true;
 	}
 

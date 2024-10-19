@@ -12,9 +12,16 @@ namespace Cine
 	{
 	public:
 
-		SpriteSheetComponent LoadSpriteSheet(std::string name, const std::filesystem::path& path);
-
+		static void Init();
+		static SpriteSheetComponent LoadSpriteSheet(std::string name, const std::filesystem::path& path, bool defaultFrame = true);
 	private:
+		AssetManager() = default;
+		AssetManager(const AssetManager&) = delete;
+		AssetManager(AssetManager&&) = delete;
+
 		TextureLibrary m_TextureLibrary;
+		
+
+		static AssetManager* s_Instance;
 	};
 }

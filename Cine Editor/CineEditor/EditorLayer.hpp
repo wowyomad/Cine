@@ -11,7 +11,7 @@ namespace Cine
 	class EditorLayer : public Layer
 	{
 	public:
-		EditorLayer() : Layer("Cine Editor") {}
+		EditorLayer() : Layer("Cine Editor") { }
 		
 
 		void OnAttach() override;
@@ -39,7 +39,6 @@ namespace Cine
 		bool m_ViewportFocused = true;
 		bool m_ViewportHovered = true;
 
-		AssetManager m_AssetManager;
 		std::filesystem::path m_ScenePath = "Assets/Scenes/Example.cine";
 
 		float m_LastFrametime = 0.0f;

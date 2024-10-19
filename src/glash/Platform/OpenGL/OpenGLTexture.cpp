@@ -162,4 +162,8 @@ namespace Cine
 	{
 		glBindTextureUnit(slot, m_RendererID);
 	}
+	const std::filesystem::path& OpenGLTexture2D::GetPath() const
+	{
+		return m_Filepath;
+	}
 }

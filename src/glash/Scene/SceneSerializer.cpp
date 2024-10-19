@@ -3,6 +3,7 @@
 
 #include "glash/Scene/Entity.hpp"
 #include "glash/Scene/Components.hpp"
+#include "glash/Scene/AssetManager.hpp"
 
 #include <yaml-cpp/yaml.h>
 
@@ -147,7 +148,52 @@ namespace Cine
 			out << YAML::BeginMap;
 
 			auto& spriteRendererComponent = entity.GetComponent<SpriteRendererComponent>();
-			out << YAML::Key << "Color" << YAML::Value << spriteRendererComponent.Color;
+			out << YAML::Key << "UseSprite" << YAML::Value << spriteRendererComponent.UseSprite;
+
+			out << YAML::EndMap;
+		}
+
+		if (entity.HasComponent<SpriteComponent>())
+		{
+			out << YAML::Key << "SpriteComponent";
+			out << YAML::BeginMap;
+
+			auto& spriteComponent = entity.GetComponent<SpriteComponent>();
+			out << YAML::Key << "Color" << YAML::Value << spriteComponent.Color;
+			out << YAML::Key << "SpriteIndex" << YAML::Value << spriteComponent.SpriteIndex;
+			
+			out << YAML::EndMap;
+		}
+
+		if (entity.HasComponent<SpriteSheetComponent>())
+		{
+			out << YAML::Key << "SpriteSheetComponent";
+			out << YAML::BeginMap;
+
+			auto& spriteSheetComponent = entity.GetComponent<SpriteSheetComponent>();
+			std::filesystem::path fullTexturePath = spriteSheetComponent.Texture->GetPath();
+			std::filesystem::path relativeTexturePath = std::filesystem::relative(fullTexturePath, "Assets");
+			std::string name = fullTexturePath.filename().string();
+
+			out << YAML::Key << "Texture" << YAML::Value << relativeTexturePath.string();
+			out << YAML::Key << "Name" << YAML::Value << name;
+			out << YAML::BeginSeq;
+
+			for (const auto& frame : spriteSheetComponent.Frames)
+			{
+				out << YAML::BeginMap;
+
+				out << YAML::Key << "Coords" << YAML::Value << YAML::BeginSeq;
+				for (const auto& coord : frame.Coords)
+				{
+					out << YAML::Flow << YAML::BeginSeq << coord.x << coord.y << YAML::EndSeq;
+				}
+				out << YAML::EndSeq;
+
+				out << YAML::EndMap;
+			}
+
+			out << YAML::EndSeq;
 
 			out << YAML::EndMap;
 		}
@@ -261,7 +307,48 @@ namespace Cine
 				if (spriteRendererComponent)
 				{
 					auto& cc = deserializedEntity.AddComponent<SpriteRendererComponent>();
-					cc.Color = spriteRendererComponent["Color"].as<glm::vec4>();
+					cc.UseSprite = spriteRendererComponent["UseSprite"].as<bool>();
+				}
+
+				auto spriteComponent = entity["SpriteComponent"];
+				if (spriteComponent)
+				{
+					auto&& cc = deserializedEntity.AddComponent<SpriteComponent>();
+					cc.Color = spriteComponent["Color"].as<glm::vec4>();
+					cc.SpriteIndex = spriteComponent["SpriteIndex"].as<int32_t>();
+				}
+
+				auto spriteSheetComponent = entity["SpriteSheetComponent"];
+				if (spriteSheetComponent)
+				{
+					auto&& cc = deserializedEntity.AddComponent<SpriteSheetComponent>();
+					
+					std::filesystem::path texturePath = spriteSheetComponent["Texture"].as<std::string>();
+					std::string name = spriteSheetComponent["Name"].as<std::string>();
+
+					cc = AssetManager::LoadSpriteSheet(name, texturePath, false);
+					
+					if (spriteSheetComponent["Frames"] && spriteSheetComponent["Frames"].IsSequence()) {
+						cc.Frames.clear();
+
+						for (const auto& frameNode : spriteSheetComponent["Frames"]) {
+							if (!frameNode.IsMap() || !frameNode["Coords"].IsSequence()) continue;
+
+							SpriteSheetComponent::Frame frame;
+
+							int i = 0;
+							for (const auto& coordNode : frameNode["Coords"]) {
+								if (coordNode.size() != 2) continue;
+
+								glm::vec2 coord;
+								coord.x = coordNode[0].as<float>();
+								coord.y = coordNode[1].as<float>();
+								frame.Coords[i++] = coord;
+							}
+
+							cc.Frames.push_back(frame);
+						}
+					}
 				}
 
 			}

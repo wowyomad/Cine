@@ -9,6 +9,8 @@
 
 #include "glash/ImGui/ImGuiLayer.hpp"
 
+#include "glash/Scene/AssetManager.hpp"
+
 //remove this
 #include "GLFW/glfw3.h"
 
@@ -40,6 +42,8 @@ namespace Cine
 
 		Renderer::Init();
 		Renderer2D::Init();
+		AssetManager::Init();
+
 
 		RenderCommand::SetClearColor({ 0.15, 0.15, 0.15, 0.15 });
 
