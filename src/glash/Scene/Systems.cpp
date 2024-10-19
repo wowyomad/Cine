@@ -18,9 +18,10 @@ namespace Cine
 				auto&& [transform, spriteRenderer, spriteSheet, sprite] = view.get<TransformComponent, SpriteRendererComponent, SpriteSheetComponent, SpriteComponent>(entity);
 				if (spriteRenderer.UseSprite)
 				{
-					if (sprite.SpriteFrameIndex >= spriteSheet.Frames.size())
+					if (sprite.SpriteFrameIndex >= (int32_t)spriteSheet.Frames.size())
 					{
 						CINE_CORE_WARN("SpriteFrameIndex ({}) >= spriteSheet.Frames.size ({})", sprite.SpriteFrameIndex, spriteSheet.Frames.size());
+						sprite.SpriteFrameIndex = -1;
 						continue;
 					}
 					Renderer2D::DrawSprite(transform.GetTransform(), spriteSheet, sprite.SpriteFrameIndex, spriteRenderer.Color);

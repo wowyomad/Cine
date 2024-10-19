@@ -275,6 +275,70 @@ namespace Cine
 		CINE_CORE_ASSERT(false, "{} is not implemented yet", __func__);
 		return false;
 	}
+
+	SpriteSheetMetaSerializer::SpriteSheetMetaSerializer(SpriteSheetComponent& spritesheet)
+		: m_Spritesheet(spritesheet)
+	{
+
+	}
+
+	void SpriteSheetMetaSerializer::Serialize(const std::filesystem::path& filepath)
+	{
+		YAML::Emitter out;
+		out << YAML::BeginSeq;
+
+		for (const auto& frame : m_Spritesheet.Frames)
+		{
+			out << YAML::BeginMap;
+
+			out << YAML::Key << "Coords" << YAML::Value << YAML::BeginSeq;
+			for (const auto& coord : frame.Coords)
+			{
+				out << YAML::Flow << YAML::BeginSeq << coord.x << coord.y << YAML::EndSeq;
+			}
+			out << YAML::EndSeq;
+
+			out << YAML::EndMap;
+		}
+
+		out << YAML::EndSeq;
+
+		std::ofstream fout(filepath);
+		fout << out.c_str();
+		fout.close();
+	}
+	bool SpriteSheetMetaSerializer::Deserialize(const std::filesystem::path& filepath)
+	{
+		std::ifstream fin(filepath);
+		if (!fin.is_open())
+			return false;
+
+		YAML::Node data = YAML::Load(fin);
+		if (!data.IsSequence())
+			return false;
+
+		m_Spritesheet.Frames.clear();
+
+		for (const auto& frameNode : data)
+		{
+			if (!frameNode["Coords"])
+				continue;
+
+			SpriteSheetComponent::Frame frame;
+			const auto& coordsNode = frameNode["Coords"];
+
+			for (size_t i = 0; i < coordsNode.size() && i < 4; ++i)
+			{
+				auto coord = coordsNode[i];
+				frame.Coords[i].x = coord[0].as<float>();
+				frame.Coords[i].y = coord[1].as<float>();
+			}
+
+			m_Spritesheet.Frames.push_back(frame);
+		}
+
+		return true;
+	}
 }
 
 

@@ -113,16 +113,11 @@ namespace Cine
 
 		auto entity = m_ActiveScene->CreateEntity("Sprite Test");
 
-		m_TextureLibrary.LoadTexture2D("Thing", "Assets/Textures/SpriteSheet.png");
-
 		auto& sr = entity.AddComponent<SpriteRendererComponent>();
 		auto& sheet = entity.AddComponent<SpriteSheetComponent>();
 		auto& sprite = entity.AddComponent<SpriteComponent>();
-
-		sheet.Texture = m_TextureLibrary.GetTexture2D("Thing");
-		sheet.Frames.push_back({ 0, 128, 128, 256 });
-		sprite.SpriteFrameIndex = 0;
-
+		sheet = m_AssetManager.LoadSpriteSheet("Hero", "Assets/Textures/Woman_Sheet.png");
+		sr.UseSprite = true;
 	}
 
 
@@ -148,7 +143,7 @@ namespace Cine
 		}
 
 		Renderer2D::ResetStats();
-		m_LastFrameTime = ts.Milleseconds();
+		m_LastFrametime = ts.Milleseconds();
 
 
 		m_Framebuffer->Bind();
@@ -255,7 +250,7 @@ namespace Cine
 			auto stats = Renderer2D::GetStats();
 			ImGui::Text("Draw Calls: %llu", stats.DrawCalls);
 			ImGui::Text("Quads: %llu", stats.QuadCount);
-			ImGui::Text("FrameTime: %.3fms", m_LastFrameTime);
+			ImGui::Text("FrameTime: %.3fms", m_LastFrametime);
 			if (ImGui::Button("Close"))
 			{
 				Application::Get().Close();

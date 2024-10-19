@@ -301,7 +301,7 @@ namespace Cine
 		s_Data.Stats.QuadCount++;
 	}
 
-	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, glm::vec2* texCoord, const glm::vec4& tintColor)
+	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, const std::array<glm::vec2, 4>& texCoords, const glm::vec4& tintColor)
 	{
 		CINE_PROFILE_FUNCTION();
 
@@ -312,7 +312,7 @@ namespace Cine
 			EndScene();
 			s_Data.QuadIndexCount = 0;
 			s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
-			DrawQuad(transform, texture, texCoord, tintColor);
+			DrawQuad(transform, texture, texCoords, tintColor);
 		}
 
 		constexpr size_t quadVertexCount = 4;
@@ -343,7 +343,7 @@ namespace Cine
 		{
 			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[i];
 			s_Data.QuadVertexBufferPtr->Color = tintColor;
-			s_Data.QuadVertexBufferPtr->TexCoord = texCoord[i];
+			s_Data.QuadVertexBufferPtr->TexCoord = texCoords[i];
 			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
 			s_Data.QuadVertexBufferPtr->Tiling = 1.0f;
 			s_Data.QuadVertexBufferPtr++;
@@ -360,15 +360,7 @@ namespace Cine
 		float height = spriteSheet.Texture->GetHeight();
 		SpriteSheetComponent::Frame frame = spriteSheet.Frames[spriteIndex];
 
-		glm::vec2 texCoords[4] =
-		{
-			{ frame.x / width, frame.y / height },
-			{ (frame.x + frame.width) / width, frame.y / height },
-			{ (frame.x + frame.width) / width, (frame.y + frame.height) / height},
-			{ frame.x / width, (frame.y + frame.height) / height }
-
-		};
-		DrawQuad(transform, spriteSheet.Texture, texCoords, tintColor);
+		DrawQuad(transform, spriteSheet.Texture, frame.Coords, tintColor);
 	}
 
 

@@ -56,7 +56,7 @@ namespace Cine
 	{
 		struct Frame
 		{
-			int32_t x, y, width, height;
+			std::array<glm::vec2, 4> Coords;
 		};
 		Ref<Texture2D> Texture;
 		std::vector<Frame> Frames;

@@ -4,6 +4,7 @@
 
 #include "Panels/SceneHierarchyPanel.hpp"
 #include "glash/Renderer/Texture.hpp"
+#include "glash/Scene/AssetManager.hpp"
 
 namespace Cine
 {
@@ -38,11 +39,10 @@ namespace Cine
 		bool m_ViewportFocused = true;
 		bool m_ViewportHovered = true;
 
-		float m_LastFrameTime = 0.0f;
-
+		AssetManager m_AssetManager;
 		std::filesystem::path m_ScenePath = "Assets/Scenes/Example.cine";
-		TextureLibrary m_TextureLibrary;
 
+		float m_LastFrametime = 0.0f;
 
 	private:
 		bool OnKeyPressed(KeyPressedEvent& e);

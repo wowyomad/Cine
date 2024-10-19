@@ -3,6 +3,7 @@
 #include "glash/Cine.hpp"
 
 #include "glash/Scene/Components.hpp"
+#include "glash/Scene/SceneSerializer.hpp"
 
 #include <imgui_internal.h>
 
@@ -352,17 +353,62 @@ namespace Cine
 		DisplayComponent<SpriteSheetComponent>(entity, "Sprite Sheet", [&entity](SpriteSheetComponent& sheet)
 			{
 				constexpr float step = 32.0f;
+				float texWidth = static_cast<float>(sheet.Texture->GetWidth());
+				float texHeight = static_cast<float>(sheet.Texture->GetHeight());
+
 				for (size_t i = 0; i < sheet.Frames.size(); ++i) {
 					auto& frame = sheet.Frames[i];
 					ImGui::PushID(static_cast<int>(i));
-
 					ImGui::Text("Frame %d", static_cast<int>(i));
-					ImGui::DragInt("X", &frame.x, step, 0, sheet.Texture->GetWidth());
-					ImGui::DragInt("Y", &frame.y, step, 0, sheet.Texture->GetHeight());
-					ImGui::DragInt("Width", &frame.width, step, 0, sheet.Texture->GetWidth());
-					ImGui::DragInt("Height", &frame.height, step, 0, sheet.Texture->GetHeight());
 
-					if (ImGui::Button("Remove Frame")) {
+					// Convert normalized coordinates to integer values for the UI
+					int x0 = static_cast<int>(frame.Coords[0].x * texWidth);
+					int y0 = static_cast<int>(frame.Coords[0].y * texHeight);
+					int x1 = static_cast<int>(frame.Coords[1].x * texWidth);
+					int y1 = static_cast<int>(frame.Coords[1].y * texHeight);
+					int x2 = static_cast<int>(frame.Coords[2].x * texWidth);
+					int y2 = static_cast<int>(frame.Coords[2].y * texHeight);
+					int x3 = static_cast<int>(frame.Coords[3].x * texWidth);
+					int y3 = static_cast<int>(frame.Coords[3].y * texHeight);
+
+					ImGui::SetNextItemWidth(80);
+					ImGui::DragInt("u0", &x0, step, 0, static_cast<int>(texWidth));
+					ImGui::SameLine();
+					ImGui::SetNextItemWidth(80);
+					ImGui::DragInt("v0", &y0, step, 0, static_cast<int>(texHeight));
+
+					ImGui::SetNextItemWidth(80);
+					ImGui::DragInt("u1", &x1, step, 0, static_cast<int>(texWidth));
+					ImGui::SameLine();
+					ImGui::SetNextItemWidth(80);
+					ImGui::DragInt("v1", &y1, step, 0, static_cast<int>(texHeight));
+
+					ImGui::SetNextItemWidth(80);
+					ImGui::DragInt("u2", &x2, step, 0, static_cast<int>(texWidth));
+					ImGui::SameLine();
+					ImGui::SetNextItemWidth(80);
+					ImGui::DragInt("v2", &y2, step, 0, static_cast<int>(texHeight));
+
+					ImGui::SetNextItemWidth(80);
+					ImGui::DragInt("u3", &x3, step, 0, static_cast<int>(texWidth));
+					ImGui::SameLine();
+					ImGui::SetNextItemWidth(80);
+					ImGui::DragInt("v3", &y3, step, 0, static_cast<int>(texHeight));
+
+					// Convert integer values back to normalized coordinates
+					frame.Coords[0].x = static_cast<float>(x0) / texWidth;
+					frame.Coords[0].y = static_cast<float>(y0) / texHeight;
+					frame.Coords[1].x = static_cast<float>(x1) / texWidth;
+					frame.Coords[1].y = static_cast<float>(y1) / texHeight;
+					frame.Coords[2].x = static_cast<float>(x2) / texWidth;
+					frame.Coords[2].y = static_cast<float>(y2) / texHeight;
+					frame.Coords[3].x = static_cast<float>(x3) / texWidth;
+					frame.Coords[3].y = static_cast<float>(y3) / texHeight;
+
+					float contentWidth = ImGui::GetContentRegionAvail().x;
+					ImGui::SetCursorPosX(contentWidth - 50);
+					ImGui::SetNextItemWidth(90);
+					if (ImGui::Button("Remove")) {
 						sheet.Frames.erase(sheet.Frames.begin() + i);
 						--i;
 					}
@@ -372,7 +418,39 @@ namespace Cine
 				}
 
 				if (ImGui::Button("Add New Frame")) {
-					sheet.Frames.push_back({ 0, 0, 64, 64 });
+					// Initialize new frame with default integer values, converted to normalized coordinates
+					float defaultX = 0.0f;
+					float defaultY = 0.0f;
+					float defaultWidth = 64.0f / texWidth;
+					float defaultHeight = 64.0f / texHeight;
+
+					SpriteSheetComponent::Frame newFrame = {
+						{ { { defaultX, defaultY }, { defaultX + defaultWidth, defaultY },
+							{ defaultX + defaultWidth, defaultY + defaultHeight }, { defaultX, defaultY + defaultHeight } } }
+					};
+					sheet.Frames.push_back(newFrame);
+				}
+
+				ImGui::Separator();
+				if (ImGui::Button("Save SpriteSheet"))
+				{
+					std::filesystem::path filepath = FileDialogs::SaveFile("Sprite Sheet (*.shmeta)\0*.shmeta\0");
+					if (!filepath.empty())
+					{
+						SpriteSheetMetaSerializer serializer(sheet);
+						serializer.Serialize(filepath);
+					}
+				}
+
+				ImGui::SameLine();
+				if (ImGui::Button("Load SpriteSheet"))
+				{
+					std::filesystem::path filepath = FileDialogs::OpenFile("Sprite Sheet (*.shmeta)\0*.shmeta\0");
+					if (!filepath.empty())
+					{
+						SpriteSheetMetaSerializer serializer(sheet);
+						serializer.Deserialize(filepath);
+					}
 				}
 			});
 	}
