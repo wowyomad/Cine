@@ -95,14 +95,10 @@ namespace Cine
 		m_ActiveScene = CreateRef<Scene>();
 		s_Scene = m_ActiveScene.get();
 
-		s_Scene->RegisterComponent<ControllerScript>();
-		s_Scene->RegisterComponent<ColorScript>();
-
 		FramebufferSpecification spec;
 		spec.Width = 1280;
 		spec.Height = 720;
 		m_Framebuffer = FrameBuffer::Create(spec);
-
 
 		m_ActiveScene = CreateRef<Scene>();
 		s_Scene = m_ActiveScene.get();
@@ -110,14 +106,6 @@ namespace Cine
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 
 		m_EditorCamera = EditorCamera(45.0f, 16.0f / 9.0f, 0.01f, 1000.0f);
-
-		auto entity = m_ActiveScene->CreateEntity("Sprite Test");
-
-		auto& sr = entity.AddComponent<SpriteRendererComponent>();
-		auto& sheet = entity.AddComponent<SpriteSheetComponent>();
-		auto& sprite = entity.AddComponent<SpriteComponent>();
-		sheet = AssetManager::LoadSpriteSheet("Hero", "Textures/Woman_Sheet.png");
-		sr.UseSprite = true;
 	}
 
 
