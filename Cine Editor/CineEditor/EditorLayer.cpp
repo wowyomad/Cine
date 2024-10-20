@@ -47,14 +47,8 @@ namespace Cine
 	class ColorScript : public NativeScript
 	{
 	public:
-		ColorScript()
-		{
-			++counter;
-			CINE_LOG_INFO("ColorScript Counter: {}", counter);
-		}
 		void OnCreate() override
 		{
-			counter = 0;
 			auto& component = GetComponent<SpriteComponent>();
 			m_SpriteComponent = &component;
 			m_Timer.Start();
@@ -75,10 +69,8 @@ namespace Cine
 	private:
 		SpriteComponent* m_SpriteComponent;
 		Timer m_Timer;
-		static int counter;
 	};
 
-	int ColorScript::counter = 0;
 
 	class ControllerScript : public NativeScript
 	{
@@ -155,12 +147,15 @@ namespace Cine
 
 		s_Scene->RegisterComponent<ControllerScript>();
 		s_Scene->RegisterComponent<RotationScript>();
+		s_Scene->RegisterComponent<ColorScript>();
 
 		auto woman = m_ActiveScene->CreateEntity("Woman");
 		woman.AddComponents<ControllerScript, SpriteComponent, SpriteRendererComponent>();
 		auto&& sheet = woman.AddComponent<SpriteSheetComponent>();
 		auto&& anim = woman.AddComponent<SpriteAnimationComponent>();
 		woman.GetComponent<SpriteRendererComponent>().UseSprite = true;
+		woman.AddComponent<RotationScript>();
+		woman.AddComponent<ColorScript>();
 
 		auto square = m_ActiveScene->CreateEntity("Square");
 		square.AddComponents<SpriteRendererComponent, SpriteSheetComponent, SpriteComponent, RotationScript>();

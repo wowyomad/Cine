@@ -34,7 +34,9 @@ namespace Cine
 
 	private:
 		Entity m_Entity;
-
 		friend class Scene;
+
+	public:
+		bool Enabled = true;
 	};
 }

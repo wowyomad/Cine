@@ -318,6 +318,11 @@ namespace Cine
 		{
 			DisplaySpriteComponent(entity);
 		}
+
+		if (entity.HasComponent<NativeScriptComponent>())
+		{
+			DisplayNativeScriptComponent(entity);
+		}
 	}
 
 	void SceneHierarchyPanel::DisplayTransformComponent(Entity entity)
@@ -384,7 +389,9 @@ namespace Cine
 	{
 		DisplayComponent<SpriteSheetComponent>(entity, "Sprite Sheet", [&entity](SpriteSheetComponent& spriteSheet)
 			{
-				if (spriteSheet.Texture)
+				static bool displayFrames = false;
+				ImGui::Checkbox("Display frames", &displayFrames);
+				if (spriteSheet.Texture && displayFrames)
 				{
 					constexpr float step = 32.0f;
 					float texWidth = static_cast<float>(spriteSheet.Texture->GetWidth());
@@ -461,18 +468,16 @@ namespace Cine
 						};
 						spriteSheet.Frames.push_back(newFrame);
 					}
-
-					if (spriteSheet.Texture && ImGui::Button("Save SpriteSheet"))
-					{
-						ImGui::OpenPopup("Save sprite sheet meta");
-					}
-					ShowConfirmationDialog(
-						"Save sprite sheet meta",
-						"Are you sure you want to save the sprite sheet meta? It will overwrite existing data",
-						[&spriteSheet]() { AssetManager::SaveSpriteSheetMeta(spriteSheet); }
-					);
-
 				}
+				if (spriteSheet.Texture && ImGui::Button("Save SpriteSheet"))
+				{
+					ImGui::OpenPopup("Save sprite sheet meta");
+				}
+				ShowConfirmationDialog(
+					"Save sprite sheet meta",
+					"Are you sure you want to save the sprite sheet meta? It will overwrite existing data",
+					[&spriteSheet]() { AssetManager::SaveSpriteSheetMeta(spriteSheet); }
+				);
 				if (!spriteSheet.Texture)
 				{
 					ImGui::BeginDisabled();
@@ -588,5 +593,38 @@ namespace Cine
 				} break;
 				}
 			});
+	}
+	void SceneHierarchyPanel::DisplayNativeScriptComponent(Entity entity)
+	{
+		DisplayComponent<NativeScriptComponent>(entity, "Native Scripts", [this, entity](NativeScriptComponent& nsc)
+			{
+				for (auto& script : nsc.Scripts)
+				{
+					bool& enabled = script.Instance->Enabled;
+
+					// Display the script name
+					ImGui::Text("%s", script.Name.c_str());
+
+					// Keep the checkbox on the same line
+					ImGui::SameLine();
+
+					// Get the maximum x position for the content area
+					float maxContentWidth = ImGui::GetContentRegionMax().x;
+
+					// Calculate the width of the checkbox label "Enabled"
+					float checkboxWidth = ImGui::CalcTextSize("Enabled").x + ImGui::GetStyle().FramePadding.x * 10;
+
+					// Set the cursor position to align the checkbox to the right
+					ImGui::SetCursorPosX(maxContentWidth - checkboxWidth);
+
+					// Create a unique ID for the checkbox while keeping the label as "Enabled"
+					std::string EnabledField = "Enabled##" + script.Name;
+					ImGui::Checkbox(EnabledField.c_str(), &enabled);
+
+					// Add a separator for better visual distinction
+					ImGui::Separator();
+				}
+			});
+
 	}
 }

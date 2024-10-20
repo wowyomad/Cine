@@ -42,7 +42,7 @@ namespace Cine
 			m_ComponentRegistry[componentName] = [&](entt::registry& registry, entt::entity entity) -> Component&
 				{
 					auto& component = registry.emplace<Component>(entity);
-					OnComponentAdded<Component>(entity, component);
+					OnRegisteredComponentAdded<Component>(entity, component);
 					return component;
 				};
 
@@ -51,7 +51,10 @@ namespace Cine
 				m_UpdateRegistry[componentName] = [&](entt::registry& registry, Timestep ts) {
 					registry.view<Component>().each([&](auto entity, Component& component)
 						{
-							component.OnUpdate(ts);
+							if (component.Enabled)
+							{
+								component.OnUpdate(ts);
+							}
 						});
 					};
 			}
@@ -63,7 +66,8 @@ namespace Cine
 			if (it != m_ComponentRegistry.end()) {
 				CINE_CORE_TRACE("Added component '{}' to '{}'", componentName, static_cast<uint32_t>(entity));
 				it->second(m_Registry, entity);
-			} else
+			}
+			else
 			{
 				CINE_CORE_TRACE("Component '{}' not found", componentName);
 
@@ -80,12 +84,15 @@ namespace Cine
 	private:
 
 		template <class Component>
-		void OnComponentAdded(entt::entity entity, Component& component)
+		void OnRegisteredComponentAdded(entt::entity entity, Component& component)
 		{
+			m_Registry.on_destroy<Component>().connect<&OnRegisteredComponentRemoved<Component>>();
+
 			if constexpr (std::is_same<Component, CameraComponent>::value)
 			{
 				component.Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight); //Shoudl it be here?
 			}
+
 			else if constexpr (std::is_base_of<NativeScript, Component>::value)
 			{
 				bool hasNativeScriptComponent = m_Registry.all_of<NativeScriptComponent>(entity);
@@ -95,15 +102,26 @@ namespace Cine
 					m_Registry.emplace<NativeScriptComponent>(entity);
 				}
 				auto& nsc = m_Registry.get<NativeScriptComponent>(entity);
-				auto instantiateScript = [&, entity]() -> NativeScript* {
-					return reinterpret_cast<NativeScript*>(&m_Registry.get<Component>(entity));
+				auto instantiateScript = [&, entity]() -> NativeScript*
+					{
+						return reinterpret_cast<NativeScript*>(&m_Registry.get<Component>(entity));
 					};
-				nsc.Bind<Component>(instantiateScript);
+				auto removeScript = [&, entity]() -> void
+					{
+						m_Registry.remove<Component>(entity);
+					};
+				nsc.Bind<Component>(instantiateScript, removeScript);
 			}
 			else
 			{
 				CINE_CORE_TRACE("Added component '{}' to entity '{}'", Utils::GetClassTypename<Component>(), static_cast<uint32_t>(entity));
 			}
+		}
+
+		template <class Component>
+		static void OnRegisteredComponentRemoved()
+		{
+			CINE_CORE_WARN("Registered component removed '{}'", Utils::GetClassTypename<Component>());
 		}
 
 	private:

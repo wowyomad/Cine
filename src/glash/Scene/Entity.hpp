@@ -32,7 +32,7 @@ namespace Cine
 		{
 			CINE_CORE_ASSERT(!HasComponent<Component>(), "Entity already has component {}", typeid(Component).name());
 			Component& component = m_Scene->m_Registry.emplace<Component>(m_EntityHandle, std::forward<Args>(args)...);
-			m_Scene->OnComponentAdded<Component>(*this, component);
+			m_Scene->OnRegisteredComponentAdded<Component>(*this, component);
 			return component;
 		}
 
@@ -43,7 +43,7 @@ namespace Cine
 			std::tuple<Components&...> components = std::tuple<Components&...>(
 				m_Scene->m_Registry.emplace<Components>(m_EntityHandle)...
 			);
-			(m_Scene->OnComponentAdded<Components>(*this, std::get<Components&>(components)), ...);
+			(m_Scene->OnRegisteredComponentAdded<Components>(*this, std::get<Components&>(components)), ...);
 			return components;
 		}
 
@@ -78,6 +78,7 @@ namespace Cine
 		template <class Component>
 		void RemoveComponent()
 		{
+			CINE_CORE_WARN("Removing component {0}", Utils::GetClassTypename<Component>());
 			CINE_CORE_ASSERT(HasComponent<Component>(), "Entity does not have component {}", typeid(Component).name());
 			m_Scene->m_Registry.remove<Component>(m_EntityHandle);
 		}

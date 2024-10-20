@@ -5,6 +5,7 @@
 
 #include "SceneCamera.hpp"
 #include "glash/Renderer/Texture.hpp"
+#include "glash/Utils/StringUtils.hpp"
 
 namespace Cine
 {
@@ -113,20 +114,35 @@ namespace Cine
 		struct Data
 		{
 			size_t Index;
+			std::string Name;
 			NativeScript* Instance = nullptr;
 
 			std::function<NativeScript* ()> InstantiateScript;
+			std::function<void()> RemoveScript;
 		};
+
+		~NativeScriptComponent()
+		{
+			for (auto& script : Scripts)
+			{
+				if (script.RemoveScript)
+				{
+					script.RemoveScript();
+				};
+			}
+		}
 
 		std::vector<Data> Scripts;
 
 		template <class T>
-		void Bind(std::function<NativeScript* ()> instantiateScript)
+		void Bind(std::function<NativeScript* ()> instantiateScript, std::function<void()> removeScript)
 		{
 			size_t ScriptID = m_ScriptCounter;
 			Data data;
 			data.Index = ScriptID;
+			data.Name = Utils::GetClassTypenameWithSpaces<T>();
 			data.InstantiateScript = instantiateScript;
+			data.RemoveScript = removeScript;
 
 			Scripts.push_back(data);
 
