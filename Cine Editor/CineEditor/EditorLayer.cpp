@@ -23,6 +23,23 @@ enum PlayerAnimation
 
 namespace Cine
 {
+	class RotationScript : public NativeScript
+	{
+	public:
+		void OnCreate() override
+		{
+			m_LocalTransform = &GetComponent<TransformComponent>();
+		}
+
+		void OnUpdate(Timestep ts) override
+		{
+			m_LocalTransform->Rotation.z += glm::radians(m_RotationSpeed) * ts;
+		}
+	private:
+		TransformComponent* m_LocalTransform;
+		float m_RotationSpeed = 90.0f;
+	};
+
 	class ColorScript : public NativeScript
 	{
 	public:
@@ -133,9 +150,10 @@ namespace Cine
 		m_EditorCamera = EditorCamera(45.0f, 16.0f / 9.0f, 0.01f, 1000.0f);
 
 		s_Scene->RegisterComponent<ControllerScript>();
+		s_Scene->RegisterComponent<RotationScript>();
 
 		auto entity = m_ActiveScene->CreateEntity("Woman");
-		entity.AddComponents<ControllerScript, SpriteComponent, SpriteRendererComponent>();
+		entity.AddComponents<ControllerScript, SpriteComponent, SpriteRendererComponent, RotationScript>();
 		auto&& sheet = entity.AddComponent<SpriteSheetComponent>();
 		auto&& anim = entity.AddComponent<SpriteAnimationComponent>();
 		entity.GetComponent<SpriteRendererComponent>().UseSprite = true;
