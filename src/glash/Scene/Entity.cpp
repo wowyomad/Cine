@@ -105,9 +105,25 @@ namespace Cine
 		CINE_CORE_TRACE("Removed child {0} from entity {1}", static_cast<uint32_t>(child), static_cast<uint32_t>(*this));
 	}
 
+	void Entity::RemoveChildren()
+	{
+		auto& hierarchy = GetComponent<HierarchyComponent>();
+		auto& chidlren = hierarchy.Children;
+
+		for (auto& child : chidlren)
+		{
+			child.RemoveParent();
+		}
+	}
 	void Entity::RemoveParent()
 	{
 		auto& hierarchy = GetComponent<HierarchyComponent>();
+
+		if (!hierarchy.Parent)
+		{
+			return;
+		}
+
 		auto& parentHierarchy = hierarchy.Parent.GetComponent<HierarchyComponent>();
 
 		//TODO: checks

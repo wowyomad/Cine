@@ -150,8 +150,14 @@ void Scene::UpdateScripts(Timestep ts)
 
 void Scene::DestroyMarkedEntities()
 {
-	for (auto entity : m_ToDestroyEntities)
+	for (auto e : m_ToDestroyEntities)
 	{
+		auto& hierarchy = m_Registry.get<HierarchyComponent>(e);
+		Entity entity = { e, this };
+
+		entity.RemoveParent();
+		entity.RemoveChildren();
+
 		if (m_Registry.all_of<NativeScriptComponent>(entity))
 		{
 			auto& nsc = m_Registry.get<NativeScriptComponent>(entity);

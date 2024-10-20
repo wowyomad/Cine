@@ -88,6 +88,7 @@ namespace Cine
 		void AddChild(Entity child);
 		void AddParent(Entity parent);
 		void RemoveChild(Entity child);
+		void RemoveChildren();
 		void RemoveParent();
 
 		void Destroy()
