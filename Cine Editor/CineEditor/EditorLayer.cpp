@@ -12,6 +12,15 @@
 
 static Cine::Scene* s_Scene = nullptr;
 
+enum PlayerAnimation
+{
+	Idle,
+	MoveUp,
+	MoveRight,
+	MoveLeft,
+	MoveDown,
+};
+
 namespace Cine
 {
 	class ColorScript : public NativeScript
@@ -55,7 +64,8 @@ namespace Cine
 	public:
 		void OnCreate() override
 		{
-
+			m_Anim = &GetComponent<SpriteAnimationComponent>();
+			m_Transform = &GetComponent<TransformComponent>();
 		}
 
 		void OnDestroy() override
@@ -66,32 +76,47 @@ namespace Cine
 		void OnUpdate(Timestep ts) override
 		{
 
-			auto& transform = GetComponent<TransformComponent>().Translation;
-
 			float speed = 5.0f;
+			glm::vec3 direction(0.0f);
 
-			if (Input::IsKeyPressed(Key::A))
-			{
-				transform.x -= speed * ts;
-			}
 			if (Input::IsKeyPressed(Key::D))
 			{
-				transform.x += speed * ts;
+				direction.x += 1.0f;
+				m_Anim->State.DesiredAnimation = PlayerAnimation::MoveRight;
+			}
+			if (Input::IsKeyPressed(Key::A))
+			{
+				direction.x -= 1.0f;
+				m_Anim->State.DesiredAnimation = PlayerAnimation::MoveLeft;
 			}
 			if (Input::IsKeyPressed(Key::W))
 			{
-				transform.y += speed * ts;
+				direction.y += 1.0f;
+				m_Anim->State.DesiredAnimation = PlayerAnimation::MoveUp;
 			}
 			if (Input::IsKeyPressed(Key::S))
 			{
-				transform.y -= speed * ts;
+				direction.y -= 1.0f;
+				m_Anim->State.DesiredAnimation = PlayerAnimation::MoveDown;
 			}
 
+			if (glm::length(direction) == 0.0f)
+			{
+				m_Anim->State.DesiredAnimation = PlayerAnimation::Idle;
+			}
+
+			m_Transform->Translation += speed * ts * direction;
+			
 		}
+	private:
+		SpriteAnimationComponent* m_Anim;
+		TransformComponent* m_Transform;
 	};
 
 	void EditorLayer::OnAttach()
 	{
+		m_IsRuntime = true;
+
 		m_ActiveScene = CreateRef<Scene>();
 		s_Scene = m_ActiveScene.get();
 
@@ -106,6 +131,47 @@ namespace Cine
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 
 		m_EditorCamera = EditorCamera(45.0f, 16.0f / 9.0f, 0.01f, 1000.0f);
+
+		s_Scene->RegisterComponent<ControllerScript>();
+
+		auto entity = m_ActiveScene->CreateEntity("Woman");
+		entity.AddComponents<ControllerScript, SpriteComponent, SpriteRendererComponent>();
+		auto&& sheet = entity.AddComponent<SpriteSheetComponent>();
+		auto&& anim = entity.AddComponent<SpriteAnimationComponent>();
+		entity.GetComponent<SpriteRendererComponent>().UseSprite = true;
+
+		auto square = m_ActiveScene->CreateEntity("Square");
+		square.GetComponent<TransformComponent>().Translation = { 1.0f, 0.0f, 0.0f };
+		entity.AddChild(square);
+		
+
+		sheet = AssetManager::LoadSpriteSheet("Woman", "Textures/Woman_Sheet.png", false);
+
+		SpriteAnimationComponent::Animation animation;
+		animation.Loop = true;
+		animation.Duration = 0.5f;
+
+		animation.SpriteFrames = { 0, 1, 2, 3, 4, 5, 6, 7 };
+		anim.Animations[PlayerAnimation::MoveUp] = animation;
+
+		animation.SpriteFrames = { 8, 9, 10, 11, 12, 13, 14, 15 };
+		anim.Animations[PlayerAnimation::MoveRight] = animation;
+
+		animation.SpriteFrames = { 16, 17, 18, 19, 20, 21, 22, 23 };
+		anim.Animations[PlayerAnimation::MoveLeft] = animation;
+
+		animation.SpriteFrames = { 24, 25, 26, 27, 28, 29, 30, 31 };
+		anim.Animations[PlayerAnimation::MoveDown] = animation;
+
+		anim.State.DefaultAnimation = -1;
+
+		animation.Loop = true;
+		animation.SpriteFrames = { 0 };
+		anim.Animations[PlayerAnimation::Idle] = animation;
+
+		auto camera = s_Scene->CreateEntity("Camera");
+		camera.AddComponent<CameraComponent>();
+		s_Scene->SetMainCamera(camera);
 	}
 
 
@@ -136,8 +202,10 @@ namespace Cine
 
 		m_Framebuffer->Bind();
 		{
-			m_ActiveScene->OnUpdateEditor(ts, m_EditorCamera);
-			//m_ActiveScene->OnUpdateRuntime(ts);
+			if(m_IsRuntime)
+				m_ActiveScene->OnUpdateRuntime(ts);
+			else
+				m_ActiveScene->OnUpdateEditor(ts, m_EditorCamera);
 		}
 		m_Framebuffer->Unbind();
 	}
@@ -278,42 +346,46 @@ namespace Cine
 		}
 
 		//Gizmos
-		Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
-		if (selectedEntity && m_GizmoOperation > 0)
+		if (m_IsRuntime)
 		{
-			ImGuizmo::SetDrawlist();
-			float windowWidth = static_cast<float>(ImGui::GetWindowWidth());
-			float windowHeight = static_cast<float>(ImGui::GetWindowHeight());
-			ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
-			;
-			const glm::mat4& cameraProjection = m_EditorCamera.GetProjection();
-			const glm::mat4& cameraView = m_EditorCamera.GetViewMatrix();
-
-			//Entity
-			auto& tc = selectedEntity.GetComponent<TransformComponent>();
-			glm::mat4 transform = tc.GetTransform();
-
-
-			static bool isOrtho = false;
-			ImGuizmo::SetOrthographic(isOrtho);
-
-			bool snap = IsGizmoSnapping();
-			float snapValues[3] = { m_SnapValue, m_SnapValue, m_SnapValue };
-
-			ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
-				static_cast<ImGuizmo::OPERATION>(m_GizmoOperation), ImGuizmo::LOCAL, glm::value_ptr(transform),
-				nullptr, snap ? snapValues : nullptr);
-
-			if (ImGuizmo::IsUsing())
+			Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
+			if (selectedEntity && m_GizmoOperation > 0)
 			{
-				glm::vec3 translation, rotation, scale;
-				Math::DecomposeTransform(transform, translation, rotation, scale);
+				ImGuizmo::SetDrawlist();
+				float windowWidth = static_cast<float>(ImGui::GetWindowWidth());
+				float windowHeight = static_cast<float>(ImGui::GetWindowHeight());
+				ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
+				;
+				const glm::mat4& cameraProjection = m_EditorCamera.GetProjection();
+				const glm::mat4& cameraView = m_EditorCamera.GetViewMatrix();
 
-				tc.Translation = translation;
-				tc.Rotation = rotation;
-				tc.Scale = scale;
+				//Entity
+				auto& tc = selectedEntity.GetComponent<TransformComponent>();
+				glm::mat4 transform = tc.GetLocalTransform();
+
+
+				static bool isOrtho = false;
+				ImGuizmo::SetOrthographic(isOrtho);
+
+				bool snap = IsGizmoSnapping();
+				float snapValues[3] = { m_SnapValue, m_SnapValue, m_SnapValue };
+
+				ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
+					static_cast<ImGuizmo::OPERATION>(m_GizmoOperation), ImGuizmo::LOCAL, glm::value_ptr(transform),
+					nullptr, snap ? snapValues : nullptr);
+
+				if (ImGuizmo::IsUsing())
+				{
+					glm::vec3 translation, rotation, scale;
+					Math::DecomposeTransform(transform, translation, rotation, scale);
+
+					tc.Translation = translation;
+					tc.Rotation = rotation;
+					tc.Scale = scale;
+				}
 			}
 		}
+		
 
 
 		ImGui::End();
@@ -355,6 +427,8 @@ namespace Cine
 
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
 	{
+		if (m_IsRuntime) return false;
+
 		if (e.GetRepeatCount() > 0)
 		{
 			return false;

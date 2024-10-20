@@ -14,6 +14,8 @@ namespace Cine
 
 		static void Init();
 		static SpriteSheetComponent LoadSpriteSheet(std::string name, const std::filesystem::path& path, bool defaultFrame = true);
+
+		static void SaveSpriteSheetMeta(SpriteSheetComponent& spriteSheetComponent);
 	private:
 		AssetManager() = default;
 		AssetManager(const AssetManager&) = delete;

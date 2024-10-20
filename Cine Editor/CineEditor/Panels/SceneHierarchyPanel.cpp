@@ -6,6 +6,8 @@
 #include "glash/Scene/SceneSerializer.hpp"
 #include "glash/Scene/AssetManager.hpp"
 
+#include "Dialog.hpp"
+
 #include <imgui_internal.h>
 
 namespace Cine
@@ -62,7 +64,7 @@ namespace Cine
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 4.0f, 4.0f });
 		float lineHeigh = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
 		ImGui::Separator();
-		
+
 		bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), treeNodeFlags, name);
 		ImGui::PopStyleVar();
 
@@ -364,16 +366,16 @@ namespace Cine
 
 	void SceneHierarchyPanel::DisplaySpriteSheetComponent(Entity entity)
 	{
-		DisplayComponent<SpriteSheetComponent>(entity, "Sprite Sheet", [&entity](SpriteSheetComponent& sheet)
+		DisplayComponent<SpriteSheetComponent>(entity, "Sprite Sheet", [&entity](SpriteSheetComponent& spriteSheet)
 			{
-				if (sheet.Texture)
+				if (spriteSheet.Texture)
 				{
 					constexpr float step = 32.0f;
-					float texWidth = static_cast<float>(sheet.Texture->GetWidth());
-					float texHeight = static_cast<float>(sheet.Texture->GetHeight());
+					float texWidth = static_cast<float>(spriteSheet.Texture->GetWidth());
+					float texHeight = static_cast<float>(spriteSheet.Texture->GetHeight());
 
-					for (size_t i = 0; i < sheet.Frames.size(); ++i) {
-						auto& frame = sheet.Frames[i];
+					for (size_t i = 0; i < spriteSheet.Frames.size(); ++i) {
+						auto& frame = spriteSheet.Frames[i];
 						ImGui::PushID(static_cast<int>(i));
 						ImGui::Text("Frame %d", static_cast<int>(i));
 
@@ -423,7 +425,7 @@ namespace Cine
 						ImGui::SetCursorPosX(contentWidth - 50);
 						ImGui::SetNextItemWidth(90);
 						if (ImGui::Button("Remove")) {
-							sheet.Frames.erase(sheet.Frames.begin() + i);
+							spriteSheet.Frames.erase(spriteSheet.Frames.begin() + i);
 							--i;
 						}
 
@@ -441,32 +443,37 @@ namespace Cine
 							{ { { defaultX, defaultY }, { defaultX + defaultWidth, defaultY },
 								{ defaultX + defaultWidth, defaultY + defaultHeight }, { defaultX, defaultY + defaultHeight } } }
 						};
-						sheet.Frames.push_back(newFrame);
+						spriteSheet.Frames.push_back(newFrame);
 					}
-				}
-				
-				ImGui::Separator();
-				ImGui::BeginDisabled();
-				if (sheet.Texture && ImGui::Button("Save SpriteSheet"))
-				{
-					std::filesystem::path filepath = FileDialogs::SaveFile("Sprite Sheet (*.png)\0*.png\0");
-					if (!filepath.empty())
+
+					if (spriteSheet.Texture && ImGui::Button("Save SpriteSheet"))
 					{
-						//TODO: Save Sprite Sheet
-
+						ImGui::OpenPopup("Save sprite sheet meta");
 					}
-				}
-				ImGui::EndDisabled();
+					ShowConfirmationDialog(
+						"Save sprite sheet meta",
+						"Are you sure you want to save the sprite sheet meta? It will overwrite existing data",
+						[&spriteSheet]() { AssetManager::SaveSpriteSheetMeta(spriteSheet); }
+					);
 
+				}
+				if (!spriteSheet.Texture)
+				{
+					ImGui::BeginDisabled();
+					ImGui::Button("Save SpriteSheet");
+					ImGui::EndDisabled();
+				}
 				ImGui::SameLine();
 				if (ImGui::Button("Load SpriteSheet"))
 				{
 					std::filesystem::path filepath = FileDialogs::OpenFile("Sprite Sheet (*.png)\0*.png\0");
 					if (!filepath.empty())
 					{
-						sheet = AssetManager::LoadSpriteSheet("dummy", filepath); //TODO: SpriteSheetName
+						spriteSheet = AssetManager::LoadSpriteSheet("dummy", filepath); //TODO: SpriteSheetName
 					}
 				}
+
+
 			});
 	}
 
@@ -475,10 +482,17 @@ namespace Cine
 
 		DisplayComponent<SpriteRendererComponent>(entity, "Sprite Renderer", [&entity](SpriteRendererComponent& sc)
 			{
-				if (entity.HasComponent<SpriteComponent>())
+				if (entity.HasComponents<SpriteComponent, SpriteSheetComponent>() && entity.GetComponent<SpriteSheetComponent>().Texture)
 				{
 					bool& useSprite = sc.UseSprite;
 					ImGui::Checkbox("Use Sprite", &useSprite);
+				}
+				else
+				{
+					ImGui::BeginDisabled();
+					bool dummy = false;
+					ImGui::Checkbox("Use Sprite", &dummy);
+					ImGui::EndDisabled();
 				}
 			});
 	}

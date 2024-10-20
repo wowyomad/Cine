@@ -45,9 +45,8 @@ namespace Cine
 	Entity Scene::CreateEntity(const std::string& name)
 	{
 		Entity entity = Entity(m_Registry.create(), this);
-		entity.AddComponent<TransformComponent>();
-		auto& tag = entity.AddComponent<TagComponent>(name);
-		tag.Tag = !name.empty() ? name : "Unkown Entity";
+		entity.AddComponents<TransformComponent, HierarchyComponent, CachedTransform>();
+		entity.AddComponent<TagComponent>(!name.empty() ? name : "Unkown Entity");
 		return entity;
 	}
 
@@ -101,6 +100,7 @@ namespace Cine
 		Renderer2D::Clear();
 		Renderer2D::BeginScene(editorCamera);
 		SpriteRendererSystem::Update(m_Registry);
+		SpriteAnimationSystem::Update(m_Registry, ts);
 		Renderer2D::EndScene();
 
 		DestroyMarkedEntities();
@@ -116,8 +116,9 @@ void Scene::OnUpdateRuntime(Timestep ts)
 	if (*m_MainCamera)
 	{
 		auto&& [cameraComponent, transformComponent] = m_MainCamera->GetComponents<CameraComponent, TransformComponent>();
-		Renderer2D::BeginScene(cameraComponent.Camera, transformComponent.GetTransform());
+		Renderer2D::BeginScene(cameraComponent.Camera, transformComponent.GetLocalTransform());
 		SpriteRendererSystem::Update(m_Registry);
+		SpriteAnimationSystem::Update(m_Registry, ts);
 		Renderer2D::EndScene();
 	}
 

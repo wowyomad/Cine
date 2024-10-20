@@ -6,6 +6,8 @@
 
 namespace Cine
 {
+	struct HierarchyComponent;
+
 	class Entity
 	{
 	public:
@@ -32,6 +34,17 @@ namespace Cine
 			Component& component = m_Scene->m_Registry.emplace<Component>(m_EntityHandle, std::forward<Args>(args)...);
 			m_Scene->OnComponentAdded<Component>(*this, component);
 			return component;
+		}
+
+		template <class... Components>
+		std::tuple<Components&...>  AddComponents()
+		{
+			CINE_CORE_ASSERT(!HasComponents<Components...>(), "Entity already has one or more components");
+			std::tuple<Components&...> components = std::tuple<Components&...>(
+				m_Scene->m_Registry.emplace<Components>(m_EntityHandle)...
+			);
+			(m_Scene->OnComponentAdded<Components>(*this, std::get<Components&>(components)), ...);
+			return components;
 		}
 
 		void AddComponentByName(const std::string& name)
@@ -69,6 +82,13 @@ namespace Cine
 			m_Scene->m_Registry.remove<Component>(m_EntityHandle);
 		}
 
+		Entity GetParent();
+		const std::vector<Entity>& GetChildren();
+		void AddChild(Entity child);
+		void AddParent(Entity parent);
+		void RemoveChild(Entity child);
+		void RemoveParent();
+
 		void Destroy()
 		{
 			m_Scene->DestroyEntity(*this);
@@ -77,16 +97,33 @@ namespace Cine
 
 		operator bool() const { return m_EntityHandle != entt::null && m_Scene; }
 		operator entt::entity() const { return m_EntityHandle; }
-		operator uint32_t() const{ return static_cast<uint32_t>(m_EntityHandle); }
+		operator uint32_t() const { return static_cast<uint32_t>(m_EntityHandle); }
 		bool operator==(const Entity& other) const { return m_EntityHandle == other.m_EntityHandle && m_Scene == other.m_Scene; }
 		bool operator==(Entity&& other) const { return (*this) == other; }
 
+		std::string ToString() const
+		{
+			if (*this)
+			{
+				return std::to_string(static_cast<uint32_t>(m_EntityHandle));
+			}
+			else
+			{
+				return "NullEntity";
+			}
+		}
 
-	public:
-		Scene* m_Scene = nullptr; 
+
+	private:
+		Scene* m_Scene = nullptr;
 		entt::entity m_EntityHandle = entt::null;
 
 		friend class Scene;
 	};
-}
 
+	struct HierarchyComponent
+	{
+		Entity Parent;
+		std::vector<Entity> Children;
+	};
+}

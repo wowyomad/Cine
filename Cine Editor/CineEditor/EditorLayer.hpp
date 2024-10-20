@@ -42,6 +42,7 @@ namespace Cine
 		std::filesystem::path m_ScenePath = "Assets/Scenes/Example.cine";
 
 		float m_LastFrametime = 0.0f;
+		bool m_IsRuntime = false;
 
 	private:
 		bool OnKeyPressed(KeyPressedEvent& e);

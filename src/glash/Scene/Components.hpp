@@ -8,6 +8,8 @@
 
 namespace Cine
 {
+	class Entity;
+
 	struct TagComponent
 	{
 		std::string Tag;
@@ -32,13 +34,20 @@ namespace Cine
 		TransformComponent(const glm::vec3& translation)
 			: Translation(translation) {}
 
-		glm::mat4 GetTransform() const
+		glm::mat4 GetLocalTransform() const
 		{
 			glm::mat4 rotation = glm::toMat4(glm::quat(Rotation));
 			return glm::translate(glm::mat4(1.0f), Translation)
 				* rotation
 				* glm::scale(glm::mat4(1.0f), Scale);
 		}
+
+		static glm::mat4 GetWorldTransform(const Entity& entity);
+	};
+
+	struct CachedTransform
+	{
+		glm::mat4 CachedTransform;
 	};
 
 	struct SpriteRendererComponent
@@ -63,6 +72,28 @@ namespace Cine
 	{
 		glm::vec4 Color = glm::vec4(1.0f);
 		int32_t SpriteIndex = 0;
+	};
+
+	struct SpriteAnimationComponent
+	{
+		struct Animation
+		{
+			std::string Name;
+			std::vector<int32_t> SpriteFrames;
+			float Duration = 1.0f;
+			bool Loop = true;
+		};
+		struct AnimationState
+		{
+			int32_t CurrentAnimation = -1;
+			int32_t DefaultAnimation = 0;
+			int32_t DesiredAnimation = DefaultAnimation;
+
+			float CurrentTime = 0.0f;
+			bool Play = true;
+		};
+		std::map<int32_t, Animation> Animations;
+		AnimationState State;
 	};
 
 	//Camera is a component like in Unity

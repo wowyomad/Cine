@@ -45,5 +45,12 @@ namespace Cine
 
         return spriteSheet;
     }
+    void AssetManager::SaveSpriteSheetMeta(SpriteSheetComponent& spriteSheetComponent)
+    {
+        std::filesystem::path realPath = spriteSheetComponent.Texture->GetPath().filename().replace_extension(".shmeta");
+        SpriteSheetMetaSerializer serializer(spriteSheetComponent);
+        serializer.Serialize(realPath);
+    }
+
 }
 
