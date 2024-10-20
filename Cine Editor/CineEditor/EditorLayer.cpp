@@ -26,6 +26,10 @@ namespace Cine
 	class RotationScript : public NativeScript
 	{
 	public:
+		RotationScript() = default;
+		RotationScript(float rotationSpeed)
+			: m_RotationSpeed(rotationSpeed) {}
+
 		void OnCreate() override
 		{
 			m_LocalTransform = &GetComponent<TransformComponent>();
@@ -152,15 +156,17 @@ namespace Cine
 		s_Scene->RegisterComponent<ControllerScript>();
 		s_Scene->RegisterComponent<RotationScript>();
 
-		auto entity = m_ActiveScene->CreateEntity("Woman");
-		entity.AddComponents<ControllerScript, SpriteComponent, SpriteRendererComponent, RotationScript>();
-		auto&& sheet = entity.AddComponent<SpriteSheetComponent>();
-		auto&& anim = entity.AddComponent<SpriteAnimationComponent>();
-		entity.GetComponent<SpriteRendererComponent>().UseSprite = true;
+		auto woman = m_ActiveScene->CreateEntity("Woman");
+		woman.AddComponents<ControllerScript, SpriteComponent, SpriteRendererComponent>();
+		auto&& sheet = woman.AddComponent<SpriteSheetComponent>();
+		auto&& anim = woman.AddComponent<SpriteAnimationComponent>();
+		woman.GetComponent<SpriteRendererComponent>().UseSprite = true;
 
 		auto square = m_ActiveScene->CreateEntity("Square");
-		square.GetComponent<TransformComponent>().Translation = { 1.0f, 0.0f, 0.0f };
-		entity.AddChild(square);
+		square.AddComponents<SpriteRendererComponent, SpriteSheetComponent, SpriteComponent, RotationScript>();
+		square.GetComponent<SpriteComponent>().Color = { 0.2f, 0.8f, 0.2f, 1.0f };
+		square.AddChild(woman);
+		
 		
 
 		sheet = AssetManager::LoadSpriteSheet("Woman", "Textures/Woman_Sheet.png", false);

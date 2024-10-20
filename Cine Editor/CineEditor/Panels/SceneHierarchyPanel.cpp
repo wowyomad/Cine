@@ -165,7 +165,10 @@ namespace Cine
 			for (auto entityID : view)
 			{
 				Entity entity(entityID, &scene);
-				DisplayEntityNode(entity);
+				if (!entity.GetComponent<HierarchyComponent>().Parent)
+				{
+					DisplayEntityNode(entity);
+				}
 			}
 		}
 
@@ -223,8 +226,9 @@ namespace Cine
 
 	void SceneHierarchyPanel::DisplayEntityNode(Entity entity)
 	{
-		auto& tag = m_Context.Scene->m_Registry.get<TagComponent>(entity).Tag;
+		auto& tag = entity.GetComponent<TagComponent>().Tag;
 
+		// ImGui tree node flags
 		ImGuiTreeNodeFlags flags = ((m_Context.Selection == entity) ? ImGuiTreeNodeFlags_OpenOnArrow : 0);
 		flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
 		if (m_Context.Selection == entity)
@@ -232,8 +236,10 @@ namespace Cine
 			flags |= ImGuiTreeNodeFlags_Selected;
 		}
 
+		// Display the entity as a tree node
 		bool expanded = ImGui::TreeNodeEx((const void*)(uint64_t)(uint32_t)entity, flags, tag.c_str());
 
+		// Handle selection
 		if (ImGui::IsItemClicked() && !ImGui::IsMouseDoubleClicked(0))
 		{
 			m_Context.Selection = entity;
@@ -244,10 +250,10 @@ namespace Cine
 			m_Context.Properties = entity;
 		}
 
+		// Handle context menu for deletion
 		bool entityDeleted = false;
 		if (ImGui::BeginPopupContextItem())
 		{
-
 			if (ImGui::MenuItem("Delete Entity"))
 			{
 				entityDeleted = true;
@@ -255,28 +261,28 @@ namespace Cine
 			ImGui::EndPopup();
 		}
 
-
+		// If the entity node is expanded, recursively display its children
 		if (expanded)
 		{
-			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
-			bool opened = ImGui::TreeNodeEx((void*)9817239, flags, tag.c_str());
-			if (opened)
+			auto& hierarchyComponent = entity.GetComponent<HierarchyComponent>();
+			for (auto child : hierarchyComponent.Children)	
 			{
-				ImGui::TreePop();
+				DisplayEntityNode(child);
 			}
 			ImGui::TreePop();
 		}
 
+		// Handle entity deletion
 		if (entityDeleted)
 		{
 			m_Context.Scene->DestroyEntity(entity);
 			if (m_Context.Selection == entity)
 			{
-				m_Context.Selection = { };
+				m_Context.Selection = {};
 			}
 			if (m_Context.Properties == entity)
 			{
-				m_Context.Properties = { };
+				m_Context.Properties = {};
 			}
 		}
 	}
@@ -356,8 +362,18 @@ namespace Cine
 				ImGui::ColorEdit4("Color", glm::value_ptr(sprite.Color));
 				if (entity.HasComponent<SpriteSheetComponent>())
 				{
-					int32_t maxIndex = entity.GetComponent<SpriteSheetComponent>().Frames.size() - 1;
-					ImGui::SliderInt("Sprite Sheet Index", &sprite.SpriteIndex, 0, maxIndex);
+					int32_t maxIndex = static_cast<int32_t>(entity.GetComponent<SpriteSheetComponent>().Frames.size()) - 1;
+					if (maxIndex >= 0)
+					{
+						ImGui::SliderInt("Sprite Sheet Index", &sprite.SpriteIndex, 0, maxIndex);
+					}
+					else
+					{
+						ImGui::BeginDisabled();
+						int32_t dummy = 0;
+						ImGui::SliderInt("Sprite Sheet Index", &dummy, 0, 0);
+						ImGui::EndDisabled();
+					}
 				}
 			});
 

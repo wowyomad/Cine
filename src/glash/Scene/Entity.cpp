@@ -25,13 +25,13 @@ namespace Cine
 
 		if (*this == child)
 		{
-			CINE_LOG_WARN("Tried to add self as a child");
+			CINE_CORE_WARN("Tried to add self as a child");
 			return;
 		}
 
 		if (hierarchy.Parent == child)
 		{
-			CINE_LOG_WARN("Tried to add parent as a child");
+			CINE_CORE_WARN("Tried to add parent as a child");
 			return;
 		}
 
@@ -42,14 +42,14 @@ namespace Cine
 			});
 		if (it != children.end())
 		{
-			CINE_LOG_WARN("Child {0} is already a child of {1}", static_cast<uint32_t>(child), static_cast<uint32_t>(*this));
+			CINE_CORE_WARN("Child {0} is already a child of {1}", static_cast<uint32_t>(child), static_cast<uint32_t>(*this));
 			return;
 		}
 
 		children.push_back(child);
 		child.AddParent(*this);
 
-		CINE_LOG_TRACE("Added child {0} to entity {1}", static_cast<uint32_t>(child), static_cast<uint32_t>(*this));
+		CINE_CORE_TRACE("Added child {0} to entity {1}", static_cast<uint32_t>(child), static_cast<uint32_t>(*this));
 	}
 
 	void Entity::AddParent(Entity parent)
@@ -58,7 +58,7 @@ namespace Cine
 
 		if (*this == parent)
 		{
-			CINE_LOG_WARN("Tried to add self as a parent");
+			CINE_CORE_WARN("Tried to add self as a parent");
 			return;
 		}
 
@@ -70,7 +70,7 @@ namespace Cine
 		if (it != children.end())
 		{
 
-			CINE_LOG_WARN("Tried to add child {0} as a parent of {1}", static_cast<uint32_t>(parent), static_cast<uint32_t>(*this));
+			CINE_CORE_WARN("Tried to add child {0} as a parent of {1}", static_cast<uint32_t>(parent), static_cast<uint32_t>(*this));
 			return;
 		}
 		if (hierarchy.Parent)
@@ -79,7 +79,7 @@ namespace Cine
 		}
 		hierarchy.Parent = parent;
 
-		CINE_LOG_TRACE("Added parent {0} to entity {1}", static_cast<uint32_t>(parent), static_cast<uint32_t>(*this));
+		CINE_CORE_TRACE("Added parent {0} to entity {1}", static_cast<uint32_t>(parent), static_cast<uint32_t>(*this));
 	}
 
 	void Entity::RemoveChild(Entity child)
@@ -95,14 +95,14 @@ namespace Cine
 			});
 		if (it == hierarchy.Children.end())
 		{
-			CINE_LOG_WARN("Entity {0} doesn't have child {1}", static_cast<uint32_t>(*this), static_cast<uint32_t>(child));
+			CINE_CORE_WARN("Entity {0} doesn't have child {1}", static_cast<uint32_t>(*this), static_cast<uint32_t>(child));
 			return;
 		}
 
 		childHierarchy.Parent = {};
 		hierarchy.Children.erase(it);
 
-		CINE_LOG_TRACE("Removed child {0} from entity {1}", static_cast<uint32_t>(child), static_cast<uint32_t>(*this));
+		CINE_CORE_TRACE("Removed child {0} from entity {1}", static_cast<uint32_t>(child), static_cast<uint32_t>(*this));
 	}
 
 	void Entity::RemoveParent()
@@ -118,14 +118,14 @@ namespace Cine
 			});
 		if (it == parentHierarchy.Children.end())
 		{
-			CINE_LOG_WARN("Entity {0} doesn't have a parent", static_cast<uint32_t>(*this));
+			CINE_CORE_WARN("Entity {0} doesn't have a parent", static_cast<uint32_t>(*this));
 			return;
 		}
 
 		hierarchy.Parent = {};
 		parentHierarchy.Children.erase(it);
 
-		CINE_LOG_TRACE("Removed parent {0} from entity {1}", static_cast<uint32_t>(hierarchy.Parent), static_cast<uint32_t>(*this));
+		CINE_CORE_TRACE("Removed parent {0} from entity {1}", static_cast<uint32_t>(hierarchy.Parent), static_cast<uint32_t>(*this));
 	}
 
 
