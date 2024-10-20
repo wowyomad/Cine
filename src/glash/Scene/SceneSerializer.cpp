@@ -171,12 +171,16 @@ namespace Cine
 			out << YAML::BeginMap;
 
 			auto& spriteSheetComponent = entity.GetComponent<SpriteSheetComponent>();
-			std::filesystem::path fullTexturePath = spriteSheetComponent.Texture->GetPath();
-			std::filesystem::path relativeTexturePath = std::filesystem::relative(fullTexturePath, "Assets");
-			std::string name = fullTexturePath.filename().string();
+			if (spriteSheetComponent.Texture)
+			{
+				std::filesystem::path fullTexturePath = spriteSheetComponent.Texture->GetPath();
+				std::filesystem::path relativeTexturePath = std::filesystem::relative(fullTexturePath, "Assets");
+				std::string name = fullTexturePath.filename().string();
 
-			out << YAML::Key << "Texture" << YAML::Value << relativeTexturePath.string();
-			out << YAML::Key << "Name" << YAML::Value << name;
+				out << YAML::Key << "Texture" << YAML::Value << relativeTexturePath.string();
+				out << YAML::Key << "Name" << YAML::Value << name;
+			}
+
 			out << YAML::BeginSeq;
 
 			for (const auto& frame : spriteSheetComponent.Frames)
@@ -323,34 +327,36 @@ namespace Cine
 				{
 					auto&& cc = deserializedEntity.AddComponent<SpriteSheetComponent>();
 					
-					std::filesystem::path texturePath = spriteSheetComponent["Texture"].as<std::string>();
-					std::string name = spriteSheetComponent["Name"].as<std::string>();
+					if (spriteSheetComponent["Texture"])
+					{
+						std::filesystem::path texturePath = spriteSheetComponent["Texture"].as<std::string>();
+						std::string name = spriteSheetComponent["Name"].as<std::string>();
 
-					cc = AssetManager::LoadSpriteSheet(name, texturePath, false);
-					
-					if (spriteSheetComponent["Frames"] && spriteSheetComponent["Frames"].IsSequence()) {
-						cc.Frames.clear();
+						cc = AssetManager::LoadSpriteSheet(name, texturePath, false);
 
-						for (const auto& frameNode : spriteSheetComponent["Frames"]) {
-							if (!frameNode.IsMap() || !frameNode["Coords"].IsSequence()) continue;
+						if (spriteSheetComponent["Frames"] && spriteSheetComponent["Frames"].IsSequence()) {
+							cc.Frames.clear();
 
-							SpriteSheetComponent::Frame frame;
+							for (const auto& frameNode : spriteSheetComponent["Frames"]) {
+								if (!frameNode.IsMap() || !frameNode["Coords"].IsSequence()) continue;
 
-							int i = 0;
-							for (const auto& coordNode : frameNode["Coords"]) {
-								if (coordNode.size() != 2) continue;
+								SpriteSheetComponent::Frame frame;
 
-								glm::vec2 coord;
-								coord.x = coordNode[0].as<float>();
-								coord.y = coordNode[1].as<float>();
-								frame.Coords[i++] = coord;
+								int i = 0;
+								for (const auto& coordNode : frameNode["Coords"]) {
+									if (coordNode.size() != 2) continue;
+
+									glm::vec2 coord;
+									coord.x = coordNode[0].as<float>();
+									coord.y = coordNode[1].as<float>();
+									frame.Coords[i++] = coord;
+								}
+
+								cc.Frames.push_back(frame);
 							}
-
-							cc.Frames.push_back(frame);
 						}
 					}
 				}
-
 			}
 		}
 
