@@ -22,8 +22,9 @@ namespace Cine
 		AssetManager(AssetManager&&) = delete;
 
 		TextureLibrary m_TextureLibrary;
-		
-
 		static AssetManager* s_Instance;
+
+	public:
+		static std::filesystem::path AssetsDirectory;
 	};
 }

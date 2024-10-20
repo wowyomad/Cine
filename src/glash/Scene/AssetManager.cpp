@@ -6,6 +6,7 @@
 namespace Cine
 {
     AssetManager* AssetManager::s_Instance = nullptr;
+    std::filesystem::path AssetManager::AssetsDirectory = "Assets";
 
     void AssetManager::Init()
     {

@@ -3,6 +3,8 @@
 #include <ImGuizmo.h>
 
 #include "Panels/SceneHierarchyPanel.hpp"
+#include "Panels/ContentBrowserPanel.hpp"
+
 #include "glash/Renderer/Texture.hpp"
 #include "glash/Scene/AssetManager.hpp"
 
@@ -23,10 +25,12 @@ namespace Cine
 		void SetupCustom();
 
 	private:
+		SceneHierarchyPanel m_SceneHierarchyPanel;
+		ContentBrowserPanel m_ContentBrowserPanel;
+
 
 		Ref<FrameBuffer> m_Framebuffer;
 		Ref<Scene> m_ActiveScene;
-		SceneHierarchyPanel m_SceneHierarchyPanel;
 		EditorCamera m_EditorCamera;
 
 		int32_t m_GizmoOperation = -1;

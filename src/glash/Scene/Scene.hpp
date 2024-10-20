@@ -14,7 +14,7 @@ namespace Cine
 	class NativeScript;
 
 	using ComponentAdder = std::function<void(entt::registry&, entt::entity)>;
-	using ComponentUpdater = std::function<void(entt::registry&, Timestep)>;
+	using ScriptUpdates = std::function<void(entt::registry&, Timestep)>;
 
 	class Scene
 	{
@@ -108,7 +108,10 @@ namespace Cine
 					};
 				auto removeScript = [&, entity]() -> void
 					{
-						m_Registry.remove<Component>(entity);
+						if (m_Registry.valid(entity) && m_Registry.all_of<Component>(entity))
+						{
+							m_Registry.remove<Component>(entity);
+						}
 					};
 				nsc.Bind<Component>(instantiateScript, removeScript);
 			}
@@ -126,7 +129,7 @@ namespace Cine
 
 	private:
 		std::unordered_map<std::string, ComponentAdder> m_ComponentRegistry;
-		std::unordered_map<std::string, ComponentUpdater> m_UpdateRegistry;
+		std::unordered_map<std::string, ScriptUpdates> m_UpdateRegistry;
 
 		std::vector<entt::entity> m_ToDestroyEntities;
 		entt::registry m_Registry;

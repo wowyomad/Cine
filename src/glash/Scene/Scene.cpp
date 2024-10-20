@@ -18,7 +18,6 @@ namespace Cine
 
 	Scene::~Scene()
 	{
-
 	}
 
 	void Scene::SetMainCamera(Entity cameraEntity)

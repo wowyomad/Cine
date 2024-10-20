@@ -334,6 +334,7 @@ namespace Cine
 		ImGui::End();
 
 		m_SceneHierarchyPanel.OnImGuiRender();
+		m_ContentBrowserPanel.OnImGuiRender();
 
 		DrawViewport();
 
