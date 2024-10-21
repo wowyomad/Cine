@@ -266,7 +266,6 @@ namespace Cine
 		static std::unordered_map<uint32_t, bool> expandedNodes;
 		bool& isExpanded = expandedNodes[(uint32_t)entity];
 
-		// Set the next item open state based on isExpanded
 		ImGui::SetNextItemOpen(isExpanded);
 
 		bool expanded = ImGui::TreeNodeEx((const void*)(uint64_t)(uint32_t)entity, flags, tag.c_str());
@@ -289,7 +288,7 @@ namespace Cine
 				{
 					if (draggedEntity->AddParent(entity))
 					{
-						isExpanded = true; // Expand the node if a parent is added
+						isExpanded = true;
 					}
 				}
 			}
@@ -316,19 +315,18 @@ namespace Cine
 			ImGui::EndPopup();
 		}
 
-		// Manage child node display and isExpanded state
-		if (expanded) // If the node is expanded this frame
+		if (expanded)
 		{
-			isExpanded = true; // Set isExpanded to true
+			isExpanded = true;
 			for (auto child : hierarchyComponent.Children)
 			{
-				DisplayEntityNode(child); // Recursively display child nodes
+				DisplayEntityNode(child);
 			}
-			ImGui::TreePop(); // Pop the tree node
+			ImGui::TreePop();
 		}
-		else if (!expanded && isExpanded) // Node was previously expanded but is now collapsed
+		else if (!expanded && isExpanded)
 		{
-			isExpanded = false; // Reset the expanded state
+			isExpanded = false;
 		}
 
 		if (entityDeleted)
