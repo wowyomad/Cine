@@ -171,8 +171,15 @@ namespace Cine
 					DisplayEntityNode(entity);
 				}
 			}
+
+			//Dummy for drag and drop into empty space
+			ImVec2 availableSpace = ImGui::GetContentRegionAvail();
+			float minHeight = 40.0f;
+			ImGui::Dummy(ImVec2(availableSpace.x, std::max(minHeight, availableSpace.y)));
+
 			if (ImGui::BeginDragDropTarget())
 			{
+				CINE_LOG_INFO("Catched drag and drop in blank space");
 				if (ImGui::AcceptDragDropPayload("ENTITY"))
 				{
 					Entity& draggedEntity = *reinterpret_cast<Entity*>(ImGui::GetDragDropPayload()->Data);
@@ -243,6 +250,7 @@ namespace Cine
 	void SceneHierarchyPanel::DisplayEntityNode(Entity entity)
 	{
 		auto& tag = entity.GetComponent<TagComponent>().Tag;
+		auto& hierarchyComponent = entity.GetComponent<HierarchyComponent>();
 
 		ImGuiTreeNodeFlags flags = ((m_Context.Selection == entity) ? ImGuiTreeNodeFlags_OpenOnArrow : 0);
 		flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
@@ -251,11 +259,21 @@ namespace Cine
 			flags |= ImGuiTreeNodeFlags_Selected;
 		}
 
-		bool expanded = ImGui::TreeNodeEx((const void*)(uint64_t)(uint32_t)entity, flags, tag.c_str());
+		if (hierarchyComponent.Children.empty()) {
+			flags |= ImGuiTreeNodeFlags_Leaf;
+		}
 
+		static std::unordered_map<uint32_t, bool> expandedNodes;
+		bool& isExpanded = expandedNodes[(uint32_t)entity];
+
+		// Set the next item open state based on isExpanded
+		ImGui::SetNextItemOpen(isExpanded);
+
+		bool expanded = ImGui::TreeNodeEx((const void*)(uint64_t)(uint32_t)entity, flags, tag.c_str());
 
 		if (ImGui::BeginDragDropSource())
 		{
+			CINE_LOG_INFO("Began drag and drop");
 			ImGui::SetDragDropPayload("ENTITY", &entity, sizeof(Entity));
 			ImGui::Text(tag.c_str());
 			ImGui::EndDragDropSource();
@@ -263,13 +281,16 @@ namespace Cine
 
 		if (ImGui::BeginDragDropTarget())
 		{
+			CINE_LOG_INFO("Caught drag and drop in entity");
 			if (ImGui::AcceptDragDropPayload("ENTITY"))
 			{
 				Entity* draggedEntity = reinterpret_cast<Entity*>(ImGui::GetDragDropPayload()->Data);
-
 				if (draggedEntity && *draggedEntity != entity)
 				{
-					draggedEntity->AddParent(entity);
+					if (draggedEntity->AddParent(entity))
+					{
+						isExpanded = true; // Expand the node if a parent is added
+					}
 				}
 			}
 			ImGui::EndDragDropTarget();
@@ -295,14 +316,19 @@ namespace Cine
 			ImGui::EndPopup();
 		}
 
-		if (expanded)
+		// Manage child node display and isExpanded state
+		if (expanded) // If the node is expanded this frame
 		{
-			auto& hierarchyComponent = entity.GetComponent<HierarchyComponent>();
+			isExpanded = true; // Set isExpanded to true
 			for (auto child : hierarchyComponent.Children)
 			{
-				DisplayEntityNode(child);
+				DisplayEntityNode(child); // Recursively display child nodes
 			}
-			ImGui::TreePop();
+			ImGui::TreePop(); // Pop the tree node
+		}
+		else if (!expanded && isExpanded) // Node was previously expanded but is now collapsed
+		{
+			isExpanded = false; // Reset the expanded state
 		}
 
 		if (entityDeleted)
@@ -318,6 +344,7 @@ namespace Cine
 			}
 		}
 	}
+
 
 	void SceneHierarchyPanel::DisplayEntityProperties(Entity entity)
 	{

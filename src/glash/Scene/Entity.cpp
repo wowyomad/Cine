@@ -52,7 +52,7 @@ namespace Cine
 	}
 
 
-	void Entity::AddParent(Entity parent)
+	bool Entity::AddParent(Entity parent)
 	{
 		auto& hierarchy = GetComponent<HierarchyComponent>();
 		auto& parentHierarchy = parent.GetComponent<HierarchyComponent>();
@@ -65,14 +65,14 @@ namespace Cine
 
 		if (selfParent)
 		{
-			return;
+			return false;
 		}
 
 		if (thisHasParent)
 		{
 			if (thisIsChild)
 			{
-				return;
+				return false;
 			}
 			else if (thisIsParent)
 			{
@@ -89,7 +89,6 @@ namespace Cine
 				hierarchy.Parent = parent;
 				oldParentChildren.push_back(parent);
 				parentHierarchy.Children.push_back(*this);
-				return;
 			}
 			else
 			{
@@ -107,7 +106,6 @@ namespace Cine
 				hierarchy.Parent = parent;
 
 				parentHierarchy.Children.push_back(*this);
-				return;
 			}
 		}
 		else
@@ -120,8 +118,8 @@ namespace Cine
 			hierarchy.Parent = parent;
 			parentHierarchy.Children.push_back(*this);
 		}
-
-
+		
+		return true;
 	}
 
 	void Entity::RemoveChild(Entity child)
@@ -168,21 +166,15 @@ namespace Cine
 
 		auto& parentHierarchy = hierarchy.Parent.GetComponent<HierarchyComponent>();
 
-		//TODO: checks
-
-		auto it = std::find_if(parentHierarchy.Children.begin(), parentHierarchy.Children.end(), [*this](Entity& entity) -> bool
-			{
-				return *this == entity;
-			});
-		if (it == parentHierarchy.Children.end())
+		for (auto child : hierarchy.Children)
 		{
-			CINE_CORE_WARN("Entity {0} doesn't have a parent", static_cast<uint32_t>(*this));
-			return;
+			child.GetComponent<HierarchyComponent>().Parent = hierarchy.Parent;
+			parentHierarchy.Children.push_back(child);
 		}
-
+		parentHierarchy.Children.erase(std::remove_if(parentHierarchy.Children.begin(), parentHierarchy.Children.end(), [this](auto& theChild)
+			{
+				return theChild == *this;
+			}));
 		hierarchy.Parent = {};
-		parentHierarchy.Children.erase(it);
-
-		CINE_CORE_TRACE("Removed parent {0} from entity {1}", static_cast<uint32_t>(hierarchy.Parent), static_cast<uint32_t>(*this));
 	}
 }

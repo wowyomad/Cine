@@ -94,7 +94,7 @@ namespace Cine
 		Entity GetParent();
 		const std::vector<Entity>& GetChildren();
 		void AddChild(Entity child);
-		void AddParent(Entity parent);
+		bool AddParent(Entity parent);
 		void RemoveChild(Entity child);
 		void RemoveChildren();
 		void RemoveParent();
