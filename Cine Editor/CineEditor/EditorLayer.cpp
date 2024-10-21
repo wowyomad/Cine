@@ -40,7 +40,18 @@ namespace Cine
 		{
 			m_LocalTransform->Rotation.z += glm::radians(m_RotationSpeed) * ts;
 		}
+
 	private:
+		friend class Deserializer;
+		friend class Serializer;
+
+		friend void Deserialize<RotationScript>(RotationScript&, const YAML::Node&);
+		friend YAML::Node Serialize<RotationScript>(RotationScript&);
+
+		BEGIN_SERIALIZE(RotationScript)
+			SERIALIZE_FIELD(m_RotationSpeed)
+		END_SERIALIZE()
+
 		TransformComponent* m_LocalTransform;
 		float m_RotationSpeed = 90.0f;
 	};
@@ -50,13 +61,17 @@ namespace Cine
 	public:
 		void OnCreate() override
 		{
-			auto& component = GetComponent<SpriteComponent>();
-			m_SpriteComponent = &component;
+			m_SpriteComponent = TryGetComponent<SpriteComponent>();
 			m_Timer.Start();
 		}
 
 		void OnUpdate(Timestep ts) override
 		{
+			if (!m_SpriteComponent)
+			{
+				return;
+			}
+
 			m_Timer.OnUpdate(ts);
 
 			float time = m_Timer.GetElapsed();
@@ -65,11 +80,16 @@ namespace Cine
 			m_SpriteComponent->Color.b = 0.5f * sin(time + 4.0f) + 0.5f;
 		}
 	public:
-		std::string String = "String from Color Script";
+
+		BEGIN_SERIALIZE(ColorScript)
+			SERIALIZE_FIELD(m_String)
+		END_SERIALIZE()
 
 	private:
 		SpriteComponent* m_SpriteComponent;
 		Timer m_Timer;
+		std::string m_String = "String from Color Script";
+
 	};
 
 
@@ -78,8 +98,8 @@ namespace Cine
 	public:
 		void OnCreate() override
 		{
-			m_Anim = &GetComponent<SpriteAnimationComponent>();
-			m_Transform = &GetComponent<TransformComponent>();
+			m_Anim = TryGetComponent<SpriteAnimationComponent>();
+			m_Transform = TryGetComponent<TransformComponent>();
 		}
 
 		void OnDestroy() override
@@ -89,6 +109,10 @@ namespace Cine
 
 		void OnUpdate(Timestep ts) override
 		{
+			if (!m_Anim || !m_Transform)
+			{
+				return;
+			}
 
 			float speed = 5.0f;
 			glm::vec3 direction(0.0f);
@@ -122,6 +146,11 @@ namespace Cine
 			m_Transform->Translation += speed * ts * direction;
 			
 		}
+
+		BEGIN_SERIALIZE(ControllerScript)
+
+		END_SERIALIZE()
+
 	private:
 		SpriteAnimationComponent* m_Anim;
 		TransformComponent* m_Transform;
@@ -129,8 +158,6 @@ namespace Cine
 
 	void EditorLayer::OnAttach()
 	{
-		SetupCustom();
-
 		m_IsRuntime = true;
 
 		m_ActiveScene = CreateRef<Scene>();
@@ -151,6 +178,17 @@ namespace Cine
 		s_Scene->RegisterComponent<ControllerScript>();
 		s_Scene->RegisterComponent<RotationScript>();
 		s_Scene->RegisterComponent<ColorScript>();
+
+		auto entity = s_Scene->CreateEntity();
+		entity.AddComponent<RotationScript>();
+		entity.AddComponent<ColorScript>();
+		YAML::Emitter out;
+		out << YAML::BeginSeq;
+		out << s_Scene->SerializeComponentByName(entity, "RotationScript");
+		out << s_Scene->SerializeComponentByName(entity, "ColorScript");
+		out << YAML::EndSeq;
+
+		std::cout << out.c_str() << std::endl;
 
 		auto woman = m_ActiveScene->CreateEntity("Woman");
 		woman.AddComponents<ControllerScript, SpriteComponent, SpriteRendererComponent>();
@@ -547,7 +585,7 @@ namespace Cine
 		glm::vec2 vec2;
 		std::vector<std::string> values;
 
-		BEGIN_SERIALIZE()
+		BEGIN_SERIALIZE(HealthComponent)
 			SERIALIZE_FIELD(value)
 			SERIALIZE_FIELD(vec2)
 			SERIALIZE_FIELD(values)
@@ -576,19 +614,18 @@ namespace Cine
 			Health.values = { "Biba", "Boba", "Dima" };
 		}
 
-		BEGIN_SERIALIZE()
+		BEGIN_SERIALIZE(PlayerScript)
 			SERIALIZE_FIELD(Speed)
 			SERIALIZE_FIELD(Name)
 			SERIALIZE_FIELD(Health)
 		END_SERIALIZE()
-
 	};
 
 	void EditorLayer::SetupCustom()
 	{
 		PlayerScript p;
 		p.Set();
-		
+	
 		YAML::Node node = Serialize(p);
 		std::string serializedString = YAML::Dump(node);
 		std::cout << "Serialized String: " << std::endl << serializedString << std::endl;

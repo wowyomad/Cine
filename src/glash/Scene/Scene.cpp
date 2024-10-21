@@ -106,71 +106,110 @@ namespace Cine
 	}
 
 
-void Scene::OnUpdateRuntime(Timestep ts)
-{
-	InstantiateScripts();
-	UpdateScripts(ts);
-
-	Renderer2D::Clear();
-	if (*m_MainCamera)
+	void Scene::OnUpdateRuntime(Timestep ts)
 	{
-		auto&& [cameraComponent, transformComponent] = m_MainCamera->GetComponents<CameraComponent, TransformComponent>();
-		Renderer2D::BeginScene(cameraComponent.Camera, transformComponent.GetLocalTransform());
-		SpriteRendererSystem::Update(m_Registry);
-		SpriteAnimationSystem::Update(m_Registry, ts);
-		Renderer2D::EndScene();
-	}
+		InstantiateScripts();
+		UpdateScripts(ts);
 
-	DestroyMarkedEntities();
-}
-
-void Scene::InstantiateScripts()
-{
-	m_Registry.view<NativeScriptComponent>().each([&](auto entity, NativeScriptComponent& nsc)
+		Renderer2D::Clear();
+		if (*m_MainCamera)
 		{
-			for (auto& script : nsc.Scripts)
-			{
-				if (!script.Instance)
-				{
-					script.Instance = script.InstantiateScript();
-					script.Instance->m_Entity = Entity(entity, this);
-					script.Instance->OnCreate();
-				}
-			}
-		});
-}
-
-void Scene::UpdateScripts(Timestep ts)
-{
-	for (auto& [componentName, updateCall] : m_UpdateRegistry)
-	{
-		updateCall(m_Registry, ts);
-	}
-}
-
-void Scene::DestroyMarkedEntities()
-{
-	for (auto e : m_ToDestroyEntities)
-	{
-		auto& hierarchy = m_Registry.get<HierarchyComponent>(e);
-		Entity entity = { e, this };
-
-		entity.RemoveParent();
-		entity.RemoveChildren();
-
-		if (m_Registry.all_of<NativeScriptComponent>(entity))
-		{
-			auto& nsc = m_Registry.get<NativeScriptComponent>(entity);
-			for (auto& script : nsc.Scripts)
-			{
-				script.Instance->OnDestroy();
-			}
+			auto&& [cameraComponent, transformComponent] = m_MainCamera->GetComponents<CameraComponent, TransformComponent>();
+			Renderer2D::BeginScene(cameraComponent.Camera, transformComponent.GetLocalTransform());
+			SpriteRendererSystem::Update(m_Registry);
+			SpriteAnimationSystem::Update(m_Registry, ts);
+			Renderer2D::EndScene();
 		}
 
-		m_Registry.destroy(entity);
+		DestroyMarkedEntities();
 	}
-	m_ToDestroyEntities.clear();
-}
+
+	void Scene::InstantiateScripts()
+	{
+		m_Registry.view<NativeScriptComponent>().each([&](auto entity, NativeScriptComponent& nsc)
+			{
+				for (auto& script : nsc.Scripts)
+				{
+					if (!script.Instance)
+					{
+						script.Instance = script.InstantiateScript();
+						script.Instance->m_Entity = Entity(entity, this);
+						script.Instance->OnCreate();
+					}
+				}
+			});
+	}
+
+	void Scene::UpdateScripts(Timestep ts)
+	{
+		for (auto& [componentName, updateCall] : m_UpdateRegistry)
+		{
+			updateCall(m_Registry, ts);
+		}
+	}
+
+	void Scene::AddComponentByName(Entity entity, const std::string& componentName)
+	{
+		auto it = m_ComponentRegistry.find(componentName);
+		if (it != m_ComponentRegistry.end()) {
+			CINE_CORE_TRACE("Added component '{}' to '{}'", componentName, static_cast<uint32_t>(entity));
+			it->second(m_Registry, entity.m_EntityHandle);
+		}
+		else
+		{
+			CINE_CORE_TRACE("Component '{}' not found", componentName);
+
+		}
+	}
+
+	YAML::Node Scene::SerializeComponentByName(Entity entity, const std::string& componentName)
+	{
+		auto it = m_SerializationRegistry.find(componentName);
+		if (it != m_SerializationRegistry.end()) {
+			CINE_CORE_TRACE("Serialized component '{}' from entity '{}'", componentName, static_cast<uint32_t>(entity));
+			return it->second(m_Registry, entity.m_EntityHandle);
+		}
+		else {
+			CINE_CORE_ASSERT(false, "Serialization for component '{}' not found", componentName);
+			return {};
+		}
+	}
+
+	void Scene::DeserializeComponentByName(Entity entity, const std::string& componentName, const YAML::Node& node)
+	{
+		auto it = m_DeserializationRegistry.find(componentName);
+		if (it != m_DeserializationRegistry.end()) {
+			CINE_CORE_TRACE("Deserialized component '{}' into entity '{}'", componentName, static_cast<uint32_t>(entity));
+			it->second(m_Registry, entity, node);
+		}
+		else {
+			CINE_CORE_TRACE("Deserialization for component '{}' not found", componentName);
+		}
+	}
+
+	void Scene::DestroyMarkedEntities()
+	{
+		for (auto e : m_ToDestroyEntities)
+		{
+			auto& hierarchy = m_Registry.get<HierarchyComponent>(e);
+			Entity entity = { e, this };
+
+			entity.RemoveParent();
+			entity.RemoveChildren();
+
+			if (m_Registry.all_of<NativeScriptComponent>(entity))
+			{
+				auto& nsc = m_Registry.get<NativeScriptComponent>(entity);
+				for (auto& script : nsc.Scripts)
+				{
+					script.Instance->OnDestroy();
+				}
+			}
+
+			m_Registry.destroy(entity);
+		}
+		m_ToDestroyEntities.clear();
+	}
 
 
 

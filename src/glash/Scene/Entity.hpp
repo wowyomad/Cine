@@ -49,7 +49,7 @@ namespace Cine
 
 		void AddComponentByName(const std::string& name)
 		{
-			m_Scene->AddComponentByName(m_EntityHandle, name);
+			m_Scene->AddComponentByName(*this, name);
 		}
 
 		template <class Component, class... Args>
@@ -67,6 +67,12 @@ namespace Cine
 			return m_Scene->m_Registry.get<Component>(m_EntityHandle);
 		}
 
+		template <class Component>
+		Component* TryGetComponent()
+		{
+			return m_Scene->m_Registry.try_get<Component>(m_EntityHandle);
+		}
+
 		//Not really good for performance
 		template<class... Components>
 		auto GetComponents()
@@ -74,6 +80,8 @@ namespace Cine
 			CINE_CORE_ASSERT(HasComponents<Components...>(), "Entity does not have all requested components");
 			return m_Scene->m_Registry.get<Components...>(m_EntityHandle);
 		}
+
+
 
 		template <class Component>
 		void RemoveComponent()

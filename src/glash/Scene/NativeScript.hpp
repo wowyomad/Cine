@@ -11,7 +11,16 @@ namespace Cine
 		NativeScript() = default;
 		NativeScript(const NativeScript&) = default;
 		NativeScript(NativeScript&&) = default;
+
+		NativeScript& operator=(const NativeScript&) = default;
+
 		virtual ~NativeScript() { }
+
+		template <class T>
+		T* TryGetComponent()
+		{
+			return m_Entity.TryGetComponent<T>();
+		}
 
 		template <class T>
 		T& GetComponent()

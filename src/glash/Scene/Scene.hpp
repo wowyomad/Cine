@@ -3,7 +3,9 @@
 #include "glash/Core/Timestep.hpp"
 #include "glash/Renderer/EditorCamera.hpp"
 #include "glash/Utils/StringUtils.hpp"
+
 #include "Components.hpp"
+#include "ComponentSerializer.hpp"
 
 #include <entt/entt.hpp>
 
@@ -15,6 +17,9 @@ namespace Cine
 
 	using ComponentAdder = std::function<void(entt::registry&, entt::entity)>;
 	using ScriptUpdates = std::function<void(entt::registry&, Timestep)>;
+
+	using SerializerFunc = std::function<YAML::Node(entt::registry&, entt::entity)>;
+	using DeserializerFunc = std::function<void(entt::registry&, entt::entity, const YAML::Node&)>;
 
 	class Scene
 	{
@@ -45,6 +50,17 @@ namespace Cine
 					OnRegisteredComponentAdded<Component>(entity, component);
 					return component;
 				};
+			m_SerializationRegistry[componentName] = [&](entt::registry& registry, entt::entity entity) -> YAML::Node
+				{
+					Component& component = registry.get<Component>(entity);
+					return Serialize(component);
+				};
+			m_DeserializationRegistry[componentName] = [&](entt::registry& registry, entt::entity entity, const YAML::Node& node)
+				{
+					Component component;
+					Deserialize(component, node); // Assume Deserialize modifies the passed component
+					registry.emplace_or_replace<Component>(entity, component);
+				};
 
 			if constexpr (std::is_base_of<NativeScript, Component>::value)
 			{
@@ -58,22 +74,11 @@ namespace Cine
 						});
 					};
 			}
-
 		}
 
-		void AddComponentByName(entt::entity entity, const std::string& componentName) {
-			auto it = m_ComponentRegistry.find(componentName);
-			if (it != m_ComponentRegistry.end()) {
-				CINE_CORE_TRACE("Added component '{}' to '{}'", componentName, static_cast<uint32_t>(entity));
-				it->second(m_Registry, entity);
-			}
-			else
-			{
-				CINE_CORE_TRACE("Component '{}' not found", componentName);
-
-			}
-		}
-
+		void AddComponentByName(Entity entity, const std::string& componentName);
+		YAML::Node SerializeComponentByName(Entity entity, const std::string& componentName);
+		void DeserializeComponentByName(Entity entity, const std::string& componentName, const YAML::Node& node);
 
 		template <class Component>
 		void OnEntityDestroyed()
@@ -130,6 +135,9 @@ namespace Cine
 	private:
 		std::unordered_map<std::string, ComponentAdder> m_ComponentRegistry;
 		std::unordered_map<std::string, ScriptUpdates> m_UpdateRegistry;
+
+		std::unordered_map<std::string, SerializerFunc> m_SerializationRegistry;
+		std::unordered_map<std::string, DeserializerFunc> m_DeserializationRegistry;
 
 		std::vector<entt::entity> m_ToDestroyEntities;
 		entt::registry m_Registry;
