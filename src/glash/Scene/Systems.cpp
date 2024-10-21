@@ -38,40 +38,83 @@ namespace Cine
 		}
 	}
 
-	void SpriteRendererSystem::Update(entt::registry& registry)
-	{
-		UpdateWorldTransforms(registry);
+    void SpriteRendererSystem::Update(entt::registry& registry)
+    {
+        auto view = registry.view<TransformComponent, SpriteRendererComponent, SpriteComponent>();
+        std::vector<entt::entity> opaqueEntities;
+        std::vector<entt::entity> transparentEntities;
 
-		{
-			auto view = registry.view<CachedTransform, SpriteRendererComponent, SpriteSheetComponent, SpriteComponent>();
-			for (auto entity : view)
-			{
-				auto&& [transform, spriteRenderer, spriteSheet, sprite] = view.get<CachedTransform, SpriteRendererComponent, SpriteSheetComponent, SpriteComponent>(entity);
-				if (spriteRenderer.UseSprite)
-				{
-					if (sprite.SpriteIndex >= (int32_t)spriteSheet.Frames.size())
-					{
-						CINE_CORE_WARN("SpriteFrameIndex ({}) >= spriteSheet.Frames.size ({})", sprite.SpriteIndex, spriteSheet.Frames.size());
-						sprite.SpriteIndex = -1;
-						continue;
-					}
-					Renderer2D::DrawSprite(transform.CachedTransform, spriteSheet, sprite.SpriteIndex, sprite.Color);
-				}
-				else
-				{
-					Renderer2D::DrawQuad(transform.CachedTransform, sprite.Color);
-				}
-			}
-		}
-		{
-			auto view = registry.view<CachedTransform, SpriteRendererComponent, SpriteComponent>(entt::exclude<SpriteSheetComponent>);
-			for (auto entity : view)
-			{
-				auto&& [transform, spriteRenderer, sprite] = view.get<CachedTransform, SpriteRendererComponent, SpriteComponent>(entity);
-				Renderer2D::DrawQuad(transform.CachedTransform, sprite.Color);
-			}
-		}
-	}
+        for (auto entity : view)
+        {
+            auto& sprite = view.get<SpriteComponent>(entity);
+            if (sprite.Color.a >= 1.0f)
+            {
+                opaqueEntities.push_back(entity);
+            }
+            else
+            {
+                transparentEntities.push_back(entity);
+            }
+        }
+
+        std::sort(opaqueEntities.begin(), opaqueEntities.end(), [&](entt::entity a, entt::entity b) {
+            auto& transformA = view.get<TransformComponent>(a);
+            auto& transformB = view.get<TransformComponent>(b);
+            return transformA.Translation.z < transformB.Translation.z;
+            });
+
+        std::sort(transparentEntities.begin(), transparentEntities.end(), [&](entt::entity a, entt::entity b) {
+            auto& transformA = view.get<TransformComponent>(a);
+            auto& transformB = view.get<TransformComponent>(b);
+            return transformA.Translation.z > transformB.Translation.z;
+            });
+
+        UpdateWorldTransforms(registry);
+
+        for (auto entity : opaqueEntities)
+        {
+            auto&& [transform, spriteRenderer, sprite] = registry.get<CachedTransform, SpriteRendererComponent, SpriteComponent>(entity);
+            bool useSprite = spriteRenderer.UseSprite;
+            bool hasSpriteSheet = registry.all_of<SpriteSheetComponent>(entity);
+
+            if (useSprite && hasSpriteSheet)
+            {
+                auto& spriteSheet = registry.get<SpriteSheetComponent>(entity);
+                if (sprite.SpriteIndex >= static_cast<int32_t>(spriteSheet.Frames.size()))
+                {
+                    CINE_CORE_WARN("SpriteFrameIndex ({}) >= spriteSheet.Frames.size ({})", sprite.SpriteIndex, spriteSheet.Frames.size());
+                    continue;
+                }
+                Renderer2D::DrawSprite(transform.CachedTransform, spriteSheet, sprite.SpriteIndex, sprite.Color);
+            }
+            else
+            {
+                Renderer2D::DrawQuad(transform.CachedTransform, sprite.Color);
+            }
+        }
+
+        for (auto entity : transparentEntities)
+        {
+            auto&& [transform, spriteRenderer, sprite] = registry.get<CachedTransform, SpriteRendererComponent, SpriteComponent>(entity);
+            bool useSprite = spriteRenderer.UseSprite;
+            bool hasSpriteSheet = registry.all_of<SpriteSheetComponent>(entity);
+
+            if (useSprite && hasSpriteSheet)
+            {
+                auto& spriteSheet = registry.get<SpriteSheetComponent>(entity);
+                if (sprite.SpriteIndex >= static_cast<int32_t>(spriteSheet.Frames.size()))
+                {
+                    CINE_CORE_WARN("SpriteFrameIndex ({}) >= spriteSheet.Frames.size ({})", sprite.SpriteIndex, spriteSheet.Frames.size());
+                    continue;
+                }
+                Renderer2D::DrawSprite(transform.CachedTransform, spriteSheet, sprite.SpriteIndex, sprite.Color);
+            }
+            else
+            {
+                Renderer2D::DrawQuad(transform.CachedTransform, sprite.Color);
+            }
+        }
+    }
 
 	//TODO: Checks?
 	void SpriteAnimationSystem::Update(entt::registry& registry, Timestep deltaTime)
@@ -80,7 +123,7 @@ namespace Cine
 		for (auto entity : view)
 		{
 			auto&& [sc, ac] = view.get<SpriteComponent, SpriteAnimationComponent>(entity);
-			
+
 			if (!ac.State.Play)
 			{
 				continue;
