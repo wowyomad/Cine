@@ -36,14 +36,14 @@ namespace Cine
 
 
 		float fontSize = 16.0f;
-		io.FontDefault = io.Fonts->AddFontFromFileTTF("Assets/Fonts/JetBrainsMono-Regular.ttf", fontSize);
-		io.Fonts->AddFontFromFileTTF("Assets/Fonts/JetBrainsMono-Bold.ttf", fontSize);
+		io.FontDefault = io.Fonts->AddFontFromFileTTF("Resources/Fonts/JetBrainsMono-Regular.ttf", fontSize);
+		io.Fonts->AddFontFromFileTTF("Resources/Fonts/JetBrainsMono-Bold.ttf", fontSize);
 
-		//ImGui::StyleColorsDark();
-		//SetDarkTheme();
+		ImGui::StyleColorsDark();
+		SetDarkTheme();
 
-		ImGui::StyleColorsLight();
-		SetLightTheme();
+		//ImGui::StyleColorsLight();
+		//SetLightTheme();
 
 		Application& app = Application::Get();
 		GLFWwindow* window = static_cast<GLFWwindow*>(app.GetWindow().GetNativeWindow());

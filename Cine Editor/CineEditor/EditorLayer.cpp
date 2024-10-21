@@ -3,10 +3,11 @@
 
 #include "Scene/Components.hpp"
 #include "Scene/SceneSerializer.hpp"
+#include "Scene/ComponentSerializer.hpp"
 #include "glash/Utils/PlatformUtils.hpp"
 #include "glash/Core/Timer.hpp"
-
 #include "glash/Math/Math.hpp"
+
 
 #include <ImGuizmo.h>
 
@@ -128,6 +129,8 @@ namespace Cine
 
 	void EditorLayer::OnAttach()
 	{
+		SetupCustom();
+
 		m_IsRuntime = true;
 
 		m_ActiveScene = CreateRef<Scene>();
@@ -154,8 +157,9 @@ namespace Cine
 		auto&& sheet = woman.AddComponent<SpriteSheetComponent>();
 		auto&& anim = woman.AddComponent<SpriteAnimationComponent>();
 		woman.GetComponent<SpriteRendererComponent>().UseSprite = true;
-		woman.AddComponent<RotationScript>();
+		woman.AddComponent<RotationScript>(-180.0f);
 		woman.AddComponent<ColorScript>();
+		woman.GetComponent<TransformComponent>().Translation.z += 0.1f;
 
 		auto square = m_ActiveScene->CreateEntity("Square");
 		square.AddComponents<SpriteRendererComponent, SpriteSheetComponent, SpriteComponent, RotationScript>();
@@ -339,13 +343,6 @@ namespace Cine
 		DrawViewport();
 
 	}
-
-	void EditorLayer::SetupCustom()
-	{
-		
-
-
-	}	
 
 	void EditorLayer::DrawViewport()
 	{
@@ -542,5 +539,72 @@ namespace Cine
 			}
 		}
 		return false;
+	}
+
+	struct HealthComponent
+	{
+		float value;
+		glm::vec2 vec2;
+		std::vector<std::string> values;
+
+		BEGIN_SERIALIZE()
+			SERIALIZE_FIELD(value)
+			SERIALIZE_FIELD(vec2)
+			SERIALIZE_FIELD(values)
+		END_SERIALIZE()
+	};
+
+
+	class PlayerScript
+	{
+	public:
+		float Speed;
+		std::string Name;
+		HealthComponent Health;
+
+	public:
+		void OnStart()
+		{
+
+		}
+
+		void Set()
+		{
+			Speed = 15.0f;
+			Name = "Alexei";
+			Health = { 15, {25.0, 60.0f} };
+			Health.values = { "Biba", "Boba", "Dima" };
+		}
+
+		BEGIN_SERIALIZE()
+			SERIALIZE_FIELD(Speed)
+			SERIALIZE_FIELD(Name)
+			SERIALIZE_FIELD(Health)
+		END_SERIALIZE()
+
+	};
+
+	void EditorLayer::SetupCustom()
+	{
+		PlayerScript p;
+		p.Set();
+		
+		YAML::Node node = Serialize(p);
+		std::string serializedString = YAML::Dump(node);
+		std::cout << "Serialized String: " << std::endl << serializedString << std::endl;
+
+		PlayerScript deserializedPlayer;
+		Deserialize(deserializedPlayer, node);
+
+		std::cout << "Deserialized Player Name: " << deserializedPlayer.Name << std::endl;
+		std::cout << "Deserialized Player Speed: " << deserializedPlayer.Speed << std::endl;
+		std::cout << "Deserialized Health Value: " << deserializedPlayer.Health.value << std::endl;
+		std::cout << "Deserialized Health Vec2: " << deserializedPlayer.Health.vec2.x << ", " << deserializedPlayer.Health.vec2.y << std::endl;
+		int i = 0;
+		for (auto& value : deserializedPlayer.Health.values)
+		{
+			std::cout << "Deserialized value " << ++i << ": " << value << std::endl;
+
+		}
 	}
 }

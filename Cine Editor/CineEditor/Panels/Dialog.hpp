@@ -5,7 +5,7 @@
 
 namespace Cine
 {
-	bool ShowConfirmationDialog(const char* title, const char* message, std::function<void()> onConfirm)
+	bool ShowConfirmationPopup(const char* title, const char* message, std::function<void()> onConfirm)
 	{
 		if (ImGui::BeginPopupModal(title, nullptr, ImGuiWindowFlags_AlwaysAutoResize))
 		{

@@ -473,7 +473,7 @@ namespace Cine
 				{
 					ImGui::OpenPopup("Save sprite sheet meta");
 				}
-				ShowConfirmationDialog(
+				ShowConfirmationPopup(
 					"Save sprite sheet meta",
 					"Are you sure you want to save the sprite sheet meta? It will overwrite existing data",
 					[&spriteSheet]() { AssetManager::SaveSpriteSheetMeta(spriteSheet); }

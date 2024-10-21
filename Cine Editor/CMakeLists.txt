@@ -3,15 +3,20 @@ set(CineEditor_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 include(${CMAKE_SOURCE_DIR}/copy_functions.cmake)
 
+
+file(GLOB EDITOR_FONTS "${CineEditor_SOURCE_DIR}/Resources/Fonts/JetBrainsMono/ttf/*")
+file(GLOB EDITOR_CONTENTBROWSER_ICONS "${CineEditor_SOURCE_DIR}/Resources/Icons/ContentBrowser/*")
 file(GLOB EDITOR_TEXTURES "${CineEditor_SOURCE_DIR}/Assets/Textures/*")
-file(GLOB EDITOR_FONTS "${CineEditor_SOURCE_DIR}/Assets/Fonts/JetBrainsMono/ttf/*")
+
+set(EDITOR_FONTS_OUT "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Resources/Fonts")
+set(EDITOR_CONTENTBROWSER_ICONS_OUT "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Resources/Icons/ContentBrowser")
 set(EDITOR_TEXTURES_OUT "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Assets/Textures")
-set(EDITOR_FONTS_OUT "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Assets/Fonts")
 
 
 message ("EDITOR OUT DIRS ${EDITOR_TEXTURES_OUT} ${EDITOR_FONTS_OUT}")
 copy_files("${EDITOR_TEXTURES}" "${EDITOR_TEXTURES_OUT}" editor_copy_textures)
 copy_files("${EDITOR_FONTS}" "${EDITOR_FONTS_OUT}" editor_copy_fonts)
+COPY_FILES("${EDITOR_CONTENTBROWSER_ICONS}" "${EDITOR_CONTENTBROWSER_ICONS_OUT}" editor_copy_contentbrowser_icons)
 
 
 file(GLOB SOURCES
@@ -29,4 +34,4 @@ target_include_directories(${CineEditor}
 )
 target_precompile_headers(${CineEditor} REUSE_FROM glash_pch)
 
-add_dependencies(${CineEditor} editor_copy_textures editor_copy_fonts)
+add_dependencies(${CineEditor} editor_copy_textures editor_copy_fonts editor_copy_contentbrowser_icons)
