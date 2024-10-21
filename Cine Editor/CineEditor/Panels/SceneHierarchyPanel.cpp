@@ -48,7 +48,6 @@ namespace Cine
 	};
 
 
-
 	template<typename T, typename Func>
 	void DisplayComponent(Entity entity, const char* name, Func&& displayFunction)
 	{
@@ -214,6 +213,8 @@ namespace Cine
 			{
 				AddComponentItem<CameraComponent>(m_Context.Properties, "Camera");
 				AddComponentItem<SpriteRendererComponent>(m_Context.Properties, "Sprite Renderer");
+				AddComponentItem<NativeScriptComponent>(m_Context.Properties, "Native Script");
+
 				ImGui::EndPopup();
 			}
 
@@ -667,20 +668,45 @@ namespace Cine
 				auto& components = m_Context.Scene->GetRegisteredComponents();
 				auto& scripts = nsc.Scripts;
 
-				for (auto&& [name, creator] : components)
+				static char searchBuffer[128] = "";
+
+				if (ImGui::Button("Add Script"))
 				{
-					auto it = std::find_if(scripts.begin(), scripts.end(), [&name](auto& script)
-						{
-							return script.Name == name;
-						});
-					if (it == scripts.end())
+					ImGui::OpenPopup("AddScriptPopup");
+				}
+
+				if (ImGui::BeginPopup("AddScriptPopup"))
+				{
+					ImGui::InputText("Search", searchBuffer, IM_ARRAYSIZE(searchBuffer));
+
+					for (auto&& [name, creator] : components)
 					{
-						if (ImGui::Button(name.c_str()))
+						auto it = std::find_if(scripts.begin(), scripts.end(), [&name](auto& script)
+							{
+								return script.Name == name;
+							});
+						bool hasScript = it != scripts.end();
+
+						if (hasScript)
+							ImGui::BeginDisabled();
+
+						if (std::string(name).find(searchBuffer) != std::string::npos)
 						{
-							m_Context.Scene->AddComponentByName(entity, name);
+							ImVec2 buttonSize = ImVec2(200.0f, 0.0f);
+
+							if (ImGui::Button(name.c_str(), buttonSize))
+							{
+								m_Context.Scene->AddComponentByName(entity, name);
+								ImGui::CloseCurrentPopup();
+							}
 						}
 
+						if (hasScript)
+							ImGui::EndDisabled();
+
 					}
+
+					ImGui::EndPopup();
 				}
 			});
 
