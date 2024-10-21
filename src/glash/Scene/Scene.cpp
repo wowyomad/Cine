@@ -150,9 +150,23 @@ namespace Cine
 
 	void Scene::AddComponentByName(Entity entity, const std::string& componentName)
 	{
-		auto it = m_ComponentRegistry.find(componentName);
-		if (it != m_ComponentRegistry.end()) {
+		auto it = m_ComponentCreators.find(componentName);
+		if (it != m_ComponentCreators.end()) {
 			CINE_CORE_TRACE("Added component '{}' to '{}'", componentName, static_cast<uint32_t>(entity));
+			it->second(m_Registry, entity.m_EntityHandle);
+		}
+		else
+		{
+			CINE_CORE_TRACE("Component '{}' not found", componentName);
+
+		}
+	}
+
+	void Scene::RemoveComponentByName(Entity entity, const std::string& componentName)
+	{
+		auto it = m_ComponentRemovers.find(componentName);
+		if (it != m_ComponentRemovers.end()) {
+			CINE_CORE_TRACE("Removed component '{}' from '{}'", componentName, static_cast<uint32_t>(entity));
 			it->second(m_Registry, entity.m_EntityHandle);
 		}
 		else

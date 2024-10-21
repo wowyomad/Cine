@@ -15,7 +15,8 @@ namespace Cine
 	class Entity;
 	class NativeScript;
 
-	using ComponentAdder = std::function<void(entt::registry&, entt::entity)>;
+	using ComponentCreater = std::function<void(entt::registry&, entt::entity)>;
+	using ComponentRemover = std::function<void(entt::registry&, entt::entity)>;
 	using ScriptUpdates = std::function<void(entt::registry&, Timestep)>;
 
 	using SerializerFunc = std::function<YAML::Node(entt::registry&, entt::entity)>;
@@ -46,14 +47,39 @@ namespace Cine
 			return m_Registry.view<entt::entity>();
 		}
 
+		const std::map<std::string, ComponentCreater>& GetRegisteredComponents()
+		{
+			return m_ComponentCreators;
+		}
+
 		template<typename Component>
 		void RegisterComponent() {
 			std::string componentName = Utils::GetClassTypename<Component>();
-			m_ComponentRegistry[componentName] = [&](entt::registry& registry, entt::entity entity) -> Component&
+			m_ComponentCreators[componentName] = [&](entt::registry& registry, entt::entity entity) -> Component&
 				{
 					auto& component = registry.emplace<Component>(entity);
 					OnRegisteredComponentAdded<Component>(entity, component);
 					return component;
+				};
+			m_ComponentRemovers[componentName] = [componentName](entt::registry& registry, entt::entity entity) -> void
+				{
+					if constexpr (std::is_base_of<NativeScript, Component>::value)
+					{
+						auto& nsc = registry.get<NativeScriptComponent>(entity);
+						auto it = std::find_if(nsc.Scripts.begin(), nsc.Scripts.end(), [&](auto& script) -> bool
+							{
+								return script.Name == componentName;
+							});
+						if (it != nsc.Scripts.end())
+						{
+							it->RemoveScript();
+							nsc.Scripts.erase(it);
+						}
+					}
+					else
+					{
+						registry.remove<Component>(entity);
+					}
 				};
 			m_SerializationRegistry[componentName] = [&](entt::registry& registry, entt::entity entity) -> YAML::Node
 				{
@@ -104,6 +130,8 @@ namespace Cine
 		}
 
 		void AddComponentByName(Entity entity, const std::string& componentName);
+		void RemoveComponentByName(Entity entity, const std::string& componentName);
+
 		YAML::Node SerializeComponentByName(Entity entity, const std::string& componentName);
 		void DeserializeComponentByName(Entity entity, const std::string& componentName, const YAML::Node& node);
 
@@ -160,11 +188,12 @@ namespace Cine
 		}
 
 	private:
-		std::unordered_map<std::string, ComponentAdder> m_ComponentRegistry;
-		std::unordered_map<std::string, ScriptUpdates> m_UpdateRegistry;
+		std::map<std::string, ComponentCreater> m_ComponentCreators;
+		std::map<std::string, ComponentRemover> m_ComponentRemovers;
+		std::map<std::string, ScriptUpdates> m_UpdateRegistry;
 
-		std::unordered_map<std::string, SerializerFunc> m_SerializationRegistry;
-		std::unordered_map<std::string, DeserializerFunc> m_DeserializationRegistry;
+		std::map<std::string, SerializerFunc> m_SerializationRegistry;
+		std::map<std::string, DeserializerFunc> m_DeserializationRegistry;
 
 		std::vector<entt::entity> m_ToDestroyEntities;
 		entt::registry m_Registry;

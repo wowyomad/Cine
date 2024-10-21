@@ -47,6 +47,8 @@ namespace Cine
 			ImGui::EndDisabled();
 	};
 
+
+
 	template<typename T, typename Func>
 	void DisplayComponent(Entity entity, const char* name, Func&& displayFunction)
 	{
@@ -602,6 +604,12 @@ namespace Cine
 				{
 					bool& enabled = script.Instance->Enabled;
 
+					std::string buttonIcon = "X##" + script.Name;
+					if (ImGui::Button(buttonIcon.c_str()))
+					{
+						m_Context.Scene->RemoveComponentByName(entity, script.Name);
+						return;
+					}
 					ImGui::Text("%s", script.Name.c_str());
 
 					ImGui::SameLine();
@@ -654,6 +662,25 @@ namespace Cine
 					}
 					ImGui::Separator();
 
+				}
+
+				auto& components = m_Context.Scene->GetRegisteredComponents();
+				auto& scripts = nsc.Scripts;
+
+				for (auto&& [name, creator] : components)
+				{
+					auto it = std::find_if(scripts.begin(), scripts.end(), [&name](auto& script)
+						{
+							return script.Name == name;
+						});
+					if (it == scripts.end())
+					{
+						if (ImGui::Button(name.c_str()))
+						{
+							m_Context.Scene->AddComponentByName(entity, name);
+						}
+
+					}
 				}
 			});
 

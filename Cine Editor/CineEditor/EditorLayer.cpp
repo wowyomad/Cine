@@ -48,18 +48,29 @@ namespace Cine
 		TransformComponent* m_LocalTransform;
 		float m_RotationSpeed = 90.0f;
 
-		BEGIN_SERIALIZE(RotationScript)
-			SERIALIZE_FIELD(m_RotationSpeed)
-			END_SERIALIZE()
+		SERIALIZE_CLASS(RotationScript, 
+			FIELD(m_RotationSpeed)
+		)
 	};
 
 	class ColorScript : public NativeScript
 	{
 	public:
+		ColorScript()
+		{
+			m_Timer.Start();
+		}
+
+		ColorScript& operator=(const ColorScript& other)
+		{
+			m_Time = other.m_Time;
+			m_String = other.m_String;
+			return *this;
+		}
+
 		void OnCreate() override
 		{
 			m_SpriteComponent = TryGetComponent<SpriteComponent>();
-			m_Timer.Start();
 		}
 
 		void OnUpdate(Timestep ts) override
@@ -77,11 +88,10 @@ namespace Cine
 			m_SpriteComponent->Color.b = 0.5f * sin(m_Time + 4.0f) + 0.5f;
 		}
 	public:
-
-		BEGIN_SERIALIZE(ColorScript)
-			SERIALIZE_FIELD(m_String)
-			SERIALIZE_FIELD(m_Time)
-			END_SERIALIZE()
+		SERIALIZE_CLASS(ColorScript,
+			FIELD(m_Time)
+			FIELD(m_String)
+		)
 
 	private:
 		SpriteComponent* m_SpriteComponent = nullptr;
@@ -146,9 +156,7 @@ namespace Cine
 
 		}
 
-		BEGIN_SERIALIZE(ControllerScript)
-
-			END_SERIALIZE()
+		SERIALIZE_CLASS(ControllerScript)
 
 	private:
 		SpriteAnimationComponent* m_Anim;
@@ -573,11 +581,7 @@ namespace Cine
 		glm::vec2 vec2;
 		std::vector<std::string> values;
 
-		BEGIN_SERIALIZE(HealthComponent)
-			SERIALIZE_FIELD(value)
-			SERIALIZE_FIELD(vec2)
-			SERIALIZE_FIELD(values)
-			END_SERIALIZE()
+		SERIALIZE_CLASS(HealthComponent)
 	};
 
 
@@ -602,11 +606,7 @@ namespace Cine
 			Health.values = { "Biba", "Boba", "Dima" };
 		}
 
-		BEGIN_SERIALIZE(PlayerScript)
-			SERIALIZE_FIELD(Speed)
-			SERIALIZE_FIELD(Name)
-			SERIALIZE_FIELD(Health)
-			END_SERIALIZE()
+		SERIALIZE_CLASS(PlayerScript)
 	};
 
 	void EditorLayer::SetupCustom()

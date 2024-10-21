@@ -8,14 +8,16 @@
 
 #include "glash/Utils/StringUtils.hpp"
 
-#define SERIALIZE_FIELD(field) visitor(#field, field);
-#define BEGIN_SERIALIZE(ClassName)\
-	friend class Deserializer; \
-	friend class Serializer; \
-	friend void Deserialize<ClassName>(ClassName&, const YAML::Node&); \
-	friend YAML::Node Serialize<ClassName>(ClassName&); \
-	template <typename Visitor> void Serialize(Visitor& visitor) {
-#define END_SERIALIZE() }
+#define FIELD(field) visitor(#field, field);
+
+#define SERIALIZE_CLASS(ClassName, ...) \
+    friend class Deserializer; \
+    friend class Serializer; \
+    friend void Deserialize<ClassName>(ClassName&, const YAML::Node&); \
+    friend YAML::Node Serialize<ClassName>(ClassName&); \
+    template <typename Visitor> void Serialize(Visitor& visitor) { \
+        __VA_ARGS__ \
+    }
 
 template <typename T>
 struct is_serializable : std::disjunction<
