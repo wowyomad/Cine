@@ -141,7 +141,6 @@ namespace Cine
 	public:
 		YAML::Emitter emitter;
 
-		// Start emitting a new map for the object
 
 		template <typename T>
 		void StartObject(const T& obj) {
@@ -149,34 +148,37 @@ namespace Cine
 			emitter << YAML::BeginMap << YAML::Key << Utils::GetClassTypename<T>() << YAML::Value << YAML::BeginMap;
 		}
 
-		// End emitting the map
 		void EndObject() {
 			emitter << YAML::EndMap << YAML::EndMap;
 		}
 
-		// Serialize a field
 		template <typename T>
 		void operator()(const std::string& name, T& value) {
 			emitter << YAML::Key << name;
 
 			if constexpr (is_serializable<T>::value)
 			{
-
-				emitter << YAML::Value << value;
+				try
+				{
+					emitter << YAML::Value << value;
+				}
+				catch (const YAML::TypedBadConversion<T>& e)
+				{
+					//CINE_CORE_WARN("Failed to convert field '{}' for type '{}': {}", name, typeid(T).name(), e.what());
+					return;
+				}
 			}
 			else
 			{
-				// Call the Serialize function of the nested class
 				Serialize(value);
 			}
 		}
 
-		// Serialize function that includes the class name
 		template <typename T>
 		void Serialize(T& obj) {
-			StartObject(obj); // Start emitting the object map
-			obj.Serialize(*this); // Serialize fields
-			EndObject(); // End emitting the object map
+			StartObject(obj);
+			obj.Serialize(*this);
+			EndObject();
 		}
 
 		YAML::Node GetNode() {
@@ -194,11 +196,12 @@ namespace Cine
 		template <typename T>
 		void operator()(const std::string& name, T& value) {
 			if (node[name]) {
-				if constexpr (is_serializable<T>::value) {
+				if constexpr (is_serializable<T>::value) 
+				{
 					value = node[name].as<T>();
 				}
-				else {
-					// Call the Deserialize function of the nested class
+				else
+				{
 					Deserialize(value, node[name]);
 				}
 			}
@@ -207,7 +210,6 @@ namespace Cine
 			}
 		}
 
-		// Deserialize function
 		template <typename T>
 		void Deserialize(T& obj, const YAML::Node& node) {
 			Deserializer deserializer(node[Utils::GetClassTypename<T>()]);
@@ -215,11 +217,10 @@ namespace Cine
 		}
 	};
 
-	// Serialization and Deserialization functions
 	template <typename T>
 	YAML::Node Serialize(T& obj) {
 		Serializer serializer;
-		serializer.Serialize(obj); // Start emitting the object map
+		serializer.Serialize(obj);
 		return serializer.GetNode();
 	}
 

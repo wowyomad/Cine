@@ -41,6 +41,11 @@ namespace Cine
 
 		NativeScript* CreateScriptInstance(const std::string& name);
 
+		auto GetEntities()
+		{
+			return m_Registry.view<entt::entity>();
+		}
+
 		template<typename Component>
 		void RegisterComponent() {
 			std::string componentName = Utils::GetClassTypename<Component>();
@@ -52,14 +57,36 @@ namespace Cine
 				};
 			m_SerializationRegistry[componentName] = [&](entt::registry& registry, entt::entity entity) -> YAML::Node
 				{
-					Component& component = registry.get<Component>(entity);
-					return Serialize(component);
+					Component* component = registry.try_get<Component>(entity);
+					if (component)
+					{
+						return Serialize(*component);
+					}
+					else
+					{
+						return {};
+					}
 				};
-			m_DeserializationRegistry[componentName] = [&](entt::registry& registry, entt::entity entity, const YAML::Node& node)
+			m_DeserializationRegistry[componentName] = [componentName](entt::registry& registry, entt::entity entity, const YAML::Node& node)
 				{
 					Component component;
-					Deserialize(component, node); // Assume Deserialize modifies the passed component
+					Deserialize(component, node);
 					registry.emplace_or_replace<Component>(entity, component);
+					
+					if constexpr (std::is_base_of<NativeScript, Component>::value)
+					{
+						auto& nsc = registry.get<NativeScriptComponent>(entity);
+						auto& Scripts = nsc.Scripts;
+						auto it = std::find_if(Scripts.begin(), Scripts.end(), [&](auto& script)
+							{
+								return script.Name == componentName;
+							});
+						if (it != Scripts.end())
+						{
+							it->Instance = nullptr;
+						}
+					}
+
 				};
 
 			if constexpr (std::is_base_of<NativeScript, Component>::value)

@@ -166,7 +166,6 @@ namespace Cine
 	{
 		auto it = m_SerializationRegistry.find(componentName);
 		if (it != m_SerializationRegistry.end()) {
-			CINE_CORE_TRACE("Serialized component '{}' from entity '{}'", componentName, static_cast<uint32_t>(entity));
 			return it->second(m_Registry, entity.m_EntityHandle);
 		}
 		else {
@@ -179,7 +178,6 @@ namespace Cine
 	{
 		auto it = m_DeserializationRegistry.find(componentName);
 		if (it != m_DeserializationRegistry.end()) {
-			CINE_CORE_TRACE("Deserialized component '{}' into entity '{}'", componentName, static_cast<uint32_t>(entity));
 			it->second(m_Registry, entity, node);
 		}
 		else {

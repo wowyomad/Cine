@@ -132,7 +132,6 @@ namespace Cine
 			}
 		}
 
-		std::vector<Data> Scripts;
 
 		template <class T>
 		void Bind(std::function<NativeScript* ()> instantiateScript, std::function<void()> removeScript)
@@ -140,7 +139,7 @@ namespace Cine
 			size_t ScriptID = m_ScriptCounter;
 			Data data;
 			data.Index = ScriptID;
-			data.Name = Utils::GetClassTypenameWithSpaces<T>();
+			data.Name = Utils::GetClassTypename<T>();
 			data.InstantiateScript = instantiateScript;
 			data.RemoveScript = removeScript;
 
@@ -150,6 +149,9 @@ namespace Cine
 		}
 	private:
 		size_t m_ScriptCounter = 0;
+
+	public:
+		std::vector<Data> Scripts;
 
 	};
 }
