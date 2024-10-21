@@ -22,64 +22,106 @@ namespace Cine
 	void Entity::AddChild(Entity child)
 	{
 		auto& hierarchy = GetComponent<HierarchyComponent>();
+		auto& childHierarchy = child.GetComponent<HierarchyComponent>();
 
-		if (*this == child)
+		//if child is this or child parent is this
+		if (*this == child || childHierarchy.Parent == *this)
 		{
-			CINE_CORE_WARN("Tried to add self as a child");
 			return;
 		}
 
+		//?
 		if (hierarchy.Parent == child)
 		{
-			CINE_CORE_WARN("Tried to add parent as a child");
-			return;
+
 		}
 
-		auto& children = hierarchy.Children;
-		auto it = std::find_if(children.begin(), children.end(), [child](Entity& entity) -> bool
-			{
-				return entity == child;
-			});
-		if (it != children.end())
+		//child has parent different from this -> remove the child from that parent and that parent from the child
+		if (childHierarchy.Parent)
 		{
-			CINE_CORE_WARN("Child {0} is already a child of {1}", static_cast<uint32_t>(child), static_cast<uint32_t>(*this));
-			return;
+			auto& oldParentChildren = childHierarchy.Parent.GetComponent<HierarchyComponent>().Children;
+			oldParentChildren.erase(std::remove_if(oldParentChildren.begin(), oldParentChildren.end(), [child](auto& theChild) -> bool
+				{
+					return child == theChild;
+				}));
+			childHierarchy.Parent = {};
 		}
 
-		children.push_back(child);
-		child.AddParent(*this);
-
-		CINE_CORE_TRACE("Added child {0} to entity {1}", static_cast<uint32_t>(child), static_cast<uint32_t>(*this));
+		childHierarchy.Parent = *this;
+		hierarchy.Children.push_back(child);
 	}
+
 
 	void Entity::AddParent(Entity parent)
 	{
 		auto& hierarchy = GetComponent<HierarchyComponent>();
+		auto& parentHierarchy = parent.GetComponent<HierarchyComponent>();
 
-		if (*this == parent)
+		bool selfParent = *this == parent;
+		bool thisHasParent = hierarchy.Parent;
+		bool parentHasParent = hierarchy.Parent;
+		bool thisIsParent = *this == parentHierarchy.Parent;
+		bool thisIsChild = hierarchy.Parent == parent;
+
+		if (selfParent)
 		{
-			CINE_CORE_WARN("Tried to add self as a parent");
 			return;
 		}
 
-		auto& children = hierarchy.Children;
-		auto it = std::find_if(children.begin(), children.end(), [parent](Entity& entity) -> bool
+		if (thisHasParent)
+		{
+			if (thisIsChild)
 			{
-				return entity == parent;
-			});
-		if (it != children.end())
-		{
+				return;
+			}
+			else if (thisIsParent)
+			{
+				for (auto child : hierarchy.Children)
+				{
+					child.GetComponent<HierarchyComponent>().Parent = hierarchy.Parent;
+				}
+				auto& oldParentChildren = hierarchy.Parent.GetComponent<HierarchyComponent>().Children;
+				oldParentChildren.erase(std::remove_if(oldParentChildren.begin(), oldParentChildren.end(), [&](auto& theChild)
+					{
+						return theChild == *this;
+					}));
+				hierarchy.Children.clear();
+				hierarchy.Parent = parent;
+				oldParentChildren.push_back(parent);
+				parentHierarchy.Children.push_back(*this);
+				return;
+			}
+			else
+			{
+				auto& oldParentChildren = hierarchy.Parent.GetComponent<HierarchyComponent>().Children;
+				for (auto child : hierarchy.Children)
+				{
+					child.GetComponent<HierarchyComponent>().Parent = hierarchy.Parent;
+					oldParentChildren.push_back(child);
+				}
+				hierarchy.Children.clear();
+				oldParentChildren.erase(std::remove_if(oldParentChildren.begin(), oldParentChildren.end(), [&](auto& theChild)
+					{
+						return theChild == *this;
+					}));
+				hierarchy.Parent = parent;
 
-			CINE_CORE_WARN("Tried to add child {0} as a parent of {1}", static_cast<uint32_t>(parent), static_cast<uint32_t>(*this));
-			return;
+				parentHierarchy.Children.push_back(*this);
+				return;
+			}
 		}
-		if (hierarchy.Parent)
+		else
 		{
-			hierarchy.Parent.RemoveChild(*this);
+			for (auto child : hierarchy.Children)
+			{
+				child.GetComponent<HierarchyComponent>().Parent = hierarchy.Parent; //Parent is null
+			}
+			hierarchy.Children.clear();
+			hierarchy.Parent = parent;
+			parentHierarchy.Children.push_back(*this);
 		}
-		hierarchy.Parent = parent;
 
-		CINE_CORE_TRACE("Added parent {0} to entity {1}", static_cast<uint32_t>(parent), static_cast<uint32_t>(*this));
+
 	}
 
 	void Entity::RemoveChild(Entity child)
@@ -143,6 +185,4 @@ namespace Cine
 
 		CINE_CORE_TRACE("Removed parent {0} from entity {1}", static_cast<uint32_t>(hierarchy.Parent), static_cast<uint32_t>(*this));
 	}
-
-
 }

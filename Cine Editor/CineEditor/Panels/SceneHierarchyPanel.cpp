@@ -171,6 +171,19 @@ namespace Cine
 					DisplayEntityNode(entity);
 				}
 			}
+			if (ImGui::BeginDragDropTarget())
+			{
+				if (ImGui::AcceptDragDropPayload("ENTITY"))
+				{
+					Entity& draggedEntity = *reinterpret_cast<Entity*>(ImGui::GetDragDropPayload()->Data);
+
+					if (draggedEntity)
+					{
+						draggedEntity.RemoveParent();
+					}
+				}
+				ImGui::EndDragDropTarget();
+			}
 		}
 
 		if (ImGui::IsMouseDoubleClicked(0) && ImGui::IsWindowHovered() && !ImGui::IsAnyItemHovered())
@@ -231,7 +244,6 @@ namespace Cine
 	{
 		auto& tag = entity.GetComponent<TagComponent>().Tag;
 
-		// ImGui tree node flags
 		ImGuiTreeNodeFlags flags = ((m_Context.Selection == entity) ? ImGuiTreeNodeFlags_OpenOnArrow : 0);
 		flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
 		if (m_Context.Selection == entity)
@@ -239,10 +251,30 @@ namespace Cine
 			flags |= ImGuiTreeNodeFlags_Selected;
 		}
 
-		// Display the entity as a tree node
 		bool expanded = ImGui::TreeNodeEx((const void*)(uint64_t)(uint32_t)entity, flags, tag.c_str());
 
-		// Handle selection
+
+		if (ImGui::BeginDragDropSource())
+		{
+			ImGui::SetDragDropPayload("ENTITY", &entity, sizeof(Entity));
+			ImGui::Text(tag.c_str());
+			ImGui::EndDragDropSource();
+		}
+
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (ImGui::AcceptDragDropPayload("ENTITY"))
+			{
+				Entity* draggedEntity = reinterpret_cast<Entity*>(ImGui::GetDragDropPayload()->Data);
+
+				if (draggedEntity && *draggedEntity != entity)
+				{
+					draggedEntity->AddParent(entity);
+				}
+			}
+			ImGui::EndDragDropTarget();
+		}
+
 		if (ImGui::IsItemClicked() && !ImGui::IsMouseDoubleClicked(0))
 		{
 			m_Context.Selection = entity;
@@ -253,7 +285,6 @@ namespace Cine
 			m_Context.Properties = entity;
 		}
 
-		// Handle context menu for deletion
 		bool entityDeleted = false;
 		if (ImGui::BeginPopupContextItem())
 		{
@@ -264,7 +295,6 @@ namespace Cine
 			ImGui::EndPopup();
 		}
 
-		// If the entity node is expanded, recursively display its children
 		if (expanded)
 		{
 			auto& hierarchyComponent = entity.GetComponent<HierarchyComponent>();
@@ -275,7 +305,6 @@ namespace Cine
 			ImGui::TreePop();
 		}
 
-		// Handle entity deletion
 		if (entityDeleted)
 		{
 			m_Context.Scene->DestroyEntity(entity);
