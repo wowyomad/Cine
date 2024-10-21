@@ -165,7 +165,7 @@ namespace Cine
 
 	void EditorLayer::OnAttach()
 	{
-		m_IsRuntime = true;
+		m_IsRuntime = false;
 
 		m_ActiveScene = CreateRef<Scene>();
 		s_Scene = m_ActiveScene.get();
@@ -223,7 +223,7 @@ namespace Cine
 		anim.State.DefaultAnimation = -1;
 
 		animation.Loop = true;
-		animation.SpriteFrames = { 0 };
+		animation.SpriteFrames = { 0, 1, 2, 3, 4, 5, 6, 7 };
 		anim.Animations[PlayerAnimation::Idle] = animation;
 
 		auto camera = s_Scene->CreateEntity("Camera");

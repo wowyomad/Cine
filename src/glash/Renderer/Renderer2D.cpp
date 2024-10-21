@@ -88,7 +88,7 @@ namespace Cine
 		uint32_t whiteTextureData = 0xFFFFFFFF;
 		s_Data.WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
 
-		s_Data.QuadShader = Shader::Create("resources/shaders/Renderer2D_Quad.glsl");
+		s_Data.QuadShader = Shader::Create("Resources/Shaders/Renderer2D_Quad.glsl");
 		s_Data.QuadShader->Bind();
 
 		int samplers[s_Data.MaxTextureSlots];
