@@ -336,7 +336,9 @@ namespace Cine
 					NewScene();
 
 				if (ImGui::MenuItem("Open...", "Ctrl+O"))
+				{
 					OpenScene();
+				}
 
 				if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S"))
 					SaveSceneAs();
@@ -394,14 +396,25 @@ namespace Cine
 			size_t id = m_Framebuffer->GetColorAttachmentRendererID();
 			ImGui::Image(reinterpret_cast<void*>(id), { m_ViewportSize.x, m_ViewportSize.y }, { 0, 1 }, { 1, 0 });
 
+			if (ImGui::BeginDragDropTarget())
+			{
+				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+				{
+					const wchar_t* path = (const wchar_t*)payload->Data;
+					OpenScene(path);
+				}
+				ImGui::EndDragDropTarget();
+			}
 		}
 
 		//Gizmos
-		if (m_IsRuntime)
+		if (!m_IsRuntime)
 		{
 			Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
 			if (selectedEntity && m_GizmoOperation > 0)
 			{
+				auto& hierachy = selectedEntity.GetComponent<HierarchyComponent>();	
+
 				ImGuizmo::SetDrawlist();
 				float windowWidth = static_cast<float>(ImGui::GetWindowWidth());
 				float windowHeight = static_cast<float>(ImGui::GetWindowHeight());
@@ -410,10 +423,23 @@ namespace Cine
 				const glm::mat4& cameraProjection = m_EditorCamera.GetProjection();
 				const glm::mat4& cameraView = m_EditorCamera.GetViewMatrix();
 
-				//Entity
 				auto& tc = selectedEntity.GetComponent<TransformComponent>();
-				glm::mat4 transform = tc.GetLocalTransform();
-
+				glm::mat4 worldTransform = tc.GetLocalTransform();
+				auto currentEntity = selectedEntity;
+				while (currentEntity.HasComponent<HierarchyComponent>())
+				{
+					auto& hierarchy = currentEntity.GetComponent<HierarchyComponent>();
+					if (hierarchy.Parent)
+					{
+						auto& parentTransform = hierarchy.Parent.GetComponent<TransformComponent>();
+						worldTransform = parentTransform.GetLocalTransform() * worldTransform;
+						currentEntity = hierarchy.Parent;
+					}
+					else
+					{
+						break;
+					}
+				}
 
 				static bool isOrtho = false;
 				ImGuizmo::SetOrthographic(isOrtho);
@@ -422,17 +448,37 @@ namespace Cine
 				float snapValues[3] = { m_SnapValue, m_SnapValue, m_SnapValue };
 
 				ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
-					static_cast<ImGuizmo::OPERATION>(m_GizmoOperation), ImGuizmo::LOCAL, glm::value_ptr(transform),
+					static_cast<ImGuizmo::OPERATION>(m_GizmoOperation), ImGuizmo::LOCAL, glm::value_ptr(worldTransform),
 					nullptr, snap ? snapValues : nullptr);
 
 				if (ImGuizmo::IsUsing())
 				{
+
+					glm::mat4 parentWorldTransform = glm::mat4(1.0f);
+					currentEntity = selectedEntity;
+					while (currentEntity.HasComponent<HierarchyComponent>())
+					{
+						auto& hierarchy = currentEntity.GetComponent<HierarchyComponent>();
+						if (hierarchy.Parent)
+						{
+							auto& parentTransform = hierarchy.Parent.GetComponent<TransformComponent>();
+							parentWorldTransform = parentTransform.GetLocalTransform() * parentWorldTransform;
+							currentEntity = hierarchy.Parent;
+						}
+						else
+						{
+							break;
+						}
+					}
+					glm::mat4 localTransform = glm::inverse(parentWorldTransform) * worldTransform;
+
 					glm::vec3 translation, rotation, scale;
-					Math::DecomposeTransform(transform, translation, rotation, scale);
+					Math::DecomposeTransform(localTransform, translation, rotation, scale);
 
 					tc.Translation = translation;
 					tc.Rotation = rotation;
 					tc.Scale = scale;
+
 				}
 			}
 		}
@@ -459,14 +505,20 @@ namespace Cine
 	}
 	void EditorLayer::OpenScene()
 	{
-		std::filesystem::path filepath = FileDialogs::OpenFile("Cine Scene (*.cine)\0*.cine\0");
-		if (!filepath.empty())
+		std::filesystem::path path = FileDialogs::OpenFile("Cine Scene (*.cine)\0*.cine\0");
+		OpenScene(path);
+	}
+
+	void EditorLayer::OpenScene(const std::filesystem::path& path)
+	{
+		if (!path.empty())
 		{
+			std::filesystem::path fullPath = AssetManager::AssetsDirectory / path;
 			m_ActiveScene = CreateRef<Scene>();
 			m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 
 			SceneSerializer serializer(m_ActiveScene);
-			serializer.Deserialize(filepath);
+			serializer.Deserialize(fullPath);
 			m_ActiveScene->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
 		}
 	}
@@ -498,7 +550,9 @@ namespace Cine
 		case Key::O:
 		{
 			if (control)
+			{
 				OpenScene();
+			}
 		} break;
 		case Key::S:
 		{

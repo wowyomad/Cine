@@ -72,7 +72,7 @@ namespace Cine
 							});
 						if (it != nsc.Scripts.end())
 						{
-							it->RemoveScript();
+							it->RemoveScript(); //Where is it being set???
 							nsc.Scripts.erase(it);
 						}
 					}
@@ -136,7 +136,7 @@ namespace Cine
 		void DeserializeComponentByName(Entity entity, const std::string& componentName, const YAML::Node& node);
 
 		template <class Component>
-		void OnEntityDestroyed()
+		void OnComponentDestroyed()
 		{
 			CINE_CORE_TRACE("Removed '{}' from '{}'", Utils::GetClassTypename(Component));
 		}
@@ -210,4 +210,5 @@ namespace Cine
 		void UpdateScripts(Timestep ts);
 		void InstantiateScripts();
 	};
+
 }

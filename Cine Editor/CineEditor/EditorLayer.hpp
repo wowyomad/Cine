@@ -55,6 +55,7 @@ namespace Cine
 		void NewScene();
 		void SaveSceneAs();
 		void OpenScene();
+		void OpenScene(const std::filesystem::path& path);
 
 		bool IsGizmoSnapping() const;
 	};

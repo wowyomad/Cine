@@ -10,7 +10,7 @@
 
 namespace Cine
 {
-	static void UpdateWorldTransforms(entt::registry& registry)
+	void UpdateWorldTransforms(entt::registry& registry)
 	{
 		auto view = registry.view<TransformComponent, CachedTransform, HierarchyComponent>();
 
@@ -68,8 +68,6 @@ namespace Cine
             auto& transformB = view.get<TransformComponent>(b);
             return transformA.Translation.z > transformB.Translation.z;
             });
-
-        UpdateWorldTransforms(registry);
 
         for (auto entity : opaqueEntities)
         {

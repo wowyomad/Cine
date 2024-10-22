@@ -93,6 +93,9 @@ namespace Cine
 
 	void Scene::OnUpdateEditor(Timestep ts, EditorCamera& editorCamera)
 	{
+		UpdateWorldTransforms(m_Registry);
+
+
 		InstantiateScripts();
 		UpdateScripts(ts);
 
@@ -108,6 +111,8 @@ namespace Cine
 
 	void Scene::OnUpdateRuntime(Timestep ts)
 	{
+		UpdateWorldTransforms(m_Registry);
+
 		InstantiateScripts();
 		UpdateScripts(ts);
 
@@ -122,6 +127,7 @@ namespace Cine
 		}
 
 		DestroyMarkedEntities();
+
 	}
 
 	void Scene::InstantiateScripts()
