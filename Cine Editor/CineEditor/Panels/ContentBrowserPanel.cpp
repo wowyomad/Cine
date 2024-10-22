@@ -53,6 +53,15 @@ namespace Cine
 			ImTextureID icon = directoryEntry.is_directory() ? (ImTextureID)m_DirectoryIcon->GetRendererID() : (ImTextureID)m_FileIcon->GetRendererID();
 			ImGui::PushStyleColor(ImGuiCol_Button, { 0.0f, 0.0f, 0.0f, 0.0f });
 			ImGui::ImageButton(filenameString.c_str(), icon, { thumbnailSize , thumbnailSize }, { 0, 1 }, { 1, 0 });
+
+
+			if (ImGui::BeginDragDropSource())
+			{
+				const wchar_t* itemPath = relativePath.c_str();
+				ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", itemPath, (wcslen(itemPath) + 1) * sizeof(wchar_t));
+				ImGui::EndDragDropSource();
+			}
+
 			ImGui::PopStyleColor();
 			if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 			{
