@@ -13,3 +13,7 @@ CMakeUserPresets.json
 /.vs
 /.vscode
 /out
+/Scriping/.vs
+/Scriping/lib/Debug
+/Scriping/out/build/win32-msvc/.cmake/api/v1/query/client-MicrosoftVS
+/Scriping/out/build/win32-msvc
