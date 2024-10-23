@@ -8,10 +8,32 @@
 #include "glash/Core/Timer.hpp"
 #include "glash/Math/Math.hpp"
 
-
 #include <ImGuizmo.h>
 
 static Cine::Scene* s_Scene = nullptr;
+
+struct ScriptNames
+{
+	char** Names = nullptr;
+	size_t Size = 0;
+
+	std::vector<std::string> operator()()
+	{
+		std::vector<std::string> names;
+		for (size_t i = 0; i < Size; i++)
+		{
+			names.push_back(Names[i]);
+		}
+		return names;
+
+	}
+};
+
+using InitializeScripts = void(*)(entt::registry&);
+using CreateScript = void(*)(entt::entity, const std::string& scriptName);
+using RemoveScript = void(*)(entt::entity, const std::string& scriptName);
+using UpdateScripts = void(*)();
+using GetScriptNames = ScriptNames * (*)();
 
 enum PlayerAnimation
 {
@@ -21,6 +43,7 @@ enum PlayerAnimation
 	MoveLeft,
 	MoveDown,
 };
+
 
 namespace Cine
 {
@@ -165,6 +188,25 @@ namespace Cine
 
 	void EditorLayer::OnAttach()
 	{
+		DynamicLibrary library;
+		std::ifstream ifs("plugin.dll");
+		if (!ifs.is_open())
+		{
+			CINE_CORE_ASSERT(false, "fuck");
+		}
+		library.load("plugin.dll");
+
+		auto initializeScripts = library.getFunction<InitializeScripts>("Initialize");
+		auto updateScripts = library.getFunction<UpdateScripts>("UpdateScripts");
+		auto createScript = library.getFunction<CreateScript>("CreateScript");
+		auto removeScript = library.getFunction<RemoveScript>("RemoveScript");
+		auto getScriptNames = library.getFunction<GetScriptNames>("GetScriptNames");
+
+
+
+
+
+
 		m_IsRuntime = false;
 
 		m_ActiveScene = CreateRef<Scene>();
