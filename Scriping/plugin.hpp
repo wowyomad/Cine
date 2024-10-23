@@ -4,6 +4,7 @@
 
 #include <entt/entt.hpp>
 #include "glash/Cine.hpp"
+#include "glash/Scene/Components.hpp"
 
 #ifdef _WIN32
 #define EXPORT __declspec(dllexport)
@@ -11,16 +12,17 @@
 #define EXPORT
 #endif
 
-struct ScriptNames
+struct ComponentsData
 {
     char** Names = nullptr;
-    size_t Size = 0;
+    bool* IsScript = nullptr;
+    size_t Count = 0;
 };
 
 extern "C" {
-    EXPORT void Initialize(entt::registry& registry);
-    EXPORT void CreateScript(entt::entity entity, const std::string& scriptName);
-    EXPORT void RemoveScript(entt::entity entity, const std::string& componentName);
+    EXPORT void InitializeComponents(entt::registry& registry);
+    EXPORT void CreateComponent(entt::entity entity, const std::string& scriptName);
+    EXPORT void RemoveComponent(entt::entity entity, const std::string& componentName);
     EXPORT void UpdateScripts(Cine::Timestep ts);
-    EXPORT ScriptNames* GetScriptNames();
+    EXPORT ComponentsData GetComponentsData();
 }

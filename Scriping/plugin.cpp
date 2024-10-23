@@ -4,51 +4,79 @@
 
 /*Should put '#include "Scripts/<Name>"'*/
 #include "Scripts/TestScript1.hpp"
-#include "Scripts/TestScript2.hpp"
+#include "Scripts/ControllerScript.hpp"
 
-using EmplaceScript = void(*)(entt::entity);
-using UpdateScript = void(*)(Timestep ts);
-using DestroyScript = void(*)(entt::entity);
+using EmplaceComponent = void(*)(entt::entity);
+using DestroyComponent = void(*)(entt::entity);
+using UpdateScriptComponent = void(*)(Timestep ts);
 
 entt::registry* s_Registry = nullptr;
-std::map<std::string, EmplaceScript> Creators;
-std::map<std::string, UpdateScript> Updaters;
-std::map<std::string, DestroyScript> Destroyers;
+std::map<std::string, EmplaceComponent> Creators;
+std::map<std::string, DestroyComponent> Destroyers;
+std::map<std::string, UpdateScriptComponent> Updaters;
 
-template <class Script>
-void RegisterScript()
+template <class Component>
+void RegisterComponent()
 {
-	if constexpr (std::is_base_of<NativeScript, Script>::value)
+	std::string name = Utils::GetClassTypename<Component>();
+	Creators[name] = [](entt::entity entity)
+		{
+			auto& component = s_Registry->emplace<Component>(entity);
+			OnComponentAdded<Component>(entity, component);
+		};
+	Destroyers[name] = [](entt::entity entity)
+		{
+			s_Registry->remove<TestScript1>(entity);
+		};
+	if constexpr (std::is_base_of<NativeScript, Component>::value)
 	{
-		std::string name = Utils::GetClassTypename<Script>();
-		Creators[name] = [](entt::entity entity)
-			{
-				s_Registry->emplace<Script>(entity);
-			};
 		Updaters[name] = [](Timestep ts)
 			{
-				s_Registry->view<Script>().each([ts](auto entity, auto& script)
+				s_Registry->view<Component>().each([ts](auto entity, auto& script)
 					{
 						script.OnUpdate(ts);
 					});
 			};
-		Destroyers[name] = [](entt::entity entity)
-			{
-				s_Registry->remove<TestScript1>(entity);
-			};
+		
 	}
 }
 
-void Initialize(entt::registry& registry)
+template <class Component>
+void OnComponentAdded(entt::entity entity, Component& component)
+{
+	if constexpr (std::is_base_of<NativeScript, Component>::value)
+	{
+		bool hasNativeScriptComponent = s_Registry->all_of<NativeScriptComponent>(entity);
+		if (!hasNativeScriptComponent)
+		{
+			s_Registry->emplace<NativeScriptComponent>(entity);
+		}
+		auto& nsc = s_Registry->get<NativeScriptComponent>(entity);
+		auto instantiateScript = [entity]() -> NativeScript*
+			{
+				return static_cast<Cine::NativeScript*>(&s_Registry->get<Component>(entity));
+			};
+		auto removeScript = [entity]() -> void
+			{
+				if (s_Registry->valid(entity) && s_Registry->all_of<Component>(entity))
+				{
+					s_Registry->remove<Component>(entity);
+				}
+			};
+		nsc.Bind<Component>(instantiateScript, removeScript);
+	}
+}
+
+void InitializeComponents(entt::registry& registry)
 {
 	s_Registry = &registry;
 
 	//Register calls here
-	RegisterScript<TestScript1>();
-	RegisterScript<TestScript2>();
+	RegisterComponent<TestScript1>();
+	RegisterComponent<ControllerScript>();
 }
 
-void CreateScript(entt::entity entity, const std::string& componentName)
+void CreateComponent(entt::entity entity, const std::string& componentName)
 {
 	auto it = Creators.find(componentName);
 	if (it != Creators.end())
@@ -57,7 +85,7 @@ void CreateScript(entt::entity entity, const std::string& componentName)
 	}
 }
 
-void RemoveScript(entt::entity entity, const std::string& componentName)
+void RemoveComponent(entt::entity entity, const std::string& componentName)
 {
 	auto it = Creators.find(componentName);
 	if (it != Creators.end())
@@ -79,18 +107,21 @@ void Destroy()
 
 }
 
-ScriptNames* GetScriptNames()
+ComponentsData GetComponentsData()
 {
-	ScriptNames* names = new ScriptNames;
-	names->Size = Creators.size();
-	names->Names = new char* [Creators.size()];
+	ComponentsData data;
+	data.Count = Creators.size();
+	data.Names = new char* [data.Count];
+	data.IsScript = new bool[data.Count];
 	size_t i = 0;
 	for (auto&& [name, _] : Creators)
 	{
 		const size_t size = name.size() + 1;
-		names->Names[i] = new char[size];
-		strncpy(names->Names[i], name.c_str(), size);
-		i++;
+		data.Names[i] = new char[size];
+		strncpy(data.Names[i], name.c_str(), size);
+		data.IsScript[i] = true;
+
+		++i;
 	}
-	return names;
+	return data;
 }

@@ -24,34 +24,7 @@ enum PlayerAnimation
 
 namespace Cine
 {
-	class RotationScript : public NativeScript
-	{
-	public:
-		RotationScript() = default;
-		RotationScript(float rotationSpeed)
-			: m_RotationSpeed(rotationSpeed) {}
-
-		void OnCreate() override
-		{
-			m_LocalTransform = &GetComponent<TransformComponent>();
-		}
-
-		void OnUpdate(Timestep ts) override
-		{
-			if (m_LocalTransform)
-			{
-				m_LocalTransform->Rotation.z += glm::radians(m_RotationSpeed) * ts;
-			}
-		}
-
-	private:
-		TransformComponent* m_LocalTransform;
-		float m_RotationSpeed = 90.0f;
-
-		SERIALIZE_CLASS(RotationScript, 
-			FIELD(m_RotationSpeed)
-		)
-	};
+	
 
 	class ColorScript : public NativeScript
 	{
@@ -88,10 +61,7 @@ namespace Cine
 			m_SpriteComponent->Color.b = 0.5f * sin(m_Time + 4.0f) + 0.5f;
 		}
 	public:
-		SERIALIZE_CLASS(ColorScript,
-			FIELD(m_Time)
-			FIELD(m_String)
-		)
+		SERIALIZE_CLASS(ColorScript)
 
 	private:
 		SpriteComponent* m_SpriteComponent = nullptr;
@@ -102,66 +72,7 @@ namespace Cine
 	};
 
 
-	class ControllerScript : public NativeScript
-	{
-	public:
-		void OnCreate() override
-		{
-			m_Anim = TryGetComponent<SpriteAnimationComponent>();
-			m_Transform = TryGetComponent<TransformComponent>();
-		}
-
-		void OnDestroy() override
-		{
-
-		}
-
-		void OnUpdate(Timestep ts) override
-		{
-			if (!m_Anim || !m_Transform)
-			{
-				return;
-			}
-
-			float speed = 5.0f;
-			glm::vec3 direction(0.0f);
-
-			if (Input::IsKeyPressed(Key::D))
-			{
-				direction.x += 1.0f;
-				m_Anim->State.DesiredAnimation = PlayerAnimation::MoveRight;
-			}
-			if (Input::IsKeyPressed(Key::A))
-			{
-				direction.x -= 1.0f;
-				m_Anim->State.DesiredAnimation = PlayerAnimation::MoveLeft;
-			}
-			if (Input::IsKeyPressed(Key::W))
-			{
-				direction.y += 1.0f;
-				m_Anim->State.DesiredAnimation = PlayerAnimation::MoveUp;
-			}
-			if (Input::IsKeyPressed(Key::S))
-			{
-				direction.y -= 1.0f;
-				m_Anim->State.DesiredAnimation = PlayerAnimation::MoveDown;
-			}
-
-			if (glm::length(direction) == 0.0f)
-			{
-				m_Anim->State.DesiredAnimation = PlayerAnimation::Idle;
-			}
-
-			m_Transform->Translation += speed * ts * direction;
-
-		}
-
-		SERIALIZE_CLASS(ControllerScript)
-
-	private:
-		SpriteAnimationComponent* m_Anim;
-		TransformComponent* m_Transform;
-	};
+	
 
 	void EditorLayer::OnAttach()
 	{
@@ -179,56 +90,10 @@ namespace Cine
 
 		m_EditorCamera = EditorCamera(45.0f, 16.0f / 9.0f, 0.01f, 1000.0f);
 
-		s_Scene->RegisterComponent<ControllerScript>();
-		s_Scene->RegisterComponent<RotationScript>();
-		s_Scene->RegisterComponent<ColorScript>();
-
-		auto woman = m_ActiveScene->CreateEntity("Woman");
-		woman.AddComponents<ControllerScript, SpriteComponent, SpriteRendererComponent>();
-		auto&& sheet = woman.AddComponent<SpriteSheetComponent>();
-		auto&& anim = woman.AddComponent<SpriteAnimationComponent>();
-		woman.GetComponent<SpriteRendererComponent>().UseSprite = true;
-		woman.AddComponent<RotationScript>(-180.0f);
-		woman.AddComponent<ColorScript>();
-		woman.GetComponent<TransformComponent>().Translation.z += 0.1f;
-
-		auto square = m_ActiveScene->CreateEntity("Square");
-		square.AddComponents<SpriteRendererComponent, SpriteSheetComponent, SpriteComponent, RotationScript>();
-		square.GetComponent<SpriteComponent>().Color = { 0.2f, 0.8f, 0.2f, 1.0f };
-		square.AddChild(woman);
-
-
-
-		sheet = AssetManager::LoadSpriteSheet("Woman", "Textures/Woman_Sheet.png", false);
-
-		SpriteAnimationComponent::Animation animation;
-		animation.Loop = true;
-		animation.Duration = 0.5f;
-
-		animation.SpriteFrames = { 0, 1, 2, 3, 4, 5, 6, 7 };
-		anim.Animations[PlayerAnimation::MoveUp] = animation;
-
-		animation.SpriteFrames = { 8, 9, 10, 11, 12, 13, 14, 15 };
-		anim.Animations[PlayerAnimation::MoveRight] = animation;
-
-		animation.SpriteFrames = { 16, 17, 18, 19, 20, 21, 22, 23 };
-		anim.Animations[PlayerAnimation::MoveLeft] = animation;
-
-		animation.SpriteFrames = { 24, 25, 26, 27, 28, 29, 30, 31 };
-		anim.Animations[PlayerAnimation::MoveDown] = animation;
-
-		anim.State.DefaultAnimation = -1;
-
-		animation.Loop = true;
-		animation.SpriteFrames = { 0, 1, 2, 3, 4, 5, 6, 7 };
-		anim.Animations[PlayerAnimation::Idle] = animation;
-
 		auto camera = s_Scene->CreateEntity("Camera");
 		camera.AddComponent<CameraComponent>();
 		s_Scene->SetMainCamera(camera);
 	}
-
-
 
 	void EditorLayer::OnDetach()
 	{

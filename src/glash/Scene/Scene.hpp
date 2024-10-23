@@ -6,6 +6,7 @@
 
 #include "Components.hpp"
 #include "ComponentSerializer.hpp"
+#include "ScriptEngine.hpp"
 
 #include <entt/entt.hpp>
 
@@ -40,8 +41,6 @@ namespace Cine
 		void OnUpdateRuntime(Timestep ts);
 		void OnUpdateEditor(Timestep ts, EditorCamera& editorCamera);
 
-		NativeScript* CreateScriptInstance(const std::string& name);
-
 		auto GetEntities()
 		{
 			return m_Registry.view<entt::entity>();
@@ -58,7 +57,7 @@ namespace Cine
 			m_ComponentCreators[componentName] = [&](entt::registry& registry, entt::entity entity) -> Component&
 				{
 					auto& component = registry.emplace<Component>(entity);
-					OnRegisteredComponentAdded<Component>(entity, component);
+					OnComponentAdded<Component>(entity, component);
 					return component;
 				};
 			m_ComponentRemovers[componentName] = [componentName](entt::registry& registry, entt::entity entity) -> void
@@ -144,7 +143,7 @@ namespace Cine
 	private:
 
 		template <class Component>
-		void OnRegisteredComponentAdded(entt::entity entity, Component& component)
+		void OnComponentAdded(entt::entity entity, Component& component)
 		{
 			m_Registry.on_destroy<Component>().connect<&OnRegisteredComponentRemoved<Component>>();
 
@@ -155,6 +154,7 @@ namespace Cine
 
 			else if constexpr (std::is_base_of<NativeScript, Component>::value)
 			{
+				std::cout << entt::type_hash<NativeScriptComponent>() << std::endl;
 				bool hasNativeScriptComponent = m_Registry.all_of<NativeScriptComponent>(entity);
 				if (!hasNativeScriptComponent)
 				{
@@ -188,6 +188,8 @@ namespace Cine
 		}
 
 	private:
+		ScriptEngine m_ScriptEngine;
+
 		std::map<std::string, ComponentCreater> m_ComponentCreators;
 		std::map<std::string, ComponentRemover> m_ComponentRemovers;
 		std::map<std::string, ScriptUpdates> m_UpdateRegistry;

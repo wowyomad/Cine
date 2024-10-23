@@ -14,49 +14,11 @@
 
 namespace Cine
 {
-
-	struct ScriptNames
-	{
-		char** Names = nullptr;
-		size_t Size = 0;
-
-		std::vector<std::string> operator()()
-		{
-			std::vector<std::string> names;
-			for (size_t i = 0; i < Size; i++)
-			{
-				names.push_back(Names[i]);
-			}
-			return names;
-
-		}
-	};
-
-	using InitializeScripts = void(*)(entt::registry&);
-	using CreateScript = void(*)(entt::entity, const std::string& scriptName);
-	using RemoveScript = void(*)(entt::entity, const std::string& scriptName);
-	using UpdateAllScripts = void(*)();
-	using GetScriptNames = ScriptNames * (*)();
-
 	Scene::Scene()
 		: m_MainCamera(new Entity())
 	{
-		DynamicLibrary library;
-		library.load("plugin.dll");
-
-		auto initializeScripts = library.getFunction<InitializeScripts>("Initialize");
-		auto updateAllScripts = library.getFunction<UpdateAllScripts>("UpdateScripts");
-		auto createScript = library.getFunction<CreateScript>("CreateScript");
-		auto removeScript = library.getFunction<RemoveScript>("RemoveScript");
-		auto getScriptNames = library.getFunction<GetScriptNames>("GetScriptNames");
-
-		initializeScripts(m_Registry);
-
-		auto entity = CreateEntity();
-		createScript(entity, "TestScript1");
-		createScript(entity, "TestScript2");
-
-		updateAllScripts();
+		m_ScriptEngine.LoadLibary("plugin.dll");
+		m_ScriptEngine.InitializeComponents(m_Registry);
 	}
 
 	Scene::~Scene()
@@ -87,7 +49,7 @@ namespace Cine
 	Entity Scene::CreateEntity(const std::string& name)
 	{
 		Entity entity = Entity(m_Registry.create(), this);
-		entity.AddComponents<TransformComponent, HierarchyComponent, CachedTransform>();
+		entity.AddComponents<TransformComponent, HierarchyComponent, CachedTransform, NativeScriptComponent>();
 		entity.AddComponent<TagComponent>(!name.empty() ? name : "Unkown Entity");
 		return entity;
 	}
