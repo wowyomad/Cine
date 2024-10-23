@@ -202,11 +202,6 @@ namespace Cine
 		auto removeScript = library.getFunction<RemoveScript>("RemoveScript");
 		auto getScriptNames = library.getFunction<GetScriptNames>("GetScriptNames");
 
-
-
-
-
-
 		m_IsRuntime = false;
 
 		m_ActiveScene = CreateRef<Scene>();
