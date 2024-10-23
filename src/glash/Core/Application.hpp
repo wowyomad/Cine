@@ -58,6 +58,7 @@ namespace Cine
 
 
 		GLASH_API static Application& Get();
+		GLASH_API static void Set(Application* ptr);
 		GLASH_API Window& GetWindow();
 		GLASH_API void Close();
 

@@ -3,6 +3,7 @@
 #include <entt/entt.hpp>
 #include "glash/Utils/PlatformUtils.hpp"
 #include "glash/Core/Timestep.hpp"
+#include "glash/Core/Application.hpp"
 
 namespace Cine
 {
@@ -17,6 +18,7 @@ namespace Cine
 	public:
 		struct ComponentsDataC;
 
+		using InitializeApplicationContextCall = void(*)(Application*);
 		using InitializeComponentsCall = void(*)(entt::registry&);
 		using CreateComponentCall = void(*)(entt::entity, const std::string& scriptName);
 		using RemoveComponentCall = void(*)(entt::entity, const std::string& scriptName);
@@ -45,6 +47,7 @@ namespace Cine
 
 		struct LibraryScriptCalls
 		{
+			InitializeApplicationContextCall InitializeApplicationContext;
 			InitializeComponentsCall InitializeComponents;
 			CreateComponentCall CreateComponent;
 			RemoveComponentCall RemoveComponent;

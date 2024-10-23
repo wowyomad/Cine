@@ -22,6 +22,13 @@ namespace Cine
 	{
 		return *s_Instance;
 	}
+	void Application::Set(Application* ptr)
+	{
+		if (!s_Instance)
+		{
+			s_Instance = ptr;
+		}
+	}
 
 	Window& Application::GetWindow()
 	{

@@ -81,6 +81,9 @@ namespace Cine
 		m_ActiveScene = CreateRef<Scene>();
 		s_Scene = m_ActiveScene.get();
 
+		auto entity = s_Scene->CreateEntity("Tvaryna");
+		entity.AddComponentByName("ControllerScript");
+
 		FramebufferSpecification spec;
 		spec.Width = 1280;
 		spec.Height = 720;

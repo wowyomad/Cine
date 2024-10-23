@@ -32,6 +32,7 @@ namespace Cine
 	}
 	void ScriptEngine::InitializeComponents(entt::registry& registry)
 	{
+		m_LibraryCalls.InitializeApplicationContext(&Application::Get());
 		m_LibraryCalls.InitializeComponents(registry);
 		UpdateComponentsData();
 	}
@@ -58,6 +59,7 @@ namespace Cine
 
 	bool ScriptEngine::UpdateFunctionCalls()
 	{
+
 		m_LibraryCalls.InitializeComponents = m_Library.GetFunction<InitializeComponentsCall>("InitializeComponents");
 		m_LibraryCalls.CreateComponent = m_Library.GetFunction<CreateComponentCall>("CreateComponent");
 		m_LibraryCalls.RemoveComponent = m_Library.GetFunction<CreateComponentCall>("RemoveComponent");
