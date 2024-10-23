@@ -6,14 +6,57 @@
 #include "Entity.hpp"
 #include "NativeScript.hpp"
 
+#include "glash/Utils/PlatformUtils.hpp"
+
 #include "glash/Renderer/Renderer2D.hpp"
+
+
 
 namespace Cine
 {
+
+	struct ScriptNames
+	{
+		char** Names = nullptr;
+		size_t Size = 0;
+
+		std::vector<std::string> operator()()
+		{
+			std::vector<std::string> names;
+			for (size_t i = 0; i < Size; i++)
+			{
+				names.push_back(Names[i]);
+			}
+			return names;
+
+		}
+	};
+
+	using InitializeScripts = void(*)(entt::registry&);
+	using CreateScript = void(*)(entt::entity, const std::string& scriptName);
+	using RemoveScript = void(*)(entt::entity, const std::string& scriptName);
+	using UpdateAllScripts = void(*)();
+	using GetScriptNames = ScriptNames * (*)();
+
 	Scene::Scene()
 		: m_MainCamera(new Entity())
 	{
+		DynamicLibrary library;
+		library.load("plugin.dll");
 
+		auto initializeScripts = library.getFunction<InitializeScripts>("Initialize");
+		auto updateAllScripts = library.getFunction<UpdateAllScripts>("UpdateScripts");
+		auto createScript = library.getFunction<CreateScript>("CreateScript");
+		auto removeScript = library.getFunction<RemoveScript>("RemoveScript");
+		auto getScriptNames = library.getFunction<GetScriptNames>("GetScriptNames");
+
+		initializeScripts(m_Registry);
+
+		auto entity = CreateEntity();
+		createScript(entity, "TestScript1");
+		createScript(entity, "TestScript2");
+
+		updateAllScripts();
 	}
 
 	Scene::~Scene()
