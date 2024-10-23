@@ -8,8 +8,11 @@
 
 #include "glash/Utils/StringUtils.hpp"
 
+#ifndef FIELD
 #define FIELD(field) visitor(#field, field);
+#endif
 
+#ifndef SERIALIZE_CLASS
 #define SERIALIZE_CLASS(ClassName, ...) \
     friend class Cine::Deserializer; \
     friend class Cine::Serializer; \
@@ -17,7 +20,8 @@
     friend YAML::Node Serialize<ClassName>(ClassName&); \
     template <typename Visitor> void Serialize(Visitor& visitor) { \
         __VA_ARGS__ \
-    }
+    } 
+#endif
 
 template <typename T>
 struct is_serializable : std::disjunction<

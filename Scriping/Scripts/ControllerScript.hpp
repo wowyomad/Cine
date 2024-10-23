@@ -1,63 +1,22 @@
 #pragma once
 #include "glash/Cine.hpp"
-#include "Scene/ComponentSerializer.hpp"
 
 #include <iostream>
 
-using namespace Cine;
-
-
-class ControllerScript : public NativeScript
+class ControllerScript0: public Cine::NativeScript
 {
 public:
 	void OnCreate() override
 	{
-		m_Transform = TryGetComponent<TransformComponent>();
+		std::cout << "TestScript 2 Created" << std::endl;
 	}
 
-	void OnDestroy() override
+	void OnUpdate(Cine::Timestep ts) override
 	{
-
+		std::cout << "TestScript 1 Update" << std::endl;
 	}
 
-	void OnUpdate(Timestep ts) override
-	{
-		if (!m_Transform)
-		{
-			return;
-		}
-
-		float speed = 5.0f;
-		glm::vec3 direction(0.0f);
-
-		if (Input::IsKeyPressed(Key::D))
-		{
-			direction.x += 1.0f;
-		}
-		if (Input::IsKeyPressed(Key::A))
-		{
-			direction.x -= 1.0f;
-		}
-		if (Input::IsKeyPressed(Key::W))
-		{
-			direction.y += 1.0f;
-		}
-		if (Input::IsKeyPressed(Key::S))
-		{
-			direction.y -= 1.0f;
-		}
-
-		if (glm::length(direction) == 0.0f)
-		{
-			
-		}
-
-		m_Transform->Translation += speed * ts * direction;
-
-	}
-
-	SERIALIZE_CLASS(ControllerScript)
-
+	SERIALIZE_CLASS(ControllerScript0)
 private:
-	TransformComponent* m_Transform;
+	Cine::TransformComponent* m_Transform;
 };

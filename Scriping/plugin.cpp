@@ -3,8 +3,10 @@
 #include <entt/entt.hpp>
 
 /*Should put '#include "Scripts/<Name>"'*/
-#include "Scripts/TestScript1.hpp"
 #include "Scripts/ControllerScript.hpp"
+#include "Scripts/TestScript1.hpp"
+
+using namespace Cine;
 
 using EmplaceComponent = void(*)(entt::entity);
 using DestroyComponent = void(*)(entt::entity);
@@ -73,7 +75,7 @@ void InitializeComponents(entt::registry& registry)
 
 	//Register calls here
 	RegisterComponent<TestScript1>();
-	RegisterComponent<ControllerScript>();
+	RegisterComponent<ControllerScript0>();
 }
 
 void CreateComponent(entt::entity entity, const std::string& componentName)
