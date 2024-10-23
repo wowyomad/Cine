@@ -182,7 +182,7 @@ namespace Cine
 			return it->second(m_Registry, entity.m_EntityHandle);
 		}
 		else {
-			CINE_CORE_ASSERT(false, "Serialization for component '{}' not found", componentName);
+			//CINE_CORE_ASSERT(false, "Serialization for component '{}' not found", componentName);
 			return {};
 		}
 	}

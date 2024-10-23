@@ -76,7 +76,7 @@ namespace Cine
 
 	void EditorLayer::OnAttach()
 	{
-		m_IsRuntime = false;
+		m_IsRuntime = true;
 
 		m_ActiveScene = CreateRef<Scene>();
 		s_Scene = m_ActiveScene.get();

@@ -4,7 +4,7 @@
 
 /*Should put '#include "Scripts/<Name>"'*/
 #include "Scripts/ControllerScript.hpp"
-#include "Scripts/TestScript1.hpp"
+#include "Scripts/TestScript.hpp"
 
 using namespace Cine;
 
@@ -28,16 +28,18 @@ void RegisterComponent()
 		};
 	Destroyers[name] = [](entt::entity entity)
 		{
-			s_Registry->remove<TestScript1>(entity);
+			s_Registry->remove<Component>(entity);
 		};
 	if constexpr (std::is_base_of<NativeScript, Component>::value)
 	{
 		Updaters[name] = [](Timestep ts)
 			{
-				s_Registry->view<Component>().each([ts](auto entity, auto& script)
-					{
-						script.OnUpdate(ts);
-					});
+				auto view = s_Registry->view<Component>();
+				for (auto entity : view)
+				{
+					auto& component = view.get<Component>(entity);
+					component.OnUpdate(ts);
+				}
 			};
 		
 	}
@@ -72,10 +74,9 @@ void OnComponentAdded(entt::entity entity, Component& component)
 void InitializeComponents(entt::registry& registry)
 {
 	s_Registry = &registry;
-
 	//Register calls here
-	RegisterComponent<TestScript1>();
-	RegisterComponent<ControllerScript0>();
+	RegisterComponent<TestScript>();
+	RegisterComponent<ControllerScript>();
 }
 
 void CreateComponent(entt::entity entity, const std::string& componentName)
@@ -126,4 +127,10 @@ ComponentsData GetComponentsData()
 		++i;
 	}
 	return data;
+}
+
+void InitializeApplicationContext(Cine::Application* application)
+{
+	Application::Set(application);
+	Input::Init();
 }

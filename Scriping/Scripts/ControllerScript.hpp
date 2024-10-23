@@ -1,22 +1,40 @@
 #pragma once
 #include "glash/Cine.hpp"
+using namespace Cine;
 
 #include <iostream>
 
-class ControllerScript0: public Cine::NativeScript
+
+class ControllerScript : public NativeScript
 {
 public:
 	void OnCreate() override
 	{
-		std::cout << "TestScript 2 Created" << std::endl;
+		m_Transform = TryGetComponent<TransformComponent>();
 	}
 
-	void OnUpdate(Cine::Timestep ts) override
+	void OnUpdate(Timestep ts) override
 	{
-		std::cout << "TestScript 1 Update" << std::endl;
+		if (Input::IsKeyPressed(Key::W))
+		{
+			m_Transform->Translation.y += m_Speed * ts;
+		}
+		if (Input::IsKeyPressed(Key::S))
+		{
+			m_Transform->Translation.y -= m_Speed * ts;
+		}
+		if (Input::IsKeyPressed(Key::D))
+		{
+			m_Transform->Translation.x += m_Speed * ts;
+		}
+		if (Input::IsKeyPressed(Key::A))
+		{
+			m_Transform->Translation.x -= m_Speed * ts;
+		}
 	}
+	SERIALIZE_CLASS(ControllerScript)
 
-	SERIALIZE_CLASS(ControllerScript0)
 private:
 	Cine::TransformComponent* m_Transform;
+	float m_Speed = 5.0f;
 };

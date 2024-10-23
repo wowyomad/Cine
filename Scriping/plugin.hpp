@@ -3,8 +3,10 @@
 #include <string>
 
 #include <entt/entt.hpp>
+
 #include "glash/Cine.hpp"
 #include "glash/Scene/Components.hpp"
+#include "glash/Core/Application.hpp"
 
 #ifdef _WIN32
 #define EXPORT __declspec(dllexport)
@@ -20,6 +22,7 @@ struct ComponentsData
 };
 
 extern "C" {
+    EXPORT void InitializeApplicationContext(Cine::Application*);
     EXPORT void InitializeComponents(entt::registry& registry);
     EXPORT void CreateComponent(entt::entity entity, const std::string& scriptName);
     EXPORT void RemoveComponent(entt::entity entity, const std::string& componentName);
