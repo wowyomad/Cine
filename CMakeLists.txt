@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(VENDOR_DIR ${CMAKE_CURRENT_SOURCE_DIR}/vendor)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/$<CONFIG>)
+set(GLASH_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 
 include(set_undefined.cmake)
@@ -28,50 +29,60 @@ set(GLFW_BUILD_WAYLAND OFF CACHE BOOL "Enable wayland scanner" FORCE)
 set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "Cames from yaml-cpp. Builds 'read' and 'parse' executables" FORCE)
 
 include(FetchContent)
+Set(FETCHCONTENT_QUIET FALSE)
 FetchContent_Declare(
     glfw
     GIT_REPOSITORY https://github.com/glfw/glfw.git
     GIT_TAG 3.4
+	GIT_PROGRESS TRUE
 )
 FetchContent_Declare(
     fmt
     GIT_REPOSITORY https://github.com/fmtlib/fmt.git
     GIT_TAG 11.0.2
+	GIT_PROGRESS TRUE
 )
 FetchContent_Declare(
     glm
     GIT_REPOSITORY https://github.com/g-truc/glm.git
     GIT_TAG 1.0.1
+	GIT_PROGRESS TRUE
 )
 FetchContent_Declare(
     spdlog
     GIT_REPOSITORY https://github.com/gabime/spdlog.git
     GIT_TAG v1.14.1
+	GIT_PROGRESS TRUE
 )
 FetchContent_Declare(
     stb
     GIT_REPOSITORY https://github.com/nothings/stb.git
     GIT_TAG f75e8d1cad7d90d72ef7a4661f1b994ef78b4e31
+	GIT_PROGRESS TRUE
 )
 FetchContent_Declare(
     imgui
     GIT_REPOSITORY https://github.com/ocornut/imgui.git
     GIT_TAG 793773209bb0fdeb8ccb756052e770457193c9f2
+	GIT_PROGRESS TRUE
 )
 FetchContent_Declare(
     entt
     GIT_REPOSITORY https://github.com/skypjack/entt.git
     GIT_TAG v3.13.2
+	GIT_PROGRESS TRUE
 )
 FetchContent_Declare(
     yaml-cpp
     GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
     GIT_TAG 0.8.0
+	GIT_PROGRESS TRUE
 )
 FetchContent_Declare(
     ImGuizmo
     GIT_REPOSITORY https://github.com/CedricGuillemet/ImGuizmo.git
     GIT_TAG 6d588209f99b1324a608783d1f52faa518886c29 # 24.09.2024
+	GIT_PROGRESS TRUE
 )
 FetchContent_MakeAvailable(ImGuizmo) #It's special
 

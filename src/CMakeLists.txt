@@ -108,4 +108,3 @@ set_target_properties(glash PROPERTIES
     FOLDER "glash"
 )
 set_target_properties(glash_pch PROPERTIES FOLDER "glash")
-

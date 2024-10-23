@@ -1,7 +1,7 @@
 set(CineEditor "CineEditor")
 set(CineEditor_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
-include(${CMAKE_SOURCE_DIR}/copy_functions.cmake)
+include(${GLASH_ROOT_DIR}/copy_functions.cmake)
 
 
 file(GLOB EDITOR_FONTS "${CineEditor_SOURCE_DIR}/Resources/Fonts/JetBrainsMono/ttf/*")
