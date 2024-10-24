@@ -88,13 +88,13 @@ namespace Cine
 
 	void Scene::OnViewportResize(uint32_t width, uint32_t height)
 	{
+		m_ViewportWidth = width;
+		m_ViewportHeight = height;
+
 		if (!*m_MainCamera)
 		{
 			return;
 		}
-
-		m_ViewportWidth = width;
-		m_ViewportHeight = height;
 
 		auto& cameraComponent = m_MainCamera->GetComponent<CameraComponent>();
 

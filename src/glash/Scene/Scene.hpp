@@ -10,18 +10,10 @@
 
 #include <entt/entt.hpp>
 
-
 namespace Cine
 {
 	class Entity;
 	class NativeScript;
-
-	using ComponentCreater = std::function<void(entt::registry&, entt::entity)>;
-	using ComponentRemover = std::function<void(entt::registry&, entt::entity)>;
-	using ScriptUpdates = std::function<void(entt::registry&, Timestep)>;
-
-	using SerializerFunc = std::function<YAML::Node(entt::registry&, entt::entity)>;
-	using DeserializerFunc = std::function<void(entt::registry&, entt::entity, const YAML::Node&)>;
 
 	class Scene
 	{
@@ -48,86 +40,9 @@ namespace Cine
 			return m_Registry.view<entt::entity>();
 		}
 
-		const std::vector<ComponentData>& GetComponentsData()
+		inline const std::vector<ComponentData>& GetComponentsData() const
 		{
 			return m_ScriptEngine.GetComponentsData();
-		}
-
-		template<typename Component>
-		void RegisterComponent() {
-			std::string componentName = Utils::GetClassTypename<Component>();
-			m_ComponentCreators[componentName] = [&](entt::registry& registry, entt::entity entity) -> Component&
-				{
-					auto& component = registry.emplace<Component>(entity);
-					OnComponentAdded<Component>(entity, component);
-					return component;
-				};
-			m_ComponentRemovers[componentName] = [componentName](entt::registry& registry, entt::entity entity) -> void
-				{
-					if constexpr (std::is_base_of<NativeScript, Component>::value)
-					{
-						auto& nsc = registry.get<NativeScriptComponent>(entity);
-						auto it = std::find_if(nsc.Scripts.begin(), nsc.Scripts.end(), [&](auto& script) -> bool
-							{
-								return script.Name == componentName;
-							});
-						if (it != nsc.Scripts.end())
-						{
-							it->RemoveScript(); //Where is it being set???
-							nsc.Scripts.erase(it);
-						}
-					}
-					else
-					{
-						registry.remove<Component>(entity);
-					}
-				};
-			m_SerializationRegistry[componentName] = [&](entt::registry& registry, entt::entity entity) -> YAML::Node
-				{
-					Component* component = registry.try_get<Component>(entity);
-					if (component)
-					{
-						return Serialize(*component);
-					}
-					else
-					{
-						return {};
-					}
-				};
-			m_DeserializationRegistry[componentName] = [componentName](entt::registry& registry, entt::entity entity, const YAML::Node& node)
-				{
-					Component component;
-					Deserialize(component, node);
-					registry.emplace_or_replace<Component>(entity, component);
-					
-					if constexpr (std::is_base_of<NativeScript, Component>::value)
-					{
-						auto& nsc = registry.get<NativeScriptComponent>(entity);
-						auto& Scripts = nsc.Scripts;
-						auto it = std::find_if(Scripts.begin(), Scripts.end(), [&](auto& script)
-							{
-								return script.Name == componentName;
-							});
-						if (it != Scripts.end())
-						{
-							it->Instance = nullptr;
-						}
-					}
-
-				};
-
-			if constexpr (std::is_base_of<NativeScript, Component>::value)
-			{
-				m_UpdateRegistry[componentName] = [&](entt::registry& registry, Timestep ts) {
-					registry.view<Component>().each([&](auto entity, Component& component)
-						{
-							if (component.Enabled)
-							{
-								component.OnUpdate(ts);
-							}
-						});
-					};
-			}
 		}
 
 		void AddComponentByName(Entity entity, const std::string& componentName);
@@ -147,35 +62,9 @@ namespace Cine
 		template <class Component>
 		void OnComponentAdded(entt::entity entity, Component& component)
 		{
-			m_Registry.on_destroy<Component>().connect<&OnRegisteredComponentRemoved<Component>>();
-
 			if constexpr (std::is_same<Component, CameraComponent>::value)
 			{
 				component.Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight); //Shoudl it be here?
-			}
-
-			else if constexpr (std::is_base_of<NativeScript, Component>::value)
-			{
-				std::cout << entt::type_hash<NativeScriptComponent>() << std::endl;
-				bool hasNativeScriptComponent = m_Registry.all_of<NativeScriptComponent>(entity);
-				if (!hasNativeScriptComponent)
-				{
-					CINE_CORE_TRACE("Added Native Script Component to {}", static_cast<uint32_t>(entity));
-					m_Registry.emplace<NativeScriptComponent>(entity);
-				}
-				auto& nsc = m_Registry.get<NativeScriptComponent>(entity);
-				auto instantiateScript = [&, entity]() -> NativeScript*
-					{
-						return reinterpret_cast<NativeScript*>(&m_Registry.get<Component>(entity));
-					};
-				auto removeScript = [&, entity]() -> void
-					{
-						if (m_Registry.valid(entity) && m_Registry.all_of<Component>(entity))
-						{
-							m_Registry.remove<Component>(entity);
-						}
-					};
-				nsc.Bind<Component>(instantiateScript, removeScript);
 			}
 			else
 			{
@@ -183,24 +72,17 @@ namespace Cine
 			}
 		}
 
-		template <class Component>
-		static void OnRegisteredComponentRemoved()
-		{
-			CINE_CORE_WARN("Registered component removed '{}'", Utils::GetClassTypename<Component>());
-		}
+	private:
+		void DestroyMarkedEntities();
+		void UpdateScripts(Timestep ts);
+		void InstantiateScripts();
 
 	private:
 		ScriptEngine& m_ScriptEngine;
-
-		std::map<std::string, ComponentCreater> m_ComponentCreators;
-		std::map<std::string, ComponentRemover> m_ComponentRemovers;
-		std::map<std::string, ScriptUpdates> m_UpdateRegistry;
-
-		std::map<std::string, SerializerFunc> m_SerializationRegistry;
-		std::map<std::string, DeserializerFunc> m_DeserializationRegistry;
+		entt::registry m_Registry;
 
 		std::vector<entt::entity> m_ToDestroyEntities;
-		entt::registry m_Registry;
+
 		Entity* m_MainCamera;
 
 		uint32_t m_ViewportWidth = 1;
@@ -209,10 +91,6 @@ namespace Cine
 		friend class Entity;
 		friend class SceneHierarchyPanel;
 		friend class SceneSerializer;
-
-		void DestroyMarkedEntities();
-		void UpdateScripts(Timestep ts);
-		void InstantiateScripts();
 	};
 
 }

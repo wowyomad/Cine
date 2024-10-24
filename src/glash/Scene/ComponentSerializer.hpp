@@ -150,7 +150,6 @@ namespace Cine
 
 		template <typename T>
 		void StartObject(const T& obj) {
-
 			emitter << YAML::BeginMap << YAML::Key << Utils::GetClassTypename<T>() << YAML::Value << YAML::BeginMap;
 		}
 

@@ -5,6 +5,7 @@
 #include "glash/Scene/Entity.hpp"
 #include "glash/Scene/Components.hpp"
 #include "glash/Scene/AssetManager.hpp"
+#include "glash/Scene/NativeScript.hpp"
 
 
 #include <yaml-cpp/yaml.h>
@@ -131,6 +132,26 @@ namespace Cine
 
 			out << YAML::EndMap;
 		}
+
+		if (entity.HasComponent<SpriteAnimationComponent>())
+		{
+			//Aimations
+		}
+
+		if (entity.HasComponent<NativeScriptComponent>())
+		{
+			out << YAML::Key << "NativeScriptComponent";
+			out << YAML::BeginMap;
+
+			ScriptEngine& se = ScriptEngine::Get();
+			auto& nsc = entity.GetComponent<NativeScriptComponent>();
+			for (auto& script : nsc.Scripts)
+			{
+				out << se.SerializeComponent(entity, script.Name);
+			}
+			out << YAML::EndMap;
+		}
+
 
 		out << YAML::EndMap; //Entity
 	}
