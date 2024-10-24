@@ -1,6 +1,6 @@
 import os
 
-scripts_dir = "Scripts"
+scripts_dir = "../Scripts"
 template_plugin_file = "plugin.cpp"
 output_plugin_file = "Generated/plugin_generated.cpp"
 include_marker = "// [INCLUDES]"
