@@ -46,9 +46,9 @@ namespace Cine
 			return m_Registry.view<entt::entity>();
 		}
 
-		const std::map<std::string, ComponentCreater>& GetRegisteredComponents()
+		const std::vector<ComponentData>& GetComponentsData()
 		{
-			return m_ComponentCreators;
+			return m_ScriptEngine.GetComponentsData();
 		}
 
 		template<typename Component>

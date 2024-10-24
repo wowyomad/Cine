@@ -163,16 +163,7 @@ namespace Cine
 
 	void Scene::RemoveComponentByName(Entity entity, const std::string& componentName)
 	{
-		auto it = m_ComponentRemovers.find(componentName);
-		if (it != m_ComponentRemovers.end()) {
-			CINE_CORE_TRACE("Removed component '{}' from '{}'", componentName, static_cast<uint32_t>(entity));
-			it->second(m_Registry, entity.m_EntityHandle);
-		}
-		else
-		{
-			CINE_CORE_TRACE("Component '{}' not found", componentName);
-
-		}
+		m_ScriptEngine.RemoveComponent(entity, componentName);
 	}
 
 	YAML::Node Scene::SerializeComponentByName(Entity entity, const std::string& componentName)

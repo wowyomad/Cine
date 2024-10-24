@@ -1,7 +1,7 @@
 #include "plugin.hpp"
 #include <iostream>
 #include <entt/entt.hpp>
- 
+
 #include "GLFW/glfw3.h" //Temporarily
 
 
@@ -28,12 +28,11 @@ void RegisterComponent()
 	std::string name = Utils::GetClassTypename<Component>();
 	Creators[name] = [](entt::entity entity) -> void
 		{
-			auto& component = s_Registry->emplace<Component>(entity);
-			OnComponentAdded<Component>(entity, component);
+			OnComponentAdded<Component>(entity);
 		};
 	Destroyers[name] = [](entt::entity entity) -> void
 		{
-			s_Registry->remove<Component>(entity);
+			OnComponentRemoved<Component>(entity);
 		};
 	Serializers[name] = [](entt::entity entity) -> 	YAML::Node
 		{
@@ -54,10 +53,10 @@ void RegisterComponent()
 			s_Registry->emplace_or_replace<Component>(entity, component);
 
 			if constexpr (std::is_base_of<NativeScript, Component>::value)
-			{ 
+			{
 				//Make Instance null to make OnCreate call?
 			}
-			
+
 		};
 	if constexpr (std::is_base_of<NativeScript, Component>::value)
 	{
@@ -80,8 +79,10 @@ void RegisterComponent()
 }
 
 template <class Component>
-void OnComponentAdded(entt::entity entity, Component& component)
+void OnComponentAdded(entt::entity entity)
 {
+	auto& component = s_Registry->emplace<Component>(entity);
+
 	if constexpr (std::is_base_of<NativeScript, Component>::value)
 	{
 		bool hasNativeScriptComponent = s_Registry->all_of<NativeScriptComponent>(entity);
@@ -102,6 +103,30 @@ void OnComponentAdded(entt::entity entity, Component& component)
 				}
 			};
 		nsc.Bind<Component>(instantiateScript, removeScript);
+	}
+}
+
+template <class Component>
+void OnComponentRemoved(entt::entity entity)
+{
+	if constexpr (std::is_base_of<NativeScript, Component>::value)
+	{
+		auto& nsc = s_Registry->get<NativeScriptComponent>(entity);
+		std::string componentName = Utils::GetClassTypename<Component>();
+
+		auto it = std::find_if(nsc.Scripts.begin(), nsc.Scripts.end(), [&](auto& script) -> bool
+			{
+				return script.Name == componentName;
+			});
+		if (it != nsc.Scripts.end())
+		{
+			it->RemoveScript(); //Don't!
+			nsc.Scripts.erase(it);
+		}	
+	}
+	else
+	{
+		s_Registry->remove<Component>(entity);
 	}
 }
 
@@ -168,7 +193,7 @@ void InitializeApplicationContext(Cine::Application* application)
 
 	//Temporarily
 	glfwInit();
-	glfwMakeContextCurrent(static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow())); 
+	glfwMakeContextCurrent(static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow()));
 
 	Internal::Input::Init();
 }
