@@ -200,9 +200,19 @@ void InitializeApplicationContext(Cine::Application* application)
 
 YAML::Node SerializeComponent(entt::entity entity, const std::string& componentName)
 {
+	auto it = Serializers.find(componentName);
+	if (it != Serializers.end())
+	{
+		return it->second(entity);
+	}
 	return YAML::Node();
 }
 
 void DeserializeComponent(entt::entity entity, const std::string& componentName, YAML::Node& node)
 {
+	auto it = Deserializers.find(componentName);
+	if (it != Deserializers.end())
+	{
+		return it->second(node, entity);
+	}
 }

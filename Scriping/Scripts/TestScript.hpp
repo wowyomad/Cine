@@ -15,7 +15,10 @@ public:
 		std::cout << "TestScript 1 Update" << std::endl;
 	}
 
-	SERIALIZE_CLASS(TestScript)
+	SERIALIZE_CLASS(TestScript,
+		FIELD(m_Number)
+	)
 private:
 	Cine::TransformComponent* m_Transform;
+	int m_Number = 0;
 };

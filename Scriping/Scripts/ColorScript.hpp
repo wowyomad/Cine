@@ -38,7 +38,10 @@ public:
 		m_SpriteComponent->Color.b = 0.5f * sin(m_Time + 4.0f) + 0.5f;
 	}
 public:
-	SERIALIZE_CLASS(ColorScript)
+	SERIALIZE_CLASS(ColorScript,
+		FIELD(m_Time)
+		FIELD(m_String)
+	)
 
 private:
 	SpriteComponent* m_SpriteComponent = nullptr;
