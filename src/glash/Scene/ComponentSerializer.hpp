@@ -8,16 +8,20 @@
 
 #include "glash/Utils/StringUtils.hpp"
 
+#ifndef FIELD
 #define FIELD(field) visitor(#field, field);
+#endif
 
+#ifndef SERIALIZE_CLASS
 #define SERIALIZE_CLASS(ClassName, ...) \
-    friend class Deserializer; \
-    friend class Serializer; \
-    friend void Deserialize<ClassName>(ClassName&, const YAML::Node&); \
-    friend YAML::Node Serialize<ClassName>(ClassName&); \
+    friend class Cine::Deserializer; \
+    friend class Cine::Serializer; \
+    friend void Cine::Deserialize<ClassName>(ClassName&, const YAML::Node&); \
+    friend YAML::Node Cine::Serialize<ClassName>(ClassName&); \
     template <typename Visitor> void Serialize(Visitor& visitor) { \
         __VA_ARGS__ \
-    }
+    } 
+#endif
 
 template <typename T>
 struct is_serializable : std::disjunction<
@@ -146,7 +150,6 @@ namespace Cine
 
 		template <typename T>
 		void StartObject(const T& obj) {
-
 			emitter << YAML::BeginMap << YAML::Key << Utils::GetClassTypename<T>() << YAML::Value << YAML::BeginMap;
 		}
 

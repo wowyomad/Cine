@@ -6,19 +6,26 @@
 #include "Entity.hpp"
 #include "NativeScript.hpp"
 
+#include "glash/Utils/PlatformUtils.hpp"
+
 #include "glash/Renderer/Renderer2D.hpp"
+
+
 
 namespace Cine
 {
 	Scene::Scene()
-		: m_MainCamera(new Entity())
+		: m_MainCamera(new Entity()), m_ScriptEngine(ScriptEngine::Get())
 	{
-
+		
 	}
 
+	// TODO: Handle save before unload.
 	Scene::~Scene()
 	{
+		
 	}
+
 
 	void Scene::SetMainCamera(Entity cameraEntity)
 	{
@@ -44,7 +51,7 @@ namespace Cine
 	Entity Scene::CreateEntity(const std::string& name)
 	{
 		Entity entity = Entity(m_Registry.create(), this);
-		entity.AddComponents<TransformComponent, HierarchyComponent, CachedTransform>();
+		entity.AddComponents<TransformComponent, HierarchyComponent, CachedTransform, NativeScriptComponent>();
 		entity.AddComponent<TagComponent>(!name.empty() ? name : "Unkown Entity");
 		return entity;
 	}
@@ -75,13 +82,13 @@ namespace Cine
 
 	void Scene::OnViewportResize(uint32_t width, uint32_t height)
 	{
+		m_ViewportWidth = width;
+		m_ViewportHeight = height;
+
 		if (!*m_MainCamera)
 		{
 			return;
 		}
-
-		m_ViewportWidth = width;
-		m_ViewportHeight = height;
 
 		auto& cameraComponent = m_MainCamera->GetComponent<CameraComponent>();
 
@@ -148,61 +155,27 @@ namespace Cine
 
 	void Scene::UpdateScripts(Timestep ts)
 	{
-		for (auto& [componentName, updateCall] : m_UpdateRegistry)
-		{
-			updateCall(m_Registry, ts);
-		}
+		m_ScriptEngine.UpdateScripts(ts);
 	}
 
 	void Scene::AddComponentByName(Entity entity, const std::string& componentName)
 	{
-		auto it = m_ComponentCreators.find(componentName);
-		if (it != m_ComponentCreators.end()) {
-			CINE_CORE_TRACE("Added component '{}' to '{}'", componentName, static_cast<uint32_t>(entity));
-			it->second(m_Registry, entity.m_EntityHandle);
-		}
-		else
-		{
-			CINE_CORE_TRACE("Component '{}' not found", componentName);
-
-		}
+		m_ScriptEngine.CreateComponent(entity, componentName);
 	}
 
 	void Scene::RemoveComponentByName(Entity entity, const std::string& componentName)
 	{
-		auto it = m_ComponentRemovers.find(componentName);
-		if (it != m_ComponentRemovers.end()) {
-			CINE_CORE_TRACE("Removed component '{}' from '{}'", componentName, static_cast<uint32_t>(entity));
-			it->second(m_Registry, entity.m_EntityHandle);
-		}
-		else
-		{
-			CINE_CORE_TRACE("Component '{}' not found", componentName);
-
-		}
+		m_ScriptEngine.RemoveComponent(entity, componentName);
 	}
 
 	YAML::Node Scene::SerializeComponentByName(Entity entity, const std::string& componentName)
 	{
-		auto it = m_SerializationRegistry.find(componentName);
-		if (it != m_SerializationRegistry.end()) {
-			return it->second(m_Registry, entity.m_EntityHandle);
-		}
-		else {
-			CINE_CORE_ASSERT(false, "Serialization for component '{}' not found", componentName);
-			return {};
-		}
+		return m_ScriptEngine.SerializeComponent(entity, componentName);
 	}
 
-	void Scene::DeserializeComponentByName(Entity entity, const std::string& componentName, const YAML::Node& node)
+	void Scene::DeserializeComponentByName(Entity entity, const std::string& componentName, YAML::Node& node)
 	{
-		auto it = m_DeserializationRegistry.find(componentName);
-		if (it != m_DeserializationRegistry.end()) {
-			it->second(m_Registry, entity, node);
-		}
-		else {
-			CINE_CORE_TRACE("Deserialization for component '{}' not found", componentName);
-		}
+		m_ScriptEngine.DeserializeComponent(entity, node, componentName);
 	}
 
 	void Scene::DestroyMarkedEntities()

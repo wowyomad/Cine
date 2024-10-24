@@ -29,6 +29,7 @@
 #include "glash/Scene/Entity.hpp"
 #include "glash/Scene/Components.hpp"
 #include "glash/Scene/NativeScript.hpp"
+#include "Scene/ComponentSerializer.hpp"
 
 #include "glash/Utils/PlatformUtils.hpp"
 

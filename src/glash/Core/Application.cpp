@@ -16,11 +16,22 @@
 
 namespace Cine
 {
+	namespace Internal
+	{
+
+	}
 	Application* Application::s_Instance = nullptr;
 
 	Application& Application::Get()
 	{
 		return *s_Instance;
+	}
+	void Application::Set(Application* ptr)
+	{
+		if (!s_Instance)
+		{
+			s_Instance = ptr;
+		}
 	}
 
 	Window& Application::GetWindow()
@@ -142,7 +153,7 @@ namespace Cine
 					}
 				}
 
-				Input::ClearStates();
+				Internal::Input::ClearStates();
 			}
 
 #if CINE_IMGUI

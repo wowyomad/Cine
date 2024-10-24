@@ -47,7 +47,6 @@ namespace Cine
 
 		void SetViewportSize(uint32_t width, uint32_t height);
 
-
 	private:
 		ProjectionType m_ProjectionType = ProjectionType::Orthographic;
 

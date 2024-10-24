@@ -719,7 +719,7 @@ namespace Cine
 
 				}
 
-				auto& components = m_Context.Scene->GetRegisteredComponents();
+				auto& componetsData = m_Context.Scene->GetComponentsData();
 				auto& scripts = nsc.Scripts;
 
 				static char searchBuffer[128] = "";
@@ -733,8 +733,13 @@ namespace Cine
 				{
 					ImGui::InputText("Search", searchBuffer, IM_ARRAYSIZE(searchBuffer));
 
-					for (auto&& [name, creator] : components)
+					for (auto&& [name, isScript] : componetsData)
 					{
+						if (!isScript)
+						{
+							continue;
+						}
+
 						auto it = std::find_if(scripts.begin(), scripts.end(), [&name](auto& script)
 							{
 								return script.Name == name;

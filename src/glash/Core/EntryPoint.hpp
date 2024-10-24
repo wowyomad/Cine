@@ -10,7 +10,7 @@ int main(int argc, char** argv)
 	Cine::Log::Init();
 
 	CINE_PROFILE_BEGIN_SESSION("Startup", "Startup-Session.json");
-	Cine::Input::Init();
+	Cine::Internal::Input::Init();
 	Cine::Application* app = Cine::CreateApplication();
 	CINE_PROFILE_END_SESSION();
 

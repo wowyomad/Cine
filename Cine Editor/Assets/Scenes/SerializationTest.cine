@@ -1,0 +1,76 @@
+Scene: Unnamed Scene
+Entities:
+  - Entity: 123123123
+    TagComponent:
+      Tag: Controllable Camera
+    TransformComponent:
+      Translation: [-2.24067688, 1.79603577, 15]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CameraComponent:
+      Camera:
+        ProjectionType: 0
+        PerspectiveFOV: 0.785398185
+        PerspectiveNear: 0.00999999978
+        PerspectiveFar: 1000
+        OrthographicSize: 10
+        OrthographicNear: -1
+        OrthographicFar: 1
+      FixedAspectRatio: false
+      IsMainCamera: true
+    NativeScriptComponent:
+      - ControllerScript: {}
+  - Entity: 123123123
+    TagComponent:
+      Tag: Colorful Square
+    TransformComponent:
+      Translation: [1.89999998, 0, 4]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      UseSprite: false
+    SpriteComponent:
+      Color: [0.945802808, 0.52035141, 0.0372588933, 1.00392163]
+      SpriteIndex: 0
+    SpriteSheetComponent:
+      ? []
+    NativeScriptComponent:
+      - ColorScript:
+          m_Time: 82.7822876
+          m_String: String from Color Script
+  - Entity: 123123123
+    TagComponent:
+      Tag: Red Square
+    TransformComponent:
+      Translation: [-2.41355896, -0.64409256, 0]
+      Rotation: [0, 0, 1.57079637]
+      Scale: [2, 2, 1]
+    SpriteRendererComponent:
+      UseSprite: false
+    SpriteComponent:
+      Color: [1, 0, 0, 1]
+      SpriteIndex: 0
+    SpriteSheetComponent:
+      ? []
+    NativeScriptComponent:
+      - ControllerScript: {}
+  - Entity: 123123123
+    TagComponent:
+      Tag: Camera
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CameraComponent:
+      Camera:
+        ProjectionType: 1
+        PerspectiveFOV: 0.785398185
+        PerspectiveNear: 0.00999999978
+        PerspectiveFar: 1000
+        OrthographicSize: 10
+        OrthographicNear: -1
+        OrthographicFar: 1
+      FixedAspectRatio: false
+      IsMainCamera: false
+    NativeScriptComponent:
+      []

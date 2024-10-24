@@ -55,19 +55,19 @@ namespace Cine
 
 	void EditorCamera::OnUpdate(Timestep ts)
 	{
-		const glm::vec2& mouse{ Input::GetMouseX(), Input::GetMouseY() };
+		const glm::vec2& mouse{ Internal::Input::GetMouseX(), Internal::Input::GetMouseY() };
 		glm::vec2 delta = (mouse - m_InitialMousePosition) * 0.003f;
 		m_InitialMousePosition = mouse;
 
-		bool altPressed = Input::IsKeyPressed(Key::LeftAlt) || Input::IsKeyPressed(Key::RightAlt);
+		bool altPressed = Internal::Input::IsKeyPressed(Key::LeftAlt) || Internal::Input::IsKeyPressed(Key::RightAlt);
 
-		if (Input::IsMouseButtonPressed(Mouse::ButtonMiddle))
+		if (Internal::Input::IsMouseButtonPressed(Mouse::ButtonMiddle))
 			MousePan(delta);
-		else if (Input::IsMouseButtonPressed(Mouse::ButtonRight))
+		else if (Internal::Input::IsMouseButtonPressed(Mouse::ButtonRight))
 			MouseRotate(delta);
 		else if (altPressed)
 		{
-			if (Input::IsMouseButtonPressed(Mouse::ButtonLeft))
+			if (Internal::Input::IsMouseButtonPressed(Mouse::ButtonLeft))
 				MouseZoom(delta.y);
 		}
 		UpdateView();

@@ -26,9 +26,6 @@ namespace Cine
 
 		bool Deserialize(const std::filesystem::path& filepath);
 		bool DeserializeRuntime(const std::filesystem::path& filepath);
-
-
-
 	private:
 		void SerializeEntity(YAML::Emitter& out, Entity entity);
 

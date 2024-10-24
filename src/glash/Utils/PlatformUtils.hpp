@@ -25,12 +25,12 @@ namespace Cine
         DynamicLibrary() : handle(nullptr) {}
 
         ~DynamicLibrary() {
-            unload();
+            Unload();
         }
 
-        bool load(const std::string& libraryName) {
+        bool Load(const std::filesystem::path& libraryName) {
 #ifdef _WIN32
-            handle = LoadLibrary(libraryName.c_str());
+            handle = LoadLibrary(libraryName.string().c_str());
             if (!handle) {
                 std::cerr << "Failed to load " << libraryName << std::endl;
                 return false;
@@ -45,7 +45,7 @@ namespace Cine
             return true;
         }
 
-        void unload() {
+        void Unload() {
             if (handle) {
 #ifdef _WIN32
                 FreeLibrary(static_cast<HMODULE>(handle));
@@ -57,7 +57,7 @@ namespace Cine
         }
 
         template <typename T>
-        T getFunction(const std::string& functionName) {
+        T GetFunction(const std::string& functionName) {
 #ifdef _WIN32
             return reinterpret_cast<T>(GetProcAddress(static_cast<HMODULE>(handle), functionName.c_str()));
 #else

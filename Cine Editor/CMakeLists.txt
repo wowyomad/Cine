@@ -14,6 +14,20 @@ set(EDITOR_CONTENTBROWSER_ICONS_OUT "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Resources
 set(EDITOR_TEXTURES_OUT "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Assets/Textures")
 set(EDITOR_SHADERS_OUT "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Resources/Shaders")
 
+set(PLUGIN_SOURCE_DIR "${CineEditor_SOURCE_DIR}/Assets/Plugin")
+set(SCRIPTS_SOURCE_DIR "${CineEditor_SOURCE_DIR}/Assets/Scripts")
+set(DEST_PLUGIN_PATH "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Assets/Plugin")
+set(DEST_SCRIPTS_PATH "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Assets/Scripts")
+
+add_custom_target(copy_plugin ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${PLUGIN_SOURCE_DIR} ${DEST_PLUGIN_PATH}
+    COMMENT "Copying Plugin directory to ${DEST_PLUGIN_PATH}"
+)
+add_custom_target(copy_scripts ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${SCRIPTS_SOURCE_DIR} ${DEST_SCRIPTS_PATH}
+    COMMENT "Copying Scripts directory to ${DEST_SCRIPTS_PATH}"
+)
+
 copy_files("${EDITOR_TEXTURES}" "${EDITOR_TEXTURES_OUT}" editor_copy_textures)
 copy_files("${EDITOR_FONTS}" "${EDITOR_FONTS_OUT}" editor_copy_fonts)
 copy_files("${EDITOR_CONTENTBROWSER_ICONS}" "${EDITOR_CONTENTBROWSER_ICONS_OUT}" editor_copy_contentbrowser_icons)
@@ -34,4 +48,4 @@ target_include_directories(${CineEditor}
 )
 target_precompile_headers(${CineEditor} REUSE_FROM glash_pch)
 
-add_dependencies(${CineEditor} editor_copy_textures editor_copy_fonts editor_copy_contentbrowser_icons editor_copy_shaders)
+add_dependencies(${CineEditor} editor_copy_textures editor_copy_fonts editor_copy_contentbrowser_icons editor_copy_shaders copy_plugin copy_scripts)

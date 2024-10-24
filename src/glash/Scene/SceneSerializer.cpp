@@ -5,6 +5,7 @@
 #include "glash/Scene/Entity.hpp"
 #include "glash/Scene/Components.hpp"
 #include "glash/Scene/AssetManager.hpp"
+#include "glash/Scene/NativeScript.hpp"
 
 
 #include <yaml-cpp/yaml.h>
@@ -131,6 +132,26 @@ namespace Cine
 
 			out << YAML::EndMap;
 		}
+
+		if (entity.HasComponent<SpriteAnimationComponent>())
+		{
+			//Aimations
+		}
+
+		if (entity.HasComponent<NativeScriptComponent>())
+		{
+			out << YAML::Key << "NativeScriptComponent";
+			out << YAML::BeginSeq;
+
+			ScriptEngine& se = ScriptEngine::Get();
+			auto& nsc = entity.GetComponent<NativeScriptComponent>();
+			for (auto& script : nsc.Scripts)
+			{
+				out << se.SerializeComponent(entity, script.Name);
+			}
+			out << YAML::EndSeq;
+		}
+
 
 		out << YAML::EndMap; //Entity
 	}
@@ -286,6 +307,29 @@ namespace Cine
 							}
 						}
 					}
+				}
+				auto nativeScriptComponent = entity["NativeScriptComponent"];
+				if (nativeScriptComponent)
+				{	
+					auto&& nsc = deserializedEntity.AddOrReplaceComponent<NativeScriptComponent>();
+
+					for (const auto& node : nativeScriptComponent)
+					{
+						if (!node.IsMap() || node.size() != 1)
+						{
+							CINE_CORE_ERROR("Invalid component format ({0}). Expected a map with one entry.", YAML::Dump(node));
+							continue;
+						}
+						std::string componentName = node.begin()->first.as<std::string>();
+						const YAML::Node& componentData = node.begin()->second;
+
+						YAML::Node wrappedComponentData;
+						wrappedComponentData[componentName] = componentData;
+
+						ScriptEngine::Get().CreateComponent(deserializedEntity, componentName);
+						ScriptEngine::Get().DeserializeComponent(deserializedEntity, const_cast<YAML::Node&>(wrappedComponentData), componentName);
+					}
+					
 				}
 			}
 		}
