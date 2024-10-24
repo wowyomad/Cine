@@ -16,6 +16,10 @@
 
 namespace Cine
 {
+	namespace Internal
+	{
+
+	}
 	Application* Application::s_Instance = nullptr;
 
 	Application& Application::Get()
@@ -149,7 +153,7 @@ namespace Cine
 					}
 				}
 
-				Input::ClearStates();
+				Internal::Input::ClearStates();
 			}
 
 #if CINE_IMGUI

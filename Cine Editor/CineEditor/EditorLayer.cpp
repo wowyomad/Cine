@@ -390,7 +390,7 @@ namespace Cine
 
 	bool EditorLayer::IsGizmoSnapping() const
 	{
-		return Input::IsKeyPressed(Key::LeftControl);
+		return Internal::Input::IsKeyPressed(Key::LeftControl);
 	}
 
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
@@ -401,8 +401,8 @@ namespace Cine
 		{
 			return false;
 		}
-		bool control = Input::IsKeyPressed(Key::LeftControl) || Input::IsKeyPressed(Key::RightControl);
-		bool shift = Input::IsKeyPressed(Key::LeftShift) || Input::IsKeyPressed(Key::RightShift);
+		bool control = Internal::Input::IsKeyPressed(Key::LeftControl) || Internal::Input::IsKeyPressed(Key::RightControl);
+		bool shift = Internal::Input::IsKeyPressed(Key::LeftShift) || Internal::Input::IsKeyPressed(Key::RightShift);
 
 		//Shortcuts
 		switch (e.GetKeyCode())

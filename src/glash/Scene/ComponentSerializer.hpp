@@ -17,7 +17,7 @@
     friend class Cine::Deserializer; \
     friend class Cine::Serializer; \
     friend void Cine::Deserialize<ClassName>(ClassName&, const YAML::Node&); \
-    friend YAML::Node Serialize<ClassName>(ClassName&); \
+    friend YAML::Node Cine::Serialize<ClassName>(ClassName&); \
     template <typename Visitor> void Serialize(Visitor& visitor) { \
         __VA_ARGS__ \
     } 

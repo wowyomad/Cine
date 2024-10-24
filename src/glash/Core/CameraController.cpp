@@ -29,19 +29,19 @@ namespace Cine
 
 		glm::vec2 movement(0.0f);
 
-		if (Input::IsKeyPressed(Key::A))
+		if (Internal::Input::IsKeyPressed(Key::A))
 		{
 			movement.x -= 1.0f;
 		}
-		if (Input::IsKeyPressed(Key::D))
+		if (Internal::Input::IsKeyPressed(Key::D))
 		{
 			movement.x += 1.0f;
 		}
-		if (Input::IsKeyPressed(Key::W))
+		if (Internal::Input::IsKeyPressed(Key::W))
 		{
 			movement.y += 1.0f;
 		}
-		if (Input::IsKeyPressed(Key::S))
+		if (Internal::Input::IsKeyPressed(Key::S))
 		{
 			movement.y -= 1.0f;
 		}
@@ -51,7 +51,7 @@ namespace Cine
 			movement = glm::normalize(movement);
 		}
 
-		if (Input::IsKeyPressed(Key::LeftShift))
+		if (Internal::Input::IsKeyPressed(Key::LeftShift))
 		{
 			movement *= m_CameraTranslatioSpeedBoost;
 		}
@@ -62,11 +62,11 @@ namespace Cine
 
 		if (m_CanRotate)
 		{
-			if (Input::IsKeyPressed(Key::E))
+			if (Internal::Input::IsKeyPressed(Key::E))
 			{
 				m_CameraRotation -= CameraRotationSpeed * ts;
 			}
-			if (Input::IsKeyPressed(Key::Q))
+			if (Internal::Input::IsKeyPressed(Key::Q))
 			{
 				m_CameraRotation += CameraRotationSpeed * ts;
 			}
@@ -94,7 +94,7 @@ namespace Cine
 	bool OrthograhpicCameraController::OnMouseScrolled(MouseScrolledEvent& event)
 	{
 		float scaleChange = -event.GetVertical() * CameraZoomSpeed;
-		if (Input::IsKeyPressed(Key::LeftShift))
+		if (Internal::Input::IsKeyPressed(Key::LeftShift))
 		{
 			scaleChange *= m_CameraZoomSpeedBoost;
 		}
