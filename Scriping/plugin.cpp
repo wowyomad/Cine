@@ -1,10 +1,8 @@
 #include "plugin.hpp"
 #include <iostream>
 #include <entt/entt.hpp>
-
-/*Should put '#include "Scripts/<Name>"'*/
-#include "Scripts/ControllerScript.hpp"
-#include "Scripts/TestScript.hpp"
+ 
+// [INCLUDES]
 
 using namespace Cine;
 
@@ -41,7 +39,7 @@ void RegisterComponent()
 					component.OnUpdate(ts);
 				}
 			};
-		
+
 	}
 }
 
@@ -74,9 +72,8 @@ void OnComponentAdded(entt::entity entity, Component& component)
 void InitializeComponents(entt::registry& registry)
 {
 	s_Registry = &registry;
-	//Register calls here
-	RegisterComponent<TestScript>();
-	RegisterComponent<ControllerScript>();
+
+	// [REGISTER]
 }
 
 void CreateComponent(entt::entity entity, const std::string& componentName)

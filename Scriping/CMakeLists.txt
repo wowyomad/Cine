@@ -15,11 +15,15 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(glash_lib)
 
-add_library(plugin SHARED plugin.cpp plugin.hpp)
+add_library(plugin SHARED "Generated/plugin_generated.cpp" plugin.hpp)
 target_link_libraries(plugin PUBLIC glash)
 message("Source dir of glash : ${glash_SOURCE_DIR}")
 target_include_directories(plugin PUBLIC ${glash_SOURCE_DIR})
 target_include_directories(plugin PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+list(APPEND PLUGIN_PROPERTIES  
+    GLASH_ENABLE_DEBUG ON)
+target_compile_definitions(plugin PRIVATE ${PLUGIN_PROPERTIES})
 
 set_target_properties(plugin PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib
