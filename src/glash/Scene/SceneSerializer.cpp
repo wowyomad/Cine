@@ -132,6 +132,19 @@ namespace Cine
 			out << YAML::EndMap;
 		}
 
+		if (entity.HasComponent<SpriteAnimationComponent>())
+		{
+			//Aimations
+		}
+
+		if (entity.HasComponent<NativeScriptComponent>())
+		{
+			auto& nsc = entity.GetComponent<NativeScriptComponent>();
+
+			Serializer serializer;
+		}
+
+
 		out << YAML::EndMap; //Entity
 	}
 
