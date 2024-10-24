@@ -10,17 +10,14 @@
 
 #include <ImGuizmo.h>
 
-static Cine::Scene* s_Scene = nullptr;
-
 namespace Cine
 {
 	void EditorLayer::OnAttach()
 	{
 		m_IsRuntime = true;
-
+		ScriptEngine::Get().LoadLibary("plugin.dll"); //Temporarily load here.
 		m_ActiveScene = CreateRef<Scene>();
-		s_Scene = m_ActiveScene.get();
-
+		ScriptEngine::Get().InitializeComponents(m_ActiveScene->GetRegistry());
 
 		FramebufferSpecification spec;
 		spec.Width = 1280;
@@ -284,8 +281,8 @@ namespace Cine
 	}
 	void EditorLayer::NewScene()
 	{
-		m_ActiveScene->UnloadLibrary();
 		m_ActiveScene = CreateRef<Scene>();
+		ScriptEngine::Get().InitializeComponents(m_ActiveScene->GetRegistry());
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 		m_ActiveScene->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
 	}
@@ -310,6 +307,8 @@ namespace Cine
 		{
 			std::filesystem::path fullPath = AssetManager::AssetsDirectory / path;
 			m_ActiveScene = CreateRef<Scene>();
+			ScriptEngine::Get().InitializeComponents(m_ActiveScene->GetRegistry());
+
 			m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 
 			SceneSerializer serializer(m_ActiveScene);

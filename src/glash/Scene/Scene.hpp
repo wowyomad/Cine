@@ -33,7 +33,7 @@ namespace Cine
 		void OnUpdateRuntime(Timestep ts);
 		void OnUpdateEditor(Timestep ts, EditorCamera& editorCamera);
 
-		void UnloadLibrary();
+		inline entt::registry& GetRegistry() { return m_Registry; }
 
 		auto GetEntities()
 		{
