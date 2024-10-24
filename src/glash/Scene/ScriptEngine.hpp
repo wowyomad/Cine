@@ -29,7 +29,10 @@ namespace Cine
 		using DeserializeComponentCall = void(*)(entt::entity entity, const std::string& componentName, YAML::Node& node);
 		using GetComponentsDataCall = ComponentsDataC(*)();
 
+		static ScriptEngine& Get();
+
 		void LoadLibary(const std::filesystem::path& libraryPath);
+		void UnloadLibrary();
 
 		void InitializeComponents(entt::registry& registry);
 		void CreateComponent(entt::entity entity, const std::string& componentName);
@@ -67,6 +70,8 @@ namespace Cine
 		DynamicLibrary m_Library;
 		std::vector<ComponentData> m_ComponentsData;
 		LibraryScriptCalls m_LibraryCalls;
-		
+
+		static ScriptEngine s_ScriptEngine;
 	};
+	
 }

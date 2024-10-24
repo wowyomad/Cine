@@ -15,15 +15,23 @@
 namespace Cine
 {
 	Scene::Scene()
-		: m_MainCamera(new Entity())
+		: m_MainCamera(new Entity()), m_ScriptEngine(ScriptEngine::Get())
 	{
 		m_ScriptEngine.LoadLibary("plugin.dll");
 		m_ScriptEngine.InitializeComponents(m_Registry);
 	}
 
+	// TODO: Handle save before unload.
 	Scene::~Scene()
 	{
+		
 	}
+
+	void Scene::UnloadLibrary()
+	{
+		m_ScriptEngine.UnloadLibrary();
+	}
+
 
 	void Scene::SetMainCamera(Entity cameraEntity)
 	{

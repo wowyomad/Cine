@@ -4,10 +4,17 @@
 
 namespace Cine
 {
-	// TODO: Handle save before unload.
+	ScriptEngine ScriptEngine::s_ScriptEngine;
+
+	ScriptEngine& ScriptEngine::Get()
+	{
+		return s_ScriptEngine;
+	}
+
+
 	void ScriptEngine::LoadLibary(const std::filesystem::path& libraryPath)
 	{
-		m_Library.Unload();
+		UnloadLibrary();
 
 		std::filesystem::path exeDir = std::filesystem::current_path();
 
@@ -29,6 +36,10 @@ namespace Cine
 
 		UpdateFunctionCalls();
 		m_ComponentsData.clear();
+	}
+	void ScriptEngine::UnloadLibrary()
+	{
+		m_Library.Unload();
 	}
 	void ScriptEngine::InitializeComponents(entt::registry& registry)
 	{

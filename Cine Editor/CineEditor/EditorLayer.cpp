@@ -12,16 +12,6 @@
 
 static Cine::Scene* s_Scene = nullptr;
 
-enum PlayerAnimation
-{
-	Idle,
-	MoveUp,
-	MoveRight,
-	MoveLeft,
-	MoveDown,
-};
-
-
 namespace Cine
 {
 	void EditorLayer::OnAttach()
@@ -31,8 +21,6 @@ namespace Cine
 		m_ActiveScene = CreateRef<Scene>();
 		s_Scene = m_ActiveScene.get();
 
-		auto entity = s_Scene->CreateEntity("Tvaryna");
-		entity.AddComponentByName("ControllerScript");
 
 		FramebufferSpecification spec;
 		spec.Width = 1280;
@@ -40,12 +28,6 @@ namespace Cine
 		m_Framebuffer = FrameBuffer::Create(spec);
 
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
-
-		m_EditorCamera = EditorCamera(45.0f, 16.0f / 9.0f, 0.01f, 1000.0f);
-
-		auto camera = s_Scene->CreateEntity("Camera");
-		camera.AddComponent<CameraComponent>();
-		s_Scene->SetMainCamera(camera);
 	}
 
 	void EditorLayer::OnDetach()
@@ -297,14 +279,12 @@ namespace Cine
 				}
 			}
 		}
-
-
-
 		ImGui::End();
 		ImGui::PopStyleVar(1);
 	}
 	void EditorLayer::NewScene()
 	{
+		m_ActiveScene->UnloadLibrary();
 		m_ActiveScene = CreateRef<Scene>();
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 		m_ActiveScene->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
@@ -442,63 +422,5 @@ namespace Cine
 			}
 		}
 		return false;
-	}
-
-	struct HealthComponent
-	{
-		float value;
-		glm::vec2 vec2;
-		std::vector<std::string> values;
-
-		SERIALIZE_CLASS(HealthComponent)
-	};
-
-
-	class PlayerScript
-	{
-	public:
-		float Speed;
-		std::string Name;
-		HealthComponent Health;
-
-	public:
-		void OnStart()
-		{
-
-		}
-
-		void Set()
-		{
-			Speed = 15.0f;
-			Name = "Alexei";
-			Health = { 15, {25.0, 60.0f} };
-			Health.values = { "Biba", "Boba", "Dima" };
-		}
-
-		SERIALIZE_CLASS(PlayerScript)
-	};
-
-	void EditorLayer::SetupCustom()
-	{
-		PlayerScript p;
-		p.Set();
-
-		YAML::Node node = Serialize(p);
-		std::string serializedString = YAML::Dump(node);
-		std::cout << "Serialized String: " << std::endl << serializedString << std::endl;
-
-		PlayerScript deserializedPlayer;
-		Deserialize(deserializedPlayer, node);
-
-		std::cout << "Deserialized Player Name: " << deserializedPlayer.Name << std::endl;
-		std::cout << "Deserialized Player Speed: " << deserializedPlayer.Speed << std::endl;
-		std::cout << "Deserialized Health Value: " << deserializedPlayer.Health.value << std::endl;
-		std::cout << "Deserialized Health Vec2: " << deserializedPlayer.Health.vec2.x << ", " << deserializedPlayer.Health.vec2.y << std::endl;
-		int i = 0;
-		for (auto& value : deserializedPlayer.Health.values)
-		{
-			std::cout << "Deserialized value " << ++i << ": " << value << std::endl;
-
-		}
 	}
 }

@@ -41,6 +41,8 @@ namespace Cine
 		void OnUpdateRuntime(Timestep ts);
 		void OnUpdateEditor(Timestep ts, EditorCamera& editorCamera);
 
+		void UnloadLibrary();
+
 		auto GetEntities()
 		{
 			return m_Registry.view<entt::entity>();
@@ -188,7 +190,7 @@ namespace Cine
 		}
 
 	private:
-		ScriptEngine m_ScriptEngine;
+		ScriptEngine& m_ScriptEngine;
 
 		std::map<std::string, ComponentCreater> m_ComponentCreators;
 		std::map<std::string, ComponentRemover> m_ComponentRemovers;
