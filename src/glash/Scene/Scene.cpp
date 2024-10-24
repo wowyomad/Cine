@@ -177,25 +177,12 @@ namespace Cine
 
 	YAML::Node Scene::SerializeComponentByName(Entity entity, const std::string& componentName)
 	{
-		auto it = m_SerializationRegistry.find(componentName);
-		if (it != m_SerializationRegistry.end()) {
-			return it->second(m_Registry, entity.m_EntityHandle);
-		}
-		else {
-			//CINE_CORE_ASSERT(false, "Serialization for component '{}' not found", componentName);
-			return {};
-		}
+		return m_ScriptEngine.SerializeComponent(entity, componentName);
 	}
 
-	void Scene::DeserializeComponentByName(Entity entity, const std::string& componentName, const YAML::Node& node)
+	void Scene::DeserializeComponentByName(Entity entity, const std::string& componentName, YAML::Node& node)
 	{
-		auto it = m_DeserializationRegistry.find(componentName);
-		if (it != m_DeserializationRegistry.end()) {
-			it->second(m_Registry, entity, node);
-		}
-		else {
-			CINE_CORE_TRACE("Deserialization for component '{}' not found", componentName);
-		}
+		m_ScriptEngine.DeserializeComponent(entity, node, componentName);
 	}
 
 	void Scene::DestroyMarkedEntities()

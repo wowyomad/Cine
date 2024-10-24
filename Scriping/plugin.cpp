@@ -2,38 +2,74 @@
 #include <iostream>
 #include <entt/entt.hpp>
  
+#include "GLFW/glfw3.h" //Temporarily
+
+
 // [INCLUDES]
 
 using namespace Cine;
 
-using EmplaceComponent = void(*)(entt::entity);
-using DestroyComponent = void(*)(entt::entity);
-using UpdateScriptComponent = void(*)(Timestep ts);
+using EmplaceComponentCall = void(*)(entt::entity);
+using DestroyComponentCall = void(*)(entt::entity);
+using UpdateScriptComponentCall = void(*)(Timestep ts);
+using SerializeComponentCall = YAML::Node(*)(entt::entity entity);
+using DeserializeComponentCall = void(*)(YAML::Node&, entt::entity);
 
 entt::registry* s_Registry = nullptr;
-std::map<std::string, EmplaceComponent> Creators;
-std::map<std::string, DestroyComponent> Destroyers;
-std::map<std::string, UpdateScriptComponent> Updaters;
+std::map<std::string, EmplaceComponentCall> Creators;
+std::map<std::string, DestroyComponentCall> Destroyers;
+std::map<std::string, UpdateScriptComponentCall> Updaters;
+std::map<std::string, SerializeComponentCall> Serializers;
+std::map<std::string, DeserializeComponentCall> Deserializers;
 
 template <class Component>
 void RegisterComponent()
 {
 	std::string name = Utils::GetClassTypename<Component>();
-	Creators[name] = [](entt::entity entity)
+	Creators[name] = [](entt::entity entity) -> void
 		{
 			auto& component = s_Registry->emplace<Component>(entity);
 			OnComponentAdded<Component>(entity, component);
 		};
-	Destroyers[name] = [](entt::entity entity)
+	Destroyers[name] = [](entt::entity entity) -> void
 		{
 			s_Registry->remove<Component>(entity);
+		};
+	Serializers[name] = [](entt::entity entity) -> 	YAML::Node
+		{
+			Component* component = s_Registry->try_get<Component>(entity);
+			if (component)
+			{
+				return Cine::Serialize(*component);
+			}
+			else
+			{
+				return {};
+			}
+		};
+	Deserializers[name] = [](YAML::Node& node, entt::entity entity)
+		{
+			Component component;
+			Cine::Deserialize(component, node);
+			s_Registry->emplace_or_replace<Component>(entity, component);
+
+			if constexpr (std::is_base_of<NativeScript, Component>::value)
+			{ 
+				//Make Instance null to make OnCreate call?
+			}
+			
 		};
 	if constexpr (std::is_base_of<NativeScript, Component>::value)
 	{
 		Updaters[name] = [](Timestep ts)
 			{
 				auto view = s_Registry->view<Component>();
-				for (auto entity : view)
+				std::vector<entt::entity> scriptEnabled;
+				std::copy_if(view.begin(), view.end(), std::back_inserter(scriptEnabled), [&view](entt::entity entity)
+					{
+						return view.get<Component>(entity).Enabled;
+					});
+				for (auto entity : scriptEnabled)
 				{
 					auto& component = view.get<Component>(entity);
 					component.OnUpdate(ts);
@@ -129,5 +165,19 @@ ComponentsData GetComponentsData()
 void InitializeApplicationContext(Cine::Application* application)
 {
 	Application::Set(application);
-	Input::Init();
+
+	//Temporarily
+	glfwInit();
+	glfwMakeContextCurrent(static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow())); 
+
+	Internal::Input::Init();
+}
+
+YAML::Node SerializeComponent(entt::entity entity, const std::string& componentName)
+{
+	return YAML::Node();
+}
+
+void DeserializeComponent(entt::entity entity, const std::string& componentName, YAML::Node& node)
+{
 }

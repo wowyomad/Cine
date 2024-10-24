@@ -52,6 +52,16 @@ namespace Cine
 		m_LibraryCalls.UpdateScripts(ts);
 	}
 
+	YAML::Node ScriptEngine::SerializeComponent(entt::entity entity, const std::string& componentName)
+	{
+		return m_LibraryCalls.SerializeComponent(entity, componentName);
+	}
+
+	void ScriptEngine::DeserializeComponent(entt::entity entity, YAML::Node& node, const std::string& componentName)
+	{
+		m_LibraryCalls.DeserializeComponent(entity, componentName, node);
+	}
+
 	const std::vector<ComponentData>& ScriptEngine::GetComponentsData() const
 	{
 		return m_ComponentsData;
@@ -64,6 +74,8 @@ namespace Cine
 		m_LibraryCalls.CreateComponent = m_Library.GetFunction<CreateComponentCall>("CreateComponent");
 		m_LibraryCalls.RemoveComponent = m_Library.GetFunction<CreateComponentCall>("RemoveComponent");
 		m_LibraryCalls.UpdateScripts = m_Library.GetFunction<UpdateAllScriptsCall>("UpdateScripts");
+		m_LibraryCalls.SerializeComponent = m_Library.GetFunction<SerializeComponentCall>("SerializeComponent");
+		m_LibraryCalls.DeserializeComponent = m_Library.GetFunction<DeserializeComponentCall>("DeserializeComponent");
 		m_LibraryCalls.GetComponentsData = m_Library.GetFunction<GetComponentsDataCall>("GetComponentsData");
 		
 		return m_LibraryCalls.InitializeComponents

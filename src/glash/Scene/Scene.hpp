@@ -132,7 +132,7 @@ namespace Cine
 		void RemoveComponentByName(Entity entity, const std::string& componentName);
 
 		YAML::Node SerializeComponentByName(Entity entity, const std::string& componentName);
-		void DeserializeComponentByName(Entity entity, const std::string& componentName, const YAML::Node& node);
+		void DeserializeComponentByName(Entity entity, const std::string& componentName, YAML::Node& node);
 
 		template <class Component>
 		void OnComponentDestroyed()

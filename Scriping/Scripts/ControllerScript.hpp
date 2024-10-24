@@ -15,19 +15,19 @@ public:
 
 	void OnUpdate(Timestep ts) override
 	{
-		if (Input::IsKeyPressed(Key::W))
+		if (Internal::Input::IsKeyPressed(Key::W))
 		{
 			m_Transform->Translation.y += m_Speed * ts;
 		}
-		if (Input::IsKeyPressed(Key::S))
+		if (Internal::Input::IsKeyPressed(Key::S))
 		{
 			m_Transform->Translation.y -= m_Speed * ts;
 		}
-		if (Input::IsKeyPressed(Key::D))
+		if (Internal::Input::IsKeyPressed(Key::D))
 		{
 			m_Transform->Translation.x += m_Speed * ts;
 		}
-		if (Input::IsKeyPressed(Key::A))
+		if (Internal::Input::IsKeyPressed(Key::A))
 		{
 			m_Transform->Translation.x -= m_Speed * ts;
 		}

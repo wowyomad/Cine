@@ -11,7 +11,7 @@ set(GLASH_BUILD_EDITOR OFF)
 FetchContent_Declare(
 	glash_lib
 	GIT_REPOSITORY https://github.com/wowyomad/cine.git
-	GIT_TAG e9da7d791686d6a182f40eb559e35d2a1643fc72
+	GIT_TAG baac9dec04daa36c6732597f68f262616f12012d
 )
 FetchContent_MakeAvailable(glash_lib)
 
@@ -22,7 +22,7 @@ target_include_directories(plugin PUBLIC ${glash_SOURCE_DIR})
 target_include_directories(plugin PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 list(APPEND PLUGIN_PROPERTIES  
-    GLASH_ENABLE_DEBUG ON)
+    GLASH_ENABLE_DEBUG)
 target_compile_definitions(plugin PRIVATE ${PLUGIN_PROPERTIES})
 
 set_target_properties(plugin PROPERTIES

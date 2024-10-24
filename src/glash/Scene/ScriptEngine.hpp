@@ -5,6 +5,8 @@
 #include "glash/Core/Timestep.hpp"
 #include "glash/Core/Application.hpp"
 
+#include "yaml-cpp/yaml.h"
+
 namespace Cine
 {
 	struct ComponentData
@@ -23,6 +25,8 @@ namespace Cine
 		using CreateComponentCall = void(*)(entt::entity, const std::string& scriptName);
 		using RemoveComponentCall = void(*)(entt::entity, const std::string& scriptName);
 		using UpdateAllScriptsCall = void(*)(Timestep ts);
+		using SerializeComponentCall = YAML::Node(*)(entt::entity entity, const std::string& componentName);
+		using DeserializeComponentCall = void(*)(entt::entity entity, const std::string& componentName, YAML::Node& node);
 		using GetComponentsDataCall = ComponentsDataC(*)();
 
 		void LoadLibary(const std::filesystem::path& libraryPath);
@@ -31,6 +35,8 @@ namespace Cine
 		void CreateComponent(entt::entity entity, const std::string& componentName);
 		void RemoveComponent(entt::entity entity, const std::string& componentName);
 		void UpdateScripts(Timestep ts);
+		YAML::Node SerializeComponent(entt::entity entity, const std::string& componentName);
+		void DeserializeComponent(entt::entity entity, YAML::Node& node, const std::string& componentName);
 		const std::vector<ComponentData>& GetComponentsData() const;
 
 	private:
@@ -53,6 +59,8 @@ namespace Cine
 			RemoveComponentCall RemoveComponent;
 			UpdateAllScriptsCall UpdateScripts;
 			GetComponentsDataCall GetComponentsData;
+			SerializeComponentCall  SerializeComponent;
+			DeserializeComponentCall DeserializeComponent;
 		};
 
 	private:
