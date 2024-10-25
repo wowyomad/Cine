@@ -131,7 +131,7 @@ namespace Cine
 						ScriptEngine::Get().InitializeComponents(m_ActiveScene->GetRegistry());
 						
 						serializer.Deserialize(savePath);
-						m_ActiveScene->SetUpdateScripts(true);
+						m_ActiveScene->SetUpdateScene(true);
 						Application::Get().SetUpdateUI(true);
 					});
 				return true;
@@ -154,7 +154,7 @@ namespace Cine
 		ImGui::Begin("Content Browser");
 		if (DisplayReloadScriptsButton())
 		{
-			m_ActiveScene->SetUpdateScripts(false);
+			m_ActiveScene->SetUpdateScene(false);
 		}
 
 		if (m_CurrentDirectory != m_AssetsDirectory)

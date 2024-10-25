@@ -659,6 +659,11 @@ namespace Cine
 				{
 					for (auto& script : nsc.Scripts)
 					{
+						if (!script.Instance)
+						{
+							continue;
+						}
+
 						bool& enabled = script.Instance->Enabled;
 
 						std::string buttonIcon = "X##" + script.Name;
@@ -693,7 +698,7 @@ namespace Cine
 							const std::string fieldName = key.first.as<std::string>();
 							YAML::Node fieldNode = key.second;
 
-							std::string fieldStr = fieldName + "##" + std::to_string(static_cast<uint32_t>(entity));
+							std::string fieldStr = fieldName + "##" + script.Name;
 							if (fieldNode.IsScalar())
 							{
 								std::string value = fieldNode.as<std::string>();

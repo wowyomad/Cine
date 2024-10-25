@@ -51,9 +51,9 @@ namespace Cine
 			m_MainCamera = new Entity();;
 		}
 	}
-	void Scene::SetUpdateScripts(bool update)
+	void Scene::SetUpdateScene(bool update)
 	{
-		m_UpdateScripts = update;
+		m_UpdateScene = update;
 	}
 
 
@@ -116,45 +116,44 @@ namespace Cine
 
 	void Scene::OnUpdateEditor(Timestep ts, EditorCamera& editorCamera)
 	{
-		if (m_UpdateScripts)
+		if (m_UpdateScene)
 		{
 			UpdateWorldTransforms(m_Registry);
 			InstantiateScripts();
 			UpdateScripts(ts);
 			SpriteAnimationSystem::Update(m_Registry, ts);
+			Renderer2D::Clear();
+			Renderer2D::BeginScene(editorCamera);
+			SpriteRendererSystem::Update(m_Registry);
+			Renderer2D::EndScene();
 
+			DestroyMarkedEntities();
 		}
-
-		Renderer2D::Clear();
-		Renderer2D::BeginScene(editorCamera);
-		SpriteRendererSystem::Update(m_Registry);
-		Renderer2D::EndScene();
-
-		DestroyMarkedEntities();
 	}
 
 
 	void Scene::OnUpdateRuntime(Timestep ts)
 	{
 
-		if (m_UpdateScripts)
+		if (m_UpdateScene)
 		{
 			UpdateWorldTransforms(m_Registry);
 			InstantiateScripts();
 			UpdateScripts(ts);
 			SpriteAnimationSystem::Update(m_Registry, ts);
+			Renderer2D::Clear();
+			if (*m_MainCamera)
+			{
+				auto&& [cameraComponent, transformComponent] = m_MainCamera->GetComponents<CameraComponent, TransformComponent>();
+				Renderer2D::BeginScene(cameraComponent.Camera, transformComponent.GetLocalTransform());
+				SpriteRendererSystem::Update(m_Registry);
+				Renderer2D::EndScene();
+			}
+
+			DestroyMarkedEntities();
 		}
 
-		Renderer2D::Clear();
-		if (*m_MainCamera)
-		{
-			auto&& [cameraComponent, transformComponent] = m_MainCamera->GetComponents<CameraComponent, TransformComponent>();
-			Renderer2D::BeginScene(cameraComponent.Camera, transformComponent.GetLocalTransform());
-			SpriteRendererSystem::Update(m_Registry);
-			Renderer2D::EndScene();
-		}
 
-		DestroyMarkedEntities();
 
 	}
 

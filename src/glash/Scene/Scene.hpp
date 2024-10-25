@@ -41,7 +41,7 @@ namespace Cine
 		}
 
 		void Clear();
-		void SetUpdateScripts(bool update);
+		void SetUpdateScene(bool update);
 		const std::string& GetName() const { return m_Name; }
 		void SetName(const std::string& name) { m_Name = name; }
 
@@ -88,7 +88,7 @@ namespace Cine
 		std::string m_Name;
 
 		std::vector<entt::entity> m_ToDestroyEntities;
-		bool m_UpdateScripts = true;
+		bool m_UpdateScene = true;
 
 		Entity* m_MainCamera;
 
