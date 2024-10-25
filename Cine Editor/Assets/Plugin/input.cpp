@@ -1,13 +1,12 @@
 #include "input.hpp"
 
-
-Input::KeyInputFunction Input::IsKeyPressedFunc;
-Input::KeyInputFunction Input::IsKeyDownFunc;
-Input::KeyInputFunction Input::IsKeyUpFunc;
-Input::MouseInputFunction Input::IsMouseButtonPressedFunc;
-Input::MouseInputFunction Input::IsMouseButtonDownFunc;
-Input::MouseInputFunction Input::IsMouseButtonUpFunc;
-Input::MousePositionFunction Input::GetMousePositionFunc;
+KeyInputFunction IsKeyPressedFunc = nullptr;
+KeyInputFunction IsKeyDownFunc = nullptr;
+KeyInputFunction IsKeyUpFunc = nullptr;
+MouseInputFunction IsMouseButtonPressedFunc = nullptr;
+MouseInputFunction IsMouseButtonDownFunc = nullptr;
+MouseInputFunction IsMouseButtonUpFunc = nullptr;
+MousePositionFunction GetMousePositionFunc = nullptr;
 
 bool Input::IsKeyPressed(KeyCode keycode)
 {

@@ -187,6 +187,25 @@ ComponentsData GetComponentsData()
 	return data;
 }
 
+void InitializeInput
+(
+	KeyInputFunction isKeyPressedFunc,
+	KeyInputFunction isKeyDownFunc,
+	KeyInputFunction isKeyUpFunc,
+	MouseInputFunction isMouseButtonPressedFunc,
+	MouseInputFunction isMouseButtonDownFunc,
+	MouseInputFunction isMouseButtonUpFunc,
+	MousePositionFunction getMousePositionFunc)
+{
+	IsKeyPressedFunc = isKeyPressedFunc;
+	IsKeyDownFunc = isKeyDownFunc;
+	IsKeyUpFunc = isKeyUpFunc;
+	IsMouseButtonPressedFunc = isMouseButtonPressedFunc;
+	IsMouseButtonDownFunc = isMouseButtonDownFunc;
+	IsMouseButtonUpFunc = isMouseButtonUpFunc;
+	GetMousePositionFunc = getMousePositionFunc;
+}
+
 void InitializeApplicationContext(Cine::Application* application)
 {
 	Application::Set(application);

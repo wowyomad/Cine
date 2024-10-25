@@ -11,7 +11,7 @@ set(GLASH_BUILD_EDITOR OFF)
 FetchContent_Declare(
 	glash_lib
 	GIT_REPOSITORY https://github.com/wowyomad/cine.git
-	GIT_TAG 129e8aff065e65308ab3e836720ffc2bbea0b644
+	GIT_TAG b95187c7a4db5a2d8a3f957a1f1531a1a74d223f
 )
 FetchContent_MakeAvailable(glash_lib)
 
@@ -34,5 +34,5 @@ set_target_properties(plugin PROPERTIES
 )
 
 if(MSVC)
-    target_link_options(plugin PRIVATE "/DEBUG:NONE")
+   target_link_options(plugin PRIVATE "/DEBUG:NONE")
 endif()
