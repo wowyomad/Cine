@@ -40,6 +40,11 @@ namespace Cine
 			return m_Registry.view<entt::entity>();
 		}
 
+		void Clear();
+		void SetUpdateScripts(bool update);
+		const std::string& GetName() const { return m_Name; }
+		void SetName(const std::string& name) { m_Name = name; }
+
 		inline const std::vector<ComponentData>& GetComponentsData() const
 		{
 			return m_ScriptEngine.GetComponentsData();
@@ -80,8 +85,10 @@ namespace Cine
 	private:
 		ScriptEngine& m_ScriptEngine;
 		entt::registry m_Registry;
+		std::string m_Name;
 
 		std::vector<entt::entity> m_ToDestroyEntities;
+		bool m_UpdateScripts = true;
 
 		Entity* m_MainCamera;
 

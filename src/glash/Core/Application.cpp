@@ -158,19 +158,25 @@ namespace Cine
 
 #if CINE_IMGUI
 			{
-
-				CINE_PROFILE_SCOPE("ImGui Render");
-
-				m_ImGuiLayer->Begin();
-				for (Layer* layer : m_LayerStack)
+				if (m_UpdateUI)
 				{
-					layer->OnImGuiRender();
+					CINE_PROFILE_SCOPE("ImGui Render");
+
+					m_ImGuiLayer->Begin();
+					for (Layer* layer : m_LayerStack)
+					{
+						layer->OnImGuiRender();
+					}
+					m_ImGuiLayer->End();
 				}
-				m_ImGuiLayer->End();
+				
 			}
 #endif
-
-			m_Window->OnUpdate();
+			if (m_UpdateUI)
+			{
+				m_Window->OnUpdate();
+			}
+			
 		}
 	}
 
@@ -188,5 +194,10 @@ namespace Cine
 	{
 		ImGui::GetAllocatorFunctions(p_alloc_func, p_free_func, p_user_data);
 	}
+	void Application::SetUpdateUI(bool update)
+	{
+		m_UpdateUI = update;
+	}
+
 }
 

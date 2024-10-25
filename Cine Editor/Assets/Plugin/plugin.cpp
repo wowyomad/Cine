@@ -165,7 +165,7 @@ void UpdateScripts(Timestep ts)
 
 void Destroy()
 {
-
+	
 }
 
 ComponentsData GetComponentsData()
@@ -190,10 +190,6 @@ ComponentsData GetComponentsData()
 void InitializeApplicationContext(Cine::Application* application)
 {
 	Application::Set(application);
-
-	//Temporarily
-	glfwInit();
-	glfwMakeContextCurrent(static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow()));
 
 	Internal::Input::Init();
 }

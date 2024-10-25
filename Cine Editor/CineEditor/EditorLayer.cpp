@@ -25,6 +25,7 @@ namespace Cine
 		m_Framebuffer = FrameBuffer::Create(spec);
 
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+		m_ContentBrowserPanel.SetContext(m_ActiveScene);
 	}
 
 	void EditorLayer::OnDetach()
@@ -145,16 +146,6 @@ namespace Cine
 
 		ImGui::Begin("Stats");
 		{
-			if (m_ActiveScene->GetMainCameraEntity())
-			{
-				auto&& [cameraComponent, tagComponent] = m_ActiveScene->GetMainCameraEntity().GetComponents<CameraComponent, TagComponent>();
-				ImGui::Text("Camera: %s", tagComponent.Tag.c_str());
-			}
-			else
-			{
-				ImGui::Text("Camera: %s", "None");
-			}
-
 			ImGui::Separator();
 			auto stats = Renderer2D::GetStats();
 			ImGui::Text("Draw Calls: %llu", stats.DrawCalls);
@@ -284,6 +275,7 @@ namespace Cine
 		m_ActiveScene = CreateRef<Scene>();
 		ScriptEngine::Get().InitializeComponents(m_ActiveScene->GetRegistry());
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+		m_ContentBrowserPanel.SetContext(m_ActiveScene);
 		m_ActiveScene->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
 	}
 	void EditorLayer::SaveSceneAs()
@@ -310,6 +302,7 @@ namespace Cine
 			ScriptEngine::Get().InitializeComponents(m_ActiveScene->GetRegistry());
 
 			m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+			m_ContentBrowserPanel.SetContext(m_ActiveScene);
 
 			SceneSerializer serializer(m_ActiveScene);
 			serializer.Deserialize(fullPath);

@@ -14,6 +14,11 @@ def run_command(command):
         exit(1)
 
 def main():
+    # Change the working directory to the script's directory
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    os.chdir(script_dir)
+    print(f"Changed working directory to: {script_dir}")
+
     # Determine the correct path separator and CMake build directory
     if platform.system() == "Windows":
         build_dir = ".\\out\\build\\win32-msvc\\"

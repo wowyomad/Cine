@@ -1,6 +1,7 @@
 #pragma once
 
 #include "glash/Scene/AssetManager.hpp"
+#include "glash/Scene/Scene.hpp"
 
 #include "glash/Renderer/Texture.hpp"
 
@@ -11,6 +12,9 @@ namespace Cine
 	public:
 		ContentBrowserPanel(const std::filesystem::path& directory = AssetManager::AssetsDirectory);
 		void OnImGuiRender();
+
+		void SetContext(Ref<Scene> scene);
+		bool DisplayReloadScriptsButton();
 	
 	private:
 		std::filesystem::path m_AssetsDirectory;
@@ -20,5 +24,8 @@ namespace Cine
 		Ref<Texture> m_FileIcon;
 
 		float m_UpdateInterval = 1.0f;
+
+		//Should be project though
+		Ref<Scene> m_ActiveScene;
 	};
 }

@@ -55,6 +55,7 @@ namespace Cine
 		GLASH_API ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
 		GLASH_API ImGuiContext* GetImGuiContext() const;
 		GLASH_API void GetAllocatorFunctions(ImGuiMemAllocFunc* p_alloc_func, ImGuiMemFreeFunc* p_free_func, void** p_user_data) const;
+		GLASH_API void SetUpdateUI(bool update);
 
 
 		GLASH_API static Application& Get();
@@ -74,6 +75,7 @@ namespace Cine
 		LayerStack m_LayerStack;
 		ImGuiLayer* m_ImGuiLayer;
 		bool m_Running;
+		bool m_UpdateUI = true;
 		bool m_Minimized = false;
 		float m_LastFrameTime = 0.0f;
 		float m_TickTime = 1.0f / 60.0f;

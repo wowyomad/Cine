@@ -166,7 +166,7 @@ namespace Cine
 			for (auto entityID : view)
 			{
 				Entity entity(entityID, &scene);
-				if (!entity.GetComponent<HierarchyComponent>().Parent)
+				if (entity.HasComponent<HierarchyComponent>() && !entity.GetComponent<HierarchyComponent>().Parent)
 				{
 					DisplayEntityNode(entity);
 				}
@@ -655,69 +655,73 @@ namespace Cine
 	{
 		DisplayComponent<NativeScriptComponent>(entity, "Native Scripts", [this, entity](NativeScriptComponent& nsc)
 			{
-				for (auto& script : nsc.Scripts)
+				if (!nsc.Scripts.size() == 0)
 				{
-					bool& enabled = script.Instance->Enabled;
-
-					std::string buttonIcon = "X##" + script.Name;
-					if (ImGui::Button(buttonIcon.c_str()))
+					for (auto& script : nsc.Scripts)
 					{
-						m_Context.Scene->RemoveComponentByName(entity, script.Name);
-						return;
-					}
-					ImGui::Text("%s", script.Name.c_str());
+						bool& enabled = script.Instance->Enabled;
 
-					ImGui::SameLine();
-
-					float maxContentWidth = ImGui::GetContentRegionMax().x;
-
-					float checkboxWidth = ImGui::CalcTextSize("Enabled").x + ImGui::GetStyle().FramePadding.x * 10;
-
-					ImGui::SetCursorPosX(maxContentWidth - checkboxWidth);
-
-					std::string EnabledField = "Enabled##" + script.Name;
-					ImGui::Checkbox(EnabledField.c_str(), &enabled);
-
-					YAML::Node serialized = m_Context.Scene->SerializeComponentByName(entity, script.Name);
-					YAML::Node node = serialized[script.Name];
-
-					if (!node)
-					{
-						continue;
-					}
-
-					for (auto key : node)
-					{
-						const std::string fieldName = key.first.as<std::string>();
-						YAML::Node fieldNode = key.second;
-
-						std::string fieldStr = fieldName + "##" + std::to_string(static_cast<uint32_t>(entity));
-						if (fieldNode.IsScalar())
+						std::string buttonIcon = "X##" + script.Name;
+						if (ImGui::Button(buttonIcon.c_str()))
 						{
-							std::string value = fieldNode.as<std::string>();
-							std::string value_copy = value;
-							value.resize(256);
-							if (ImGui::InputText(fieldStr.c_str(), const_cast<char*>(value.c_str()), value.length()))
-							{
-								try
-								{
-									fieldNode = value.c_str();
-									serialized[script.Name] = node;
-									m_Context.Scene->DeserializeComponentByName(entity, script.Name, serialized);
-								}
-								catch (const std::exception& e)
-								{
-									fieldNode = value_copy.c_str();
-									serialized[script.Name] = node;
-									m_Context.Scene->DeserializeComponentByName(entity, script.Name, serialized);
+							m_Context.Scene->RemoveComponentByName(entity, script.Name);
+							return;
+						}
+						ImGui::Text("%s", script.Name.c_str());
 
+						ImGui::SameLine();
+
+						float maxContentWidth = ImGui::GetContentRegionMax().x;
+
+						float checkboxWidth = ImGui::CalcTextSize("Enabled").x + ImGui::GetStyle().FramePadding.x * 10;
+
+						ImGui::SetCursorPosX(maxContentWidth - checkboxWidth);
+
+						std::string EnabledField = "Enabled##" + script.Name;
+						ImGui::Checkbox(EnabledField.c_str(), &enabled);
+
+						YAML::Node serialized = m_Context.Scene->SerializeComponentByName(entity, script.Name);
+						YAML::Node node = serialized[script.Name];
+
+						if (!node)
+						{
+							continue;
+						}
+
+						for (auto key : node)
+						{
+							const std::string fieldName = key.first.as<std::string>();
+							YAML::Node fieldNode = key.second;
+
+							std::string fieldStr = fieldName + "##" + std::to_string(static_cast<uint32_t>(entity));
+							if (fieldNode.IsScalar())
+							{
+								std::string value = fieldNode.as<std::string>();
+								std::string value_copy = value;
+								value.resize(256);
+								if (ImGui::InputText(fieldStr.c_str(), const_cast<char*>(value.c_str()), value.length()))
+								{
+									try
+									{
+										fieldNode = value.c_str();
+										serialized[script.Name] = node;
+										m_Context.Scene->DeserializeComponentByName(entity, script.Name, serialized);
+									}
+									catch (const std::exception& e)
+									{
+										fieldNode = value_copy.c_str();
+										serialized[script.Name] = node;
+										m_Context.Scene->DeserializeComponentByName(entity, script.Name, serialized);
+
+									}
 								}
 							}
 						}
-					}
-					ImGui::Separator();
+						ImGui::Separator();
 
+					}
 				}
+				
 
 				auto& componetsData = m_Context.Scene->GetComponentsData();
 				auto& scripts = nsc.Scripts;

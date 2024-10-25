@@ -2,15 +2,146 @@
 #include "ContentBrowserPanel.hpp"
 
 #include "glash/Scene/AssetManager.hpp"
-
+#include "glash/Scene/SceneSerializer.hpp"
 #include "glash/Core/Timer.hpp"
 
 #include <filesystem>
-
 #include <imgui.h>	
+
+static std::atomic<bool> s_IsReloadingScripts(false);
+static std::atomic<int> s_ScriptReloadTimeElapsed(0);
+static std::thread s_ScriptThread;
 
 namespace Cine
 {
+	bool RunPythonScriptSilently(const std::string& scriptPath)
+	{
+		STARTUPINFO si = { sizeof(si) };
+		PROCESS_INFORMATION pi;
+		si.dwFlags = STARTF_USESHOWWINDOW;
+		si.wShowWindow = SW_HIDE;
+
+		std::string command = "python " + scriptPath;
+
+		char cmdLine[256];
+		strncpy(cmdLine, command.c_str(), sizeof(cmdLine));
+		cmdLine[sizeof(cmdLine) - 1] = '\0';
+
+		if (CreateProcessA(NULL, cmdLine, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi))
+		{
+			WaitForSingleObject(pi.hProcess, INFINITE);
+			CloseHandle(pi.hProcess);
+			CloseHandle(pi.hThread);
+			return true;
+		}
+		else
+		{
+			std::cerr << "Failed to run script: " << scriptPath << " with error code " << GetLastError() << std::endl;
+			return false;
+		}
+	}
+
+	bool RunPythonScriptWithCmd(const std::string& scriptPath)
+	{
+		STARTUPINFO si = { sizeof(si) };
+		PROCESS_INFORMATION pi;
+
+		std::string command = "cmd /c python " + scriptPath + " && pause";
+		char cmdLine[256];
+		strncpy(cmdLine, command.c_str(), sizeof(cmdLine));
+		cmdLine[sizeof(cmdLine) - 1] = '\0';
+
+		if (CreateProcessA(NULL, cmdLine, NULL, NULL, FALSE, CREATE_NEW_CONSOLE, NULL, NULL, &si, &pi))
+		{
+			WaitForSingleObject(pi.hProcess, INFINITE);
+			CloseHandle(pi.hProcess);
+			CloseHandle(pi.hThread);
+			return true;
+		}
+		else 
+		{
+			std::cerr << "Failed to run script: " << scriptPath << " with error code " << GetLastError() << std::endl;
+			return false;
+		}
+	}
+
+	void RunScriptAsync(const std::string& scriptPath, std::function<void()> onFinish) {
+		if (s_ScriptThread.joinable()) {
+			s_ScriptThread.join();
+		}
+
+		s_IsReloadingScripts = true;
+		s_ScriptReloadTimeElapsed = 0;
+
+		s_ScriptThread = std::thread([scriptPath, onFinish]() {
+			auto startTime = std::chrono::steady_clock::now();
+
+			std::thread timerThread([&]() {
+				while (s_IsReloadingScripts) {
+					std::this_thread::sleep_for(std::chrono::seconds(1));
+					auto now = std::chrono::steady_clock::now();
+					s_ScriptReloadTimeElapsed = std::chrono::duration_cast<std::chrono::seconds>(now - startTime).count();
+				}
+				});
+
+			RunPythonScriptSilently(scriptPath);
+
+			s_IsReloadingScripts = false;
+
+			if (timerThread.joinable()) {
+				timerThread.join();
+			}
+
+			if (onFinish) {
+				onFinish();
+			}
+			});
+
+			s_ScriptThread.detach();
+	}
+
+
+	bool ContentBrowserPanel::DisplayReloadScriptsButton()
+	{
+		if (s_IsReloadingScripts)
+		{
+			ImGui::Button(("Reloading... " + std::to_string(s_ScriptReloadTimeElapsed) + "s").c_str());
+		}
+		else
+		{
+			if (ImGui::Button("Reload Scripts"))
+			{
+#if _DEBUG
+				std::string path = "./Assets/Plugin/all_in_one_debug.py";
+#else
+				std::string path = "./Assets/Plugin/all_in_one_release.py";
+#endif
+				RunScriptAsync(path, [&]()
+					{
+						SceneSerializer serializer(m_ActiveScene);
+						std::filesystem::path savePath = std::filesystem::path(AssetManager::AssetsDirectory / "Scenes" / m_ActiveScene->GetName());
+						savePath.replace_extension(".cine.temp");
+						serializer.Serialize(savePath);
+
+						Application::Get().SetUpdateUI(false);
+						m_ActiveScene->Clear();
+
+						ScriptEngine::Get().UnloadLibrary();
+						ScriptEngine::Get().LoadLibary("plugin.dll");
+						ScriptEngine::Get().InitializeComponents(m_ActiveScene->GetRegistry());
+						
+						serializer.Deserialize(savePath);
+						m_ActiveScene->SetUpdateScripts(true);
+						Application::Get().SetUpdateUI(true);
+					});
+				return true;
+			}
+		}
+		return false;
+	}
+
+
+
 	ContentBrowserPanel::ContentBrowserPanel(const std::filesystem::path& directory)
 		: m_AssetsDirectory(directory), m_CurrentDirectory(m_AssetsDirectory)
 	{
@@ -21,6 +152,10 @@ namespace Cine
 	void ContentBrowserPanel::OnImGuiRender()
 	{
 		ImGui::Begin("Content Browser");
+		if (DisplayReloadScriptsButton())
+		{
+			m_ActiveScene->SetUpdateScripts(false);
+		}
 
 		if (m_CurrentDirectory != m_AssetsDirectory)
 		{
@@ -79,6 +214,11 @@ namespace Cine
 		}
 
 		ImGui::End();
+	}
+
+	void ContentBrowserPanel::SetContext(Ref<Scene> scene)
+	{
+		m_ActiveScene = scene;
 	}
 
 }

@@ -15,15 +15,15 @@
 namespace Cine
 {
 	Scene::Scene()
-		: m_MainCamera(new Entity()), m_ScriptEngine(ScriptEngine::Get())
+		: m_MainCamera(new Entity()), m_ScriptEngine(ScriptEngine::Get()), m_Name("Unnamed Scene")
 	{
-		
+
 	}
 
 	// TODO: Handle save before unload.
 	Scene::~Scene()
 	{
-		
+
 	}
 
 
@@ -41,6 +41,22 @@ namespace Cine
 		//make sure that when destroyed, m_MainCamera.m_EntityHandle = entt::null; Curerntly done primitively right inside DestroyEntity.
 
 	}
+
+	void Scene::Clear()
+	{
+		m_Registry = entt::registry();
+		if (m_MainCamera && *m_MainCamera)
+		{
+			delete m_MainCamera;
+			m_MainCamera = new Entity();;
+		}
+	}
+	void Scene::SetUpdateScripts(bool update)
+	{
+		m_UpdateScripts = update;
+	}
+
+
 
 	Entity Scene::GetMainCameraEntity()
 	{
@@ -100,16 +116,18 @@ namespace Cine
 
 	void Scene::OnUpdateEditor(Timestep ts, EditorCamera& editorCamera)
 	{
-		UpdateWorldTransforms(m_Registry);
+		if (m_UpdateScripts)
+		{
+			UpdateWorldTransforms(m_Registry);
+			InstantiateScripts();
+			UpdateScripts(ts);
+			SpriteAnimationSystem::Update(m_Registry, ts);
 
-
-		InstantiateScripts();
-		UpdateScripts(ts);
+		}
 
 		Renderer2D::Clear();
 		Renderer2D::BeginScene(editorCamera);
 		SpriteRendererSystem::Update(m_Registry);
-		SpriteAnimationSystem::Update(m_Registry, ts);
 		Renderer2D::EndScene();
 
 		DestroyMarkedEntities();
@@ -118,10 +136,14 @@ namespace Cine
 
 	void Scene::OnUpdateRuntime(Timestep ts)
 	{
-		UpdateWorldTransforms(m_Registry);
 
-		InstantiateScripts();
-		UpdateScripts(ts);
+		if (m_UpdateScripts)
+		{
+			UpdateWorldTransforms(m_Registry);
+			InstantiateScripts();
+			UpdateScripts(ts);
+			SpriteAnimationSystem::Update(m_Registry, ts);
+		}
 
 		Renderer2D::Clear();
 		if (*m_MainCamera)
@@ -129,7 +151,6 @@ namespace Cine
 			auto&& [cameraComponent, transformComponent] = m_MainCamera->GetComponents<CameraComponent, TransformComponent>();
 			Renderer2D::BeginScene(cameraComponent.Camera, transformComponent.GetLocalTransform());
 			SpriteRendererSystem::Update(m_Registry);
-			SpriteAnimationSystem::Update(m_Registry, ts);
 			Renderer2D::EndScene();
 		}
 
@@ -155,6 +176,7 @@ namespace Cine
 
 	void Scene::UpdateScripts(Timestep ts)
 	{
+
 		m_ScriptEngine.UpdateScripts(ts);
 	}
 
