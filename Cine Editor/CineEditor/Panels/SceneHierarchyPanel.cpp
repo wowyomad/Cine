@@ -6,6 +6,8 @@
 #include "glash/Scene/SceneSerializer.hpp"
 #include "glash/Scene/AssetManager.hpp"
 
+#include "../Utils/Shell.hpp"
+
 #include "Dialog.hpp"
 
 #include <imgui_internal.h>
@@ -738,9 +740,54 @@ namespace Cine
 					ImGui::OpenPopup("AddScriptPopup");
 				}
 
+				static bool showCreationResult = false;
+				static bool creationSuccess = false;
+				static std::string creationMessage;
+				static ImVec2 creationPopupPosition = ImVec2(0, 0);
+
 				if (ImGui::BeginPopup("AddScriptPopup"))
 				{
 					ImGui::InputText("Search", searchBuffer, IM_ARRAYSIZE(searchBuffer));
+
+					ImGui::SameLine();
+					ImGui::Dummy(ImVec2(10.0f, 0.0f));
+					ImGui::SameLine();
+
+					if (ImGui::Button("Create"))
+					{
+						std::string scriptName = searchBuffer;
+						scriptName += ".hpp";
+						std::filesystem::path scriptFilePath = AssetManager::AssetsDirectory / "Scripts" / scriptName;
+
+						if (std::filesystem::exists(scriptFilePath))
+						{
+							creationSuccess = false;
+							creationMessage = "Script already exists.";
+						}
+						else
+						{
+							Shell::CreateNewScript(searchBuffer);
+
+							if (std::filesystem::exists(scriptFilePath))
+							{
+								creationSuccess = true;
+							}
+
+							if (creationSuccess)
+							{
+								creationMessage = "Script created successfully!";
+								ZeroMemory(searchBuffer, sizeof(searchBuffer));
+							}
+							else
+							{
+								creationMessage = "Failed to create the script.";
+							}
+						}
+
+						showCreationResult = true;
+						creationPopupPosition = ImGui::GetCursorScreenPos();
+						ImGui::CloseCurrentPopup();
+					}
 
 					for (auto&& [name, isScript] : componetsData)
 					{
@@ -771,8 +818,31 @@ namespace Cine
 
 						if (hasScript)
 							ImGui::EndDisabled();
-
 					}
+
+					ImGui::EndPopup();
+				}
+
+				if (showCreationResult)
+				{
+					ImGui::SetNextWindowPos(creationPopupPosition, ImGuiCond_Always);
+					ImGui::OpenPopup("CreationResultPopup");
+				}
+
+				if (ImGui::BeginPopupModal("CreationResultPopup", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+				{
+					ImGui::Text("%s", creationMessage.c_str());
+					ImGui::Spacing();
+					ImGui::Separator();
+					ImGui::Spacing();
+
+					if (ImGui::Button("OK", ImVec2(120, 0)))
+					{
+						showCreationResult = false;
+						ImGui::CloseCurrentPopup();
+					}
+
+					ImGui::SetItemDefaultFocus();
 
 					ImGui::EndPopup();
 				}

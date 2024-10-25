@@ -36,6 +36,7 @@ copy_files("${EDITOR_SHADERS}" "${EDITOR_SHADERS_OUT}" editor_copy_shaders)
 file(GLOB SOURCES
 	${CineEditor_SOURCE_DIR}/CineEditor/*
 	${CineEditor_SOURCE_DIR}/CineEditor/Panels/*
+    ${CineEditor_SOURCE_DIR}/CineEditor/Utils/*
 )
 
 list(APPEND editor_PRECOMPILE_DEFINITIONS GLASH_ENABLE_DEBUG)

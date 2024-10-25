@@ -5,6 +5,8 @@
 #include "glash/Scene/SceneSerializer.hpp"
 #include "glash/Core/Timer.hpp"
 
+#include "../Utils/Shell.hpp"
+
 #include <filesystem>
 #include <imgui.h>	
 
@@ -14,57 +16,6 @@ static std::thread s_ScriptThread;
 
 namespace Cine
 {
-	bool RunPythonScriptSilently(const std::string& scriptPath)
-	{
-		STARTUPINFO si = { sizeof(si) };
-		PROCESS_INFORMATION pi;
-		si.dwFlags = STARTF_USESHOWWINDOW;
-		si.wShowWindow = SW_HIDE;
-
-		std::string command = "python " + scriptPath;
-
-		char cmdLine[256];
-		strncpy(cmdLine, command.c_str(), sizeof(cmdLine));
-		cmdLine[sizeof(cmdLine) - 1] = '\0';
-
-		if (CreateProcessA(NULL, cmdLine, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi))
-		{
-			WaitForSingleObject(pi.hProcess, INFINITE);
-			CloseHandle(pi.hProcess);
-			CloseHandle(pi.hThread);
-			return true;
-		}
-		else
-		{
-			std::cerr << "Failed to run script: " << scriptPath << " with error code " << GetLastError() << std::endl;
-			return false;
-		}
-	}
-
-	bool RunPythonScriptWithCmd(const std::string& scriptPath)
-	{
-		STARTUPINFO si = { sizeof(si) };
-		PROCESS_INFORMATION pi;
-
-		std::string command = "cmd /c python " + scriptPath + " && pause";
-		char cmdLine[256];
-		strncpy(cmdLine, command.c_str(), sizeof(cmdLine));
-		cmdLine[sizeof(cmdLine) - 1] = '\0';
-
-		if (CreateProcessA(NULL, cmdLine, NULL, NULL, FALSE, CREATE_NEW_CONSOLE, NULL, NULL, &si, &pi))
-		{
-			WaitForSingleObject(pi.hProcess, INFINITE);
-			CloseHandle(pi.hProcess);
-			CloseHandle(pi.hThread);
-			return true;
-		}
-		else 
-		{
-			std::cerr << "Failed to run script: " << scriptPath << " with error code " << GetLastError() << std::endl;
-			return false;
-		}
-	}
-
 	void RunScriptAsync(const std::string& scriptPath, std::function<void()> onFinish) {
 		if (s_ScriptThread.joinable()) {
 			s_ScriptThread.join();
@@ -84,7 +35,7 @@ namespace Cine
 				}
 				});
 
-			RunPythonScriptSilently(scriptPath);
+			Shell::RunPythonScriptLoud(scriptPath);
 
 			s_IsReloadingScripts = false;
 
