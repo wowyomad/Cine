@@ -295,7 +295,7 @@ namespace Cine
 
 	void EditorLayer::OpenScene(const std::filesystem::path& path)
 	{
-		if (!path.empty())
+		if (!path.empty() && path.filename().extension().string() == ".cine")
 		{
 			std::filesystem::path fullPath = AssetManager::AssetsDirectory / path;
 			m_ActiveScene = CreateRef<Scene>();

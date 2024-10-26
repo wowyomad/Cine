@@ -20,11 +20,11 @@ set(DEST_PLUGIN_PATH "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Assets/Plugin")
 set(DEST_SCRIPTS_PATH "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Assets/Scripts")
 
 add_custom_target(copy_plugin ALL
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${PLUGIN_SOURCE_DIR} ${DEST_PLUGIN_PATH}
+    COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different ${PLUGIN_SOURCE_DIR} ${DEST_PLUGIN_PATH}
     COMMENT "Copying Plugin directory to ${DEST_PLUGIN_PATH}"
 )
 add_custom_target(copy_scripts ALL
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${SCRIPTS_SOURCE_DIR} ${DEST_SCRIPTS_PATH}
+    COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different ${SCRIPTS_SOURCE_DIR} ${DEST_SCRIPTS_PATH}
     COMMENT "Copying Scripts directory to ${DEST_SCRIPTS_PATH}"
 )
 
