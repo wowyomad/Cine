@@ -177,4 +177,34 @@ namespace Cine
 			}));
 		hierarchy.Parent = {};
 	}
+
+	Entity Entity::Clone()
+	{
+		Entity clone = Entity(m_Scene->m_Registry.create(), m_Scene);
+
+		for (auto&& [id, storage] : m_Scene->m_Registry.storage())
+		{
+			if (storage.contains(m_EntityHandle))
+			{
+				storage.push(clone, storage.value(m_EntityHandle));
+			}
+			if (storage.type().hash() == entt::type_id<NativeScriptComponent>().hash())
+			{
+				auto& cloneNsc = clone.GetComponent<NativeScriptComponent>();
+
+				for (auto& script : cloneNsc.Scripts)
+				{
+					script.Instance = nullptr;
+				}
+			}
+			else if (storage.type().hash() == entt::type_id<HierarchyComponent>().hash())
+			{
+				auto& cloneHierarchy = clone.GetComponent<HierarchyComponent>();
+				cloneHierarchy.Children = {};
+				cloneHierarchy.Parent = {};
+			}
+		}
+
+		return clone;
+	}
 }

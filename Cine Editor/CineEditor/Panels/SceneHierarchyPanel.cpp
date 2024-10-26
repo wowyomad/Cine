@@ -203,9 +203,9 @@ namespace Cine
 
 		if (ImGui::BeginPopupContextWindow(0, ImGuiPopupFlags_MouseButtonDefault_ | ImGuiPopupFlags_NoOpenOverItems))
 		{
-			if (ImGui::MenuItem("Create Empty Entity"))
+			if (ImGui::MenuItem("Create Entity"))
 			{
-				Entity newEntity = m_Context.Scene->CreateEntity("Empty Entity");
+				Entity newEntity = m_Context.Scene->CreateEntity("New Entity");
 				m_Context.Properties = newEntity;
 			}
 			ImGui::EndPopup();
@@ -310,10 +310,26 @@ namespace Cine
 		bool entityDeleted = false;
 		if (ImGui::BeginPopupContextItem())
 		{
-			if (ImGui::MenuItem("Delete Entity"))
+			if (ImGui::MenuItem("Delete"))
 			{
 				entityDeleted = true;
 			}
+			if (ImGui::MenuItem("Clone"))
+			{
+				Entity clone = entity.Clone();
+				clone.GetComponent<TagComponent>().Tag = entity.GetComponent<TagComponent>().Tag + " (Clone)";
+				if (entity == m_Context.Selection)
+				{
+					m_Context.Selection = clone;
+				}
+
+				if (entity == m_Context.Properties)
+				{
+					m_Context.Properties = clone;
+				}
+
+			}
+
 			ImGui::EndPopup();
 		}
 

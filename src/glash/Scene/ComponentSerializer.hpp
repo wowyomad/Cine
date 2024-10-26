@@ -21,6 +21,9 @@
         __VA_ARGS__ \
     } 
 #endif
+#ifndef ASSIGN
+#define ASSIGN(field) this->field = other.field;
+#endif
 
 template <typename T>
 struct is_serializable : std::disjunction<

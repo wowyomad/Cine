@@ -189,6 +189,20 @@ namespace Cine
 		m_ScriptEngine.RemoveComponent(entity, componentName);
 	}
 
+	Entity Scene::FindEntityByName(const std::string& name)
+	{
+		auto view = m_Registry.view<TagComponent>();
+		for (auto entity : view)
+		{
+			if (view.get<TagComponent>(entity).Tag == name)
+			{
+				return Entity(entity, this);
+			}
+		}
+		return Entity(); //invalid entity
+	}
+
+
 	YAML::Node Scene::SerializeComponentByName(Entity entity, const std::string& componentName)
 	{
 		return m_ScriptEngine.SerializeComponent(entity, componentName);

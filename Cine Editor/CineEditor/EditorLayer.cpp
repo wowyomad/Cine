@@ -14,7 +14,7 @@ namespace Cine
 {
 	void EditorLayer::OnAttach()
 	{
-		m_IsRuntime = true;
+		m_IsRuntime = false;
 		ScriptEngine::Get().LoadLibary("plugin.dll"); //Temporarily load here.
 		m_ActiveScene = CreateRef<Scene>();
 		ScriptEngine::Get().InitializeComponents(m_ActiveScene->GetRegistry());

@@ -53,6 +53,8 @@ namespace Cine
 		void AddComponentByName(Entity entity, const std::string& componentName);
 		void RemoveComponentByName(Entity entity, const std::string& componentName);
 
+		Entity FindEntityByName(const std::string& name);
+
 		YAML::Node SerializeComponentByName(Entity entity, const std::string& componentName);
 		void DeserializeComponentByName(Entity entity, const std::string& componentName, YAML::Node& node);
 

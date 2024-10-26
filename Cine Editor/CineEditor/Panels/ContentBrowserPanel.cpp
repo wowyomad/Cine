@@ -35,7 +35,7 @@ namespace Cine
 				}
 				});
 
-			Shell::RunPythonScriptLoud(scriptPath);
+			Shell::RunPythonLoud(scriptPath);
 
 			s_IsReloadingScripts = false;
 
@@ -104,18 +104,40 @@ namespace Cine
 	void ContentBrowserPanel::OnImGuiRender()
 	{
 		ImGui::Begin("Content Browser");
+
 		if (DisplayReloadScriptsButton())
 		{
 			m_ActiveScene->SetUpdateScene(false);
 		}
 
+		float contentWidth = ImGui::GetContentRegionAvail().x;
+
+		ImGui::SameLine(contentWidth - 120);
+		if (ImGui::Button("Open Explorer"))
+		{
+			Shell::OpenExlorer(m_CurrentDirectory);
+		}
+
+		if (m_CurrentDirectory.filename() == "Scripts")
+		{
+			ImGui::NewLine();
+			ImGui::SameLine(contentWidth - 120);
+			if (ImGui::Button("Open Editor"))
+			{
+				Shell::OpenEditor(m_CurrentDirectory);
+			}
+		}
+
 		if (m_CurrentDirectory != m_AssetsDirectory)
 		{
+			ImGui::NewLine();
 			if (ImGui::Button("<"))
 			{
 				m_CurrentDirectory = m_CurrentDirectory.parent_path();
 			}
 		}
+
+		
 
 		float padding = 8.0f;
 		float thumbnailSize = 96;

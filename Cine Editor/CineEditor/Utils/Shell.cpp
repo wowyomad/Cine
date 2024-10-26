@@ -6,7 +6,7 @@
 namespace Cine
 {
 #if _WIN32
-	bool Shell::RunPythonScriptSilently(const std::string& scriptPath)
+	bool Shell::RunPythonSilently(const std::string& scriptPath)
 	{
 		STARTUPINFO si = { sizeof(si) };
 		PROCESS_INFORMATION pi;
@@ -36,10 +36,8 @@ namespace Cine
 		}
 	}
 
-	bool Shell::RunPythonScriptLoud(const std::string& scriptPath)
+	bool Shell::RunPythonLoud(const std::string& scriptPath)
 	{
-		
-
 		STARTUPINFO si = { sizeof(si) };
 		PROCESS_INFORMATION pi;
 		si.dwFlags = STARTF_USESHOWWINDOW;
@@ -64,12 +62,65 @@ namespace Cine
 			return false;
 		}
 	}
+	bool Shell::OpenEditor(const std::filesystem::path& where)
+	{
+		HINSTANCE result = ShellExecuteA(NULL, "open", "code", where.string().c_str(), NULL, SW_HIDE);
+
+		if ((int)result >= 32)
+		{
+			return true;
+		}
+		else
+		{
+			CINE_CORE_ASSERT(false, "Failed to open Visual Studio Code at {0}", where.string());
+			return false;
+		}
+	}
+	bool Shell::OpenExlorer(const std::filesystem::path& where)
+	{
+		HINSTANCE result = ShellExecuteA(NULL, "open", "explorer.exe", where.string().c_str(), NULL, SW_SHOWNORMAL);
+
+		if ((int)result >= 32)
+		{
+			return true;
+		}
+		else
+		{
+			CINE_CORE_ASSERT(false, "Failed to open explorer at {0}", where.string());
+			return false;
+		}
+	}
 	bool Shell::CreateNewScript(const std::string& name)
 	{
 		std::string command = "./Assets/Plugin/creator.py ";
 		command += name;
-		return Shell::RunPythonScriptLoud(command.c_str());
+		return Shell::RunPythonLoud(command.c_str());
 	}
+
+	bool Shell::RunShellCommandLoud(const std::string& command)
+	{
+		STARTUPINFO si = { sizeof(si) };
+		PROCESS_INFORMATION pi;
+		si.dwFlags = STARTF_USESHOWWINDOW;
+		si.wShowWindow = SW_HIDE;
+
+		char cmdLine[256];
+		strncpy(cmdLine, command.c_str(), sizeof(cmdLine));
+		cmdLine[sizeof(cmdLine) - 1] = '\0';
+
+		if (CreateProcessA(NULL, cmdLine, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi))
+		{
+			WaitForSingleObject(pi.hProcess, INFINITE);
+			CloseHandle(pi.hProcess);
+			CloseHandle(pi.hThread);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
 #endif // _WIN32
 }
 
