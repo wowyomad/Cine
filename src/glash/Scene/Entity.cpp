@@ -191,7 +191,6 @@ namespace Cine
 			if (storage.type().hash() == entt::type_id<NativeScriptComponent>().hash())
 			{
 				auto& cloneNsc = clone.GetComponent<NativeScriptComponent>();
-
 				for (auto& script : cloneNsc.Scripts)
 				{
 					script.Instance = nullptr;

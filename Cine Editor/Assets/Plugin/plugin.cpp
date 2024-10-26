@@ -81,7 +81,7 @@ void RegisterComponent()
 template <class Component>
 void OnComponentAdded(entt::entity entity)
 {
-	auto& component = s_Registry->emplace<Component>(entity);
+	auto& component = s_Registry->emplace_or_replace<Component>(entity);
 
 	if constexpr (std::is_base_of<NativeScript, Component>::value)
 	{
