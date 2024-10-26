@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include "glash/Core/Log.hpp"
 
 #ifdef _WIN32
 #define NOMINMAX 
@@ -22,17 +23,20 @@ namespace Cine
     class DynamicLibrary {
     public:
 
-        DynamicLibrary() : handle(nullptr) {}
+        DynamicLibrary() : m_Handle(nullptr) {}
 
         ~DynamicLibrary() {
             Unload();
         }
 
-        bool Load(const std::filesystem::path& libraryName) {
+        bool Load(const std::filesystem::path& libraryName) 
+        {
+            m_Name = libraryName.string();
+            CINE_CORE_WARN("Loading library {0}", m_Name);
 #ifdef _WIN32
-            handle = LoadLibrary(libraryName.string().c_str());
-            if (!handle) {
-                std::cerr << "Failed to load " << libraryName << std::endl;
+            m_Handle = LoadLibrary(m_Name.c_str());
+            if (!m_Handle) {
+                CINE_CORE_WARN("Failed to load ", m_Name);
                 return false;
             }
 #else
@@ -46,27 +50,30 @@ namespace Cine
         }
 
         void Unload() {
-            if (handle) {
+            if (m_Handle)
+            {
+                CINE_CORE_WARN("Unloading library {0}", m_Name);
 #ifdef _WIN32
-                FreeLibrary(static_cast<HMODULE>(handle));
+                FreeLibrary(static_cast<HMODULE>(m_Handle));
 #else
                 dlclose(handle);
 #endif
-                handle = nullptr;
+                m_Handle = nullptr;
             }
         }
 
         template <typename T>
         T GetFunction(const std::string& functionName) {
 #ifdef _WIN32
-            return reinterpret_cast<T>(GetProcAddress(static_cast<HMODULE>(handle), functionName.c_str()));
+            return reinterpret_cast<T>(GetProcAddress(static_cast<HMODULE>(m_Handle), functionName.c_str()));
 #else
             return reinterpret_cast<T>(dlsym(handle, functionName.c_str()));
 #endif
         }
 
     private:
-        void* handle;
+        void* m_Handle = nullptr;
+        std::string m_Name;
     };
 
 
