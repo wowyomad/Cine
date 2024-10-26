@@ -233,7 +233,7 @@ namespace Cine
 				}
 			}
 			else {
-				CINE_CORE_INFO("Field {0} not found", name);
+				//CINE_CORE_INFO("Field {0} not found", name);
 			}
 		}
 
@@ -248,7 +248,7 @@ namespace Cine
 			if (node[name]) {
 				const auto& seqNode = node[name];
 				if (!seqNode.IsSequence()) {
-					CINE_CORE_ERROR("Expected a sequence for field: {0}", name);
+					//CINE_CORE_ERROR("Expected a sequence for field: {0}", name);
 					return;
 				}
 
@@ -265,7 +265,7 @@ namespace Cine
 				}
 			}
 			else {
-				CINE_CORE_ERROR("Field {0} found", name);
+				//CINE_CORE_ERROR("Field {0} found", name);
 			}
 		}
 	};

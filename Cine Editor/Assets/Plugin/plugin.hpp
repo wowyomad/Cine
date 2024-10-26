@@ -10,6 +10,8 @@
 #include "glash/Cine.hpp"
 #include "glash/Scene/Components.hpp"
 #include "glash/Core/Application.hpp"
+#include "glash/Core/Log.hpp"
+
 #include "input.hpp"
 
 #ifdef _WIN32

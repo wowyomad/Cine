@@ -89,7 +89,6 @@ namespace Cine
 
 	bool ScriptEngine::UpdateFunctionCalls()
 	{
-		m_LibraryCalls.InitializeApplicationContext = m_Library.GetFunction<InitializeApplicationContextCall>("InitializeApplicationContext");
 		m_LibraryCalls.InitializeComponents = m_Library.GetFunction<InitializeComponentsCall>("InitializeComponents");
 		m_LibraryCalls.CreateComponent = m_Library.GetFunction<CreateComponentCall>("CreateComponent");
 		m_LibraryCalls.RemoveComponent = m_Library.GetFunction<CreateComponentCall>("RemoveComponent");

@@ -1,9 +1,9 @@
 #include "plugin.hpp"
+
 #include <iostream>
 #include <entt/entt.hpp>
 
 #include "GLFW/glfw3.h" //Temporarily
-
 
 // [INCLUDES]
 
@@ -195,7 +195,8 @@ void InitializeInput
 	MouseInputFunction isMouseButtonPressedFunc,
 	MouseInputFunction isMouseButtonDownFunc,
 	MouseInputFunction isMouseButtonUpFunc,
-	MousePositionFunction getMousePositionFunc)
+	MousePositionFunction getMousePositionFunc
+)
 {
 	IsKeyPressedFunc = isKeyPressedFunc;
 	IsKeyDownFunc = isKeyDownFunc;
