@@ -2,15 +2,98 @@
 #include "ContentBrowserPanel.hpp"
 
 #include "glash/Scene/AssetManager.hpp"
-
+#include "glash/Scene/SceneSerializer.hpp"
 #include "glash/Core/Timer.hpp"
 
-#include <filesystem>
+#include "../Utils/Shell.hpp"
 
+#include <filesystem>
 #include <imgui.h>	
+
+static std::atomic<bool> s_IsReloadingScripts(false);
+static std::atomic<int> s_ScriptReloadTimeElapsed(0);
+static std::thread s_ScriptThread;
 
 namespace Cine
 {
+	void RunScriptAsync(const std::string& scriptPath, std::function<void()> onFinish) {
+		if (s_ScriptThread.joinable()) {
+			s_ScriptThread.join();
+		}
+
+		s_IsReloadingScripts = true;
+		s_ScriptReloadTimeElapsed = 0;
+
+		s_ScriptThread = std::thread([scriptPath, onFinish]() {
+			auto startTime = std::chrono::steady_clock::now();
+
+			std::thread timerThread([&]() {
+				while (s_IsReloadingScripts) {
+					std::this_thread::sleep_for(std::chrono::seconds(1));
+					auto now = std::chrono::steady_clock::now();
+					s_ScriptReloadTimeElapsed = std::chrono::duration_cast<std::chrono::seconds>(now - startTime).count();
+				}
+				});
+
+			Shell::RunPythonLoud(scriptPath);
+
+			s_IsReloadingScripts = false;
+
+			if (timerThread.joinable()) {
+				timerThread.join();
+			}
+
+			if (onFinish) {
+				onFinish();
+			}
+			});
+
+			s_ScriptThread.detach();
+	}
+
+
+	bool ContentBrowserPanel::DisplayReloadScriptsButton()
+	{
+		if (s_IsReloadingScripts)
+		{
+			ImGui::Button(("Reloading... " + std::to_string(s_ScriptReloadTimeElapsed) + "s").c_str());
+		}
+		else
+		{
+			if (ImGui::Button("Reload Scripts"))
+			{
+#if _DEBUG
+				std::string path = "./Assets/Plugin/all_in_one_debug.py";
+#else
+				std::string path = "./Assets/Plugin/all_in_one_release.py";
+#endif
+				RunScriptAsync(path, [&]()
+					{
+						SceneSerializer serializer(m_ActiveScene);
+						std::filesystem::path savePath = std::filesystem::path(AssetManager::AssetsDirectory / "Scenes" / m_ActiveScene->GetName());
+						savePath.replace_extension(".cine.temp");
+						serializer.Serialize(savePath);
+
+						Application::Get().SetUpdateUI(false);
+						std::this_thread::sleep_for(std::chrono::milliseconds(100)); //Right...
+						m_ActiveScene->Clear();
+
+						ScriptEngine::Get().UnloadLibrary();
+						ScriptEngine::Get().LoadLibary("plugin.dll");
+						ScriptEngine::Get().InitializeComponents(m_ActiveScene->GetRegistry());
+						
+						serializer.Deserialize(savePath);
+						m_ActiveScene->SetUpdateScene(true);
+						Application::Get().SetUpdateUI(true);
+					});
+				return true;
+			}
+		}
+		return false;
+	}
+
+
+
 	ContentBrowserPanel::ContentBrowserPanel(const std::filesystem::path& directory)
 		: m_AssetsDirectory(directory), m_CurrentDirectory(m_AssetsDirectory)
 	{
@@ -22,13 +105,39 @@ namespace Cine
 	{
 		ImGui::Begin("Content Browser");
 
+		if (DisplayReloadScriptsButton())
+		{
+			m_ActiveScene->SetUpdateScene(false);
+		}
+
+		float contentWidth = ImGui::GetContentRegionAvail().x;
+
+		ImGui::SameLine(contentWidth - 120);
+		if (ImGui::Button("Open Explorer"))
+		{
+			Shell::OpenExlorer(m_CurrentDirectory);
+		}
+
+		if (m_CurrentDirectory.filename() == "Scripts")
+		{
+			ImGui::NewLine();
+			ImGui::SameLine(contentWidth - 120);
+			if (ImGui::Button("Open Editor"))
+			{
+				Shell::OpenEditor(m_CurrentDirectory);
+			}
+		}
+
 		if (m_CurrentDirectory != m_AssetsDirectory)
 		{
+			ImGui::NewLine();
 			if (ImGui::Button("<"))
 			{
 				m_CurrentDirectory = m_CurrentDirectory.parent_path();
 			}
 		}
+
+		
 
 		float padding = 8.0f;
 		float thumbnailSize = 96;
@@ -79,6 +188,11 @@ namespace Cine
 		}
 
 		ImGui::End();
+	}
+
+	void ContentBrowserPanel::SetContext(Ref<Scene> scene)
+	{
+		m_ActiveScene = scene;
 	}
 
 }

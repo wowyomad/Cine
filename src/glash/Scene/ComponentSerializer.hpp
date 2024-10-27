@@ -11,7 +11,6 @@
 #ifndef FIELD
 #define FIELD(field) visitor(#field, field);
 #endif
-
 #ifndef SERIALIZE_CLASS
 #define SERIALIZE_CLASS(ClassName, ...) \
     friend class Cine::Deserializer; \
@@ -21,6 +20,9 @@
     template <typename Visitor> void Serialize(Visitor& visitor) { \
         __VA_ARGS__ \
     } 
+#endif
+#ifndef ASSIGN
+#define ASSIGN(field) this->field = other.field;
 #endif
 
 template <typename T>
@@ -158,7 +160,8 @@ namespace Cine
 		}
 
 		template <typename T>
-		void operator()(const std::string& name, T& value) {
+		void operator()(const std::string& name, T& value)
+		{
 			emitter << YAML::Key << name;
 
 			if constexpr (is_serializable<T>::value)
@@ -169,13 +172,35 @@ namespace Cine
 				}
 				catch (const YAML::TypedBadConversion<T>& e)
 				{
-					//CINE_CORE_WARN("Failed to convert field '{}' for type '{}': {}", name, typeid(T).name(), e.what());
 					return;
 				}
 			}
 			else
 			{
 				Serialize(value);
+			}
+		}
+
+		template <typename T>
+		void operator()(const std::string& name, std::vector<T>& vec)
+		{
+			emitter << YAML::Key << name << YAML::Value << YAML::BeginSeq;
+			for (auto& element : vec) {
+				if constexpr (is_serializable<T>::value)
+				{
+					try
+					{
+						emitter << YAML::Value << element;
+					}
+					catch (const YAML::TypedBadConversion<T>& e)
+					{
+						return;
+					}
+				}
+				else
+				{
+					Serialize(element);
+				}
 			}
 		}
 
@@ -197,10 +222,10 @@ namespace Cine
 
 		Deserializer(const YAML::Node& node) : node(node) {}
 
-		// Deserialize a field
 		template <typename T>
 		void operator()(const std::string& name, T& value) {
-			if (node[name]) {
+			if (node[name]) 
+			{
 				if constexpr (is_serializable<T>::value) 
 				{
 					value = node[name].as<T>();
@@ -211,7 +236,7 @@ namespace Cine
 				}
 			}
 			else {
-				throw std::runtime_error("Field not found: " + name);
+				//CINE_CORE_INFO("Field {0} not found", name);
 			}
 		}
 
@@ -220,7 +245,34 @@ namespace Cine
 			Deserializer deserializer(node[Utils::GetClassTypename<T>()]);
 			obj.Serialize(deserializer);
 		}
+
+		template <typename T>
+		void operator()(const std::string& name, std::vector<T>& vec) {
+			if (node[name]) {
+				const auto& seqNode = node[name];
+				if (!seqNode.IsSequence()) {
+					//CINE_CORE_ERROR("Expected a sequence for field: {0}", name);
+					return;
+				}
+
+				vec.clear();
+				for (const auto& elementNode : seqNode) {
+					T element;
+					if constexpr (is_serializable<T>::value) {
+						element = elementNode.as<T>();
+					}
+					else {
+						Deserialize(element, elementNode);
+					}
+					vec.push_back(element);
+				}
+			}
+			else {
+				//CINE_CORE_ERROR("Field {0} found", name);
+			}
+		}
 	};
+
 
 	template <typename T>
 	YAML::Node Serialize(T& obj) {

@@ -6,6 +6,8 @@
 #include "glash/Scene/SceneSerializer.hpp"
 #include "glash/Scene/AssetManager.hpp"
 
+#include "../Utils/Shell.hpp"
+
 #include "Dialog.hpp"
 
 #include <imgui_internal.h>
@@ -166,7 +168,7 @@ namespace Cine
 			for (auto entityID : view)
 			{
 				Entity entity(entityID, &scene);
-				if (!entity.GetComponent<HierarchyComponent>().Parent)
+				if (entity.HasComponent<HierarchyComponent>() && !entity.GetComponent<HierarchyComponent>().Parent)
 				{
 					DisplayEntityNode(entity);
 				}
@@ -201,9 +203,9 @@ namespace Cine
 
 		if (ImGui::BeginPopupContextWindow(0, ImGuiPopupFlags_MouseButtonDefault_ | ImGuiPopupFlags_NoOpenOverItems))
 		{
-			if (ImGui::MenuItem("Create Empty Entity"))
+			if (ImGui::MenuItem("Create Entity"))
 			{
-				Entity newEntity = m_Context.Scene->CreateEntity("Empty Entity");
+				Entity newEntity = m_Context.Scene->CreateEntity("New Entity");
 				m_Context.Properties = newEntity;
 			}
 			ImGui::EndPopup();
@@ -308,10 +310,26 @@ namespace Cine
 		bool entityDeleted = false;
 		if (ImGui::BeginPopupContextItem())
 		{
-			if (ImGui::MenuItem("Delete Entity"))
+			if (ImGui::MenuItem("Delete"))
 			{
 				entityDeleted = true;
 			}
+			if (ImGui::MenuItem("Clone"))
+			{
+				Entity clone = entity.Clone();
+				clone.GetComponent<TagComponent>().Tag = entity.GetComponent<TagComponent>().Tag + " (Clone)";
+				if (entity == m_Context.Selection)
+				{
+					m_Context.Selection = clone;
+				}
+
+				if (entity == m_Context.Properties)
+				{
+					m_Context.Properties = clone;
+				}
+
+			}
+
 			ImGui::EndPopup();
 		}
 
@@ -655,69 +673,78 @@ namespace Cine
 	{
 		DisplayComponent<NativeScriptComponent>(entity, "Native Scripts", [this, entity](NativeScriptComponent& nsc)
 			{
-				for (auto& script : nsc.Scripts)
+				if (!nsc.Scripts.size() == 0)
 				{
-					bool& enabled = script.Instance->Enabled;
-
-					std::string buttonIcon = "X##" + script.Name;
-					if (ImGui::Button(buttonIcon.c_str()))
+					for (auto& script : nsc.Scripts)
 					{
-						m_Context.Scene->RemoveComponentByName(entity, script.Name);
-						return;
-					}
-					ImGui::Text("%s", script.Name.c_str());
-
-					ImGui::SameLine();
-
-					float maxContentWidth = ImGui::GetContentRegionMax().x;
-
-					float checkboxWidth = ImGui::CalcTextSize("Enabled").x + ImGui::GetStyle().FramePadding.x * 10;
-
-					ImGui::SetCursorPosX(maxContentWidth - checkboxWidth);
-
-					std::string EnabledField = "Enabled##" + script.Name;
-					ImGui::Checkbox(EnabledField.c_str(), &enabled);
-
-					YAML::Node serialized = m_Context.Scene->SerializeComponentByName(entity, script.Name);
-					YAML::Node node = serialized[script.Name];
-
-					if (!node)
-					{
-						continue;
-					}
-
-					for (auto key : node)
-					{
-						const std::string fieldName = key.first.as<std::string>();
-						YAML::Node fieldNode = key.second;
-
-						std::string fieldStr = fieldName + "##" + std::to_string(static_cast<uint32_t>(entity));
-						if (fieldNode.IsScalar())
+						if (!script.Instance)
 						{
-							std::string value = fieldNode.as<std::string>();
-							std::string value_copy = value;
-							value.resize(256);
-							if (ImGui::InputText(fieldStr.c_str(), const_cast<char*>(value.c_str()), value.length()))
-							{
-								try
-								{
-									fieldNode = value.c_str();
-									serialized[script.Name] = node;
-									m_Context.Scene->DeserializeComponentByName(entity, script.Name, serialized);
-								}
-								catch (const std::exception& e)
-								{
-									fieldNode = value_copy.c_str();
-									serialized[script.Name] = node;
-									m_Context.Scene->DeserializeComponentByName(entity, script.Name, serialized);
+							continue;
+						}
 
+						bool& enabled = script.Instance->Enabled;
+
+						std::string buttonIcon = "X##" + script.Name;
+						if (ImGui::Button(buttonIcon.c_str()))
+						{
+							m_Context.Scene->RemoveComponentByName(entity, script.Name);
+							return;
+						}
+						ImGui::Text("%s", script.Name.c_str());
+
+						ImGui::SameLine();
+
+						float maxContentWidth = ImGui::GetContentRegionMax().x;
+
+						float checkboxWidth = ImGui::CalcTextSize("Enabled").x + ImGui::GetStyle().FramePadding.x * 10;
+
+						ImGui::SetCursorPosX(maxContentWidth - checkboxWidth);
+
+						std::string EnabledField = "Enabled##" + script.Name;
+						ImGui::Checkbox(EnabledField.c_str(), &enabled);
+
+						YAML::Node serialized = m_Context.Scene->SerializeComponentByName(entity, script.Name);
+						YAML::Node node = serialized[script.Name];
+
+						if (!node)
+						{
+							continue;
+						}
+
+						for (auto key : node)
+						{
+							const std::string fieldName = key.first.as<std::string>();
+							YAML::Node fieldNode = key.second;
+
+							std::string fieldStr = fieldName + "##" + script.Name;
+							if (fieldNode.IsScalar())
+							{
+								std::string value = fieldNode.as<std::string>();
+								std::string value_copy = value;
+								value.resize(256);
+								if (ImGui::InputText(fieldStr.c_str(), const_cast<char*>(value.c_str()), value.length()))
+								{
+									try
+									{
+										fieldNode = value.c_str();
+										serialized[script.Name] = node;
+										m_Context.Scene->DeserializeComponentByName(entity, script.Name, serialized);
+									}
+									catch (const std::exception& e)
+									{
+										fieldNode = value_copy.c_str();
+										serialized[script.Name] = node;
+										m_Context.Scene->DeserializeComponentByName(entity, script.Name, serialized);
+
+									}
 								}
 							}
 						}
-					}
-					ImGui::Separator();
+						ImGui::Separator();
 
+					}
 				}
+				
 
 				auto& componetsData = m_Context.Scene->GetComponentsData();
 				auto& scripts = nsc.Scripts;
@@ -729,9 +756,54 @@ namespace Cine
 					ImGui::OpenPopup("AddScriptPopup");
 				}
 
+				static bool showCreationResult = false;
+				static bool creationSuccess = false;
+				static std::string creationMessage;
+				static ImVec2 creationPopupPosition = ImVec2(0, 0);
+
 				if (ImGui::BeginPopup("AddScriptPopup"))
 				{
 					ImGui::InputText("Search", searchBuffer, IM_ARRAYSIZE(searchBuffer));
+
+					ImGui::SameLine();
+					ImGui::Dummy(ImVec2(10.0f, 0.0f));
+					ImGui::SameLine();
+
+					if (ImGui::Button("Create"))
+					{
+						std::string scriptName = searchBuffer;
+						scriptName += ".hpp";
+						std::filesystem::path scriptFilePath = AssetManager::AssetsDirectory / "Scripts" / scriptName;
+
+						if (std::filesystem::exists(scriptFilePath))
+						{
+							creationSuccess = false;
+							creationMessage = "Script already exists.";
+						}
+						else
+						{
+							Shell::CreateNewScript(searchBuffer);
+
+							if (std::filesystem::exists(scriptFilePath))
+							{
+								creationSuccess = true;
+							}
+
+							if (creationSuccess)
+							{
+								creationMessage = "Script created successfully!";
+								ZeroMemory(searchBuffer, sizeof(searchBuffer));
+							}
+							else
+							{
+								creationMessage = "Failed to create the script.";
+							}
+						}
+
+						showCreationResult = true;
+						creationPopupPosition = ImGui::GetCursorScreenPos();
+						ImGui::CloseCurrentPopup();
+					}
 
 					for (auto&& [name, isScript] : componetsData)
 					{
@@ -762,8 +834,31 @@ namespace Cine
 
 						if (hasScript)
 							ImGui::EndDisabled();
-
 					}
+
+					ImGui::EndPopup();
+				}
+
+				if (showCreationResult)
+				{
+					ImGui::SetNextWindowPos(creationPopupPosition, ImGuiCond_Always);
+					ImGui::OpenPopup("CreationResultPopup");
+				}
+
+				if (ImGui::BeginPopupModal("CreationResultPopup", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+				{
+					ImGui::Text("%s", creationMessage.c_str());
+					ImGui::Spacing();
+					ImGui::Separator();
+					ImGui::Spacing();
+
+					if (ImGui::Button("OK", ImVec2(120, 0)))
+					{
+						showCreationResult = false;
+						ImGui::CloseCurrentPopup();
+					}
+
+					ImGui::SetItemDefaultFocus();
 
 					ImGui::EndPopup();
 				}

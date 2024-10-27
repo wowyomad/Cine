@@ -2,12 +2,15 @@ import os
 import sys
 
 def create_header_file(file_name):
+    # Get the directory of the current script
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+
     # Extract the base name without the extension
     base_name = os.path.splitext(file_name)[0]
     hpp_file_name = base_name + '.hpp'
 
-    # Target directory for the file
-    target_dir = os.path.join("..", "Scripts")
+    # Target directory for the file, relative to the script's directory
+    target_dir = os.path.join(script_dir, "..", "Scripts")
     os.makedirs(target_dir, exist_ok=True)
 
     # Full path for the .hpp file
@@ -21,7 +24,7 @@ def create_header_file(file_name):
 
     # Class template
     class_template = f"""#pragma once
-#include "Cine.hpp"
+#include "include/Base.hpp"
 
 using namespace Cine;
 

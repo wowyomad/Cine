@@ -10,6 +10,9 @@
 #include "glash/Cine.hpp"
 #include "glash/Scene/Components.hpp"
 #include "glash/Core/Application.hpp"
+#include "glash/Core/Log.hpp"
+
+#include "input.hpp"
 
 #ifdef _WIN32
 #define EXPORT __declspec(dllexport)
@@ -33,4 +36,15 @@ extern "C" {
     EXPORT YAML::Node SerializeComponent(entt::entity entity, const std::string& componentName);
     EXPORT void DeserializeComponent(entt::entity entity, const std::string& componentName, YAML::Node& node);
     EXPORT ComponentsData GetComponentsData();
+
+    EXPORT void InitializeInput
+    (
+        KeyInputFunction isKeyPressedFunc,
+        KeyInputFunction isKeyDownFunc,
+        KeyInputFunction isKeyUpFunc,
+        MouseInputFunction isMousePressedFunc,
+        MouseInputFunction isMouseDownFunc,
+        MouseInputFunction isMouseUpFunc,
+        MousePositionFunction getMousePositoinFunc
+    );
 }

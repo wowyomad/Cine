@@ -12,26 +12,49 @@ namespace Cine
 {
 	class EditorLayer : public Layer
 	{
+		enum class SceneState
+		{
+			Edit = 0,
+			Play = 1	
+		};
+
+
+
 	public:
 		EditorLayer() : Layer("Cine Editor") { }
 		
-
 		void OnAttach() override;
 		void OnDetach() override;
 		void OnUpdate(Timestep ts) override;
 		void OnEvent(Event& event) override;
 		void OnImGuiRender() override;
 
-		void SetupCustom();
+	private:
+		bool OnKeyPressed(KeyPressedEvent& e);
+		void DrawViewport();
+
+		void NewScene();
+		void SaveSceneAs();
+		void OpenScene();
+		void OpenScene(const std::filesystem::path& path);
+
+		void UI_Toolbar();
+
+		void OnScenePlay();
+		void OnScenePause();
+
+		bool IsGizmoSnapping() const;
 
 	private:
 		SceneHierarchyPanel m_SceneHierarchyPanel;
 		ContentBrowserPanel m_ContentBrowserPanel;
 
-
 		Ref<FrameBuffer> m_Framebuffer;
 		Ref<Scene> m_ActiveScene;
 		EditorCamera m_EditorCamera;
+
+		Ref<Texture2D> m_IconPlay;
+		Ref<Texture2D> m_IconStop;
 
 		int32_t m_GizmoOperation = -1;
 		float m_SnapScale = 0.1f;
@@ -48,15 +71,6 @@ namespace Cine
 		float m_LastFrametime = 0.0f;
 		bool m_IsRuntime = false;
 
-	private:
-		bool OnKeyPressed(KeyPressedEvent& e);
-		void DrawViewport();
-
-		void NewScene();
-		void SaveSceneAs();
-		void OpenScene();
-		void OpenScene(const std::filesystem::path& path);
-
-		bool IsGizmoSnapping() const;
+		SceneState m_SceneState = SceneState::Edit;
 	};
 }

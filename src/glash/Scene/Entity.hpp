@@ -81,6 +81,8 @@ namespace Cine
 			return m_Scene->m_Registry.get<Components...>(m_EntityHandle);
 		}
 
+		Entity Clone();
+
 
 
 		template <class Component>

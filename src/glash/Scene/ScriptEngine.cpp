@@ -43,8 +43,17 @@ namespace Cine
 	}
 	void ScriptEngine::InitializeComponents(entt::registry& registry)
 	{
-		m_LibraryCalls.InitializeApplicationContext(&Application::Get());
 		m_LibraryCalls.InitializeComponents(registry);
+		m_LibraryCalls.InitializeInput
+		(
+			Internal::Input::IsKeyPressed,
+			Internal::Input::IsKeyDown,
+			Internal::Input::IsKeyUp,
+			Internal::Input::IsMouseButtonPressed,
+			Internal::Input::IsMouseButtonDown,
+			Internal::Input::IsMouseButtonUp,
+			Internal::Input::GetMousePosition
+		);
 		UpdateComponentsData();
 	}
 
@@ -80,7 +89,6 @@ namespace Cine
 
 	bool ScriptEngine::UpdateFunctionCalls()
 	{
-		m_LibraryCalls.InitializeApplicationContext = m_Library.GetFunction<InitializeApplicationContextCall>("InitializeApplicationContext");
 		m_LibraryCalls.InitializeComponents = m_Library.GetFunction<InitializeComponentsCall>("InitializeComponents");
 		m_LibraryCalls.CreateComponent = m_Library.GetFunction<CreateComponentCall>("CreateComponent");
 		m_LibraryCalls.RemoveComponent = m_Library.GetFunction<CreateComponentCall>("RemoveComponent");
@@ -88,11 +96,15 @@ namespace Cine
 		m_LibraryCalls.SerializeComponent = m_Library.GetFunction<SerializeComponentCall>("SerializeComponent");
 		m_LibraryCalls.DeserializeComponent = m_Library.GetFunction<DeserializeComponentCall>("DeserializeComponent");
 		m_LibraryCalls.GetComponentsData = m_Library.GetFunction<GetComponentsDataCall>("GetComponentsData");
+		m_LibraryCalls.InitializeInput = m_Library.GetFunction<InitializeInputCall>("InitializeInput");
+		
 		
 		return m_LibraryCalls.InitializeComponents
 			&& m_LibraryCalls.CreateComponent
 			&& m_LibraryCalls.RemoveComponent
 			&& m_LibraryCalls.UpdateScripts
+			&& m_LibraryCalls.SerializeComponent
+			&& m_LibraryCalls.DeserializeComponent
 			&& m_LibraryCalls.GetComponentsData;
 	}
 

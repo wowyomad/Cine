@@ -17,6 +17,11 @@ namespace Cine
 
 	class ScriptEngine
 	{
+	private:
+		using KeyInputFunction = bool(*)(KeyCode);
+		using MouseInputFunction = bool(*)(MouseCode);
+		using MousePositionFunction = glm::vec2(*)();
+		
 	public:
 		struct ComponentsDataC;
 
@@ -28,6 +33,16 @@ namespace Cine
 		using SerializeComponentCall = YAML::Node(*)(entt::entity entity, const std::string& componentName);
 		using DeserializeComponentCall = void(*)(entt::entity entity, const std::string& componentName, YAML::Node& node);
 		using GetComponentsDataCall = ComponentsDataC(*)();
+		using InitializeInputCall =  void(*)
+		(
+			KeyInputFunction,
+			KeyInputFunction,
+			KeyInputFunction,
+			MouseInputFunction,
+			MouseInputFunction,
+			MouseInputFunction,
+			MousePositionFunction
+		);
 
 		static ScriptEngine& Get();
 
@@ -64,6 +79,7 @@ namespace Cine
 			GetComponentsDataCall GetComponentsData;
 			SerializeComponentCall  SerializeComponent;
 			DeserializeComponentCall DeserializeComponent;
+			InitializeInputCall InitializeInput;
 		};
 
 	private:

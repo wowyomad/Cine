@@ -1,14 +1,16 @@
 #pragma once
-#include "Cine.hpp"
+#include "include/Base.hpp"
+#include "SnakeBodySegment.hpp"
+#include <format>
 
 using namespace Cine;
 
-class Boba : public NativeScript
+class Snake : public NativeScript
 {
     public:
         void OnCreate() override
         {
-            
+            std::cout << std::format("I'm snake and I was created!");
         }
 
         void OnUpdate(Timestep ts) override
@@ -17,7 +19,7 @@ class Boba : public NativeScript
         }
 
         // Assign fields that you expect to be serialized (don't assign pointers or references!)
-        Boba& operator=(const Boba& other)
+        Snake& operator=(const Snake& other)
         {
             if (this == &other)
                 return *this;
@@ -26,9 +28,10 @@ class Boba : public NativeScript
         }
 
     private:
+        SnakeBodySegment m_Segment;
 
 
-        SERIALIZE_CLASS(Boba,
-
+        SERIALIZE_CLASS(Snake,
+            FIELD(m_Segment)
         )
 };

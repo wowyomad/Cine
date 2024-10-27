@@ -14,10 +14,18 @@ namespace Cine
 {
 	void EditorLayer::OnAttach()
 	{
-		m_IsRuntime = true;
 		ScriptEngine::Get().LoadLibary("plugin.dll"); //Temporarily load here.
 		m_ActiveScene = CreateRef<Scene>();
 		ScriptEngine::Get().InitializeComponents(m_ActiveScene->GetRegistry());
+
+
+		TextureSpecification iconSpecification;
+		iconSpecification.MagFilter = TextureFilter::Linear;
+		iconSpecification.MinFilter = TextureFilter::Linear;
+
+		m_IconPlay = Texture2D::Create("Resources/Icons/UI/PlayButton.png", iconSpecification);
+		m_IconStop = Texture2D::Create("Resources/Icons/UI/PauseButton.png", iconSpecification);
+
 
 		FramebufferSpecification spec;
 		spec.Width = 1280;
@@ -25,6 +33,7 @@ namespace Cine
 		m_Framebuffer = FrameBuffer::Create(spec);
 
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+		m_ContentBrowserPanel.SetContext(m_ActiveScene);
 	}
 
 	void EditorLayer::OnDetach()
@@ -53,10 +62,12 @@ namespace Cine
 
 		m_Framebuffer->Bind();
 		{
-			if (m_IsRuntime)
-				m_ActiveScene->OnUpdateRuntime(ts);
-			else
-				m_ActiveScene->OnUpdateEditor(ts, m_EditorCamera);
+			switch (m_SceneState)
+			{
+			case SceneState::Play: m_ActiveScene->OnUpdateRuntime(ts); break;
+			case SceneState::Edit: m_ActiveScene->OnUpdateEditor(ts, m_EditorCamera); break;
+			}
+				
 		}
 		m_Framebuffer->Unbind();
 	}
@@ -145,16 +156,6 @@ namespace Cine
 
 		ImGui::Begin("Stats");
 		{
-			if (m_ActiveScene->GetMainCameraEntity())
-			{
-				auto&& [cameraComponent, tagComponent] = m_ActiveScene->GetMainCameraEntity().GetComponents<CameraComponent, TagComponent>();
-				ImGui::Text("Camera: %s", tagComponent.Tag.c_str());
-			}
-			else
-			{
-				ImGui::Text("Camera: %s", "None");
-			}
-
 			ImGui::Separator();
 			auto stats = Renderer2D::GetStats();
 			ImGui::Text("Draw Calls: %llu", stats.DrawCalls);
@@ -202,7 +203,7 @@ namespace Cine
 		}
 
 		//Gizmos
-		if (!m_IsRuntime)
+		if (m_SceneState == SceneState::Edit)
 		{
 			Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
 			if (selectedEntity && m_GizmoOperation > 0)
@@ -276,14 +277,76 @@ namespace Cine
 				}
 			}
 		}
+		UI_Toolbar();
+
 		ImGui::End();
 		ImGui::PopStyleVar(1);
 	}
+
+	void EditorLayer::UI_Toolbar()
+	{
+		ImGuiWindowFlags toolbarFlags =
+			ImGuiWindowFlags_NoDecoration |
+			ImGuiWindowFlags_NoScrollbar |
+			ImGuiWindowFlags_NoScrollWithMouse;
+
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0.0f, 2.0f });
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, { 0.0f, 0.0f });
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0.0f, 0.0f });
+
+		
+		auto& colors = ImGui::GetStyle().Colors;
+		ImGui::PushStyleColor(ImGuiCol_Button, { 0.0f, 0.0f, 0.0f, 0.0f });
+		auto& buttonHovered = colors[ImGuiCol_ButtonHovered];
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { buttonHovered.x, buttonHovered.y, buttonHovered.z, 0.5f });
+		auto& buttonActive = colors[ImGuiCol_ButtonHovered];
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, { buttonActive.x, buttonActive.y, buttonActive.z, 0.5f });
+
+
+		ImGuiID viewportDockID = ImGui::GetID("Viewport");
+		ImGui::SetNextWindowDockID(viewportDockID, ImGuiCond_FirstUseEver);
+
+		ImGui::Begin("##toolbar", nullptr, toolbarFlags);
+
+
+		float size = ImGui::GetWindowHeight() - 4.0f;
+
+		Ref<Texture2D> icon = m_SceneState == SceneState::Play ? m_IconStop : m_IconPlay;
+		ImGui::SameLine((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+
+
+		if (ImGui::ImageButton("##sceneStateIcon", (ImTextureID)icon->GetRendererID(), { size, size }, {0.0f, 0.0f}, {1.0f, 1.0f}))
+		{
+			if (m_SceneState == SceneState::Edit)
+			{
+				OnScenePlay();
+			}
+			else if (m_SceneState == SceneState::Play)
+			{
+				OnScenePause();
+			}
+		}
+		ImGui::PopStyleVar(3);
+		ImGui::PopStyleColor(3);
+		ImGui::End();
+	}
+
+	void EditorLayer::OnScenePlay()
+	{
+		m_SceneState = SceneState::Play;
+	}
+
+	void EditorLayer::OnScenePause()
+	{
+		m_SceneState = SceneState::Edit;
+	}
+
 	void EditorLayer::NewScene()
 	{
 		m_ActiveScene = CreateRef<Scene>();
 		ScriptEngine::Get().InitializeComponents(m_ActiveScene->GetRegistry());
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+		m_ContentBrowserPanel.SetContext(m_ActiveScene);
 		m_ActiveScene->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
 	}
 	void EditorLayer::SaveSceneAs()
@@ -303,19 +366,22 @@ namespace Cine
 
 	void EditorLayer::OpenScene(const std::filesystem::path& path)
 	{
-		if (!path.empty())
+		if (!path.empty() && path.filename().extension().string() == ".cine")
 		{
 			std::filesystem::path fullPath = AssetManager::AssetsDirectory / path;
 			m_ActiveScene = CreateRef<Scene>();
 			ScriptEngine::Get().InitializeComponents(m_ActiveScene->GetRegistry());
 
 			m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+			m_ContentBrowserPanel.SetContext(m_ActiveScene);
 
 			SceneSerializer serializer(m_ActiveScene);
 			serializer.Deserialize(fullPath);
 			m_ActiveScene->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
 		}
 	}
+
+
 
 	bool EditorLayer::IsGizmoSnapping() const
 	{

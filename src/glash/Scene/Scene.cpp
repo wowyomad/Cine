@@ -15,15 +15,15 @@
 namespace Cine
 {
 	Scene::Scene()
-		: m_MainCamera(new Entity()), m_ScriptEngine(ScriptEngine::Get())
+		: m_MainCamera(new Entity()), m_ScriptEngine(ScriptEngine::Get()), m_Name("Unnamed Scene")
 	{
-		
+
 	}
 
 	// TODO: Handle save before unload.
 	Scene::~Scene()
 	{
-		
+
 	}
 
 
@@ -41,6 +41,22 @@ namespace Cine
 		//make sure that when destroyed, m_MainCamera.m_EntityHandle = entt::null; Curerntly done primitively right inside DestroyEntity.
 
 	}
+
+	void Scene::Clear()
+	{
+		m_Registry = entt::registry();
+		if (m_MainCamera && *m_MainCamera)
+		{
+			delete m_MainCamera;
+			m_MainCamera = new Entity();;
+		}
+	}
+	void Scene::SetUpdateScene(bool update)
+	{
+		m_UpdateScene = update;
+	}
+
+
 
 	Entity Scene::GetMainCameraEntity()
 	{
@@ -100,40 +116,43 @@ namespace Cine
 
 	void Scene::OnUpdateEditor(Timestep ts, EditorCamera& editorCamera)
 	{
-		UpdateWorldTransforms(m_Registry);
+		if (m_UpdateScene)
+		{
+			UpdateWorldTransforms(m_Registry);
+			InstantiateScripts();
 
+			Renderer2D::Clear();
+			Renderer2D::BeginScene(editorCamera);
+			SpriteRendererSystem::Update(m_Registry);
+			Renderer2D::EndScene();
 
-		InstantiateScripts();
-		UpdateScripts(ts);
-
-		Renderer2D::Clear();
-		Renderer2D::BeginScene(editorCamera);
-		SpriteRendererSystem::Update(m_Registry);
-		SpriteAnimationSystem::Update(m_Registry, ts);
-		Renderer2D::EndScene();
-
-		DestroyMarkedEntities();
+			DestroyMarkedEntities();
+		}
 	}
 
 
 	void Scene::OnUpdateRuntime(Timestep ts)
 	{
-		UpdateWorldTransforms(m_Registry);
 
-		InstantiateScripts();
-		UpdateScripts(ts);
-
-		Renderer2D::Clear();
-		if (*m_MainCamera)
+		if (m_UpdateScene)
 		{
-			auto&& [cameraComponent, transformComponent] = m_MainCamera->GetComponents<CameraComponent, TransformComponent>();
-			Renderer2D::BeginScene(cameraComponent.Camera, transformComponent.GetLocalTransform());
-			SpriteRendererSystem::Update(m_Registry);
+			UpdateWorldTransforms(m_Registry);
+			InstantiateScripts();
+			UpdateScripts(ts);
 			SpriteAnimationSystem::Update(m_Registry, ts);
-			Renderer2D::EndScene();
+			Renderer2D::Clear();
+			if (*m_MainCamera)
+			{
+				auto&& [cameraComponent, transform] = m_MainCamera->GetComponents<CameraComponent, CachedTransform>();
+				Renderer2D::BeginScene(cameraComponent.Camera, transform.CachedMatrix);
+				SpriteRendererSystem::Update(m_Registry);
+				Renderer2D::EndScene();
+			}
+
+			DestroyMarkedEntities();
 		}
 
-		DestroyMarkedEntities();
+
 
 	}
 
@@ -155,6 +174,7 @@ namespace Cine
 
 	void Scene::UpdateScripts(Timestep ts)
 	{
+
 		m_ScriptEngine.UpdateScripts(ts);
 	}
 
@@ -167,6 +187,20 @@ namespace Cine
 	{
 		m_ScriptEngine.RemoveComponent(entity, componentName);
 	}
+
+	Entity Scene::FindEntityByName(const std::string& name)
+	{
+		auto view = m_Registry.view<TagComponent>();
+		for (auto entity : view)
+		{
+			if (view.get<TagComponent>(entity).Tag == name)
+			{
+				return Entity(entity, this);
+			}
+		}
+		return Entity(); //invalid entity
+	}
+
 
 	YAML::Node Scene::SerializeComponentByName(Entity entity, const std::string& componentName)
 	{

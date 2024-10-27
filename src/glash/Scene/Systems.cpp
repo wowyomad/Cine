@@ -19,12 +19,12 @@ namespace Cine
 			{
 				auto&& [transform, cachedTransform] = registry.get<TransformComponent, CachedTransform>(entity);
 
-				cachedTransform.CachedTransform = parentTransform * transform.GetLocalTransform();
+				cachedTransform.CachedMatrix = parentTransform * transform.GetLocalTransform();
 
 				auto& hierarchy = registry.get<HierarchyComponent>(entity);
 				for (auto child : hierarchy.Children)
 				{
-					UpdateTransformRecursively(child, cachedTransform.CachedTransform);
+					UpdateTransformRecursively(child, cachedTransform.CachedMatrix);
 				}
 			};
 
@@ -83,11 +83,11 @@ namespace Cine
                     CINE_CORE_WARN("SpriteFrameIndex ({}) >= spriteSheet.Frames.size ({})", sprite.SpriteIndex, spriteSheet.Frames.size());
                     continue;
                 }
-                Renderer2D::DrawSprite(transform.CachedTransform, spriteSheet, sprite.SpriteIndex, sprite.Color);
+                Renderer2D::DrawSprite(transform.CachedMatrix, spriteSheet, sprite.SpriteIndex, sprite.Color);
             }
             else
             {
-                Renderer2D::DrawQuad(transform.CachedTransform, sprite.Color);
+                Renderer2D::DrawQuad(transform.CachedMatrix, sprite.Color);
             }
         }
 
@@ -105,11 +105,11 @@ namespace Cine
                     CINE_CORE_WARN("SpriteFrameIndex ({}) >= spriteSheet.Frames.size ({})", sprite.SpriteIndex, spriteSheet.Frames.size());
                     continue;
                 }
-                Renderer2D::DrawSprite(transform.CachedTransform, spriteSheet, sprite.SpriteIndex, sprite.Color);
+                Renderer2D::DrawSprite(transform.CachedMatrix, spriteSheet, sprite.SpriteIndex, sprite.Color);
             }
             else
             {
-                Renderer2D::DrawQuad(transform.CachedTransform, sprite.Color);
+                Renderer2D::DrawQuad(transform.CachedMatrix, sprite.Color);
             }
         }
     }
