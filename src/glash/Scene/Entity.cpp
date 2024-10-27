@@ -259,7 +259,7 @@ namespace Cine
 				storage.push(clone, storage.value(m_EntityHandle));
 			}
 
-			else if (storage.type().hash() == entt::type_id<HierarchyComponent>().hash())
+			if (storage.type().hash() == entt::type_id<HierarchyComponent>().hash())
 			{
 				auto& cloneHierarchy = clone.GetComponent<HierarchyComponent>();
 				cloneHierarchy.Children = {};
