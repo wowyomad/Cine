@@ -11,7 +11,7 @@ set(GLASH_BUILD_EDITOR OFF)
 FetchContent_Declare(
 	glash_lib
 	GIT_REPOSITORY https://github.com/wowyomad/cine.git
-	GIT_TAG 5bfbb975cbabb387b22f058769d3d036eabe9924
+	GIT_TAG edd6cfc5602ad81ab1001a40958bfebed7a39bfe
 )
 FetchContent_MakeAvailable(glash_lib)
 

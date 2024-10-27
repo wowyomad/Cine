@@ -719,66 +719,64 @@ namespace Cine
 							std::string fieldStr = fieldName + "##" + script.Name;
 							if (fieldNode.IsScalar())
 							{
-								std::string value = fieldNode.as<std::string>();
-								std::string value_copy = value;
-								value.resize(256);
+								std::string stringValue = fieldNode.as<std::string>();
+								std::string value_copy = stringValue;
+								stringValue.resize(256);
 
-								// Try to parse the value into int or float
 								int intValue = 0;
 								float floatValue = 0.0f;
 								bool isInt = false, isFloat = false;
 
-								try {
-									intValue = std::stoi(value);
-									isInt = true;
+								if (!stringValue.contains('.'))
+								{
+									try
+									{
+										intValue = std::stoi(stringValue);
+										isInt = true;
+									}
+									catch (const std::exception&) {}
 								}
-								catch (const std::exception&) {
-									// Not an integer
+								else
+								{
+									try
+									{
+										floatValue = std::stof(stringValue);
+										isFloat = true;
+									}
+									catch (const std::exception&) {}
+
 								}
 
-								try {
-									floatValue = std::stof(value);
-									isFloat = true;
-								}
-								catch (const std::exception&) {
-									// Not a float
-								}
-
-								// Determine the appropriate ImGui input field
 								bool valueChanged = false;
 								if (isInt)
 								{
-									// Integer input
-									if (ImGui::InputInt(fieldStr.c_str(), &intValue))
+									if (ImGui::DragInt(fieldStr.c_str(), &intValue, 1.0f, std::numeric_limits<int>::min(), std::numeric_limits<int>::max()))
 									{
-										value = std::to_string(intValue);
+										stringValue = std::to_string(intValue);
 										valueChanged = true;
 									}
 								}
 								else if (isFloat)
 								{
-									// Float input
-									if (ImGui::InputFloat(fieldStr.c_str(), &floatValue, 0.1f, 1.0f, "%.3f"))
+									if (ImGui::DragFloat(fieldStr.c_str(), &floatValue, 0.1f, std::numeric_limits<float>::min(), std::numeric_limits<float>::max(), "%.3f"))
 									{
-										value = std::to_string(floatValue);
+										stringValue = std::to_string(floatValue);
 										valueChanged = true;
 									}
 								}
 								else
 								{
-									// String input as fallback
-									if (ImGui::InputText(fieldStr.c_str(), const_cast<char*>(value.c_str()), value.length()))
+									if (ImGui::InputText(fieldStr.c_str(), const_cast<char*>(stringValue.c_str()), stringValue.length()))
 									{
 										valueChanged = true;
 									}
 								}
 
-								// Update the YAML node and save the change if the value was modified
 								if (valueChanged)
 								{
 									try
 									{
-										fieldNode = value.c_str();
+										fieldNode = stringValue.c_str();
 										serialized[script.Name] = node;
 										m_Context.Scene->DeserializeComponentByName(entity, script.Name, serialized);
 									}
@@ -796,7 +794,7 @@ namespace Cine
 
 					}
 				}
-				
+
 
 				auto& componetsData = m_Context.Scene->GetComponentsData();
 				auto& scripts = nsc.Scripts;
