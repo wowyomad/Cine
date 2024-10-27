@@ -236,6 +236,8 @@ namespace Cine
 				AddComponentItem<CameraComponent>(m_Context.Properties, "Camera");
 				AddComponentItem<SpriteRendererComponent>(m_Context.Properties, "Sprite Renderer");
 				AddComponentItem<NativeScriptComponent>(m_Context.Properties, "Native Script");
+				AddComponentItem<RigidBody2DComponent>(m_Context.Properties, "Rigid Body 2D");
+				AddComponentItem<BoxCollider2DComponent>(m_Context.Properties, "Box Collider 2D");
 
 				ImGui::EndPopup();
 			}
@@ -392,6 +394,16 @@ namespace Cine
 		if (entity.HasComponent<SpriteComponent>())
 		{
 			DisplaySpriteComponent(entity);
+		}
+
+		if (entity.HasComponent<RigidBody2DComponent>())
+		{
+			DisplayRigidBody2DComponent(entity);
+		}
+
+		if (entity.HasComponent<BoxCollider2DComponent>())
+		{
+			DisplayBoxCollider2DComponent(entity);
 		}
 
 		if (entity.HasComponent<NativeScriptComponent>())
@@ -667,6 +679,47 @@ namespace Cine
 					}
 				} break;
 				}
+			});
+	}
+	void SceneHierarchyPanel::DisplayBoxCollider2DComponent(Entity entity)
+	{
+		DisplayComponent<BoxCollider2DComponent>(entity, "Box Collider 2D", [this, entity](BoxCollider2DComponent& collider)
+			{
+				ImGui::DragFloat2("Offset", glm::value_ptr(collider.Offset), 0.01f, 0.0f, 0.0f, "%.2f");
+				ImGui::DragFloat2("Size", glm::value_ptr(collider.Size), 0.01f, 0.0f, 0.0f, "%.2f");
+
+				ImGui::DragFloat("Density", &collider.Density, 0.01, 0.0f, 0.0f, "%.2f");
+				ImGui::DragFloat("Friction", &collider.Friction, 0.01, 0.0f, 1.0f, "%.2f");
+				ImGui::DragFloat("Restitution", &collider.Restitution, 0.01f, 0.0f, 1.0f, "%.2f");
+			});
+	}
+
+	void SceneHierarchyPanel::DisplayRigidBody2DComponent(Entity entity)
+	{
+		DisplayComponent<RigidBody2DComponent>(entity, "Rigid Body 2D", [this, entity](RigidBody2DComponent& rb)
+			{
+				std::array<const char*, 3> typeStrigns = { "Static", "Dynamic", "Kinematic"};
+				const char* currentType = typeStrigns[static_cast<int>(rb.Type)];
+
+				if (ImGui::BeginCombo("Body Type", currentType))
+				{
+					for (int i = 0; i < typeStrigns.size(); ++i)
+					{
+						bool isSelected = currentType == typeStrigns[i];
+						if (ImGui::Selectable(typeStrigns[i], &isSelected))
+						{
+							currentType = typeStrigns[i];
+							rb.Type = static_cast<RigidBody2DComponent::BodyType>(i);
+						}
+						if (isSelected)
+						{
+							ImGui::SetItemDefaultFocus();
+						}
+					}
+					ImGui::EndCombo();
+				}
+
+				if (ImGui::Checkbox("Fixed Rotation", &rb.FixedRotation));
 			});
 	}
 	void SceneHierarchyPanel::DisplayNativeScriptComponent(Entity entity)

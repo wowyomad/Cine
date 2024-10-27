@@ -4,7 +4,7 @@
 
 namespace Cine
 {
-	glm::mat4 TransformComponent::GetWorldTransform(const Entity& entity)
+	glm::mat4 TransformComponent::GetWorldTransform(Entity& entity)
 	{
 		CINE_CORE_ASSERT(false, "Not implemented yet");
 		return glm::mat4(1.0f);

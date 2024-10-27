@@ -9,11 +9,14 @@
 #include "ScriptEngine.hpp"
 
 #include <entt/entt.hpp>
+#include <box2d/box2d.h>
 
 namespace Cine
 {
 	class Entity;
 	class NativeScript;
+
+
 
 	class Scene
 	{
@@ -29,6 +32,9 @@ namespace Cine
 		Entity GetMainCameraEntity();
 
 		void OnViewportResize(uint32_t width, uint32_t height);
+
+		void OnRuntimeStart();
+		void OnRuntimeStop();	
 
 		void OnUpdateRuntime(Timestep ts);
 		void OnUpdateEditor(Timestep ts, EditorCamera& editorCamera);
@@ -91,6 +97,8 @@ namespace Cine
 
 		std::vector<entt::entity> m_ToDestroyEntities;
 		bool m_UpdateScene = true;
+
+		b2WorldId m_PhysicsWorldID;
 
 		Entity* m_MainCamera;
 
