@@ -14,7 +14,7 @@ public:
     {
         if(m_Transform)
         {
-            m_Transform->Rotation.z += m_RotationSpeed * ts;
+            m_Transform->Rotation.z += glm::radians(m_RotationSpeed) * ts;
         }
     }
 

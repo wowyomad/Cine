@@ -722,7 +722,59 @@ namespace Cine
 								std::string value = fieldNode.as<std::string>();
 								std::string value_copy = value;
 								value.resize(256);
-								if (ImGui::InputText(fieldStr.c_str(), const_cast<char*>(value.c_str()), value.length()))
+
+								// Try to parse the value into int or float
+								int intValue = 0;
+								float floatValue = 0.0f;
+								bool isInt = false, isFloat = false;
+
+								try {
+									intValue = std::stoi(value);
+									isInt = true;
+								}
+								catch (const std::exception&) {
+									// Not an integer
+								}
+
+								try {
+									floatValue = std::stof(value);
+									isFloat = true;
+								}
+								catch (const std::exception&) {
+									// Not a float
+								}
+
+								// Determine the appropriate ImGui input field
+								bool valueChanged = false;
+								if (isInt)
+								{
+									// Integer input
+									if (ImGui::InputInt(fieldStr.c_str(), &intValue))
+									{
+										value = std::to_string(intValue);
+										valueChanged = true;
+									}
+								}
+								else if (isFloat)
+								{
+									// Float input
+									if (ImGui::InputFloat(fieldStr.c_str(), &floatValue, 0.1f, 1.0f, "%.3f"))
+									{
+										value = std::to_string(floatValue);
+										valueChanged = true;
+									}
+								}
+								else
+								{
+									// String input as fallback
+									if (ImGui::InputText(fieldStr.c_str(), const_cast<char*>(value.c_str()), value.length()))
+									{
+										valueChanged = true;
+									}
+								}
+
+								// Update the YAML node and save the change if the value was modified
+								if (valueChanged)
 								{
 									try
 									{
@@ -732,10 +784,10 @@ namespace Cine
 									}
 									catch (const std::exception& e)
 									{
+										// Revert the value if deserialization fails
 										fieldNode = value_copy.c_str();
 										serialized[script.Name] = node;
 										m_Context.Scene->DeserializeComponentByName(entity, script.Name, serialized);
-
 									}
 								}
 							}
