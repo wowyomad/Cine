@@ -24,7 +24,7 @@ def create_header_file(file_name):
 
     # Class template
     class_template = f"""#pragma once
-#include "Cine.hpp"
+#include "include/Base.hpp"
 
 using namespace Cine;
 

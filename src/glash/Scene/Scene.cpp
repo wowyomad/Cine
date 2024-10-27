@@ -120,8 +120,7 @@ namespace Cine
 		{
 			UpdateWorldTransforms(m_Registry);
 			InstantiateScripts();
-			UpdateScripts(ts);
-			SpriteAnimationSystem::Update(m_Registry, ts);
+
 			Renderer2D::Clear();
 			Renderer2D::BeginScene(editorCamera);
 			SpriteRendererSystem::Update(m_Registry);
@@ -144,8 +143,8 @@ namespace Cine
 			Renderer2D::Clear();
 			if (*m_MainCamera)
 			{
-				auto&& [cameraComponent, transformComponent] = m_MainCamera->GetComponents<CameraComponent, TransformComponent>();
-				Renderer2D::BeginScene(cameraComponent.Camera, transformComponent.GetLocalTransform());
+				auto&& [cameraComponent, transform] = m_MainCamera->GetComponents<CameraComponent, CachedTransform>();
+				Renderer2D::BeginScene(cameraComponent.Camera, transform.CachedMatrix);
 				SpriteRendererSystem::Update(m_Registry);
 				Renderer2D::EndScene();
 			}

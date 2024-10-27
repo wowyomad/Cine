@@ -48,7 +48,7 @@ namespace Cine
 
 	struct CachedTransform
 	{
-		glm::mat4 CachedTransform;
+		glm::mat4 CachedMatrix;
 	};
 
 	struct SpriteRendererComponent
