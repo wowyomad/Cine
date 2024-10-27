@@ -176,7 +176,6 @@ namespace Cine
 
 	void Scene::OnUpdateRuntime(Timestep ts)
 	{
-
 		if (m_UpdateScene)
 		{
 			UpdateWorldTransforms(m_Registry);
