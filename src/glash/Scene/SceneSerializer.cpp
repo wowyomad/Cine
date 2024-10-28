@@ -175,6 +175,7 @@ namespace Cine
 
 			auto& collider = entity.GetComponent<BoxCollider2DComponent>();
 
+			out << YAML::Key << "IsTrigger" << collider.IsTrigger;
 			out << YAML::Key << "Offset" << collider.Offset;
 			out << YAML::Key << "Size" << collider.Size;
 			out << YAML::Key << "Density" << collider.Density;
@@ -375,13 +376,13 @@ namespace Cine
 				if (boxCollider2DComponent)
 				{
 					auto&& collider = deserializedEntity.AddOrReplaceComponent<BoxCollider2DComponent>();
+					collider.IsTrigger = boxCollider2DComponent["IsTrigger"].as<bool>();
 					collider.Offset = boxCollider2DComponent["Offset"].as<glm::vec2>();
 					collider.Size = boxCollider2DComponent["Size"].as<glm::vec2>();	
 					collider.Density = boxCollider2DComponent["Density"].as<float>();
 					collider.Friction = boxCollider2DComponent["Friction"].as<float>();
 					collider.Restitution = boxCollider2DComponent["Restitution"].as<float>();
 					collider.RestitutionThreshold = boxCollider2DComponent["RestitutionThreshold"].as<float>();
-
 				}
 
 				auto nativeScriptComponent = entity["NativeScriptComponent"];

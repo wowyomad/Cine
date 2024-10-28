@@ -163,7 +163,9 @@ namespace Cine
 				Renderer2D::EndScene();
 			}
 
+			DestroyComponents();
 			DestroyEntities();
+
 		}
 	}
 
@@ -179,6 +181,7 @@ namespace Cine
 			SpriteRendererSystem::Update(m_Registry);
 			Renderer2D::EndScene();
 
+			DestroyComponents();
 			DestroyEntities();
 		}
 	}

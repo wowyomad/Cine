@@ -206,7 +206,7 @@ namespace Cine
 		if (m_SceneState == SceneState::Edit)
 		{
 			Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
-			if (selectedEntity && m_GizmoOperation > 0)
+			if (selectedEntity && selectedEntity.IsValid() && m_GizmoOperation > 0)
 			{
 				auto& hierachy = selectedEntity.GetComponent<HierarchyComponent>();	
 

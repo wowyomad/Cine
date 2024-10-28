@@ -18,6 +18,11 @@ namespace Cine
 		Entity(entt::entity handle, Scene* scene);
 		Entity(const Entity& other) = default;
 
+		bool IsValid() const
+		{
+			return m_Scene->m_Registry.valid(m_EntityHandle);
+		}
+
 		template <class Component>
 		bool HasComponent()
 		{

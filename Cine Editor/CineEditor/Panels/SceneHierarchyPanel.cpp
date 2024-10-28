@@ -168,6 +168,20 @@ namespace Cine
 			for (auto entityID : view)
 			{
 				Entity entity(entityID, &scene);
+
+				if (!entity.IsValid())
+				{
+					if (m_Context.Selection == entity)
+					{
+						m_Context.Selection = {};
+					}
+					if (m_Context.Properties == entity)
+					{
+						m_Context.Properties = {};
+					}
+					continue;
+				}
+
 				if (entity.HasComponent<HierarchyComponent>() && !entity.GetComponent<HierarchyComponent>().Parent)
 				{
 					DisplayEntityNode(entity);
