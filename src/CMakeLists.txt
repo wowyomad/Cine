@@ -92,6 +92,7 @@ target_link_libraries(glash
     PUBLIC EnTT::EnTT 
     PUBLIC yaml-cpp::yaml-cpp
     PUBLIC ImGuizmo
+    PUBLIC box2d
 )
 
 if(MSVC)

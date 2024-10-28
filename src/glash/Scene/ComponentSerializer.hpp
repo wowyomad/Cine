@@ -35,7 +35,8 @@ struct is_serializable : std::disjunction<
 > {};
 
 template <typename T>
-struct is_serializable<std::vector<T>> {
+struct is_serializable<std::vector<T>>
+{
 	static constexpr bool value = is_serializable<T>::value;
 };
 
@@ -151,11 +152,13 @@ namespace Cine
 
 
 		template <typename T>
-		void StartObject(const T& obj) {
+		void StartObject(const T& obj)
+		{
 			emitter << YAML::BeginMap << YAML::Key << Utils::GetClassTypename<T>() << YAML::Value << YAML::BeginMap;
 		}
 
-		void EndObject() {
+		void EndObject()
+		{
 			emitter << YAML::EndMap << YAML::EndMap;
 		}
 
@@ -166,14 +169,22 @@ namespace Cine
 
 			if constexpr (is_serializable<T>::value)
 			{
-				try
+				if constexpr (std::is_floating_point_v<T>)
 				{
-					emitter << YAML::Value << value;
+					emitter << YAML::Value << formatFloat(value);
 				}
-				catch (const YAML::TypedBadConversion<T>& e)
+				else
 				{
-					return;
+					try
+					{
+						emitter << YAML::Value << value;
+					}
+					catch (const YAML::TypedBadConversion<T>& e)
+					{
+						return;
+					}
 				}
+
 			}
 			else
 			{
@@ -188,14 +199,22 @@ namespace Cine
 			for (auto& element : vec) {
 				if constexpr (is_serializable<T>::value)
 				{
-					try
+					if constexpr (std::is_floating_point_v<T>)
 					{
-						emitter << YAML::Value << element;
+						emitter << YAML::Value << formatFloat(element);
 					}
-					catch (const YAML::TypedBadConversion<T>& e)
+					else
 					{
-						return;
+						try
+						{
+							emitter << YAML::Value << element;
+						}
+						catch (const YAML::TypedBadConversion<T>& e)
+						{
+							return;
+						}
 					}
+
 				}
 				else
 				{
@@ -205,15 +224,25 @@ namespace Cine
 		}
 
 		template <typename T>
-		void Serialize(T& obj) {
+		void Serialize(T& obj)
+		{
 			StartObject(obj);
 			obj.Serialize(*this);
 			EndObject();
 		}
 
-		YAML::Node GetNode() {
+		YAML::Node GetNode()
+		{
 			return YAML::Load(emitter.c_str());
 		}
+
+		std::string formatFloat(float value, int precision = 8)
+		{
+			std::ostringstream oss;
+			oss << std::fixed << std::setprecision(precision) << value;
+			return oss.str();
+		}
+
 	};
 
 	class Deserializer {
@@ -223,10 +252,11 @@ namespace Cine
 		Deserializer(const YAML::Node& node) : node(node) {}
 
 		template <typename T>
-		void operator()(const std::string& name, T& value) {
-			if (node[name]) 
+		void operator()(const std::string& name, T& value)
+		{
+			if (node[name])
 			{
-				if constexpr (is_serializable<T>::value) 
+				if constexpr (is_serializable<T>::value)
 				{
 					value = node[name].as<T>();
 				}
@@ -241,13 +271,15 @@ namespace Cine
 		}
 
 		template <typename T>
-		void Deserialize(T& obj, const YAML::Node& node) {
+		void Deserialize(T& obj, const YAML::Node& node)
+		{
 			Deserializer deserializer(node[Utils::GetClassTypename<T>()]);
 			obj.Serialize(deserializer);
 		}
 
 		template <typename T>
-		void operator()(const std::string& name, std::vector<T>& vec) {
+		void operator()(const std::string& name, std::vector<T>& vec)
+		{
 			if (node[name]) {
 				const auto& seqNode = node[name];
 				if (!seqNode.IsSequence()) {
@@ -256,9 +288,11 @@ namespace Cine
 				}
 
 				vec.clear();
-				for (const auto& elementNode : seqNode) {
+				for (const auto& elementNode : seqNode)
+				{
 					T element;
-					if constexpr (is_serializable<T>::value) {
+					if constexpr (is_serializable<T>::value)
+					{
 						element = elementNode.as<T>();
 					}
 					else {
@@ -275,18 +309,17 @@ namespace Cine
 
 
 	template <typename T>
-	YAML::Node Serialize(T& obj) {
+	YAML::Node Serialize(T& obj)
+	{
 		Serializer serializer;
 		serializer.Serialize(obj);
 		return serializer.GetNode();
 	}
 
 	template <typename T>
-	void Deserialize(T& obj, const YAML::Node& node) {
+	void Deserialize(T& obj, const YAML::Node& node)
+	{
 		Deserializer deserializer(node[Utils::GetClassTypename<T>()]);
 		obj.Serialize(deserializer);
 	}
 }
-
-
-

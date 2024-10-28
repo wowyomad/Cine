@@ -236,6 +236,8 @@ namespace Cine
 				AddComponentItem<CameraComponent>(m_Context.Properties, "Camera");
 				AddComponentItem<SpriteRendererComponent>(m_Context.Properties, "Sprite Renderer");
 				AddComponentItem<NativeScriptComponent>(m_Context.Properties, "Native Script");
+				AddComponentItem<RigidBody2DComponent>(m_Context.Properties, "Rigid Body 2D");
+				AddComponentItem<BoxCollider2DComponent>(m_Context.Properties, "Box Collider 2D");
 
 				ImGui::EndPopup();
 			}
@@ -392,6 +394,16 @@ namespace Cine
 		if (entity.HasComponent<SpriteComponent>())
 		{
 			DisplaySpriteComponent(entity);
+		}
+
+		if (entity.HasComponent<RigidBody2DComponent>())
+		{
+			DisplayRigidBody2DComponent(entity);
+		}
+
+		if (entity.HasComponent<BoxCollider2DComponent>())
+		{
+			DisplayBoxCollider2DComponent(entity);
 		}
 
 		if (entity.HasComponent<NativeScriptComponent>())
@@ -669,6 +681,47 @@ namespace Cine
 				}
 			});
 	}
+	void SceneHierarchyPanel::DisplayBoxCollider2DComponent(Entity entity)
+	{
+		DisplayComponent<BoxCollider2DComponent>(entity, "Box Collider 2D", [this, entity](BoxCollider2DComponent& collider)
+			{
+				ImGui::DragFloat2("Offset", glm::value_ptr(collider.Offset), 0.01f, 0.0f, 0.0f, "%.2f");
+				ImGui::DragFloat2("Size", glm::value_ptr(collider.Size), 0.01f, 0.0f, 0.0f, "%.2f");
+
+				ImGui::DragFloat("Density", &collider.Density, 0.01, 0.0f, 0.0f, "%.2f");
+				ImGui::DragFloat("Friction", &collider.Friction, 0.01, 0.0f, 1.0f, "%.2f");
+				ImGui::DragFloat("Restitution", &collider.Restitution, 0.01f, 0.0f, 1.0f, "%.2f");
+			});
+	}
+
+	void SceneHierarchyPanel::DisplayRigidBody2DComponent(Entity entity)
+	{
+		DisplayComponent<RigidBody2DComponent>(entity, "Rigid Body 2D", [this, entity](RigidBody2DComponent& rb)
+			{
+				std::array<const char*, 3> typeStrigns = { "Static", "Dynamic", "Kinematic"};
+				const char* currentType = typeStrigns[static_cast<int>(rb.Type)];
+
+				if (ImGui::BeginCombo("Body Type", currentType))
+				{
+					for (int i = 0; i < typeStrigns.size(); ++i)
+					{
+						bool isSelected = currentType == typeStrigns[i];
+						if (ImGui::Selectable(typeStrigns[i], &isSelected))
+						{
+							currentType = typeStrigns[i];
+							rb.Type = static_cast<RigidBody2DComponent::BodyType>(i);
+						}
+						if (isSelected)
+						{
+							ImGui::SetItemDefaultFocus();
+						}
+					}
+					ImGui::EndCombo();
+				}
+
+				if (ImGui::Checkbox("Fixed Rotation", &rb.FixedRotation));
+			});
+	}
 	void SceneHierarchyPanel::DisplayNativeScriptComponent(Entity entity)
 	{
 		DisplayComponent<NativeScriptComponent>(entity, "Native Scripts", [this, entity](NativeScriptComponent& nsc)
@@ -719,23 +772,73 @@ namespace Cine
 							std::string fieldStr = fieldName + "##" + script.Name;
 							if (fieldNode.IsScalar())
 							{
-								std::string value = fieldNode.as<std::string>();
-								std::string value_copy = value;
-								value.resize(256);
-								if (ImGui::InputText(fieldStr.c_str(), const_cast<char*>(value.c_str()), value.length()))
+								std::string stringValue = fieldNode.as<std::string>();
+								std::string value_copy = stringValue;
+								stringValue.resize(256);
+
+								int intValue = 0;
+								float floatValue = 0.0f;
+								bool isInt = false, isFloat = false;
+
+								if (!stringValue.contains('.'))
 								{
 									try
 									{
-										fieldNode = value.c_str();
+										intValue = std::stoi(stringValue);
+										isInt = true;
+									}
+									catch (const std::exception&) {}
+								}
+								else
+								{
+									try
+									{
+										floatValue = std::stof(stringValue);
+										isFloat = true;
+									}
+									catch (const std::exception&) {}
+
+								}
+
+								bool valueChanged = false;
+								if (isInt)
+								{
+									if (ImGui::DragInt(fieldStr.c_str(), &intValue, 1.0f, std::numeric_limits<int>::min(), std::numeric_limits<int>::max()))
+									{
+										stringValue = std::to_string(intValue);
+										valueChanged = true;
+									}
+								}
+								else if (isFloat)
+								{
+									if (ImGui::DragFloat(fieldStr.c_str(), &floatValue, 0.1f, std::numeric_limits<float>::min(), std::numeric_limits<float>::max(), "%.3f"))
+									{
+										stringValue = std::to_string(floatValue);
+										valueChanged = true;
+									}
+								}
+								else
+								{
+									if (ImGui::InputText(fieldStr.c_str(), const_cast<char*>(stringValue.c_str()), stringValue.length()))
+									{
+										valueChanged = true;
+									}
+								}
+
+								if (valueChanged)
+								{
+									try
+									{
+										fieldNode = stringValue.c_str();
 										serialized[script.Name] = node;
 										m_Context.Scene->DeserializeComponentByName(entity, script.Name, serialized);
 									}
 									catch (const std::exception& e)
 									{
+										// Revert the value if deserialization fails
 										fieldNode = value_copy.c_str();
 										serialized[script.Name] = node;
 										m_Context.Scene->DeserializeComponentByName(entity, script.Name, serialized);
-
 									}
 								}
 							}
@@ -744,7 +847,7 @@ namespace Cine
 
 					}
 				}
-				
+
 
 				auto& componetsData = m_Context.Scene->GetComponentsData();
 				auto& scripts = nsc.Scripts;

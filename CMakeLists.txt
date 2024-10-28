@@ -79,6 +79,12 @@ FetchContent_Declare(
 	GIT_PROGRESS TRUE
 )
 FetchContent_Declare(
+    box2d
+    GIT_REPOSITORY https://github.com/erincatto/box2d.git
+    GIT_TAG v3.0.0
+	GIT_PROGRESS TRUE
+)
+FetchContent_Declare(
     ImGuizmo
     GIT_REPOSITORY https://github.com/CedricGuillemet/ImGuizmo.git
     GIT_TAG 6d588209f99b1324a608783d1f52faa518886c29 # 24.09.2024
@@ -86,7 +92,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(ImGuizmo) #It's special
 
-list(APPEND BUILD_DEPENDENCIES glfw fmt glm spdlog imgui entt yaml-cpp)
+list(APPEND BUILD_DEPENDENCIES glfw fmt glm spdlog imgui entt yaml-cpp box2d)
 list(APPEND HEADER_DEPENDENCIES stb)
 list(APPEND DEPENDENCY_TARGETS ${BUILD_DEPENDENCIES} ${HEADER_DEPENDENCIES})
 FetchContent_MakeAvailable(${DEPENDENCY_TARGETS})

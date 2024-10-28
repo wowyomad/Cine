@@ -13,7 +13,29 @@
 
 namespace Cine
 {
-	
+	static std::string RigidBody2DBodyTypeToString(RigidBody2DComponent::BodyType bodyType)
+	{
+		switch (bodyType)
+		{
+		case RigidBody2DComponent::BodyType::Static:    return "Static";
+		case RigidBody2DComponent::BodyType::Dynamic:   return "Dynamic";
+		case RigidBody2DComponent::BodyType::Kinematic: return "Kinematic";
+		}
+
+		CINE_CORE_ASSERT(false, "Unknown body type");
+		return {};
+	}
+
+	static RigidBody2DComponent::BodyType RigidBody2DBodyTypeFromString(const std::string& bodyTypeString)
+	{
+		if (bodyTypeString == "Static")    return RigidBody2DComponent::BodyType::Static;
+		if (bodyTypeString == "Dynamic")   return RigidBody2DComponent::BodyType::Dynamic;
+		if (bodyTypeString == "Kinematic") return RigidBody2DComponent::BodyType::Kinematic;
+
+		CINE_CORE_ASSERT(false, "Unknown body type");
+		return RigidBody2DComponent::BodyType::Static;
+	}
+
 	void SceneSerializer::SerializeEntity(YAML::Emitter& out, Entity entity)
 	{
 		out << YAML::BeginMap; //Entity
@@ -131,6 +153,37 @@ namespace Cine
 			out << YAML::EndSeq;
 
 			out << YAML::EndMap;
+		}
+
+		if (entity.HasComponent<RigidBody2DComponent>())
+		{
+			out << YAML::Key << "RigidBody2DComponent";
+			out << YAML::BeginMap;
+
+			auto& rb = entity.GetComponent<RigidBody2DComponent>();
+			
+			out << YAML::Key << "Type" << YAML::Value << RigidBody2DBodyTypeToString(rb.Type);
+			out << YAML::Key << "FixedRotation" << YAML::Value << rb.FixedRotation;
+
+			out << YAML::EndMap;
+		}
+
+		if (entity.HasComponent<BoxCollider2DComponent>())
+		{
+			out << YAML::Key << "BoxCollider2DComponent";
+			out << YAML::BeginMap;
+
+			auto& collider = entity.GetComponent<BoxCollider2DComponent>();
+
+			out << YAML::Key << "Offset" << collider.Offset;
+			out << YAML::Key << "Size" << collider.Size;
+			out << YAML::Key << "Density" << collider.Density;
+			out << YAML::Key << "Friction" << collider.Friction;
+			out << YAML::Key << "Restitution" << collider.Restitution;
+
+			out << YAML::EndMap;
+
+
 		}
 
 		if (entity.HasComponent<SpriteAnimationComponent>())
@@ -308,6 +361,27 @@ namespace Cine
 						}
 					}
 				}
+
+				auto rigidBody2DComponent = entity["RigidBody2DComponent"];
+				if (rigidBody2DComponent)
+				{
+					auto&& rb = deserializedEntity.AddOrReplaceComponent<RigidBody2DComponent>();
+					rb.FixedRotation = rigidBody2DComponent["FixedRotation"].as<bool>();
+					rb.Type = RigidBody2DBodyTypeFromString(rigidBody2DComponent["Type"].as<std::string>());
+				}
+
+				auto boxCollider2DComponent = entity["BoxCollider2DComponent"];
+				if (boxCollider2DComponent)
+				{
+					auto&& collider = deserializedEntity.AddOrReplaceComponent<BoxCollider2DComponent>();
+					collider.Offset = boxCollider2DComponent["Offset"].as<glm::vec2>();
+					collider.Size = boxCollider2DComponent["Size"].as<glm::vec2>();	
+					collider.Density = boxCollider2DComponent["Density"].as<float>();
+					collider.Friction = boxCollider2DComponent["Friction"].as<float>();
+					collider.Restitution = boxCollider2DComponent["Restitution"].as<float>();
+
+				}
+
 				auto nativeScriptComponent = entity["NativeScriptComponent"];
 				if (nativeScriptComponent)
 				{	

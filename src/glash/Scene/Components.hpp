@@ -43,7 +43,7 @@ namespace Cine
 				* glm::scale(glm::mat4(1.0f), Scale);
 		}
 
-		static glm::mat4 GetWorldTransform(const Entity& entity);
+		static glm::mat4 GetWorldTransform(Entity& entity);
 	};
 
 	struct CachedTransform
@@ -153,5 +153,27 @@ namespace Cine
 	public:
 		std::vector<Data> Scripts;
 
+	};
+
+	struct RigidBody2DComponent
+	{
+		enum class BodyType { Static = 0, Dynamic, Kinematic };
+		BodyType Type = BodyType::Dynamic;
+		bool FixedRotation = false;
+
+		size_t BodyHandle;
+		
+		RigidBody2DComponent() = default;
+		RigidBody2DComponent(const RigidBody2DComponent&) = default;
+	};
+
+	struct BoxCollider2DComponent
+	{
+		glm::vec2 Offset = { 0.0f, 0.0f };
+		glm::vec2 Size = { 0.5f, 0.5f };
+
+		float Density = 1.0f;
+		float Friction = 0.5f;
+		float Restitution = 0.0f;
 	};
 }

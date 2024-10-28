@@ -19,6 +19,55 @@ namespace Cine
 		return GetComponent<HierarchyComponent>().Children;
 	}
 
+	glm::vec3 Entity::Translation()
+	{
+		auto& hierarchy = GetComponent<HierarchyComponent>();
+		if (!hierarchy.Parent)
+		{
+			return LocalTranslation();
+		}
+		else
+		{
+			glm::vec3 translation, rotation, scale;
+			auto& transform = GetComponent<CachedTransform>();
+			Math::DecomposeTransform(transform.CachedMatrix, translation, rotation, scale);
+			return translation;
+		}
+
+	}
+
+	glm::vec3 Entity::Rotation()
+	{
+		auto& hierarchy = GetComponent<HierarchyComponent>();
+		if (!hierarchy.Parent)
+		{
+			return LocalRotation();
+		}
+		else
+		{
+			glm::vec3 translation, rotation, scale;
+			auto& transform = GetComponent<CachedTransform>();
+			Math::DecomposeTransform(transform.CachedMatrix, translation, rotation, scale);
+			return rotation;
+		}
+	}
+
+	glm::vec3 Entity::Scale()
+	{
+		auto& hierarchy = GetComponent<HierarchyComponent>();
+		if (!hierarchy.Parent)
+		{
+			return LocalScale();
+		}
+		else
+		{
+			glm::vec3 translation, rotation, scale;
+			auto& transform = GetComponent<CachedTransform>();
+			Math::DecomposeTransform(transform.CachedMatrix, translation, rotation, scale);
+			return scale;
+		}
+	}
+
 	void Entity::AddChild(Entity child)
 	{
 		auto& hierarchy = GetComponent<HierarchyComponent>();
@@ -118,7 +167,7 @@ namespace Cine
 			hierarchy.Parent = parent;
 			parentHierarchy.Children.push_back(*this);
 		}
-		
+
 		return true;
 	}
 
@@ -182,21 +231,35 @@ namespace Cine
 	{
 		Entity clone = Entity(m_Scene->m_Registry.create(), m_Scene);
 
+		auto& nscStorage = m_Scene->m_Registry.storage<NativeScriptComponent>();
+		if (nscStorage.contains(m_EntityHandle))
+		{
+			nscStorage.push(clone);
+
+			for (auto& script : GetComponent<NativeScriptComponent>().Scripts)
+			{
+				clone.AddComponentByName(script.Name);
+			}
+		}
+
 		for (auto&& [id, storage] : m_Scene->m_Registry.storage())
 		{
-			if (storage.contains(m_EntityHandle))
-			{
-				storage.push(clone, storage.value(m_EntityHandle));
-			}
 			if (storage.type().hash() == entt::type_id<NativeScriptComponent>().hash())
 			{
-				auto& cloneNsc = clone.GetComponent<NativeScriptComponent>();
-				for (auto& script : cloneNsc.Scripts)
-				{
-					script.Instance = nullptr;
-				}
+				continue;
 			}
-			else if (storage.type().hash() == entt::type_id<HierarchyComponent>().hash())
+
+			if (storage.contains(m_EntityHandle))
+			{
+				//Contains 'script'
+				if (storage.contains(clone))
+				{
+					storage.erase(clone);
+				}
+				storage.push(clone, storage.value(m_EntityHandle));
+			}
+
+			if (storage.type().hash() == entt::type_id<HierarchyComponent>().hash())
 			{
 				auto& cloneHierarchy = clone.GetComponent<HierarchyComponent>();
 				cloneHierarchy.Children = {};

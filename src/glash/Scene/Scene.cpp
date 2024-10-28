@@ -10,10 +10,22 @@
 
 #include "glash/Renderer/Renderer2D.hpp"
 
+#include <box2d/box2d.h>
+
 
 
 namespace Cine
 {
+	static b2BodyType CineRigiBody2DTypeToBox2DType(RigidBody2DComponent::BodyType type)
+	{
+		switch (type)
+		{
+		case RigidBody2DComponent::BodyType::Static: return b2BodyType::b2_staticBody;
+		case RigidBody2DComponent::BodyType::Kinematic: return b2BodyType::b2_kinematicBody;
+		case RigidBody2DComponent::BodyType::Dynamic: return b2BodyType::b2_dynamicBody;
+		}
+	}
+
 	Scene::Scene()
 		: m_MainCamera(new Entity()), m_ScriptEngine(ScriptEngine::Get()), m_Name("Unnamed Scene")
 	{
@@ -114,6 +126,100 @@ namespace Cine
 		}
 	}
 
+	void Scene::OnRuntimeStart()
+	{
+		b2WorldDef def = b2DefaultWorldDef();
+		def.gravity = { 0.0f, -9.8f };
+		m_PhysicsWorldID = b2CreateWorld(&def);
+
+		auto view = m_Registry.view<RigidBody2DComponent>();
+
+		for (auto e : view)
+		{
+			Entity entity = { e, this };
+			auto& transform = entity.Transform();
+			//glm::vec3 position, rotation, scale;
+			//Math::DecomposeTransform(transform.CachedMatrix, position, rotation, scale);
+
+			auto& rb2d = entity.GetComponent<RigidBody2DComponent>();
+		
+			b2BodyDef bodyDef = b2DefaultBodyDef();
+			bodyDef.type = CineRigiBody2DTypeToBox2DType(rb2d.Type);
+			bodyDef.position = { transform.Translation.x, transform.Translation.y };
+			bodyDef.rotation = b2MakeRot(transform.Rotation.z);
+			bodyDef.fixedRotation = rb2d.FixedRotation;
+
+			b2BodyId bodyID = b2CreateBody(m_PhysicsWorldID, &bodyDef);
+			rb2d.BodyHandle = *reinterpret_cast<size_t*>(&bodyID);
+
+			if (entity.HasComponent<BoxCollider2DComponent>())
+			{
+				auto& collider = entity.GetComponent<BoxCollider2DComponent>();
+				
+				b2Polygon boxShape = b2MakeBox(collider.Size.x * transform.Scale.x, collider.Size.y * transform.Scale.y);
+				b2ShapeDef shapeDef = b2DefaultShapeDef();
+				shapeDef.density = collider.Density;
+				shapeDef.friction = collider.Friction;
+				shapeDef.restitution = collider.Restitution;
+				
+				b2CreatePolygonShape(bodyID, &shapeDef, &boxShape);
+			}
+
+		}
+	}
+
+	void Scene::OnRuntimeStop()
+	{
+		m_PhysicsWorldID = {};
+	}
+
+
+	void Scene::OnUpdateRuntime(Timestep ts)
+	{
+		if (m_UpdateScene)
+		{
+			UpdateWorldTransforms(m_Registry);
+			InstantiateScripts();
+
+			//Physics
+			{
+				const int32_t velocityIterations = 6;
+				const int32_t positionIterations = 2;
+				const int32_t substepCount = 1;
+				b2World_Step(m_PhysicsWorldID, ts, substepCount);
+
+				auto view = m_Registry.view<RigidBody2DComponent>();
+				for (auto e : view)
+				{
+					Entity entity = { e, this };
+					auto& transform = entity.Transform();
+					auto& rb = entity.GetComponent<RigidBody2DComponent>();
+					b2BodyId bodyID = *(b2BodyId*)&rb.BodyHandle;
+
+					const b2Vec2& position = b2Body_GetPosition(bodyID);
+					transform.Translation.x = position.x;
+					transform.Translation.y = position.y;
+					transform.Rotation.z = b2Rot_GetAngle(b2Body_GetRotation(bodyID));
+					
+				}
+			}
+
+			UpdateScripts(ts);
+			SpriteAnimationSystem::Update(m_Registry, ts);
+
+			Renderer2D::Clear();
+			if (*m_MainCamera)
+			{
+				auto&& [cameraComponent, transform] = m_MainCamera->GetComponents<CameraComponent, CachedTransform>();
+				Renderer2D::BeginScene(cameraComponent.Camera, transform.CachedMatrix);
+				SpriteRendererSystem::Update(m_Registry);
+				Renderer2D::EndScene();
+			}
+
+			DestroyMarkedEntities();
+		}
+	}
+
 	void Scene::OnUpdateEditor(Timestep ts, EditorCamera& editorCamera)
 	{
 		if (m_UpdateScene)
@@ -128,32 +234,6 @@ namespace Cine
 
 			DestroyMarkedEntities();
 		}
-	}
-
-
-	void Scene::OnUpdateRuntime(Timestep ts)
-	{
-
-		if (m_UpdateScene)
-		{
-			UpdateWorldTransforms(m_Registry);
-			InstantiateScripts();
-			UpdateScripts(ts);
-			SpriteAnimationSystem::Update(m_Registry, ts);
-			Renderer2D::Clear();
-			if (*m_MainCamera)
-			{
-				auto&& [cameraComponent, transform] = m_MainCamera->GetComponents<CameraComponent, CachedTransform>();
-				Renderer2D::BeginScene(cameraComponent.Camera, transform.CachedMatrix);
-				SpriteRendererSystem::Update(m_Registry);
-				Renderer2D::EndScene();
-			}
-
-			DestroyMarkedEntities();
-		}
-
-
-
 	}
 
 	void Scene::InstantiateScripts()

@@ -14,7 +14,6 @@ namespace Cine
 		static void Update(entt::registry& registry);
 	};
 
-
 	class SpriteAnimationSystem
 	{
 	public:

@@ -333,11 +333,13 @@ namespace Cine
 
 	void EditorLayer::OnScenePlay()
 	{
+		m_ActiveScene->OnRuntimeStart();
 		m_SceneState = SceneState::Play;
 	}
 
 	void EditorLayer::OnScenePause()
 	{
+		m_ActiveScene->OnRuntimeStop();
 		m_SceneState = SceneState::Edit;
 	}
 

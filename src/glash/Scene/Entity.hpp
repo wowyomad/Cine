@@ -3,6 +3,9 @@
 #include <entt/entt.hpp>
 
 #include "Scene.hpp"
+#include "Components.hpp"
+
+#include "glash/Math/Math.hpp"
 
 namespace Cine
 {
@@ -81,9 +84,31 @@ namespace Cine
 			return m_Scene->m_Registry.get<Components...>(m_EntityHandle);
 		}
 
+		TransformComponent& Transform()
+		{
+			return GetComponent<TransformComponent>();
+		}
+
+		glm::vec3& LocalTranslation()
+		{
+			return Transform().Translation;
+		}
+
+		glm::vec3& LocalRotation()
+		{
+			return Transform().Rotation;
+		}
+
+		glm::vec3& LocalScale()
+		{
+			return Transform().Scale;
+		}
+
+		glm::vec3 Translation();
+		glm::vec3 Rotation();
+		glm::vec3 Scale();
+
 		Entity Clone();
-
-
 
 		template <class Component>
 		void RemoveComponent()

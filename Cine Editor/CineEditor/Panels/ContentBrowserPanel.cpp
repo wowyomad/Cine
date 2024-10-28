@@ -84,6 +84,7 @@ namespace Cine
 						
 						serializer.Deserialize(savePath);
 						m_ActiveScene->SetUpdateScene(true);
+						m_ActiveScene->OnRuntimeStart();
 						Application::Get().SetUpdateUI(true);
 					});
 				return true;
@@ -108,6 +109,7 @@ namespace Cine
 		if (DisplayReloadScriptsButton())
 		{
 			m_ActiveScene->SetUpdateScene(false);
+			m_ActiveScene->OnRuntimeStop();
 		}
 
 		float contentWidth = ImGui::GetContentRegionAvail().x;
