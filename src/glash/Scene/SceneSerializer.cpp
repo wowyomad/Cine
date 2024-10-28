@@ -180,6 +180,7 @@ namespace Cine
 			out << YAML::Key << "Density" << collider.Density;
 			out << YAML::Key << "Friction" << collider.Friction;
 			out << YAML::Key << "Restitution" << collider.Restitution;
+			out << YAML::Key << "RestitutionThreshold" << collider.RestitutionThreshold;
 
 			out << YAML::EndMap;
 
@@ -379,6 +380,7 @@ namespace Cine
 					collider.Density = boxCollider2DComponent["Density"].as<float>();
 					collider.Friction = boxCollider2DComponent["Friction"].as<float>();
 					collider.Restitution = boxCollider2DComponent["Restitution"].as<float>();
+					collider.RestitutionThreshold = boxCollider2DComponent["RestitutionThreshold"].as<float>();
 
 				}
 

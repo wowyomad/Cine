@@ -9,7 +9,8 @@
 #include "ScriptEngine.hpp"
 
 #include <entt/entt.hpp>
-#include <box2d/box2d.h>
+
+class b2World;
 
 namespace Cine
 {
@@ -33,6 +34,7 @@ namespace Cine
 
 		void OnViewportResize(uint32_t width, uint32_t height);
 
+		void OnPhysics2DStart();
 		void OnRuntimeStart();
 		void OnRuntimeStop();	
 
@@ -98,7 +100,7 @@ namespace Cine
 		std::vector<entt::entity> m_ToDestroyEntities;
 		bool m_UpdateScene = true;
 
-		b2WorldId m_PhysicsWorldID;
+		Scope<b2World> m_PhysicsWorld;
 
 		Entity* m_MainCamera;
 

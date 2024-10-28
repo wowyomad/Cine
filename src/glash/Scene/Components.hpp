@@ -161,7 +161,7 @@ namespace Cine
 		BodyType Type = BodyType::Dynamic;
 		bool FixedRotation = false;
 
-		size_t BodyHandle;
+		void* RuntimeBody;
 		
 		RigidBody2DComponent() = default;
 		RigidBody2DComponent(const RigidBody2DComponent&) = default;
@@ -175,5 +175,6 @@ namespace Cine
 		float Density = 1.0f;
 		float Friction = 0.5f;
 		float Restitution = 0.0f;
+		float RestitutionThreshold = 0.1f;
 	};
 }

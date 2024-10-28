@@ -691,6 +691,7 @@ namespace Cine
 				ImGui::DragFloat("Density", &collider.Density, 0.01, 0.0f, 0.0f, "%.2f");
 				ImGui::DragFloat("Friction", &collider.Friction, 0.01, 0.0f, 1.0f, "%.2f");
 				ImGui::DragFloat("Restitution", &collider.Restitution, 0.01f, 0.0f, 1.0f, "%.2f");
+				ImGui::DragFloat("Restituion Threasold", &collider.RestitutionThreshold, 0.01f, 0.0f, 1.0f, "%.2f");
 			});
 	}
 

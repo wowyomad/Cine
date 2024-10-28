@@ -29,6 +29,8 @@ set(GLFW_BUILD_WAYLAND OFF CACHE BOOL "Enable wayland scanner" FORCE)
 
 set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "Cames from yaml-cpp. Builds 'read' and 'parse' executables" FORCE)
 
+set(BOX2D_BUILD_TESTBED OFF CACHE BOOL "Came from box2d. Causes target errors since their test builds create targets imgui, glad and glfw")
+
 include(FetchContent)
 FetchContent_Declare(
     glfw
@@ -81,7 +83,7 @@ FetchContent_Declare(
 FetchContent_Declare(
     box2d
     GIT_REPOSITORY https://github.com/erincatto/box2d.git
-    GIT_TAG v3.0.0
+    GIT_TAG v2.4.2
 	GIT_PROGRESS TRUE
 )
 FetchContent_Declare(

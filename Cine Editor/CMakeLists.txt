@@ -19,6 +19,11 @@ add_custom_target(copy_assets ALL
     COMMENT "Copying Resources directory to ${DEST_ASSETS_DIR}"
 )
 
+add_custom_target(copy_imgui_ini ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/imgui.ini ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+    COMMENT "Copying Editor imgui.ini file to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+)
+
 copy_files("${EDITOR_TEXTURES}" "${EDITOR_TEXTURES_OUT}" editor_copy_textures)
 copy_files("${EDITOR_FONTS}" "${EDITOR_FONTS_OUT}" editor_copy_fonts)
 copy_files("${EDITOR_CONTENTBROWSER_ICONS}" "${EDITOR_CONTENTBROWSER_ICONS_OUT}" editor_copy_contentbrowser_icons)
@@ -40,4 +45,4 @@ target_include_directories(${CineEditor}
 )
 target_precompile_headers(${CineEditor} REUSE_FROM glash_pch)
 
-add_dependencies(${CineEditor} copy_assets copy_resources)
+add_dependencies(${CineEditor} copy_assets copy_resources copy_imgui_ini)
