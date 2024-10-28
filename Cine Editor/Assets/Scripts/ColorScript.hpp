@@ -37,6 +37,16 @@ public:
 		m_SpriteComponent->Color.g = 0.5f * sin(m_Time + 2.0f) + 0.5f;
 		m_SpriteComponent->Color.b = 0.5f * sin(m_Time + 4.0f) + 0.5f;
 	}
+
+	void OnTriggerEnter(Entity entity) override
+	{
+		std::cout << "Trigger enter on " << static_cast<uint32_t>(entity) << std::endl;
+	}
+
+	void OnTriggerExit(Entity entity) override
+	{
+		std::cout << "Trigger exit on " << static_cast<uint32_t>(entity) << std::endl;
+	}
 public:
 	SERIALIZE_CLASS(ColorScript,
 		FIELD(m_Time)
