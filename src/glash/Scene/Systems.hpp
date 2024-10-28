@@ -43,8 +43,16 @@ namespace Cine
 		void SetScene(Scene& scene);
 		
 	private:
+		class ContactListener : public b2ContactListener
+		{
+			void BeginContact(b2Contact* contact) override;
+			void EndContact(b2Contact* contact) override;
+
+		};
+	private:
 		Scene* m_Scene = nullptr;
 		Scope<b2World> m_PhysicsWorld;
+		ContactListener m_ContactListener;
 
 	};
 }

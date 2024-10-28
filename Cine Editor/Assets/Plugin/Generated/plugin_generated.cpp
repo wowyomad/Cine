@@ -1,13 +1,16 @@
 #include "plugin.hpp"
+
 #include <iostream>
 #include <entt/entt.hpp>
 
 #include "GLFW/glfw3.h" //Temporarily
 
-
 // [INCLUDES]
-#include "D:\Dev\Game Development\Cine\Cine Editor\Assets\Plugin\..\Scripts/ColorScript.hpp"
-#include "D:\Dev\Game Development\Cine\Cine Editor\Assets\Plugin\..\Scripts/RotatorScript.hpp"
+#include "D:\Dev\Game Development\cine\Cine Editor\Assets\Plugin\..\Scripts/ColorScript.hpp"
+#include "D:\Dev\Game Development\cine\Cine Editor\Assets\Plugin\..\Scripts/RotatorScript.hpp"
+#include "D:\Dev\Game Development\cine\Cine Editor\Assets\Plugin\..\Scripts/Snake.hpp"
+#include "D:\Dev\Game Development\cine\Cine Editor\Assets\Plugin\..\Scripts/SnakeBodySegment.hpp"
+#include "D:\Dev\Game Development\cine\Cine Editor\Assets\Plugin\..\Scripts/SnakeController.hpp"
 
 using namespace Cine;
 
@@ -83,7 +86,7 @@ void RegisterComponent()
 template <class Component>
 void OnComponentAdded(entt::entity entity)
 {
-	auto& component = s_Registry->emplace<Component>(entity);
+	auto& component = s_Registry->emplace_or_replace<Component>(entity);
 
 	if constexpr (std::is_base_of<NativeScript, Component>::value)
 	{
@@ -139,6 +142,9 @@ void InitializeComponents(entt::registry& registry)
 	// [REGISTER]
 	RegisterComponent<ColorScript>();
 	RegisterComponent<RotatorScript>();
+	RegisterComponent<Snake>();
+	RegisterComponent<SnakeBodySegment>();
+	RegisterComponent<SnakeController>();
 }
 
 void CreateComponent(entt::entity entity, const std::string& componentName)
@@ -189,6 +195,26 @@ ComponentsData GetComponentsData()
 		++i;
 	}
 	return data;
+}
+
+void InitializeInput
+(
+	KeyInputFunction isKeyPressedFunc,
+	KeyInputFunction isKeyDownFunc,
+	KeyInputFunction isKeyUpFunc,
+	MouseInputFunction isMouseButtonPressedFunc,
+	MouseInputFunction isMouseButtonDownFunc,
+	MouseInputFunction isMouseButtonUpFunc,
+	MousePositionFunction getMousePositionFunc
+)
+{
+	IsKeyPressedFunc = isKeyPressedFunc;
+	IsKeyDownFunc = isKeyDownFunc;
+	IsKeyUpFunc = isKeyUpFunc;
+	IsMouseButtonPressedFunc = isMouseButtonPressedFunc;
+	IsMouseButtonDownFunc = isMouseButtonDownFunc;
+	IsMouseButtonUpFunc = isMouseButtonUpFunc;
+	GetMousePositionFunc = getMousePositionFunc;
 }
 
 void InitializeApplicationContext(Cine::Application* application)

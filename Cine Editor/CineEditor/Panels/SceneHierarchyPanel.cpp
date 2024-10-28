@@ -685,6 +685,7 @@ namespace Cine
 	{
 		DisplayComponent<BoxCollider2DComponent>(entity, "Box Collider 2D", [this, entity](BoxCollider2DComponent& collider)
 			{
+				ImGui::Checkbox("Is Trigger", &collider.IsTrigger);
 				ImGui::DragFloat2("Offset", glm::value_ptr(collider.Offset), 0.01f, 0.0f, 0.0f, "%.2f");
 				ImGui::DragFloat2("Size", glm::value_ptr(collider.Size), 0.01f, 0.0f, 0.0f, "%.2f");
 

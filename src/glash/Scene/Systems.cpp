@@ -14,53 +14,24 @@
 
 namespace Cine
 {
-    static b2BodyType CineRigiBody2DTypeToBox2DType(RigidBody2DComponent::BodyType type)
-    {
-        switch (type)
-        {
-        case RigidBody2DComponent::BodyType::Static: return b2BodyType::b2_staticBody;
-        case RigidBody2DComponent::BodyType::Kinematic: return b2BodyType::b2_kinematicBody;
-        case RigidBody2DComponent::BodyType::Dynamic: return b2BodyType::b2_dynamicBody;
-        }
+	static b2BodyType CineRigiBody2DTypeToBox2DType(RigidBody2DComponent::BodyType type)
+	{
+		switch (type)
+		{
+		case RigidBody2DComponent::BodyType::Static: return b2BodyType::b2_staticBody;
+		case RigidBody2DComponent::BodyType::Kinematic: return b2BodyType::b2_kinematicBody;
+		case RigidBody2DComponent::BodyType::Dynamic: return b2BodyType::b2_dynamicBody;
+		}
 
-        CINE_CORE_ASSERT(false, "There's no such rigid body type");
-        return b2BodyType::b2_staticBody;
-    }
+		CINE_CORE_ASSERT(false, "There's no such rigid body type");
+		return b2BodyType::b2_staticBody;
+	}
 
-    struct FixtureData
-    {
-        Entity entity;
-        FixtureData(Entity entity) : entity(entity) { };
-    };
-
-    class ContactListener : public b2ContactListener
-    {
-        void BeginContact(b2Contact* contact) override
-        {
-            auto entityA = reinterpret_cast<Entity*>(contact->GetFixtureA()->GetUserData().pointer);
-            auto entityB = reinterpret_cast<Entity*>(contact->GetFixtureB()->GetUserData().pointer);
-            if (entityA && entityB)
-            {
-                if (contact->GetFixtureA()->IsSensor())
-                    entityA->OnTriggerEnter(*entityB);
-                if (contact->GetFixtureB()->IsSensor())
-                    entityB->OnTriggerEnter(*entityA);
-            }
-        }
-
-        void EndContact(b2Contact* contact) override
-        {
-            auto entityA = reinterpret_cast<Entity*>(contact->GetFixtureA()->GetUserData().pointer);
-            auto entityB = reinterpret_cast<Entity*>(contact->GetFixtureB()->GetUserData().pointer);
-            if (entityA && entityB)
-            {
-                if (contact->GetFixtureA()->IsSensor())
-                    entityA->OnTriggerExit(*entityB);
-                if (contact->GetFixtureB()->IsSensor())
-                    entityB->OnTriggerExit(*entityA);
-            }
-        }
-    };
+	struct FixtureData
+	{
+		Entity entity;
+		FixtureData(Entity entity) : entity(entity) { };
+	};
 
 	void UpdateWorldTransforms(entt::registry& registry)
 	{
@@ -90,81 +61,81 @@ namespace Cine
 		}
 	}
 
-    void SpriteRendererSystem::Update(entt::registry& registry)
-    {
-        auto view = registry.view<TransformComponent, SpriteRendererComponent, SpriteComponent>();
-        std::vector<entt::entity> opaqueEntities;
-        std::vector<entt::entity> transparentEntities;
+	void SpriteRendererSystem::Update(entt::registry& registry)
+	{
+		auto view = registry.view<TransformComponent, SpriteRendererComponent, SpriteComponent>();
+		std::vector<entt::entity> opaqueEntities;
+		std::vector<entt::entity> transparentEntities;
 
-        for (auto entity : view)
-        {
-            auto& sprite = view.get<SpriteComponent>(entity);
-            if (sprite.Color.a >= 1.0f)
-            {
-                opaqueEntities.push_back(entity);
-            }
-            else
-            {
-                transparentEntities.push_back(entity);
-            }
-        }
+		for (auto entity : view)
+		{
+			auto& sprite = view.get<SpriteComponent>(entity);
+			if (sprite.Color.a >= 1.0f)
+			{
+				opaqueEntities.push_back(entity);
+			}
+			else
+			{
+				transparentEntities.push_back(entity);
+			}
+		}
 
-        std::sort(opaqueEntities.begin(), opaqueEntities.end(), [&](entt::entity a, entt::entity b) {
-            auto& transformA = view.get<TransformComponent>(a);
-            auto& transformB = view.get<TransformComponent>(b);
-            return transformA.Translation.z < transformB.Translation.z;
-            });
+		std::sort(opaqueEntities.begin(), opaqueEntities.end(), [&](entt::entity a, entt::entity b) {
+			auto& transformA = view.get<TransformComponent>(a);
+			auto& transformB = view.get<TransformComponent>(b);
+			return transformA.Translation.z < transformB.Translation.z;
+			});
 
-        std::sort(transparentEntities.begin(), transparentEntities.end(), [&](entt::entity a, entt::entity b) {
-            auto& transformA = view.get<TransformComponent>(a);
-            auto& transformB = view.get<TransformComponent>(b);
-            return transformA.Translation.z > transformB.Translation.z;
-            });
+		std::sort(transparentEntities.begin(), transparentEntities.end(), [&](entt::entity a, entt::entity b) {
+			auto& transformA = view.get<TransformComponent>(a);
+			auto& transformB = view.get<TransformComponent>(b);
+			return transformA.Translation.z > transformB.Translation.z;
+			});
 
-        for (auto entity : opaqueEntities)
-        {
-            auto&& [transform, spriteRenderer, sprite] = registry.get<CachedTransform, SpriteRendererComponent, SpriteComponent>(entity);
-            bool useSprite = spriteRenderer.UseSprite;
-            bool hasSpriteSheet = registry.all_of<SpriteSheetComponent>(entity);
+		for (auto entity : opaqueEntities)
+		{
+			auto&& [transform, spriteRenderer, sprite] = registry.get<CachedTransform, SpriteRendererComponent, SpriteComponent>(entity);
+			bool useSprite = spriteRenderer.UseSprite;
+			bool hasSpriteSheet = registry.all_of<SpriteSheetComponent>(entity);
 
-            if (useSprite && hasSpriteSheet)
-            {
-                auto& spriteSheet = registry.get<SpriteSheetComponent>(entity);
-                if (sprite.SpriteIndex >= static_cast<int32_t>(spriteSheet.Frames.size()))
-                {
-                    CINE_CORE_WARN("SpriteFrameIndex ({}) >= spriteSheet.Frames.size ({})", sprite.SpriteIndex, spriteSheet.Frames.size());
-                    continue;
-                }
-                Renderer2D::DrawSprite(transform.CachedMatrix, spriteSheet, sprite.SpriteIndex, sprite.Color);
-            }
-            else
-            {
-                Renderer2D::DrawQuad(transform.CachedMatrix, sprite.Color);
-            }
-        }
+			if (useSprite && hasSpriteSheet)
+			{
+				auto& spriteSheet = registry.get<SpriteSheetComponent>(entity);
+				if (sprite.SpriteIndex >= static_cast<int32_t>(spriteSheet.Frames.size()))
+				{
+					CINE_CORE_WARN("SpriteFrameIndex ({}) >= spriteSheet.Frames.size ({})", sprite.SpriteIndex, spriteSheet.Frames.size());
+					continue;
+				}
+				Renderer2D::DrawSprite(transform.CachedMatrix, spriteSheet, sprite.SpriteIndex, sprite.Color);
+			}
+			else
+			{
+				Renderer2D::DrawQuad(transform.CachedMatrix, sprite.Color);
+			}
+		}
 
-        for (auto entity : transparentEntities)
-        {
-            auto&& [transform, spriteRenderer, sprite] = registry.get<CachedTransform, SpriteRendererComponent, SpriteComponent>(entity);
-            bool useSprite = spriteRenderer.UseSprite;
-            bool hasSpriteSheet = registry.all_of<SpriteSheetComponent>(entity);
+		for (auto entity : transparentEntities)
+		{
+			auto&& [transform, spriteRenderer, sprite] = registry.get<CachedTransform, SpriteRendererComponent, SpriteComponent>(entity);
+			bool useSprite = spriteRenderer.UseSprite;
+			bool hasSpriteSheet = registry.all_of<SpriteSheetComponent>(entity);
 
-            if (useSprite && hasSpriteSheet)
-            {
-                auto& spriteSheet = registry.get<SpriteSheetComponent>(entity);
-                if (sprite.SpriteIndex >= static_cast<int32_t>(spriteSheet.Frames.size()))
-                {
-                    CINE_CORE_WARN("SpriteFrameIndex ({}) >= spriteSheet.Frames.size ({})", sprite.SpriteIndex, spriteSheet.Frames.size());
-                    continue;
-                }
-                Renderer2D::DrawSprite(transform.CachedMatrix, spriteSheet, sprite.SpriteIndex, sprite.Color);
-            }
-            else
-            {
-                Renderer2D::DrawQuad(transform.CachedMatrix, sprite.Color);
-            }
-        }
-    }
+			if (useSprite && hasSpriteSheet)
+			{
+				auto& spriteSheet = registry.get<SpriteSheetComponent>(entity);
+				if (sprite.SpriteIndex >= static_cast<int32_t>(spriteSheet.Frames.size()))
+				{
+					CINE_CORE_WARN("SpriteFrameIndex ({}) >= spriteSheet.Frames.size ({})", sprite.SpriteIndex, spriteSheet.Frames.size());
+					continue;
+				}
+				Renderer2D::DrawSprite(transform.CachedMatrix, spriteSheet, sprite.SpriteIndex, sprite.Color);
+			}
+			else
+			{
+				Renderer2D::DrawQuad(transform.CachedMatrix, sprite.Color);
+			}
+		}
+	}
 
 	//TODO: Checks?
 	void SpriteAnimationSystem::Update(entt::registry& registry, Timestep deltaTime)
@@ -215,98 +186,125 @@ namespace Cine
 		}
 	}
 
-    Physics2DSystem::Physics2DSystem(Scene& scene)
-        : m_Scene(&scene)
-    {
+	Physics2DSystem::Physics2DSystem(Scene& scene)
+		: m_Scene(&scene)
+	{
 
-    }
+	}
 
-    Physics2DSystem::~Physics2DSystem()
-    {
-        
-    }
+	Physics2DSystem::~Physics2DSystem()
+	{
 
-    void Physics2DSystem::Start()
-    {
-        m_PhysicsWorld = CreateScope<b2World>(b2Vec2(0.0f, -9.8f));
-        auto& registry = m_Scene->m_Registry;
-        auto view = registry.view<RigidBody2DComponent>();
-        for (auto e : view)
-        {
-            AddRigidBody(Entity(e, m_Scene));
-        }
-    }
+	}
 
-    void Physics2DSystem::Stop()
-    {
-        m_PhysicsWorld.reset();
-    }
+	void Physics2DSystem::Start()
+	{
+		m_PhysicsWorld = CreateScope<b2World>(b2Vec2(0.0f, -9.8f));
+		m_PhysicsWorld->SetContactListener(&m_ContactListener);
+		auto& registry = m_Scene->m_Registry;
+		auto view = registry.view<RigidBody2DComponent>();
+		for (auto e : view)
+		{
+			AddRigidBody(Entity(e, m_Scene));
+		}
+	}
 
-    void Physics2DSystem::Update(Timestep ts)
-    {
-        const int32_t velocityIterations = 6;
-        const int32_t positionIterations = 2;
-        m_PhysicsWorld->Step(ts, velocityIterations, positionIterations);
+	void Physics2DSystem::Stop()
+	{
+		m_PhysicsWorld.reset();
+	}
 
-        auto view = m_Scene->m_Registry.view<RigidBody2DComponent>();
-        for (auto e : view)
-        {
-            Entity entity = { e, m_Scene };
-            auto& transform = entity.Transform();
-            auto& rb = entity.GetComponent<RigidBody2DComponent>();
+	void Physics2DSystem::Update(Timestep ts)
+	{
+		const int32_t velocityIterations = 6;
+		const int32_t positionIterations = 2;
+		m_PhysicsWorld->Step(ts, velocityIterations, positionIterations);
 
-            if (rb.RuntimeBody)
-            {
-                b2Body& body = *static_cast<b2Body*>(rb.RuntimeBody);
-                const auto& position = body.GetPosition();
-                transform.Translation.x = position.x;
-                transform.Translation.y = position.y;
-                transform.Rotation.z = body.GetAngle();
-            }
-        }
-    }
+		auto view = m_Scene->m_Registry.view<RigidBody2DComponent>();
+		for (auto e : view)
+		{
+			Entity entity = { e, m_Scene };
+			auto& transform = entity.Transform();
+			auto& rb = entity.GetComponent<RigidBody2DComponent>();
 
-    void Physics2DSystem::AddRigidBody(Entity entity)
-    {
-        auto& transform = entity.Transform();
-        auto& rb = entity.GetComponent<RigidBody2DComponent>();
+			if (rb.RuntimeBody)
+			{
+				b2Body& body = *static_cast<b2Body*>(rb.RuntimeBody);
+				const auto& position = body.GetPosition();
+				transform.Translation.x = position.x;
+				transform.Translation.y = position.y;
+				transform.Rotation.z = body.GetAngle();
+			}
+		}
+	}
 
-        b2BodyDef bodyDef;
-        bodyDef.type = CineRigiBody2DTypeToBox2DType(rb.Type);
-        bodyDef.position = { transform.Translation.x, transform.Translation.y };
-        bodyDef.angle = transform.Rotation.z;
-        bodyDef.fixedRotation = rb.FixedRotation;
+	void Physics2DSystem::AddRigidBody(Entity entity)
+	{
+		auto& transform = entity.Transform();
+		auto& rb = entity.GetComponent<RigidBody2DComponent>();
 
-        b2Body* body = m_PhysicsWorld->CreateBody(&bodyDef);
-        rb.RuntimeBody = body;
+		b2BodyDef bodyDef;
+		bodyDef.type = CineRigiBody2DTypeToBox2DType(rb.Type);
+		bodyDef.position = { transform.Translation.x, transform.Translation.y };
+		bodyDef.angle = transform.Rotation.z;
+		bodyDef.fixedRotation = rb.FixedRotation;
 
-        if (entity.HasComponent<BoxCollider2DComponent>())
-            AddCollider(entity);
-    }
+		b2Body* body = m_PhysicsWorld->CreateBody(&bodyDef);
+		rb.RuntimeBody = body;
 
-    void Physics2DSystem::AddCollider(Entity entity)
-    {
-        auto& transform = entity.Transform();
-        auto& rb = entity.GetComponent<RigidBody2DComponent>();
-        auto& collider = entity.GetComponent<BoxCollider2DComponent>();
+		if (entity.HasComponent<BoxCollider2DComponent>())
+			AddCollider(entity);
+	}
 
-        b2PolygonShape boxShape;
-        boxShape.SetAsBox(collider.Size.x * transform.Scale.x, collider.Size.y * transform.Scale.y,
-            { collider.Offset.x, collider.Offset.y }, 0.0f);
+	void Physics2DSystem::AddCollider(Entity entity)
+	{
+		auto& transform = entity.Transform();
+		auto& rb = entity.GetComponent<RigidBody2DComponent>();
+		auto& collider = entity.GetComponent<BoxCollider2DComponent>();
 
-        b2FixtureDef fixtureDef;
-        fixtureDef.shape = &boxShape;
-        fixtureDef.density = collider.Density;
-        fixtureDef.friction = collider.Friction;
-        fixtureDef.restitution = collider.Restitution;
-        fixtureDef.restitutionThreshold = collider.RestitutionThreshold;
-        fixtureDef.isSensor = collider.IsTrigger;
-        fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(new FixtureData(entity));
-        static_cast<b2Body*>(rb.RuntimeBody)->CreateFixture(&fixtureDef);
-    }
+		b2PolygonShape boxShape;
+		boxShape.SetAsBox(collider.Size.x * transform.Scale.x, collider.Size.y * transform.Scale.y,
+			{ collider.Offset.x, collider.Offset.y }, 0.0f);
 
-    void Physics2DSystem::SetScene(Scene& scene)
-    {
-        m_Scene = &scene;
-    }
+		b2FixtureDef fixtureDef;
+		fixtureDef.shape = &boxShape;
+		fixtureDef.density = collider.Density;
+		fixtureDef.friction = collider.Friction;
+		fixtureDef.restitution = collider.Restitution;
+		fixtureDef.restitutionThreshold = collider.RestitutionThreshold;
+		fixtureDef.isSensor = collider.IsTrigger;
+		fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(new FixtureData(entity));
+		static_cast<b2Body*>(rb.RuntimeBody)->CreateFixture(&fixtureDef);
+	}
+
+	void Physics2DSystem::SetScene(Scene& scene)
+	{
+		m_Scene = &scene;
+	}
+
+	void Physics2DSystem::ContactListener::BeginContact(b2Contact* contact)
+	{
+		auto entityA = reinterpret_cast<Entity*>(contact->GetFixtureA()->GetUserData().pointer);
+		auto entityB = reinterpret_cast<Entity*>(contact->GetFixtureB()->GetUserData().pointer);
+		if (entityA && entityB)
+		{
+			if (contact->GetFixtureA()->IsSensor())
+				entityA->OnTriggerEnter(*entityB);
+			if (contact->GetFixtureB()->IsSensor())
+				entityB->OnTriggerEnter(*entityA);
+		}
+	}
+
+	void Physics2DSystem::ContactListener::EndContact(b2Contact* contact)
+	{
+		auto entityA = reinterpret_cast<Entity*>(contact->GetFixtureA()->GetUserData().pointer);
+		auto entityB = reinterpret_cast<Entity*>(contact->GetFixtureB()->GetUserData().pointer);
+		if (entityA && entityB)
+		{
+			if (contact->GetFixtureA()->IsSensor())
+				entityA->OnTriggerExit(*entityB);
+			if (contact->GetFixtureB()->IsSensor())
+				entityB->OnTriggerExit(*entityA);
+		}
+	}
 }
