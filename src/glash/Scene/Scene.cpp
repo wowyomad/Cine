@@ -16,18 +16,11 @@
 
 namespace Cine
 {
-	static b2BodyType CineRigiBody2DTypeToBox2DType(RigidBody2DComponent::BodyType type)
-	{
-		switch (type)
-		{
-		case RigidBody2DComponent::BodyType::Static: return b2BodyType::b2_staticBody;
-		case RigidBody2DComponent::BodyType::Kinematic: return b2BodyType::b2_kinematicBody;
-		case RigidBody2DComponent::BodyType::Dynamic: return b2BodyType::b2_dynamicBody;
-		}
-	}
-
 	Scene::Scene()
-		: m_MainCamera(new Entity()), m_ScriptEngine(ScriptEngine::Get()), m_Name("Unnamed Scene")
+		: m_MainCamera(new Entity()),
+		m_ScriptEngine(ScriptEngine::Get()),
+		m_Name("Unnamed Scene"),
+		m_PhysicsSystem(*this)
 	{
 
 	}
@@ -127,43 +120,7 @@ namespace Cine
 
 	void Scene::OnPhysics2DStart()
 	{
-		m_PhysicsWorld = CreateScope<b2World>(b2Vec2(0.0f, -9.8f));
-
-		auto view = m_Registry.view<RigidBody2DComponent>();
-
-		for (auto e : view)
-		{
-			Entity entity = { e, this };
-			auto& transform = entity.Transform();
-			auto& rb = entity.GetComponent<RigidBody2DComponent>();
-
-			b2BodyDef bodyDef;
-			bodyDef.type = CineRigiBody2DTypeToBox2DType(rb.Type);
-			bodyDef.position = { transform.Translation.x, transform.Translation.y };
-			bodyDef.angle = transform.Rotation.z;
-			bodyDef.fixedRotation = rb.FixedRotation;
-
-			b2Body* body = m_PhysicsWorld->CreateBody(&bodyDef);
-
-			if (entity.HasComponent<BoxCollider2DComponent>())
-			{
-				auto& collider = entity.GetComponent<BoxCollider2DComponent>();
-
-				b2PolygonShape boxShape;
-				boxShape.SetAsBox(collider.Size.x * transform.Scale.x, collider.Size.y * transform.Scale.y, { collider.Offset.x, collider.Offset.y }, 0.0f);
-
-				b2FixtureDef fixtureDef;
-				fixtureDef.shape = &boxShape;
-				fixtureDef.density = collider.Density;
-				fixtureDef.friction = collider.Friction;
-				fixtureDef.restitution = collider.Restitution;
-				fixtureDef.restitutionThreshold = collider.RestitutionThreshold;
-				body->CreateFixture(&fixtureDef);
-
-				rb.RuntimeBody = body;
-			}
-
-		}
+		m_PhysicsSystem.Start();
 	}
 
 	void Scene::OnRuntimeStart()
@@ -173,7 +130,7 @@ namespace Cine
 
 	void Scene::OnRuntimeStop()
 	{
-		m_PhysicsWorld = {};
+		m_PhysicsSystem.Stop();
 	}
 
 
@@ -184,27 +141,7 @@ namespace Cine
 			UpdateWorldTransforms(m_Registry);
 			InstantiateScripts();
 
-			// Physics
-			{
-				const int32_t velocityIterations = 6;
-				const int32_t positionIterations = 2;
-				m_PhysicsWorld->Step(ts, velocityIterations, positionIterations);
-
-				auto view = m_Registry.view<RigidBody2DComponent>();
-				for (auto e : view)
-				{
-					Entity entity = { e, this };
-					auto& transform = entity.GetComponent<TransformComponent>();
-					auto& rb = entity.GetComponent<RigidBody2DComponent>();
-
-					b2Body* body = (b2Body*)rb.RuntimeBody;
-
-					const auto& position = body->GetPosition();
-					transform.Translation.x = position.x;
-					transform.Translation.y = position.y;
-					transform.Rotation.z = body->GetAngle();
-				}
-			}
+			m_PhysicsSystem.Update(ts);
 
 			UpdateScripts(ts);
 			SpriteAnimationSystem::Update(m_Registry, ts);
@@ -218,7 +155,7 @@ namespace Cine
 				Renderer2D::EndScene();
 			}
 
-			DestroyMarkedEntities();
+			DestroyEntities();
 		}
 	}
 
@@ -234,7 +171,7 @@ namespace Cine
 			SpriteRendererSystem::Update(m_Registry);
 			Renderer2D::EndScene();
 
-			DestroyMarkedEntities();
+			DestroyEntities();
 		}
 	}
 
@@ -294,7 +231,7 @@ namespace Cine
 		m_ScriptEngine.DeserializeComponent(entity, node, componentName);
 	}
 
-	void Scene::DestroyMarkedEntities()
+	void Scene::DestroyEntities()
 	{
 		for (auto e : m_ToDestroyEntities)
 		{
@@ -316,6 +253,16 @@ namespace Cine
 			m_Registry.destroy(entity);
 		}
 		m_ToDestroyEntities.clear();
+	}
+
+
+	void Scene::DestroyComponents()
+	{
+		for (auto destroyCallback : m_ToDestroyComponentCallbacks)
+		{
+			destroyCallback();
+		}
+		m_ToDestroyComponentCallbacks.clear();
 	}
 
 

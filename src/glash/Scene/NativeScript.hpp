@@ -41,6 +41,10 @@ namespace Cine
 		virtual void OnDestroy() {}
 		virtual void OnUpdate(Timestep ts) {}
 
+		virtual void OnTriggerEnter(Entity other) {}
+		virtual void OnTriggerExit(Entity other) {}
+
+
 	private:
 		Entity m_Entity;
 		friend class Scene;

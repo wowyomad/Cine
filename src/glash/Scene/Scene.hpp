@@ -5,6 +5,7 @@
 #include "glash/Utils/StringUtils.hpp"
 
 #include "Components.hpp"
+#include "Systems.hpp"
 #include "ComponentSerializer.hpp"
 #include "ScriptEngine.hpp"
 
@@ -16,8 +17,6 @@ namespace Cine
 {
 	class Entity;
 	class NativeScript;
-
-
 
 	class Scene
 	{
@@ -67,6 +66,17 @@ namespace Cine
 		void DeserializeComponentByName(Entity entity, const std::string& componentName, YAML::Node& node);
 
 		template <class Component>
+		void OnComponentRemoved(entt::entity entity)
+		{
+			m_ToDestroyComponentCallbacks.push_back([&]()
+				{
+					CINE_CORE_WARN("Removing component {0}", Utils::GetClassTypename<Component>());
+					CINE_CORE_ASSERT(m_Registry.all_of<Component>(entity), "Entity does not have component {}", typeid(Component).name());
+					m_Registry.remove<Component>(entity);
+				});
+		}
+
+		template <class Component>
 		void OnComponentDestroyed()
 		{
 			CINE_CORE_TRACE("Removed '{}' from '{}'", Utils::GetClassTypename(Component));
@@ -88,9 +98,12 @@ namespace Cine
 		}
 
 	private:
-		void DestroyMarkedEntities();
+		void DestroyEntities();
+		void DestroyComponents();
 		void UpdateScripts(Timestep ts);
 		void InstantiateScripts();
+
+		using DestroyComponentCallback = std::function<void()>;
 
 	private:
 		ScriptEngine& m_ScriptEngine;
@@ -98,18 +111,21 @@ namespace Cine
 		std::string m_Name;
 
 		std::vector<entt::entity> m_ToDestroyEntities;
+		std::vector<DestroyComponentCallback> m_ToDestroyComponentCallbacks;
 		bool m_UpdateScene = true;
-
-		Scope<b2World> m_PhysicsWorld;
 
 		Entity* m_MainCamera;
 
 		uint32_t m_ViewportWidth = 1;
 		uint32_t m_ViewportHeight = 1;
 
+		Physics2DSystem m_PhysicsSystem;
+
+
 		friend class Entity;
 		friend class SceneHierarchyPanel;
 		friend class SceneSerializer;
+		friend class Physics2DSystem;
 	};
 
 }

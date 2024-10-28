@@ -63,6 +63,12 @@ namespace Cine
 			return component;
 		}
 
+		template <class Component>
+		void RemoveComponent()
+		{
+			m_Scene->OnComponentRemoved<Component>(*this);
+		}
+
 		template<class Component>
 		Component& GetComponent()
 		{
@@ -108,16 +114,11 @@ namespace Cine
 		glm::vec3 Rotation();
 		glm::vec3 Scale();
 
+		void OnTriggerEnter(Entity other);
+		void OnTriggerExit(Entity other);
+
+
 		Entity Clone();
-
-		template <class Component>
-		void RemoveComponent()
-		{
-			CINE_CORE_WARN("Removing component {0}", Utils::GetClassTypename<Component>());
-			CINE_CORE_ASSERT(HasComponent<Component>(), "Entity does not have component {}", typeid(Component).name());
-			m_Scene->m_Registry.remove<Component>(m_EntityHandle);
-		}
-
 		Entity GetParent();
 		const std::vector<Entity>& GetChildren();
 		void AddChild(Entity child);

@@ -176,5 +176,7 @@ namespace Cine
 		float Friction = 0.5f;
 		float Restitution = 0.0f;
 		float RestitutionThreshold = 0.1f;
+		
+		bool IsTrigger = false;
 	};
 }

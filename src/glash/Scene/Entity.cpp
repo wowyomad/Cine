@@ -1,5 +1,6 @@
 #include "glash/glash_pch.hpp"
 #include "Entity.hpp"
+#include "NativeScript.hpp"
 
 namespace Cine
 {
@@ -266,7 +267,38 @@ namespace Cine
 				cloneHierarchy.Parent = {};
 			}
 		}
-
 		return clone;
+	}
+
+	void Entity::OnTriggerEnter(Entity other)
+	{
+		if (HasComponent<NativeScriptComponent>())
+		{
+			auto& nsc = GetComponent<NativeScriptComponent>();
+			for (auto& script : nsc.Scripts)
+			{
+				NativeScript* instance = script.Instance;
+				if (instance)
+				{
+					instance->OnTriggerEnter(other);
+				}
+			}
+		}
+	}
+
+	void Entity::OnTriggerExit(Entity other)
+	{
+		if (HasComponent<NativeScriptComponent>())
+		{
+			auto& nsc = GetComponent<NativeScriptComponent>();
+			for (auto& script : nsc.Scripts)
+			{
+				NativeScript* instance = script.Instance;
+				if (instance)
+				{
+					instance->OnTriggerExit(other);
+				}
+			}
+		}
 	}
 }
