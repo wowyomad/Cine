@@ -37,6 +37,8 @@ namespace Cine
 		void OnRuntimeStart();
 		void OnRuntimeStop();	
 
+		bool IsRuntime() const { return m_IsRuntime; }
+
 		void OnUpdateRuntime(Timestep ts);
 		void OnUpdateEditor(Timestep ts, EditorCamera& editorCamera);
 
@@ -113,6 +115,7 @@ namespace Cine
 		std::vector<entt::entity> m_ToDestroyEntities;
 		std::vector<DestroyComponentCallback> m_ToDestroyComponentCallbacks;
 		bool m_UpdateScene = true;
+		bool m_IsRuntime = false;
 
 		Entity* m_MainCamera;
 

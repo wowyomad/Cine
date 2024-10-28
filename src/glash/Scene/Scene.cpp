@@ -125,12 +125,20 @@ namespace Cine
 
 	void Scene::OnRuntimeStart()
 	{
-		OnPhysics2DStart();
+		if (!m_IsRuntime)
+		{
+			m_IsRuntime = true;
+			OnPhysics2DStart();
+		}
 	}
 
 	void Scene::OnRuntimeStop()
 	{
-		m_PhysicsSystem.Stop();
+		if (m_IsRuntime)
+		{
+			m_IsRuntime = false;
+			m_PhysicsSystem.Stop();
+		}
 	}
 
 

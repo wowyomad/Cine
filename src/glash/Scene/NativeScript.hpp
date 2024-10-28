@@ -41,8 +41,8 @@ namespace Cine
 		virtual void OnDestroy() {}
 		virtual void OnUpdate(Timestep ts) {}
 
-		virtual void OnTriggerEnter(Entity other) { CINE_CORE_INFO("OnTriggerEnter: {0} with {1}", static_cast<uint32_t>(m_Entity), static_cast<uint32_t>(other)); }
-		virtual void OnTriggerExit(Entity other) { CINE_CORE_INFO("OnTriggerExit: {0} with {1}", static_cast<uint32_t>(m_Entity), static_cast<uint32_t>(other)); }
+		virtual void OnTriggerEnter(Entity other) { }
+		virtual void OnTriggerExit(Entity other) { }
 
 
 	private:

@@ -13,6 +13,7 @@
 static std::atomic<bool> s_IsReloadingScripts(false);
 static std::atomic<int> s_ScriptReloadTimeElapsed(0);
 static std::thread s_ScriptThread;
+static bool s_IsSceneRuntime = false;
 
 namespace Cine
 {
@@ -84,7 +85,11 @@ namespace Cine
 						
 						serializer.Deserialize(savePath);
 						m_ActiveScene->SetUpdateScene(true);
-						m_ActiveScene->OnRuntimeStart();
+						if (s_IsSceneRuntime)
+						{
+							m_ActiveScene->OnRuntimeStart();
+							s_IsSceneRuntime = false;
+						}
 						Application::Get().SetUpdateUI(true);
 					});
 				return true;
@@ -109,7 +114,11 @@ namespace Cine
 		if (DisplayReloadScriptsButton())
 		{
 			m_ActiveScene->SetUpdateScene(false);
-			m_ActiveScene->OnRuntimeStop();
+			if (m_ActiveScene->IsRuntime())
+			{
+				s_IsSceneRuntime = true;
+				m_ActiveScene->OnRuntimeStop();
+			}
 		}
 
 		float contentWidth = ImGui::GetContentRegionAvail().x;
