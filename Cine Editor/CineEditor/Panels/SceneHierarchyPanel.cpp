@@ -290,7 +290,6 @@ namespace Cine
 
 		if (ImGui::BeginDragDropSource())
 		{
-			CINE_LOG_INFO("Began drag and drop");
 			ImGui::SetDragDropPayload("ENTITY", &entity, sizeof(Entity));
 			ImGui::Text(tag.c_str());
 			ImGui::EndDragDropSource();
@@ -298,7 +297,6 @@ namespace Cine
 
 		if (ImGui::BeginDragDropTarget())
 		{
-			CINE_LOG_INFO("Caught drag and drop in entity");
 			if (ImGui::AcceptDragDropPayload("ENTITY"))
 			{
 				Entity* draggedEntity = reinterpret_cast<Entity*>(ImGui::GetDragDropPayload()->Data);
@@ -878,7 +876,8 @@ namespace Cine
 				static bool showCreationResult = false;
 				static bool creationSuccess = false;
 				static std::string creationMessage;
-				static ImVec2 creationPopupPosition = ImVec2(0, 0);
+				static float notificationTimer = 0.0f;
+				const float notificationDuration = 5.0f;
 
 				if (ImGui::BeginPopup("AddScriptPopup"))
 				{
@@ -920,7 +919,7 @@ namespace Cine
 						}
 
 						showCreationResult = true;
-						creationPopupPosition = ImGui::GetCursorScreenPos();
+						notificationTimer = notificationDuration;
 						ImGui::CloseCurrentPopup();
 					}
 
@@ -960,26 +959,11 @@ namespace Cine
 
 				if (showCreationResult)
 				{
-					ImGui::SetNextWindowPos(creationPopupPosition, ImGuiCond_Always);
-					ImGui::OpenPopup("CreationResultPopup");
-				}
-
-				if (ImGui::BeginPopupModal("CreationResultPopup", NULL, ImGuiWindowFlags_AlwaysAutoResize))
-				{
-					ImGui::Text("%s", creationMessage.c_str());
-					ImGui::Spacing();
-					ImGui::Separator();
-					ImGui::Spacing();
-
-					if (ImGui::Button("OK", ImVec2(120, 0)))
+					ShowNotification(creationMessage, notificationTimer, notificationDuration);
+					if (notificationTimer <= 0.0f)
 					{
 						showCreationResult = false;
-						ImGui::CloseCurrentPopup();
 					}
-
-					ImGui::SetItemDefaultFocus();
-
-					ImGui::EndPopup();
 				}
 			});
 

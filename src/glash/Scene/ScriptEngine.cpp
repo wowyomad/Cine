@@ -82,6 +82,11 @@ namespace Cine
 		m_LibraryCalls.DeserializeComponent(entity, componentName, node);
 	}
 
+	void ScriptEngine::SetActiveRegistry(entt::registry& registry)
+	{
+		m_LibraryCalls.SetActiveRegistry(registry);
+	}
+
 	const std::vector<ComponentData>& ScriptEngine::GetComponentsData() const
 	{
 		return m_ComponentsData;
@@ -96,16 +101,22 @@ namespace Cine
 		m_LibraryCalls.SerializeComponent = m_Library.GetFunction<SerializeComponentCall>("SerializeComponent");
 		m_LibraryCalls.DeserializeComponent = m_Library.GetFunction<DeserializeComponentCall>("DeserializeComponent");
 		m_LibraryCalls.GetComponentsData = m_Library.GetFunction<GetComponentsDataCall>("GetComponentsData");
+		m_LibraryCalls.SetActiveRegistry = m_Library.GetFunction<SetActiveRegistryCall>("SetActiveRegistry");
 		m_LibraryCalls.InitializeInput = m_Library.GetFunction<InitializeInputCall>("InitializeInput");
 		
-		
-		return m_LibraryCalls.InitializeComponents
+		bool allSet = m_LibraryCalls.InitializeComponents
 			&& m_LibraryCalls.CreateComponent
 			&& m_LibraryCalls.RemoveComponent
 			&& m_LibraryCalls.UpdateScripts
 			&& m_LibraryCalls.SerializeComponent
 			&& m_LibraryCalls.DeserializeComponent
-			&& m_LibraryCalls.GetComponentsData;
+			&& m_LibraryCalls.SetActiveRegistry
+			&& m_LibraryCalls.GetComponentsData
+			&& m_LibraryCalls.InitializeInput;
+		
+		CINE_CORE_ASSERT(allSet, "Some of the library function weren't initialized");
+
+		return allSet;
 	}
 
 	void ScriptEngine::UpdateComponentsData()

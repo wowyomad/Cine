@@ -207,6 +207,11 @@ void InitializeInput
 	GetMousePositionFunc = getMousePositionFunc;
 }
 
+void SetActiveRegistry(entt::registry& registry)
+{
+	s_Registry = &registry;
+}
+
 void InitializeApplicationContext(Cine::Application* application)
 {
 	Application::Set(application);

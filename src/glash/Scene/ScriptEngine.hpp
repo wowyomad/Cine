@@ -33,6 +33,7 @@ namespace Cine
 		using SerializeComponentCall = YAML::Node(*)(entt::entity entity, const std::string& componentName);
 		using DeserializeComponentCall = void(*)(entt::entity entity, const std::string& componentName, YAML::Node& node);
 		using GetComponentsDataCall = ComponentsDataC(*)();
+		using SetActiveRegistryCall = void(*)(entt::registry&);
 		using InitializeInputCall =  void(*)
 		(
 			KeyInputFunction,
@@ -55,6 +56,7 @@ namespace Cine
 		void UpdateScripts(Timestep ts);
 		YAML::Node SerializeComponent(entt::entity entity, const std::string& componentName);
 		void DeserializeComponent(entt::entity entity, YAML::Node& node, const std::string& componentName);
+		void SetActiveRegistry(entt::registry& registry);
 		const std::vector<ComponentData>& GetComponentsData() const;
 
 	private:
@@ -80,6 +82,7 @@ namespace Cine
 			SerializeComponentCall  SerializeComponent;
 			DeserializeComponentCall DeserializeComponent;
 			InitializeInputCall InitializeInput;
+			SetActiveRegistryCall SetActiveRegistry;
 		};
 
 	private:

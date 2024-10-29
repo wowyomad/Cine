@@ -64,9 +64,10 @@ namespace Cine
 			if (ImGui::Button("Reload Scripts"))
 			{
 #if _DEBUG
-				std::string path = "./Assets/Plugin/all_in_one_debug.py";
+				std::string path = "./Assets/Plugin/all_in_one.py --configuration Debug";
+
 #else
-				std::string path = "./Assets/Plugin/all_in_one_release.py";
+				std::string path = "./Assets/Plugin/all_in_one.py --configuration Release";
 #endif
 				RunScriptAsync(path, [&]()
 					{
