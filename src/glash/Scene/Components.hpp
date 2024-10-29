@@ -6,10 +6,20 @@
 #include "SceneCamera.hpp"
 #include "glash/Renderer/Texture.hpp"
 #include "glash/Utils/StringUtils.hpp"
+#include "glash/Core/UUID.hpp"
 
 namespace Cine
 {
 	class Entity;
+
+	struct IDComponent
+	{
+		UUID ID;
+		
+		IDComponent() = default;
+		IDComponent(UUID id) : ID(id) { }
+		IDComponent(const IDComponent&) = default;
+	};
 
 	struct TagComponent
 	{
@@ -161,7 +171,7 @@ namespace Cine
 		BodyType Type = BodyType::Dynamic;
 		bool FixedRotation = false;
 
-		void* RuntimeBody;
+		void* RuntimeBody = nullptr;
 		
 		RigidBody2DComponent() = default;
 		RigidBody2DComponent(const RigidBody2DComponent&) = default;

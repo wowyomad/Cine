@@ -70,8 +70,14 @@ namespace Cine
 
 	Entity Scene::CreateEntity(const std::string& name)
 	{
+		return CreateEntityWithUUID(UUID(), name);
+	}
+
+	Entity Scene::CreateEntityWithUUID(UUID uuid, const std::string& name)
+	{
 		Entity entity = Entity(m_Registry.create(), this);
 		entity.AddComponents<TransformComponent, HierarchyComponent, CachedTransform, NativeScriptComponent>();
+		entity.AddComponent<IDComponent>(uuid);
 		entity.AddComponent<TagComponent>(!name.empty() ? name : "Unkown Entity");
 		return entity;
 	}

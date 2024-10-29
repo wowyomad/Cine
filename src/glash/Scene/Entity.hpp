@@ -80,6 +80,7 @@ namespace Cine
 			CINE_CORE_ASSERT(HasComponent<Component>(), "Entity does not have component {}", typeid(Component).name());
 			return m_Scene->m_Registry.get<Component>(m_EntityHandle);
 		}
+	
 
 		template <class Component>
 		Component* TryGetComponent()
@@ -115,12 +116,15 @@ namespace Cine
 			return Transform().Scale;
 		}
 
+
 		glm::vec3 Translation();
 		glm::vec3 Rotation();
 		glm::vec3 Scale();
 
 		void OnTriggerEnter(Entity other);
 		void OnTriggerExit(Entity other);
+
+		UUID GetID() { return GetComponent<IDComponent>().ID; }
 
 
 		Entity Clone();

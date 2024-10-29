@@ -25,6 +25,7 @@ namespace Cine
 		~Scene();
 
 		Entity CreateEntity(const std::string& name = std::string());
+		Entity CreateEntityWithUUID(UUID uuid, const std::string& name = std::string());
 		Entity GetEntity(const std::string& name);
 		void DestroyEntity(Entity entity);
 
@@ -70,7 +71,7 @@ namespace Cine
 		template <class Component>
 		void OnComponentRemoved(entt::entity entity)
 		{
-			m_ToDestroyComponentCallbacks.push_back([&]()
+			m_ToDestroyComponentCallbacks.push_back([&, entity]()
 				{
 					CINE_CORE_WARN("Removing component {0}", Utils::GetClassTypename<Component>());
 					CINE_CORE_ASSERT(m_Registry.all_of<Component>(entity), "Entity does not have component {}", typeid(Component).name());
