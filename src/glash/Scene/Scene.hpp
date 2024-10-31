@@ -36,6 +36,7 @@ namespace Cine
 
 		void OnPhysics2DStart();
 		void OnRuntimeStart();
+		void OnRuntimePause();
 		void OnRuntimeStop();	
 
 		bool IsRuntime() const { return m_IsRuntime; }

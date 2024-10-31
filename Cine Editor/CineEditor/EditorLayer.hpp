@@ -15,7 +15,8 @@ namespace Cine
 		enum class SceneState
 		{
 			Edit = 0,
-			Play = 1	
+			Pause = 1,
+			Play = 2,
 		};
 
 
@@ -42,6 +43,7 @@ namespace Cine
 
 		void OnScenePlay();
 		void OnScenePause();
+		void OnSceneStop();
 
 		bool IsGizmoSnapping() const;
 
@@ -50,7 +52,7 @@ namespace Cine
 		ContentBrowserPanel m_ContentBrowserPanel;
 
 		Ref<FrameBuffer> m_Framebuffer;
-		Ref<Scene> m_ActiveScene;
+		Ref<Scene> m_ActiveScene, m_RuntimeScene, m_EditorScene;
 		EditorCamera m_EditorCamera;
 
 		Ref<Texture2D> m_IconPlay;

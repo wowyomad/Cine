@@ -15,8 +15,9 @@ namespace Cine
 	void EditorLayer::OnAttach()
 	{
 		ScriptEngine::Get().LoadLibary("plugin.dll"); //Temporarily load here.
-		m_ActiveScene = CreateRef<Scene>();
-		ScriptEngine::Get().InitializeComponents(m_ActiveScene->GetRegistry());
+		m_EditorScene = CreateRef<Scene>();
+		OnSceneStop();
+		ScriptEngine::Get().InitializeComponents(m_EditorScene->GetRegistry());
 
 
 		TextureSpecification iconSpecification;
@@ -65,7 +66,7 @@ namespace Cine
 			switch (m_SceneState)
 			{
 			case SceneState::Play: m_ActiveScene->OnUpdateRuntime(ts); break;
-			case SceneState::Edit: m_ActiveScene->OnUpdateEditor(ts, m_EditorCamera); break;
+			case SceneState::Edit: case SceneState::Pause: m_ActiveScene->OnUpdateEditor(ts, m_EditorCamera); break;
 			}
 				
 		}
@@ -203,7 +204,7 @@ namespace Cine
 		}
 
 		//Gizmos
-		if (m_SceneState == SceneState::Edit)
+		if (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Pause)
 		{
 			Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
 			if (selectedEntity && selectedEntity.IsValid() && m_GizmoOperation > 0)
@@ -317,7 +318,7 @@ namespace Cine
 
 		if (ImGui::ImageButton("##sceneStateIcon", (ImTextureID)(uint64_t)icon->GetRendererID(), { size, size }, {0.0f, 0.0f}, {1.0f, 1.0f}))
 		{
-			if (m_SceneState == SceneState::Edit)
+			if (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Pause)
 			{
 				OnScenePlay();
 			}
@@ -333,30 +334,64 @@ namespace Cine
 
 	void EditorLayer::OnScenePlay()
 	{
+		if (m_SceneState == SceneState::Play)
+		{
+			return;
+		}
+
+		if (m_SceneState == SceneState::Edit)
+		{
+			std::string tempSceneName = m_EditorScene->GetName() + ".runtime";
+			SceneSerializer serializer(m_EditorScene);
+			serializer.Serialize(tempSceneName);
+			m_RuntimeScene = CreateRef<Scene>();
+			SceneSerializer deserializer(m_RuntimeScene);
+			deserializer.Deserialize(tempSceneName);
+		}
+
+		m_ActiveScene = m_RuntimeScene;
+		ScriptEngine::Get().SetActiveRegistry(m_ActiveScene->GetRegistry());
 		m_ActiveScene->OnRuntimeStart();
+		m_ActiveScene->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
 		m_SceneState = SceneState::Play;
+		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 	}
 
 	void EditorLayer::OnScenePause()
 	{
-		m_ActiveScene->OnRuntimeStop();
+		m_ActiveScene->OnRuntimePause();
+		m_SceneState = SceneState::Pause;
+		ScriptEngine::Get().SetActiveRegistry(m_ActiveScene->GetRegistry());
+		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+
+	}
+
+	void EditorLayer::OnSceneStop()
+	{
+		m_ActiveScene = m_EditorScene;	
 		m_SceneState = SceneState::Edit;
+		ScriptEngine::Get().SetActiveRegistry(m_ActiveScene->GetRegistry());
+		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 	}
 
 	void EditorLayer::NewScene()
 	{
-		m_ActiveScene = CreateRef<Scene>();
-		ScriptEngine::Get().InitializeComponents(m_ActiveScene->GetRegistry());
-		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
-		m_ContentBrowserPanel.SetContext(m_ActiveScene);
-		m_ActiveScene->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
+		if (m_SceneState == SceneState::Edit)
+		{
+			m_EditorScene = CreateRef<Scene>();
+			ScriptEngine::Get().InitializeComponents(m_EditorScene->GetRegistry());
+			m_SceneHierarchyPanel.SetContext(m_EditorScene);
+			m_ContentBrowserPanel.SetContext(m_EditorScene);
+			m_EditorScene->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
+		}
+	
 	}
 	void EditorLayer::SaveSceneAs()
 	{
 		std::filesystem::path filepath = FileDialogs::SaveFile("Cine Scene (*.cine)\0*.cine\0");
 		if (!filepath.empty())
 		{
-			SceneSerializer serializer(m_ActiveScene);
+			SceneSerializer serializer(m_EditorScene);
 			serializer.Serialize(filepath);
 		}
 	}
@@ -371,15 +406,17 @@ namespace Cine
 		if (!path.empty() && path.filename().extension().string() == ".cine")
 		{
 			std::filesystem::path fullPath = AssetManager::AssetsDirectory / path;
-			m_ActiveScene = CreateRef<Scene>();
-			ScriptEngine::Get().InitializeComponents(m_ActiveScene->GetRegistry());
+			m_EditorScene = CreateRef<Scene>();
+			ScriptEngine::Get().InitializeComponents(m_EditorScene->GetRegistry());
 
-			m_SceneHierarchyPanel.SetContext(m_ActiveScene);
-			m_ContentBrowserPanel.SetContext(m_ActiveScene);
+			m_SceneHierarchyPanel.SetContext(m_EditorScene);
+			m_ContentBrowserPanel.SetContext(m_EditorScene);
 
-			SceneSerializer serializer(m_ActiveScene);
+			SceneSerializer serializer(m_EditorScene);
 			serializer.Deserialize(fullPath);
-			m_ActiveScene->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
+			m_EditorScene->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
+			
+			OnSceneStop();
 		}
 	}
 
