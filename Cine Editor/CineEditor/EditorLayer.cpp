@@ -315,7 +315,7 @@ namespace Cine
 		ImGui::SameLine((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
 
 
-		if (ImGui::ImageButton("##sceneStateIcon", (ImTextureID)icon->GetRendererID(), { size, size }, {0.0f, 0.0f}, {1.0f, 1.0f}))
+		if (ImGui::ImageButton("##sceneStateIcon", (ImTextureID)(uint64_t)icon->GetRendererID(), { size, size }, {0.0f, 0.0f}, {1.0f, 1.0f}))
 		{
 			if (m_SceneState == SceneState::Edit)
 			{

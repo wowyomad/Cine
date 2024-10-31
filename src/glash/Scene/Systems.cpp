@@ -307,4 +307,46 @@ namespace Cine
 				entityB->OnTriggerExit(*entityA);
 		}
 	}
+
+	void Physics2DSystem::UpdateRigidBodyParameters(Entity entity)
+	{
+		auto& rb = entity.GetComponent<RigidBody2DComponent>();
+
+		// Check if the rigid body already exists in the physics world
+		if (!rb.RuntimeBody)
+			return;
+
+		b2Body* body = static_cast<b2Body*>(rb.RuntimeBody);
+
+		// Update body type and fixed rotation from the RigidBody2DComponent
+		body->SetType(CineRigiBody2DTypeToBox2DType(rb.Type));
+		body->SetFixedRotation(rb.FixedRotation);
+
+		auto& transform = entity.Transform();
+		body->SetTransform({ transform.Translation.x, transform.Translation.y }, transform.Rotation.z);
+
+		if (entity.HasComponent<BoxCollider2DComponent>())
+		{
+			auto& collider = entity.GetComponent<BoxCollider2DComponent>();
+
+			while (b2Fixture* fixture = body->GetFixtureList())
+				body->DestroyFixture(fixture);
+
+			b2PolygonShape boxShape;
+			boxShape.SetAsBox(collider.Size.x * transform.Scale.x, collider.Size.y * transform.Scale.y,
+				{ collider.Offset.x, collider.Offset.y }, 0.0f);
+
+			b2FixtureDef fixtureDef;
+			fixtureDef.shape = &boxShape;
+			fixtureDef.density = collider.Density;
+			fixtureDef.friction = collider.Friction;
+			fixtureDef.restitution = collider.Restitution;
+			fixtureDef.restitutionThreshold = collider.RestitutionThreshold;
+			fixtureDef.isSensor = collider.IsTrigger;
+
+			fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(new FixtureData(entity));
+
+			body->CreateFixture(&fixtureDef);
+		}
+	}
 }

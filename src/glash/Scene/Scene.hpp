@@ -49,6 +49,10 @@ namespace Cine
 		{
 			return m_Registry.view<entt::entity>();
 		}
+		Physics2DSystem& GetPhysics2DSystem()
+		{
+			return m_PhysicsSystem;
+		}
 
 		void Clear();
 		void SetUpdateScene(bool update);

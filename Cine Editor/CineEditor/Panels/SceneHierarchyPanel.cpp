@@ -324,10 +324,8 @@ namespace Cine
 		bool entityDeleted = false;
 		if (ImGui::BeginPopupContextItem())
 		{
-			if (ImGui::MenuItem("Delete"))
-			{
-				entityDeleted = true;
-			}
+			ImVec4 cloneButtonColor = { 0.25f, 1.0f, 0.35f, 1.0f };
+			ImGui::PushStyleColor(ImGuiCol_Text, cloneButtonColor);
 			if (ImGui::MenuItem("Clone"))
 			{
 				Entity clone = entity.Clone();
@@ -341,9 +339,15 @@ namespace Cine
 				{
 					m_Context.Properties = clone;
 				}
-
 			}
-
+			ImGui::PopStyleColor();
+			ImVec4 deleteButtonColor = { 1.0f, 0.15f, 0.15f, 1.0f };
+			ImGui::PushStyleColor(ImGuiCol_Text, deleteButtonColor);
+			if (ImGui::MenuItem("Delete"))
+			{
+				entityDeleted = true;
+			}
+			ImGui::PopStyleColor();
 			ImGui::EndPopup();
 		}
 
@@ -697,14 +701,20 @@ namespace Cine
 	{
 		DisplayComponent<BoxCollider2DComponent>(entity, "Box Collider 2D", [this, entity](BoxCollider2DComponent& collider)
 			{
-				ImGui::Checkbox("Is Trigger", &collider.IsTrigger);
-				ImGui::DragFloat2("Offset", glm::value_ptr(collider.Offset), 0.01f, 0.0f, 0.0f, "%.2f");
-				ImGui::DragFloat2("Size", glm::value_ptr(collider.Size), 0.01f, 0.0f, 0.0f, "%.2f");
+				bool valueChanged = false;
+				valueChanged |= ImGui::Checkbox("Is Trigger", &collider.IsTrigger);
+				valueChanged |= ImGui::DragFloat2("Offset", glm::value_ptr(collider.Offset), 0.01f, 0.0f, 0.0f, "%.2f");
+				valueChanged |= ImGui::DragFloat2("Size", glm::value_ptr(collider.Size), 0.01f, 0.0f, 0.0f, "%.2f");
 
-				ImGui::DragFloat("Density", &collider.Density, 0.01, 0.0f, 0.0f, "%.2f");
-				ImGui::DragFloat("Friction", &collider.Friction, 0.01, 0.0f, 1.0f, "%.2f");
-				ImGui::DragFloat("Restitution", &collider.Restitution, 0.01f, 0.0f, 1.0f, "%.2f");
-				ImGui::DragFloat("Restituion Threasold", &collider.RestitutionThreshold, 0.01f, 0.0f, 1.0f, "%.2f");
+				valueChanged |= ImGui::DragFloat("Density", &collider.Density, 0.01, 0.0f, 0.0f, "%.2f");
+				valueChanged |= ImGui::DragFloat("Friction", &collider.Friction, 0.01, 0.0f, 1.0f, "%.2f");
+				valueChanged |= ImGui::DragFloat("Restitution", &collider.Restitution, 0.01f, 0.0f, 1.0f, "%.2f");
+				valueChanged |= ImGui::DragFloat("Restituion Threasold", &collider.RestitutionThreshold, 0.01f, 0.0f, 1.0f, "%.2f");
+
+				if (valueChanged && m_Context.Scene->IsRuntime())
+				{
+					m_Context.Scene->GetPhysics2DSystem().UpdateRigidBodyParameters(entity);
+				}
 			});
 	}
 
@@ -712,6 +722,7 @@ namespace Cine
 	{
 		DisplayComponent<RigidBody2DComponent>(entity, "Rigid Body 2D", [this, entity](RigidBody2DComponent& rb)
 			{
+				bool valueChanged = false;
 				std::array<const char*, 3> typeStrigns = { "Static", "Dynamic", "Kinematic"};
 				const char* currentType = typeStrigns[static_cast<int>(rb.Type)];
 
@@ -722,6 +733,8 @@ namespace Cine
 						bool isSelected = currentType == typeStrigns[i];
 						if (ImGui::Selectable(typeStrigns[i], &isSelected))
 						{
+							valueChanged |= true;
+
 							currentType = typeStrigns[i];
 							rb.Type = static_cast<RigidBody2DComponent::BodyType>(i);
 						}
@@ -733,7 +746,15 @@ namespace Cine
 					ImGui::EndCombo();
 				}
 
-				if (ImGui::Checkbox("Fixed Rotation", &rb.FixedRotation));
+				if (ImGui::Checkbox("Fixed Rotation", &rb.FixedRotation))
+				{
+					valueChanged |= true;
+				}
+
+				if (valueChanged && m_Context.Scene->IsRuntime())
+				{
+					m_Context.Scene->GetPhysics2DSystem().UpdateRigidBodyParameters(entity);
+				}
 			});
 	}
 	void SceneHierarchyPanel::DisplayNativeScriptComponent(Entity entity)

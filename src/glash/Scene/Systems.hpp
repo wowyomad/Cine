@@ -39,6 +39,8 @@ namespace Cine
 
 		void AddRigidBody(Entity entity);
 		void AddCollider(Entity entity);
+		
+		void UpdateRigidBodyParameters(Entity entity);
 
 		void SetScene(Scene& scene);
 		
