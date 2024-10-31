@@ -56,7 +56,7 @@ public:
 private:
 	SpriteComponent* m_SpriteComponent = nullptr;
 	Timer m_Timer;
-	float m_Time;
+	float m_Time = 0.0f;
 	std::string m_String = "String from Color Script";
 
 };

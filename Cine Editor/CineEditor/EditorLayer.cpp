@@ -16,8 +16,8 @@ namespace Cine
 	{
 		ScriptEngine::Get().LoadLibary("plugin.dll"); //Temporarily load here.
 		m_EditorScene = CreateRef<Scene>();
-		OnSceneStop();
 		ScriptEngine::Get().InitializeComponents(m_EditorScene->GetRegistry());
+		m_ActiveScene = m_EditorScene;
 
 
 		TextureSpecification iconSpecification;
@@ -25,7 +25,8 @@ namespace Cine
 		iconSpecification.MinFilter = TextureFilter::Linear;
 
 		m_IconPlay = Texture2D::Create("Resources/Icons/UI/PlayButton.png", iconSpecification);
-		m_IconStop = Texture2D::Create("Resources/Icons/UI/PauseButton.png", iconSpecification);
+		m_IconPause = Texture2D::Create("Resources/Icons/UI/PauseButton.png", iconSpecification);
+		m_IconStop = Texture2D::Create("Resources/Icons/UI/StopButton.png", iconSpecification);
 
 
 		FramebufferSpecification spec;
@@ -295,7 +296,6 @@ namespace Cine
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, { 0.0f, 0.0f });
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0.0f, 0.0f });
 
-		
 		auto& colors = ImGui::GetStyle().Colors;
 		ImGui::PushStyleColor(ImGuiCol_Button, { 0.0f, 0.0f, 0.0f, 0.0f });
 		auto& buttonHovered = colors[ImGuiCol_ButtonHovered];
@@ -303,20 +303,24 @@ namespace Cine
 		auto& buttonActive = colors[ImGuiCol_ButtonHovered];
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, { buttonActive.x, buttonActive.y, buttonActive.z, 0.5f });
 
-
 		ImGuiID viewportDockID = ImGui::GetID("Viewport");
 		ImGui::SetNextWindowDockID(viewportDockID, ImGuiCond_FirstUseEver);
 
 		ImGui::Begin("##toolbar", nullptr, toolbarFlags);
 
-
 		float size = ImGui::GetWindowHeight() - 4.0f;
+		Ref<Texture2D> playPauseIcon = m_SceneState == SceneState::Play ? m_IconPause : m_IconPlay;
 
-		Ref<Texture2D> icon = m_SceneState == SceneState::Play ? m_IconStop : m_IconPlay;
-		ImGui::SameLine((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+		float totalWidth = size;
+		bool hasStopButton = (m_SceneState == SceneState::Play || m_SceneState == SceneState::Pause);
+		if (hasStopButton)
+		{
+			totalWidth += size + ImGui::GetStyle().ItemSpacing.x;
+		}
 
+		ImGui::SameLine((ImGui::GetWindowContentRegionMax().x * 0.5f) - (totalWidth * 0.5f));
 
-		if (ImGui::ImageButton("##sceneStateIcon", (ImTextureID)(uint64_t)icon->GetRendererID(), { size, size }, {0.0f, 0.0f}, {1.0f, 1.0f}))
+		if (ImGui::ImageButton("##sceneStateIcon", (ImTextureID)(uint64_t)playPauseIcon->GetRendererID(), { size, size }, { 0.0f, 0.0f }, { 1.0f, 1.0f }))
 		{
 			if (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Pause)
 			{
@@ -327,10 +331,22 @@ namespace Cine
 				OnScenePause();
 			}
 		}
+
+		if (hasStopButton)
+		{
+			ImGui::SameLine();
+			if (ImGui::ImageButton("##stopIcon", (ImTextureID)(uint64_t)m_IconStop->GetRendererID(), { size, size }, { 0.0f, 0.0f }, { 1.0f, 1.0f }))
+			{
+				OnSceneStop();
+			}
+		}
+
 		ImGui::PopStyleVar(3);
 		ImGui::PopStyleColor(3);
 		ImGui::End();
 	}
+
+
 
 	void EditorLayer::OnScenePlay()
 	{
@@ -345,33 +361,34 @@ namespace Cine
 			SceneSerializer serializer(m_EditorScene);
 			serializer.Serialize(tempSceneName);
 			m_RuntimeScene = CreateRef<Scene>();
+			ScriptEngine::Get().SetActiveRegistry(m_RuntimeScene->GetRegistry());
 			SceneSerializer deserializer(m_RuntimeScene);
 			deserializer.Deserialize(tempSceneName);
 		}
 
 		m_ActiveScene = m_RuntimeScene;
-		ScriptEngine::Get().SetActiveRegistry(m_ActiveScene->GetRegistry());
+		ScriptEngine::Get().SetActiveRegistry(m_ActiveScene->GetRegistry()); //This needs to be called on if (m_SceneState == SceneState::Edit) as well before deserializing...
 		m_ActiveScene->OnRuntimeStart();
 		m_ActiveScene->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
-		m_SceneState = SceneState::Play;
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+
+		m_SceneState = SceneState::Play;
 	}
 
 	void EditorLayer::OnScenePause()
 	{
 		m_ActiveScene->OnRuntimePause();
 		m_SceneState = SceneState::Pause;
-		ScriptEngine::Get().SetActiveRegistry(m_ActiveScene->GetRegistry());
-		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
-
 	}
 
 	void EditorLayer::OnSceneStop()
 	{
+		m_ActiveScene->OnRuntimeStop();
+		ScriptEngine::Get().SetActiveRegistry(m_EditorScene->GetRegistry());
+		m_SceneHierarchyPanel.SetContext(m_EditorScene);
 		m_ActiveScene = m_EditorScene;	
+
 		m_SceneState = SceneState::Edit;
-		ScriptEngine::Get().SetActiveRegistry(m_ActiveScene->GetRegistry());
-		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 	}
 
 	void EditorLayer::NewScene()
@@ -407,16 +424,19 @@ namespace Cine
 		{
 			std::filesystem::path fullPath = AssetManager::AssetsDirectory / path;
 			m_EditorScene = CreateRef<Scene>();
+			ScriptEngine::Get().SetActiveRegistry(m_EditorScene->GetRegistry());
+			SceneSerializer serializer(m_EditorScene);
 			ScriptEngine::Get().InitializeComponents(m_EditorScene->GetRegistry());
+			serializer.Deserialize(fullPath);
+
 
 			m_SceneHierarchyPanel.SetContext(m_EditorScene);
 			m_ContentBrowserPanel.SetContext(m_EditorScene);
 
-			SceneSerializer serializer(m_EditorScene);
-			serializer.Deserialize(fullPath);
 			m_EditorScene->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
-			
-			OnSceneStop();
+
+			m_ActiveScene = m_EditorScene;
+			//OnSceneStop();
 		}
 	}
 
@@ -459,6 +479,7 @@ namespace Cine
 				SaveSceneAs();
 		} break;
 		}
+
 		//Gizmos
 		if (m_ViewportFocused || m_ViewportHovered)
 		{

@@ -56,7 +56,9 @@ namespace Cine
 		EditorCamera m_EditorCamera;
 
 		Ref<Texture2D> m_IconPlay;
+		Ref<Texture2D> m_IconPause;
 		Ref<Texture2D> m_IconStop;
+		
 
 		int32_t m_GizmoOperation = -1;
 		float m_SnapScale = 0.1f;

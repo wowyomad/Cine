@@ -138,17 +138,13 @@ namespace Cine
 
 	void Scene::OnRuntimeStop()
 	{
-
 		m_IsRuntime = false;
 		m_PhysicsSystem.Stop();
-
 	}
 
 	void Scene::OnRuntimePause()
 	{
-
 		m_PhysicsSystem.Stop();
-
 	}
 
 
