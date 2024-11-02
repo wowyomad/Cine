@@ -14,10 +14,10 @@ namespace Cine
 {
 	void EditorLayer::OnAttach()
 	{
-		ScriptEngine::Get().LoadLibary("plugin.dll"); //Temporarily load here.
 		m_EditorScene = CreateRef<Scene>();
-		ScriptEngine::Get().InitializeComponents(m_EditorScene->GetRegistry());
 		m_ActiveScene = m_EditorScene;
+		ScriptEngine::Get().LoadLibary("plugin.dll");
+		ScriptEngine::Get().InitializeComponents(m_ActiveScene->GetRegistry());
 
 
 		TextureSpecification iconSpecification;
@@ -367,7 +367,7 @@ namespace Cine
 		}
 
 		m_ActiveScene = m_RuntimeScene;
-		ScriptEngine::Get().SetActiveRegistry(m_ActiveScene->GetRegistry()); //This needs to be called on if (m_SceneState == SceneState::Edit) as well before deserializing...
+		ScriptEngine::Get().SetActiveRegistry(m_ActiveScene->GetRegistry()); 
 		m_ActiveScene->OnRuntimeStart();
 		m_ActiveScene->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
@@ -386,6 +386,7 @@ namespace Cine
 		m_ActiveScene->OnRuntimeStop();
 		ScriptEngine::Get().SetActiveRegistry(m_EditorScene->GetRegistry());
 		m_SceneHierarchyPanel.SetContext(m_EditorScene);
+		m_ContentBrowserPanel.SetContext(m_EditorScene);
 		m_ActiveScene = m_EditorScene;	
 
 		m_SceneState = SceneState::Edit;
@@ -420,22 +421,27 @@ namespace Cine
 
 	void EditorLayer::OpenScene(const std::filesystem::path& path)
 	{
+		if (m_SceneState != SceneState::Edit)
+		{
+			return;
+		}
+
 		if (!path.empty() && path.filename().extension().string() == ".cine")
 		{
-			std::filesystem::path fullPath = AssetManager::AssetsDirectory / path;
 			m_EditorScene = CreateRef<Scene>();
-			ScriptEngine::Get().SetActiveRegistry(m_EditorScene->GetRegistry());
-			SceneSerializer serializer(m_EditorScene);
-			ScriptEngine::Get().InitializeComponents(m_EditorScene->GetRegistry());
-			serializer.Deserialize(fullPath);
-
-
+			m_ActiveScene = m_EditorScene; //don't move this piece of shit!
 			m_SceneHierarchyPanel.SetContext(m_EditorScene);
 			m_ContentBrowserPanel.SetContext(m_EditorScene);
 
+			ScriptEngine::Get().InitializeComponents(m_EditorScene->GetRegistry());
+
+			std::filesystem::path fullPath = AssetManager::AssetsDirectory / path;
+
+			SceneSerializer serializer(m_EditorScene);
+			serializer.Deserialize(fullPath);
+
 			m_EditorScene->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
 
-			m_ActiveScene = m_EditorScene;
 			//OnSceneStop();
 		}
 	}

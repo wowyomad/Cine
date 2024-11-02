@@ -81,6 +81,7 @@ void RegisterComponent()
 template <class Component>
 void OnComponentAdded(entt::entity entity)
 {
+	std::cout << "Adding component " << Utils::GetClassTypename<Component>() << " to " << static_cast<uint32_t>(entity) << " in registry " << s_Registry << '\n';
 	auto& component = s_Registry->emplace_or_replace<Component>(entity);
 
 	if constexpr (std::is_base_of<NativeScript, Component>::value)
@@ -93,10 +94,14 @@ void OnComponentAdded(entt::entity entity)
 		auto& nsc = s_Registry->get<NativeScriptComponent>(entity);
 		auto instantiateScript = [entity]() -> NativeScript*
 			{
+				std::cout << "Instantiating component " << Utils::GetClassTypename<Component>() << "(" << entt::type_id<Entity>().hash() << ", " << entt::type_id<Entity>().index() << ")" << " for entity " << static_cast<uint32_t>(entity) << " at " << s_Registry << "\n";
+ 
 				return static_cast<Cine::NativeScript*>(&s_Registry->get<Component>(entity));
 			};
 		auto removeScript = [entity]() -> void
 			{
+				std::cout << "Removing component " << Utils::GetClassTypename<Component>() << "(" << entt::type_id<Entity>().hash() << ", " << entt::type_id<Entity>().index() << ")" << " for entity " << static_cast<uint32_t>(entity) << " at " << s_Registry << "\n";
+
 				if (s_Registry->valid(entity) && s_Registry->all_of<Component>(entity))
 				{
 					s_Registry->remove<Component>(entity);
@@ -210,13 +215,6 @@ void InitializeInput
 void SetActiveRegistry(entt::registry& registry)
 {
 	s_Registry = &registry;
-}
-
-void InitializeApplicationContext(Cine::Application* application)
-{
-	Application::Set(application);
-
-	Internal::Input::Init();
 }
 
 YAML::Node SerializeComponent(entt::entity entity, const std::string& componentName)

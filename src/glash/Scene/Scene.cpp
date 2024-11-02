@@ -201,6 +201,7 @@ namespace Cine
 				{
 					if (!script.Instance)
 					{
+						Entity e{ entity, this };
 						script.Instance = script.InstantiateScript();
 						script.Instance->m_Entity = Entity(entity, this);
 						script.Instance->OnCreate();
