@@ -384,10 +384,17 @@ namespace Cine
 	void EditorLayer::OnSceneStop()
 	{
 		m_ActiveScene->OnRuntimeStop();
-		ScriptEngine::Get().SetActiveRegistry(m_EditorScene->GetRegistry());
+
 		m_SceneHierarchyPanel.SetContext(m_EditorScene);
 		m_ContentBrowserPanel.SetContext(m_EditorScene);
-		m_ActiveScene = m_EditorScene;	
+
+		m_ActiveScene.reset();
+		m_RuntimeScene.reset();
+
+		ScriptEngine::Get().SetActiveRegistry(m_EditorScene->GetRegistry());
+
+
+		m_ActiveScene = m_EditorScene;
 
 		m_SceneState = SceneState::Edit;
 	}
