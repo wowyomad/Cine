@@ -195,7 +195,6 @@ namespace Cine
 
 			if (ImGui::BeginDragDropTarget())
 			{
-				CINE_LOG_INFO("Catched drag and drop in blank space");
 				if (ImGui::AcceptDragDropPayload("ENTITY"))
 				{
 					Entity& draggedEntity = *reinterpret_cast<Entity*>(ImGui::GetDragDropPayload()->Data);

@@ -104,69 +104,51 @@ namespace Cine
 
 	bool Entity::AddParent(Entity parent)
 	{
-		auto& hierarchy = GetComponent<HierarchyComponent>();
-		auto& parentHierarchy = parent.GetComponent<HierarchyComponent>();
-
-		bool selfParent = *this == parent;
-		bool thisHasParent = hierarchy.Parent;
-		bool parentHasParent = hierarchy.Parent;
-		bool thisIsParent = *this == parentHierarchy.Parent;
-		bool thisIsChild = hierarchy.Parent == parent;
-
-		if (selfParent)
+		// Prevent self-parenting
+		if (*this == parent)
 		{
 			return false;
 		}
 
-		if (thisHasParent)
-		{
-			if (thisIsChild)
-			{
-				return false;
-			}
-			else if (thisIsParent)
-			{
-				for (auto child : hierarchy.Children)
-				{
-					child.GetComponent<HierarchyComponent>().Parent = hierarchy.Parent;
-				}
-				auto& oldParentChildren = hierarchy.Parent.GetComponent<HierarchyComponent>().Children;
-				oldParentChildren.erase(std::remove_if(oldParentChildren.begin(), oldParentChildren.end(), [&](auto& theChild)
-					{
-						return theChild == *this;
-					}));
-				hierarchy.Children.clear();
-				hierarchy.Parent = parent;
-				oldParentChildren.push_back(parent);
-				parentHierarchy.Children.push_back(*this);
-			}
-			else
-			{
-				auto& oldParentChildren = hierarchy.Parent.GetComponent<HierarchyComponent>().Children;
-				for (auto child : hierarchy.Children)
-				{
-					child.GetComponent<HierarchyComponent>().Parent = hierarchy.Parent;
-					oldParentChildren.push_back(child);
-				}
-				hierarchy.Children.clear();
-				oldParentChildren.erase(std::remove_if(oldParentChildren.begin(), oldParentChildren.end(), [&](auto& theChild)
-					{
-						return theChild == *this;
-					}));
-				hierarchy.Parent = parent;
+		auto& hierarchy = GetComponent<HierarchyComponent>();
+		auto& parentHierarchy = parent.GetComponent<HierarchyComponent>();
 
-				parentHierarchy.Children.push_back(*this);
-			}
-		}
-		else
+		// Check for a cycle: If the new parent is a descendant of this entity, reject the operation
+		Entity currentParent = parent;
+		while (currentParent)
 		{
-			for (auto child : hierarchy.Children)
+			if (*this == currentParent)
 			{
-				child.GetComponent<HierarchyComponent>().Parent = hierarchy.Parent; //Parent is null
+				return false; // Rejecting circular reference
 			}
+			currentParent = currentParent.GetComponent<HierarchyComponent>().Parent;
+		}
+
+		// If this entity already has a parent, detach it from the current parent first
+		if (hierarchy.Parent)
+		{
+			// Remove this entity from its current parent's children
+			auto& oldParentChildren = hierarchy.Parent.GetComponent<HierarchyComponent>().Children;
+			oldParentChildren.erase(std::remove(oldParentChildren.begin(), oldParentChildren.end(), *this), oldParentChildren.end());
+
+			// Transfer this entity's children to its current parent
+			for (auto& child : hierarchy.Children)
+			{
+				child.GetComponent<HierarchyComponent>().Parent = hierarchy.Parent;
+				oldParentChildren.push_back(child);
+			}
+
 			hierarchy.Children.clear();
-			hierarchy.Parent = parent;
-			parentHierarchy.Children.push_back(*this);
+		}
+
+		// Now, assign the new parent and register this entity as a child
+		hierarchy.Parent = parent;
+		parentHierarchy.Children.push_back(*this);
+
+		// Confirm all children still point to this entity as their parent
+		for (auto& child : hierarchy.Children)
+		{
+			child.GetComponent<HierarchyComponent>().Parent = *this;
 		}
 
 		return true;
@@ -216,15 +198,11 @@ namespace Cine
 
 		auto& parentHierarchy = hierarchy.Parent.GetComponent<HierarchyComponent>();
 
-		for (auto child : hierarchy.Children)
-		{
-			child.GetComponent<HierarchyComponent>().Parent = hierarchy.Parent;
-			parentHierarchy.Children.push_back(child);
-		}
-		parentHierarchy.Children.erase(std::remove_if(parentHierarchy.Children.begin(), parentHierarchy.Children.end(), [this](auto& theChild)
-			{
-				return theChild == *this;
-			}));
+		parentHierarchy.Children.erase(
+			std::remove(parentHierarchy.Children.begin(), parentHierarchy.Children.end(), *this),
+			parentHierarchy.Children.end()
+		);
+
 		hierarchy.Parent = {};
 	}
 

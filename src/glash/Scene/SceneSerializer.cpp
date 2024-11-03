@@ -451,16 +451,6 @@ namespace Cine
 			}
 		}
 
-		if (hierarchy)
-		{
-			//do stuff
-			//you can do 
-			//m_Scene->GetEntityById(123);
-			//and
-			//Entity entity;
-			//entity.AddParent(anotherEntity)
-		}
-
 		return true;
 	}
 

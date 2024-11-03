@@ -408,6 +408,8 @@ namespace Cine
 			m_SceneHierarchyPanel.SetContext(m_EditorScene);
 			m_ContentBrowserPanel.SetContext(m_EditorScene);
 			m_EditorScene->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
+
+			m_ActiveScene = m_EditorScene;
 		}
 	
 	}
