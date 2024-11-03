@@ -40,8 +40,6 @@ namespace Cine
 	{
 		CINE_CORE_ASSERT(entity.HasComponent<IDComponent>(), "Entity doesn't have IDComponent");
 
-
-
 		out << YAML::BeginMap; //Entity
 		out << YAML::Key << "Entity" << YAML::Value << entity.GetID(); //Entity ID
 
@@ -62,7 +60,7 @@ namespace Cine
 			out << YAML::BeginMap; //TransformComponent
 
 			auto& transformComponent = entity.GetComponent<TransformComponent>();
-			
+
 			out << YAML::Key << "Translation" << transformComponent.Translation;
 			out << YAML::Key << "Rotation" << transformComponent.Rotation;
 			out << YAML::Key << "Scale" << transformComponent.Scale;
@@ -94,7 +92,7 @@ namespace Cine
 			//This would work for now. Should use UUIDs and store this 'flag' in scene, not in every camera component.
 			//TODO: Remove this
 			bool isMainCamera = m_Scene->GetMainCameraEntity() == entity;
-			out << YAML::Key << "IsMainCamera" << YAML::Value << isMainCamera; 
+			out << YAML::Key << "IsMainCamera" << YAML::Value << isMainCamera;
 
 			out << YAML::EndMap; //Camera Component
 		}
@@ -118,7 +116,7 @@ namespace Cine
 			auto& spriteComponent = entity.GetComponent<SpriteComponent>();
 			out << YAML::Key << "Color" << YAML::Value << spriteComponent.Color;
 			out << YAML::Key << "SpriteIndex" << YAML::Value << spriteComponent.SpriteIndex;
-			
+
 			out << YAML::EndMap;
 		}
 
@@ -165,7 +163,7 @@ namespace Cine
 			out << YAML::BeginMap;
 
 			auto& rb = entity.GetComponent<RigidBody2DComponent>();
-			
+
 			out << YAML::Key << "Type" << YAML::Value << RigidBody2DBodyTypeToString(rb.Type);
 			out << YAML::Key << "FixedRotation" << YAML::Value << rb.FixedRotation;
 
@@ -188,8 +186,6 @@ namespace Cine
 			out << YAML::Key << "RestitutionThreshold" << collider.RestitutionThreshold;
 
 			out << YAML::EndMap;
-
-
 		}
 
 		if (entity.HasComponent<SpriteAnimationComponent>())
@@ -225,18 +221,41 @@ namespace Cine
 		out << YAML::Key << "Scene" << YAML::Value << "Unnamed Scene";
 		out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
 
-		m_Scene->m_Registry.view<entt::entity>().each([&](auto entityID)
+		auto entities = m_Scene->m_Registry.view<entt::entity>();
+		for (auto e : entities)
+		{
+			Entity entity = { e, m_Scene.get() };
+			if (!entity)
 			{
-				Entity entity = { entityID, m_Scene.get() };
-				if (!entity)
-				{
-					return;
-				}
-
-				SerializeEntity(out, entity);
-			});
+				return;
+			}
+			SerializeEntity(out, entity);
+		}
 		out << YAML::EndSeq;
+
+		out << YAML::Key << "Hierarchy" << YAML::Value << YAML::BeginSeq;
+		for (auto e : entities)
+		{
+			Entity entity = { e, m_Scene.get() };
+			out << YAML::BeginMap;
+			out << YAML::Key << "ID" << YAML::Value << entity.GetID();
+
+			auto parent = entity.GetParent();
+			if (parent)
+			{
+				out << YAML::Key << "ParentID" << YAML::Value << parent.GetID();
+			}
+			else
+			{
+				out << YAML::Key << "ParentID" << YAML::Value << YAML::Null;
+			}
+
+			out << YAML::EndMap;
+		}
+		out << YAML::EndSeq;
+
 		out << YAML::EndMap;
+
 		//TODO: Save which camera is Main.
 
 		if (filepath.has_parent_path())
@@ -308,7 +327,7 @@ namespace Cine
 					cc.Camera.SetOrthographicSize(cameraProps["OrthographicSize"].as<float>());
 					cc.Camera.SetOrthographicNearClip(cameraProps["OrthographicNear"].as<float>());
 					cc.Camera.SetOrthographicFarClip(cameraProps["OrthographicFar"].as<float>());
-					
+
 					cc.FixedAspectRatio = cameraComponent["FixedAspectRatio"].as<bool>();
 					bool isMainCamera = cameraComponent["IsMainCamera"].as<bool>();
 					if (isMainCamera)
@@ -336,7 +355,7 @@ namespace Cine
 				if (spriteSheetComponent)
 				{
 					auto&& cc = deserializedEntity.AddComponent<SpriteSheetComponent>();
-					
+
 					if (spriteSheetComponent["Texture"])
 					{
 						std::filesystem::path texturePath = spriteSheetComponent["Texture"].as<std::string>();
@@ -382,7 +401,7 @@ namespace Cine
 					auto&& collider = deserializedEntity.AddOrReplaceComponent<BoxCollider2DComponent>();
 					collider.IsTrigger = boxCollider2DComponent["IsTrigger"].as<bool>();
 					collider.Offset = boxCollider2DComponent["Offset"].as<glm::vec2>();
-					collider.Size = boxCollider2DComponent["Size"].as<glm::vec2>();	
+					collider.Size = boxCollider2DComponent["Size"].as<glm::vec2>();
 					collider.Density = boxCollider2DComponent["Density"].as<float>();
 					collider.Friction = boxCollider2DComponent["Friction"].as<float>();
 					collider.Restitution = boxCollider2DComponent["Restitution"].as<float>();
@@ -391,7 +410,7 @@ namespace Cine
 
 				auto nativeScriptComponent = entity["NativeScriptComponent"];
 				if (nativeScriptComponent)
-				{	
+				{
 					auto&& nsc = deserializedEntity.AddOrReplaceComponent<NativeScriptComponent>();
 
 					for (const auto& node : nativeScriptComponent)
@@ -410,9 +429,36 @@ namespace Cine
 						ScriptEngine::Get().CreateComponent(deserializedEntity, componentName);
 						ScriptEngine::Get().DeserializeComponent(deserializedEntity, const_cast<YAML::Node&>(wrappedComponentData), componentName);
 					}
-					
+
 				}
 			}
+		}
+
+		auto hierarchy = data["Hierarchy"];
+		if (hierarchy)
+		{
+			for (const auto& node : hierarchy)	
+			{
+				UUID entityID = node["ID"].as<uint64_t>();
+				Entity entity = m_Scene->GetEntityById(entityID);
+
+				if (entity && node["ParentID"].IsScalar())
+				{
+					UUID parentID = node["ParentID"].as<uint64_t>();
+					Entity parentEntity = m_Scene->GetEntityById(parentID);
+					entity.AddParent(parentEntity);
+				}
+			}
+		}
+
+		if (hierarchy)
+		{
+			//do stuff
+			//you can do 
+			//m_Scene->GetEntityById(123);
+			//and
+			//Entity entity;
+			//entity.AddParent(anotherEntity)
 		}
 
 		return true;

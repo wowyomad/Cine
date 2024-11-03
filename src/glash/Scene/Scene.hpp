@@ -46,6 +46,8 @@ namespace Cine
 
 		inline entt::registry& GetRegistry() { return m_Registry; }
 
+		Entity GetEntityById(UUID id);
+
 		auto GetEntities()
 		{
 			return m_Registry.view<entt::entity>();
