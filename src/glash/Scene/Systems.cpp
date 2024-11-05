@@ -263,7 +263,7 @@ namespace Cine
 		auto& collider = entity.GetComponent<BoxCollider2DComponent>();
 
 		b2PolygonShape boxShape;
-		boxShape.SetAsBox(collider.Size.x * transform.Scale.x, collider.Size.y * transform.Scale.y,
+		boxShape.SetAsBox(collider.Size.x * transform.Scale.x - boxShape.m_radius, collider.Size.y * transform.Scale.y - boxShape.m_radius,
 			{ collider.Offset.x, collider.Offset.y }, 0.0f);
 
 		b2FixtureDef fixtureDef;
