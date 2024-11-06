@@ -35,5 +35,16 @@ set_target_properties(plugin PROPERTIES
 )
 
 if(MSVC)
-  target_link_options(plugin PRIVATE "/DEBUG:NONE")
+ # target_link_options(plugin PRIVATE "/DEBUG:NONE")
 endif()
+
+if(MSVC)
+    add_custom_command(TARGET plugin PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E echo "Removing existing .pdb file if it exists"
+        COMMAND ${CMAKE_COMMAND} -E echo "File path: ${CMAKE_CURRENT_SOURCE_DIR}/lib/Debug/plugin.pdb"
+        COMMAND ${CMAKE_COMMAND} -E remove "${CMAKE_CURRENT_SOURCE_DIR}/lib/Debug/plugin.pdb"
+        COMMENT "Removing .pdb file before build"
+        VERBATIM
+    )
+endif()
+

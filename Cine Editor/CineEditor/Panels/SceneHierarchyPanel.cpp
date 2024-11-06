@@ -959,7 +959,13 @@ namespace Cine
 						if (hasScript)
 							ImGui::BeginDisabled();
 
-						if (std::string(name).find(searchBuffer) != std::string::npos)
+						std::string nameCopy(name);
+						std::string searchValue = searchBuffer;
+						
+						std::transform(nameCopy.begin(), nameCopy.end(), nameCopy.begin(), ::tolower);
+						std::transform(searchValue.begin(), searchValue.end(), searchValue.begin(), ::tolower);
+
+						if (nameCopy.find(searchValue) != std::string::npos)
 						{
 							ImVec2 buttonSize = ImVec2(200.0f, 0.0f);
 

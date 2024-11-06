@@ -75,6 +75,4 @@ namespace Cine
         void* m_Handle = nullptr;
         std::string m_Name;
     };
-
-
 }
