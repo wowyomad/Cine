@@ -24,6 +24,7 @@ target_include_directories(plugin PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 list(APPEND PLUGIN_PROPERTIES  
     GLASH_ENABLE_DEBUG)
 target_compile_definitions(plugin PRIVATE ${PLUGIN_PROPERTIES})
+target_precompile_headers(plugin PRIVATE "scripts_pch.hpp")
 
 set_target_properties(plugin PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib

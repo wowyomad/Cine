@@ -370,7 +370,9 @@ namespace Cine
 		ScriptEngine::Get().SetActiveRegistry(m_ActiveScene->GetRegistry()); 
 		m_ActiveScene->OnRuntimeStart();
 		m_ActiveScene->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
+
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+		m_ContentBrowserPanel.SetContext(m_ActiveScene);
 
 		m_SceneState = SceneState::Play;
 	}

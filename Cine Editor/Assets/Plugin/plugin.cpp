@@ -1,5 +1,5 @@
+#include "scripts_pch.hpp"
 #include "plugin.hpp"
-
 #include <iostream>
 #include <entt/entt.hpp>
 

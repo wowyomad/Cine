@@ -63,7 +63,9 @@ namespace Cine
 
 	void Scene::Clear()
 	{
+		m_Registry.clear();
 		m_Registry = entt::registry();
+
 		if (m_MainCamera && *m_MainCamera)
 		{
 			delete m_MainCamera;

@@ -77,7 +77,7 @@ namespace Cine
 						serializer.Serialize(savePath);
 
 						Application::Get().SetUpdateUI(false);
-						std::this_thread::sleep_for(std::chrono::milliseconds(100)); //Right...
+						std::this_thread::sleep_for(std::chrono::milliseconds(500)); //Right...
 						m_ActiveScene->Clear();
 
 						ScriptEngine::Get().UnloadLibrary();

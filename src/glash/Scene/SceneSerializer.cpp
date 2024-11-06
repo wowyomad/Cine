@@ -274,6 +274,7 @@ namespace Cine
 
 	bool SceneSerializer::Deserialize(const std::filesystem::path& filepath)
 	{
+
 		std::ifstream stream(filepath);
 		std::stringstream strStream;
 		strStream << stream.rdbuf();
