@@ -77,7 +77,7 @@ namespace Cine
 						serializer.Serialize(savePath);
 
 						Application::Get().SetUpdateUI(false);
-						std::this_thread::sleep_for(std::chrono::milliseconds(500)); //Right...
+						std::this_thread::sleep_for(std::chrono::milliseconds(30)); //Right...
 						m_ActiveScene->Clear();
 
 						ScriptEngine::Get().UnloadLibrary();
@@ -85,13 +85,16 @@ namespace Cine
 						ScriptEngine::Get().InitializeComponents(m_ActiveScene->GetRegistry());
 						
 						serializer.Deserialize(savePath);
-						m_ActiveScene->SetUpdateScene(true);
 						if (s_IsSceneRuntime)
 						{
 							m_ActiveScene->OnRuntimeStart();
 							s_IsSceneRuntime = false;
 						}
+						m_ActiveScene->SetUpdateScene(true);
+
 						Application::Get().SetUpdateUI(true);
+
+						CINE_CORE_INFO("Finished reloading!");
 					});
 				return true;
 			}
