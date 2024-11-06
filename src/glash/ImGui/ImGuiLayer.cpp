@@ -36,8 +36,8 @@ namespace Cine
 
 
 		float fontSize = 16.0f;
-		io.FontDefault = io.Fonts->AddFontFromFileTTF("Resources/Fonts/JetBrainsMono/ttf/JetBrainsMono-Regular.ttf", fontSize);
-		io.Fonts->AddFontFromFileTTF("Resources/Fonts/JetBrainsMono/ttf/JetBrainsMono-Bold.ttf", fontSize);
+		io.FontDefault = io.Fonts->AddFontFromFileTTF("Resources/Fonts/JetBrainsMono/ttf/JetBrainsMono-Regular.ttf", fontSize, nullptr, io.Fonts->GetGlyphRangesCyrillic());
+		io.Fonts->AddFontFromFileTTF("Resources/Fonts/JetBrainsMono/ttf/JetBrainsMono-Bold.ttf", fontSize, nullptr, io.Fonts->GetGlyphRangesCyrillic());
 
 		ImGui::StyleColorsDark();
 		SetDarkTheme();

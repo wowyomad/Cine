@@ -81,11 +81,11 @@ void RegisterComponent()
 template <class Component>
 void OnComponentAdded(entt::entity entity)
 {
-	std::cout << "Adding component " << Utils::GetClassTypename<Component>() << " to " << static_cast<uint32_t>(entity) << " in registry " << s_Registry << '\n';
-	auto& component = s_Registry->emplace_or_replace<Component>(entity);
-
 	if constexpr (std::is_base_of<NativeScript, Component>::value)
 	{
+		std::cout << "Adding Script " << Utils::GetClassTypename<Component>() << " to " << static_cast<uint32_t>(entity) << " in registry " << s_Registry << '\n';
+		auto& component = s_Registry->emplace_or_replace<Component>(entity);
+
 		bool hasNativeScriptComponent = s_Registry->all_of<NativeScriptComponent>(entity);
 		if (!hasNativeScriptComponent)
 		{
@@ -94,13 +94,13 @@ void OnComponentAdded(entt::entity entity)
 		auto& nsc = s_Registry->get<NativeScriptComponent>(entity);
 		auto instantiateScript = [entity]() -> NativeScript*
 			{
-				std::cout << "Instantiating component " << Utils::GetClassTypename<Component>() << "(" << entt::type_id<Entity>().hash() << ", " << entt::type_id<Entity>().index() << ")" << " for entity " << static_cast<uint32_t>(entity) << " at " << s_Registry << "\n";
+				std::cout << "Instantiating Script " << Utils::GetClassTypename<Component>() << "(" << entt::type_id<Entity>().hash() << ", " << entt::type_id<Entity>().index() << ")" << " for entity " << static_cast<uint32_t>(entity) << " at " << s_Registry << "\n";
  
 				return static_cast<Cine::NativeScript*>(&s_Registry->get<Component>(entity));
 			};
 		auto removeScript = [entity]() -> void
 			{
-				std::cout << "Removing component " << Utils::GetClassTypename<Component>() << "(" << entt::type_id<Entity>().hash() << ", " << entt::type_id<Entity>().index() << ")" << " for entity " << static_cast<uint32_t>(entity) << " at " << s_Registry << "\n";
+				std::cout << "Removing Script " << Utils::GetClassTypename<Component>() << "(" << entt::type_id<Entity>().hash() << ", " << entt::type_id<Entity>().index() << ")" << " for entity " << static_cast<uint32_t>(entity) << " at " << s_Registry << "\n";
 
 				if (s_Registry->valid(entity) && s_Registry->all_of<Component>(entity))
 				{
@@ -108,6 +108,11 @@ void OnComponentAdded(entt::entity entity)
 				}
 			};
 		nsc.Bind<Component>(instantiateScript, removeScript);
+	}
+	else
+	{
+		std::cout << "Adding Component " << Utils::GetClassTypename<Component>() << " to " << static_cast<uint32_t>(entity) << " in registry " << s_Registry << '\n';
+		auto& component = s_Registry->emplace_or_replace<Component>(entity);
 	}
 }
 
@@ -185,7 +190,7 @@ ComponentsData GetComponentsData()
 		const size_t size = name.size() + 1;
 		data.Names[i] = new char[size];
 		strncpy(data.Names[i], name.c_str(), size);
-		data.IsScript[i] = true;
+		data.IsScript[i] = Updaters.find(name) != Updaters.end();
 
 		++i;
 	}
