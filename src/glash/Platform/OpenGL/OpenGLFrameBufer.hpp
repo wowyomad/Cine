@@ -11,7 +11,11 @@ namespace Cine
 		~OpenGLFrameBuffer();
 
 		const FramebufferSpecification& GetSpecification() const override { return m_Specification; };
-		uint32_t GetColorAttachmentRendererID() const override { return m_ColorAttachment; }
+		uint32_t GetColorAttachmentRendererID(uint32_t index = 0) const override
+		{
+			CINE_CORE_ASSERT(index < m_ColorAttachments.size(), ""); 
+			return m_ColorAttachments[index];
+		}
 
 		void Resize(uint32_t width, uint32_t height) override;
 
@@ -23,9 +27,13 @@ namespace Cine
 
 	private:
 		uint32_t m_RendererID = 0;
-		uint32_t m_ColorAttachment = 0;
-		uint32_t m_DepthAttachment = 0;
 		FramebufferSpecification m_Specification;
+
+		std::vector<FramebufferTextureSpecification> m_ColorAttachmentSpecs;
+		FramebufferTextureSpecification m_DepthAttachmentSpec;
+
+		std::vector<uint32_t> m_ColorAttachments;
+		uint32_t m_DepthAttachment;
 
 	private:
 		void ClearBuffer();

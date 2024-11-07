@@ -30,6 +30,7 @@ namespace Cine
 
 
 		FramebufferSpecification spec;
+		spec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::Depth };
 		spec.Width = 1280;
 		spec.Height = 720;
 		m_Framebuffer = FrameBuffer::Create(spec);
