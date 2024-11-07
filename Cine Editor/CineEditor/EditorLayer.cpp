@@ -30,7 +30,7 @@ namespace Cine
 
 
 		FramebufferSpecification spec;
-		spec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::Depth };
+		spec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::Depth };
 		spec.Width = 1280;
 		spec.Height = 720;
 		m_Framebuffer = FrameBuffer::Create(spec);
@@ -54,7 +54,7 @@ namespace Cine
 			m_EditorCamera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
 			m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 		}
-		if (m_ViewportHovered)
+		if (m_ViewportHovered && m_SceneState != SceneState::Play)
 		{
 			m_EditorCamera.OnUpdate(ts);
 		}

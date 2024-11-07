@@ -7,7 +7,8 @@ namespace Cine
 	{
 		None = 0,
 		
-		RGBA8 = 1,
+		RGBA8,
+		RED_INTEGER,
 		
 		DEPTH24STENCIL8,
 

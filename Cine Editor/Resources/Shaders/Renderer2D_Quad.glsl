@@ -30,7 +30,8 @@ in flat float v_TexIndex;
 
 uniform sampler2D u_Textures[32];
 
-out vec4 o_Color;
+layout(location = 0) out vec4 o_Color;
+layout(location = 1) out int o_Color2;
 
 void main()
 {
@@ -79,6 +80,8 @@ void main()
 		discard;
 
 	o_Color = texColor;
+
+	o_Color2 = 50;
 }
 
 #endif

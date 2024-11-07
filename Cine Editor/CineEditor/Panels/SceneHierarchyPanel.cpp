@@ -55,12 +55,16 @@ namespace Cine
 	{
 		ImGui::Spacing();
 
-		constexpr ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen
-			| ImGuiTreeNodeFlags_AllowItemOverlap
+		ImGuiTreeNodeFlags treeNodeFlags =
+			ImGuiTreeNodeFlags_AllowItemOverlap
 			| ImGuiTreeNodeFlags_Framed
 			| ImGuiTreeNodeFlags_FramePadding
-			| ImGuiTreeNodeFlags_SpanAvailWidth
-			;
+			| ImGuiTreeNodeFlags_SpanAvailWidth;
+		
+		if constexpr (std::is_same<T, TransformComponent>::value || std::is_same<T, TagComponent>::value)
+		{
+			treeNodeFlags |= ImGuiTreeNodeFlags_DefaultOpen;
+		}
 
 		ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
 
@@ -74,12 +78,14 @@ namespace Cine
 		bool removeComponent = false;
 		if constexpr (!IsNonRemovableComponent<T>::value)
 		{
+			static const std::string uniqueButtonName = "+##" + Utils::GetClassTypename<T>();
+			static const std::string uniquePopupID = "ComponentSettings##" + Utils::GetClassTypename<T>();
 			ImGui::SameLine(contentRegionAvailable.x - lineHeigh * 0.5f);
-			if (ImGui::Button("+", { lineHeigh, lineHeigh }))
+			if (ImGui::Button(uniqueButtonName.c_str(), {lineHeigh, lineHeigh}))
 			{
-				ImGui::OpenPopup("ComponentSettings");
+				ImGui::OpenPopup(uniquePopupID.c_str());
 			}
-			if (ImGui::BeginPopup("ComponentSettings"))
+			if (ImGui::BeginPopup(uniquePopupID.c_str()))
 			{
 				if (ImGui::MenuItem("Remove Component"))
 				{
