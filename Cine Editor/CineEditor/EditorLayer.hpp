@@ -61,6 +61,7 @@ namespace Cine
 		
 
 		int32_t m_GizmoOperation = -1;
+		ImGuizmo::MODE m_GuizmoMode = ImGuizmo::MODE::LOCAL;
 		float m_SnapScale = 0.1f;
 		float m_SnapTranslation = 0.5f;
 		float m_SnapRotation = 5.0f;

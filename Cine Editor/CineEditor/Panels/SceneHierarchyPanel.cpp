@@ -101,8 +101,10 @@ namespace Cine
 		}
 	}
 
-	static void DisplayVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f)
+	static bool DisplayVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f)
 	{
+		bool updated = false;
+
 		ImGuiIO& io = ImGui::GetIO();
 		auto boldFont = io.Fonts->Fonts[1];
 
@@ -126,12 +128,16 @@ namespace Cine
 			ImGui::PushFont(boldFont);
 
 			if (ImGui::Button(label, buttonSize))
+			{
 				value = resetValue;
+				updated = true;
+			}
 
 			ImGui::PopFont();
 			ImGui::PopStyleColor(3);
 			ImGui::SameLine();
-			ImGui::DragFloat(("##" + std::string(label)).c_str(), &value, 0.1f, 0.0f, 0.0f, "%.2f");
+			if (ImGui::DragFloat(("##" + std::string(label)).c_str(), &value, 0.1f, 0.0f, 0.0f, "%.2f"))
+				updated = true;
 			ImGui::PopItemWidth();
 			ImGui::SameLine();
 			};
@@ -144,6 +150,8 @@ namespace Cine
 
 		ImGui::Columns(1);
 		ImGui::PopID();
+
+		return updated;
 	}
 
 
@@ -429,22 +437,27 @@ namespace Cine
 
 	void SceneHierarchyPanel::DisplayTransformComponent(Entity entity)
 	{
+		bool updated = false;
 		ImGui::IsItemDeactivated();
-		DisplayComponent<TransformComponent>(entity, "Transform", [](TransformComponent& tc)
+		DisplayComponent<TransformComponent>(entity, "Transform", [&](TransformComponent& tc)
 			{
 				auto& translation = tc.Translation;
-				DisplayVec3Control("Position", translation);
+				updated |= DisplayVec3Control("Position", translation);
 
 				ImGui::Spacing();
 
 				auto rotation = glm::degrees(tc.Rotation);
-				DisplayVec3Control("Rotation", rotation);
+				updated |= DisplayVec3Control("Rotation", rotation);
 				tc.Rotation = glm::radians(rotation);
 
 				ImGui::Spacing();
 
 				auto& scale = tc.Scale;
-				DisplayVec3Control("Scale", scale, 1.0f);
+				updated |= DisplayVec3Control("Scale", scale, 1.0f);
+
+
+				if(updated)
+					m_Context.Scene->GetPhysics2DSystem().UpdateRigidBodyParameters(entity);
 			});
 	}
 

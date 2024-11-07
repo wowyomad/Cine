@@ -104,6 +104,7 @@ void OnComponentAdded(entt::entity entity)
 
 				if (s_Registry->valid(entity) && s_Registry->all_of<Component>(entity))
 				{
+					s_Registry->get<Component>(entity).OnDestroy();
 					s_Registry->remove<Component>(entity);
 				}
 			};

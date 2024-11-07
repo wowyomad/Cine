@@ -245,7 +245,7 @@ namespace Cine
 				float snapValues[3] = { m_SnapValue, m_SnapValue, m_SnapValue };
 
 				ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
-					static_cast<ImGuizmo::OPERATION>(m_GizmoOperation), ImGuizmo::LOCAL, glm::value_ptr(worldTransform),
+					static_cast<ImGuizmo::OPERATION>(m_GizmoOperation), m_GuizmoMode, glm::value_ptr(worldTransform),
 					nullptr, snap ? snapValues : nullptr);
 
 				if (ImGuizmo::IsUsing())
@@ -502,25 +502,24 @@ namespace Cine
 		{
 			switch (e.GetKeyCode())
 			{
+			case Key::G:
+				m_GuizmoMode = m_GuizmoMode == ImGuizmo::MODE::LOCAL ? ImGuizmo::MODE::WORLD : ImGuizmo::MODE::LOCAL;
+				break;
 			case Key::Q:
 				m_GizmoOperation = -1;
 				break;
-
 			case Key::W:
 				m_GizmoOperation = ImGuizmo::OPERATION::TRANSLATE;
 				m_SnapValue = m_SnapTranslation;
 				break;
-
 			case Key::E:
 				m_GizmoOperation = ImGuizmo::OPERATION::ROTATE;
 				m_SnapValue = m_SnapRotation;
 				break;
-
 			case Key::R:
 				m_GizmoOperation = ImGuizmo::OPERATION::SCALE;
 				m_SnapValue = m_SnapScale;
 				break;
-
 			case Key::X:
 			case Key::Y:
 			case Key::Z:

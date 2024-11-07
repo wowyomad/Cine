@@ -280,8 +280,14 @@ namespace Cine
 				auto& nsc = m_Registry.get<NativeScriptComponent>(entity);
 				for (auto& script : nsc.Scripts)
 				{
-					script.Instance->OnDestroy();
+					m_ScriptEngine.RemoveComponent(entity, script.Name);
 				}
+				m_Registry.remove<NativeScriptComponent>(entity);
+			}
+
+			if (m_Registry.all_of<RigidBody2DComponent>(e))
+			{
+				m_PhysicsSystem.RemoveRigidBody(Entity(e, this));
 			}
 
 			m_Registry.destroy(entity);

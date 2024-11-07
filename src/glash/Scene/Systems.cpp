@@ -308,19 +308,41 @@ namespace Cine
 		}
 	}
 
+	void Physics2DSystem::RemoveRigidBody(Entity entity)
+	{
+		if (!m_PhysicsWorld)
+			return;
+
+		if (entity.HasComponent<RigidBody2DComponent>())
+		{
+			auto& rb = entity.GetComponent<RigidBody2DComponent>();
+			if (rb.RuntimeBody)
+			{
+				b2Body* body = static_cast<b2Body*>(rb.RuntimeBody);
+
+				m_PhysicsWorld->DestroyBody(body);
+
+				rb.RuntimeBody = nullptr;
+			}
+		}
+	}
+
 	void Physics2DSystem::UpdateRigidBodyParameters(Entity entity)
 	{
-		auto& rb = entity.GetComponent<RigidBody2DComponent>();
+		if (!m_PhysicsWorld || !entity.HasComponent<RigidBody2DComponent>())
+			return;
 
-		// Check if the rigid body already exists in the physics world
+		auto& rb = entity.GetComponent<RigidBody2DComponent>();
 		if (!rb.RuntimeBody)
 			return;
 
 		b2Body* body = static_cast<b2Body*>(rb.RuntimeBody);
 
-		// Update body type and fixed rotation from the RigidBody2DComponent
 		body->SetType(CineRigiBody2DTypeToBox2DType(rb.Type));
 		body->SetFixedRotation(rb.FixedRotation);
+		
+		body->SetLinearVelocity({ 0.0f, 0.0f });
+		body->SetAngularVelocity(0.0f);
 
 		auto& transform = entity.Transform();
 		body->SetTransform({ transform.Translation.x, transform.Translation.y }, transform.Rotation.z);
