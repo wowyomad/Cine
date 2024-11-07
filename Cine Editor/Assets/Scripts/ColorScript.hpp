@@ -40,13 +40,14 @@ public:
 
 	void OnTriggerEnter(Entity entity) override
 	{
-		std::cout << "Trigger enter on " << static_cast<uint32_t>(entity) << std::endl;
+		
 	}
 
 	void OnTriggerExit(Entity entity) override
 	{
-		std::cout << "Trigger exit on " << static_cast<uint32_t>(entity) << std::endl;
+
 	}
+	
 public:
 	SERIALIZE_CLASS(ColorScript,
 		FIELD(m_Time)

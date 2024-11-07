@@ -163,8 +163,31 @@ namespace Cine
 	void SceneHierarchyPanel::SetContext(const Ref<Scene>& scene)
 	{
 		m_Context.Scene = scene;
+		auto selection = m_Context.Selection;
+		auto properties = m_Context.Properties;
+		
 		m_Context.Selection = {};
 		m_Context.Properties = {};
+
+		if (selection)
+		{
+			UUID selectedEntityID = selection.GetID();
+			Entity selectedEntity = m_Context.Scene->GetEntityById(selectedEntityID);
+			if (selectedEntity)
+			{
+				m_Context.Selection = selectedEntity;
+			}
+		}
+
+		if (properties)
+		{
+			UUID propertiesEntityID = properties.GetID();
+			Entity propertiesEntity = m_Context.Scene->GetEntityById(propertiesEntityID);
+			if (propertiesEntity)
+			{
+				m_Context.Properties = propertiesEntity;
+			}
+		}
 	}
 
 	void SceneHierarchyPanel::OnImGuiRender()

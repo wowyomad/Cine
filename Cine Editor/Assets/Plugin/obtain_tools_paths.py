@@ -75,6 +75,7 @@ def generate_c_cpp_properties(output_dir):
                 "compilerPath": os.path.join(install_path, "VC", "Tools", "MSVC", max(os.listdir(os.path.join(install_path, "VC", "Tools", "MSVC"))), "bin", "Hostx64", "x64", "cl.exe"),
                 "includePath": [
                     "${workspaceFolder}/**",
+                    "${workspaceFolder}/../**",
                     msvc_include_path,
                     windows_sdk_include_path
                 ],
