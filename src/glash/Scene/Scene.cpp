@@ -33,15 +33,20 @@ namespace Cine
 
 	Entity Scene::GetEntityById(UUID id)
 	{
+		CINE_CORE_TRACE("Looking for {0}", (uint64_t)id);
 		auto view = m_Registry.view<entt::entity>();
 		for (auto e : view)
 		{
 			Entity entity(e, this);
+			CINE_CORE_TRACE("Found {0}", (uint64_t)entity.GetID());
+
 			if (id == entity.GetID())
 			{
+				std::cout << "\n";
 				return entity;
 			}
 		}
+		std::cout << "\n";
 		return Entity();
 	}
 

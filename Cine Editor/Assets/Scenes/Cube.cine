@@ -1,0 +1,122 @@
+Scene: Unnamed Scene
+Entities:
+  - Entity: 111
+    TagComponent:
+      Tag: Bottom
+    TransformComponent:
+      Translation: [0, -0.5, 0]
+      Rotation: [-1.57079637, -0, 0]
+      Scale: [1, 0.999980152, 0.999980152]
+    SpriteRendererComponent:
+      UseSprite: false
+    SpriteComponent:
+      Color: [0.632003427, 1, 0.451476812, 1]
+      SpriteIndex: 0
+    SpriteSheetComponent:
+      ? []
+    NativeScriptComponent:
+      []
+  - Entity: 222
+    TagComponent:
+      Tag: Back
+    TransformComponent:
+      Translation: [0, 0, -0.5]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      UseSprite: false
+    SpriteComponent:
+      Color: [0.632003427, 1, 0.451476812, 1]
+      SpriteIndex: 0
+    SpriteSheetComponent:
+      ? []
+    NativeScriptComponent:
+      []
+  - Entity: 333
+    TagComponent:
+      Tag: Top
+    TransformComponent:
+      Translation: [0, 0.5, 0]
+      Rotation: [-1.57079637, -0, 0]
+      Scale: [1, 0.999980152, 0.999980152]
+    SpriteRendererComponent:
+      UseSprite: false
+    SpriteComponent:
+      Color: [0.632003427, 1, 0.451476812, 1]
+      SpriteIndex: 0
+    SpriteSheetComponent:
+      ? []
+    NativeScriptComponent:
+      []
+  - Entity: 444
+    TagComponent:
+      Tag: Left
+    TransformComponent:
+      Translation: [-0.5, 0, 0]
+      Rotation: [0, 1.57079637, 0]
+      Scale: [0.99999404, 1, 0.99999404]
+    SpriteRendererComponent:
+      UseSprite: false
+    SpriteComponent:
+      Color: [0.632003427, 1, 0.451476812, 1]
+      SpriteIndex: 0
+    SpriteSheetComponent:
+      ? []
+    NativeScriptComponent:
+      []
+  - Entity: 555
+    TagComponent:
+      Tag: Right
+    TransformComponent:
+      Translation: [0.5, 0, 0]
+      Rotation: [0, 1.57079637, 0]
+      Scale: [0.999918222, 1, 0.999918222]
+    SpriteRendererComponent:
+      UseSprite: false
+    SpriteComponent:
+      Color: [0.632003427, 1, 0.451476812, 1]
+      SpriteIndex: 0
+    SpriteSheetComponent:
+      ? []
+    NativeScriptComponent:
+      []
+  - Entity: 666
+    TagComponent:
+      Tag: Cube
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1.00000155, 1, 1.00000012]
+    NativeScriptComponent:
+      []
+  - Entity: 777
+    TagComponent:
+      Tag: Front
+    TransformComponent:
+      Translation: [0, 0, 0.5]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      UseSprite: false
+    SpriteComponent:
+      Color: [0.632003427, 1, 0.451476812, 1]
+      SpriteIndex: 0
+    SpriteSheetComponent:
+      ? []
+    NativeScriptComponent:
+      []
+Hierarchy:
+  - ID: 111
+    ParentID: 666
+  - ID: 222
+    ParentID: 666
+  - ID: 333
+    ParentID: 666
+  - ID: 444
+    ParentID: 666
+  - ID: 555
+    ParentID: 666
+  - ID: 666
+    ParentID: ~
+  - ID: 777
+    ParentID: 666

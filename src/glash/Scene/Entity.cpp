@@ -209,6 +209,7 @@ namespace Cine
 	Entity Entity::Clone()
 	{
 		Entity clone = Entity(m_Scene->m_Registry.create(), m_Scene);
+		clone.AddComponent<IDComponent>(UUID());
 
 		auto& nscStorage = m_Scene->m_Registry.storage<NativeScriptComponent>();
 		if (nscStorage.contains(m_EntityHandle))
@@ -224,6 +225,11 @@ namespace Cine
 		for (auto&& [id, storage] : m_Scene->m_Registry.storage())
 		{
 			if (storage.type().hash() == entt::type_id<NativeScriptComponent>().hash())
+			{
+				continue;
+			}
+
+			if (storage.type().hash() == entt::type_id<IDComponent>().hash())
 			{
 				continue;
 			}
