@@ -20,6 +20,8 @@ public:
 
 	void OnCreate() override
 	{
+		m_Timer.Start();
+		std::cout << "OnCreate: " << m_Timer.GetElapsed() << std::endl;
 		m_SpriteComponent = TryGetComponent<SpriteComponent>();
 	}
 

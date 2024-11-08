@@ -88,7 +88,6 @@ namespace Cine
 			//Expensive call!
 			int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
 			m_HoveredEntity = pixelData >= 0 ? (Entity(static_cast<entt::entity>(pixelData), m_ActiveScene.get())) : Entity();
-			CINE_CORE_TRACE("PIXELDATA: {0} ({1}, {2})", pixelData, mouseX, mouseY);
 		}
 
 		m_Framebuffer->Unbind();
@@ -511,7 +510,7 @@ namespace Cine
 		if (m_GizmoOperation > -1)
 			return false;
 
-		if (m_HoveredEntity)
+		if (e.GetMouseButton() == Mouse::ButtonLeft && m_HoveredEntity)
 		{
 			if (m_SceneHierarchyPanel.GetSelectedEntity() == m_HoveredEntity)
 			{
