@@ -67,6 +67,7 @@ namespace Cine
 		float m_SnapRotation = 5.0f;
 		float m_SnapValue = 0.0f;
 
+		std::array<glm::vec2, 2> m_ViewportBounds;
 		glm::vec2 m_ViewportSize = { 0.0f, 0.0f };
 		bool m_ViewportFocused = true;
 		bool m_ViewportHovered = true;

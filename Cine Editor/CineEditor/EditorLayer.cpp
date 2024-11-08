@@ -62,16 +62,34 @@ namespace Cine
 		Renderer2D::ResetStats();
 		m_LastFrametime = ts.Milleseconds();
 
-
 		m_Framebuffer->Bind();
+		RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
+		RenderCommand::Clear();
+		m_Framebuffer->ClearAttachment(1, -1);
+
 		{
 			switch (m_SceneState)
 			{
 			case SceneState::Play: m_ActiveScene->OnUpdateRuntime(ts); break;
 			case SceneState::Edit: case SceneState::Pause: m_ActiveScene->OnUpdateEditor(ts, m_EditorCamera); break;
-			}
-				
+			}	
 		}
+
+
+		auto [mx, my] = ImGui::GetMousePos();
+		mx -= m_ViewportBounds[0].x;
+		my -= m_ViewportBounds[0].y;
+		glm::vec2 viewportSize = m_ViewportBounds[1] - m_ViewportBounds[0];
+
+		int mouseX = static_cast<int>(mx);
+		int mouseY = static_cast<int>(viewportSize.y - my); //flip Y coordinates
+
+		if (mouseX >= 0 && mouseY >= 0 && mouseX <= (int)viewportSize.x && mouseY <= (int)viewportSize.y)
+		{
+			int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
+			CINE_CORE_INFO("Pixel Data: {0}", pixelData);
+		}
+
 		m_Framebuffer->Unbind();
 	}
 
@@ -184,6 +202,8 @@ namespace Cine
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0.0f, 0.0f });
 		ImGui::Begin("Viewport");
 		{
+			auto viewportOffset = ImGui::GetCursorPos();
+
 			m_ViewportFocused = ImGui::IsWindowFocused();
 			m_ViewportHovered = ImGui::IsWindowHovered();
 			Application::Get().GetImGuiLayer()->SetBlockEvents(!m_ViewportFocused && !m_ViewportHovered);
@@ -193,6 +213,15 @@ namespace Cine
 
 			size_t id = m_Framebuffer->GetColorAttachmentRendererID();
 			ImGui::Image(reinterpret_cast<void*>(id), { m_ViewportSize.x, m_ViewportSize.y }, { 0, 1 }, { 1, 0 });
+
+			auto windowSize = ImGui::GetWindowSize();
+			ImVec2 minBound = ImGui::GetWindowPos();
+			minBound.x += viewportOffset.x;
+			//minBound.y += viewportOffset.y; //incorrect when flipped
+
+			ImVec2 maxBound = { minBound.x + windowSize.x, minBound.y + windowSize.y }; 
+			m_ViewportBounds[0] = { minBound.x, minBound.y };
+			m_ViewportBounds[1] = { maxBound.x, maxBound.y };
 
 			if (ImGui::BeginDragDropTarget())
 			{

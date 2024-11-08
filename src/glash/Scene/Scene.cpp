@@ -181,7 +181,6 @@ namespace Cine
 			UpdateScripts(ts);
 			SpriteAnimationSystem::Update(m_Registry, ts);
 
-			Renderer2D::Clear();
 			if (*m_MainCamera)
 			{
 				auto&& [cameraComponent, transform] = m_MainCamera->GetComponents<CameraComponent, CachedTransform>();
@@ -203,7 +202,6 @@ namespace Cine
 			UpdateWorldTransforms(m_Registry);
 			InstantiateScripts();
 
-			Renderer2D::Clear();
 			Renderer2D::BeginScene(editorCamera);
 			SpriteRendererSystem::Update(m_Registry);
 			Renderer2D::EndScene();

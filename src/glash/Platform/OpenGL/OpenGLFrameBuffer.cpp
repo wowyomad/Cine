@@ -74,6 +74,20 @@ namespace Cine
 			}
 			glFramebufferTexture2D(GL_FRAMEBUFFER, attachmentType, TextureTarget(multisampled), id, 0);
 		}
+
+		static GLenum CineTextureFormatToOpenGL(FramebufferTextureFormat format)
+		{
+			switch (format)
+			{
+			case FramebufferTextureFormat::RGBA8: return GL_RGBA8;
+			case FramebufferTextureFormat::RED_INTEGER: return GL_RED_INTEGER;
+			case FramebufferTextureFormat::DEPTH24STENCIL8: return GL_DEPTH24_STENCIL8;
+			}
+
+			CINE_CORE_ASSERT(false, "");
+			return 0;
+		}
+
 	}
 
 
@@ -112,6 +126,25 @@ namespace Cine
 		Invalidate();
 		glViewport(0, 0, m_Specification.Width, m_Specification.Height);
 
+	}
+
+	int OpenGLFrameBuffer::ReadPixel(uint32_t attachmentIndex, int x, int y)
+	{
+		CINE_CORE_ASSERT(attachmentIndex < m_ColorAttachments.size(), "");
+		glReadBuffer(GL_COLOR_ATTACHMENT0 + attachmentIndex);
+
+		int pixelData;
+		glReadPixels(x, y, 1, 1, GL_RED_INTEGER, GL_INT, &pixelData);
+		return pixelData;
+	}
+
+	void OpenGLFrameBuffer::ClearAttachment(uint32_t attachmentIndex, int value)
+	{
+		CINE_CORE_ASSERT(attachmentIndex < m_ColorAttachments.size(), "");
+
+		auto& spec = m_ColorAttachmentSpecs[attachmentIndex];
+		
+		glClearTexImage(m_ColorAttachments[attachmentIndex], 0, Utils::CineTextureFormatToOpenGL(spec.TextureFormat), GL_INT, &value);
 	}
 
 	void OpenGLFrameBuffer::Invalidate()
@@ -178,6 +211,7 @@ namespace Cine
 	void OpenGLFrameBuffer::Bind()
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
+		glViewport(0, 0, m_Specification.Width, m_Specification.Height);
 	}
 
 	void OpenGLFrameBuffer::Unbind()

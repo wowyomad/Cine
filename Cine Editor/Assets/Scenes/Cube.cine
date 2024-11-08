@@ -10,7 +10,7 @@ Entities:
     SpriteRendererComponent:
       UseSprite: false
     SpriteComponent:
-      Color: [0.632003427, 1, 0.451476812, 1]
+      Color: [0.126366779, 0.200000003, 0.0901960731, 1]
       SpriteIndex: 0
     SpriteSheetComponent:
       ? []
@@ -26,7 +26,7 @@ Entities:
     SpriteRendererComponent:
       UseSprite: false
     SpriteComponent:
-      Color: [0.632003427, 1, 0.451476812, 1]
+      Color: [0.393967032, 0.623529434, 0.281199545, 0.988235295]
       SpriteIndex: 0
     SpriteSheetComponent:
       ? []
@@ -58,7 +58,7 @@ Entities:
     SpriteRendererComponent:
       UseSprite: false
     SpriteComponent:
-      Color: [0.632003427, 1, 0.451476812, 1]
+      Color: [0.557500541, 0.882352948, 0.397923857, 1]
       SpriteIndex: 0
     SpriteSheetComponent:
       ? []
@@ -74,7 +74,7 @@ Entities:
     SpriteRendererComponent:
       UseSprite: false
     SpriteComponent:
-      Color: [0.632003427, 1, 0.451476812, 1]
+      Color: [0.284944713, 0.450980395, 0.203383297, 1]
       SpriteIndex: 0
     SpriteSheetComponent:
       ? []
@@ -85,7 +85,7 @@ Entities:
       Tag: Cube
     TransformComponent:
       Translation: [0, 0, 0]
-      Rotation: [0, 0, 0]
+      Rotation: [0, 0.785398185, 0]
       Scale: [1.00000155, 1, 1.00000012]
     NativeScriptComponent:
       []
@@ -93,16 +93,46 @@ Entities:
     TagComponent:
       Tag: Front
     TransformComponent:
-      Translation: [0, 0, 0.5]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
+      Translation: [-1.1920929e-07, 0, 0.5]
+      Rotation: [0, -8.94397303e-08, 0]
+      Scale: [0.99963367, 1, 0.999633551]
     SpriteRendererComponent:
       UseSprite: false
     SpriteComponent:
-      Color: [0.632003427, 1, 0.451476812, 1]
+      Color: [0.470778227, 0.745098054, 0.336024582, 1]
       SpriteIndex: 0
     SpriteSheetComponent:
       ? []
+    NativeScriptComponent:
+      []
+  - Entity: 15606433406137565437
+    TagComponent:
+      Tag: Center
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    NativeScriptComponent:
+      - RotatorScript:
+          m_RotationSpeed: 30.00000000
+  - Entity: 3617113973099581822
+    TagComponent:
+      Tag: Cameraw
+    TransformComponent:
+      Translation: [-2.51829219, 0.264656246, -1.27817726]
+      Rotation: [-2.33031225, -0.66657418, 2.18277621]
+      Scale: [1.00004303, 0.999994814, 0.999982417]
+    CameraComponent:
+      Camera:
+        ProjectionType: 0
+        PerspectiveFOV: 0.959931076
+        PerspectiveNear: 0.00999999978
+        PerspectiveFar: 1000
+        OrthographicSize: 10
+        OrthographicNear: -1
+        OrthographicFar: 1
+      FixedAspectRatio: false
+      IsMainCamera: true
     NativeScriptComponent:
       []
 Hierarchy:
@@ -117,6 +147,10 @@ Hierarchy:
   - ID: 555
     ParentID: 666
   - ID: 666
-    ParentID: ~
+    ParentID: 15606433406137565437
   - ID: 777
     ParentID: 666
+  - ID: 15606433406137565437
+    ParentID: ~
+  - ID: 3617113973099581822
+    ParentID: ~

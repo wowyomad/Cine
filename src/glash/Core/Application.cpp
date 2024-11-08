@@ -129,8 +129,6 @@ namespace Cine
 			if (!m_Minimized)
 			{
 				m_TickAccumulator += deltaTime;
-
-
 				{
 					CINE_PROFILE_SCOPE("LayerStack FixedUpdate");
 
