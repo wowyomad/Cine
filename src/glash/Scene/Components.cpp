@@ -4,9 +4,17 @@
 
 namespace Cine
 {
-	glm::mat4 TransformComponent::GetWorldTransform(Entity& entity)
-	{
-		CINE_CORE_ASSERT(false, "Not implemented yet");
-		return glm::mat4(1.0f);
-	}
+    glm::mat4 TransformComponent::GetWorldTransform(Entity& entity)
+    {
+        auto& hierarchy = entity.GetComponent<HierarchyComponent>();
+        auto& transform = entity.GetComponent<TransformComponent>();
+
+        if (!hierarchy.Parent)
+        {
+            return transform.GetLocalTransform();
+        }
+
+        glm::mat4 parentWorldTransform = GetWorldTransform(hierarchy.Parent);
+        return parentWorldTransform * transform.GetLocalTransform();
+    }
 }

@@ -447,7 +447,7 @@ namespace Cine
 				{
 					UUID parentID = node["ParentID"].as<uint64_t>();
 					Entity parentEntity = m_Scene->GetEntityById(parentID);
-					entity.AddParent(parentEntity);
+					entity.AddParentWithoutTransform(parentEntity);
 				}
 			}
 		}

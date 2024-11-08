@@ -30,8 +30,8 @@ namespace Cine
 		else
 		{
 			glm::vec3 translation, rotation, scale;
-			auto& transform = GetComponent<CachedTransform>();
-			Math::DecomposeTransform(transform.CachedMatrix, translation, rotation, scale);
+			auto transform = TransformComponent::GetWorldTransform(*this);
+			Math::DecomposeTransform(transform, translation, rotation, scale);
 			return translation;
 		}
 
@@ -47,8 +47,8 @@ namespace Cine
 		else
 		{
 			glm::vec3 translation, rotation, scale;
-			auto& transform = GetComponent<CachedTransform>();
-			Math::DecomposeTransform(transform.CachedMatrix, translation, rotation, scale);
+			auto transform = TransformComponent::GetWorldTransform(*this);
+			Math::DecomposeTransform(transform, translation, rotation, scale);
 			return rotation;
 		}
 	}
@@ -63,8 +63,8 @@ namespace Cine
 		else
 		{
 			glm::vec3 translation, rotation, scale;
-			auto& transform = GetComponent<CachedTransform>();
-			Math::DecomposeTransform(transform.CachedMatrix, translation, rotation, scale);
+			auto transform = TransformComponent::GetWorldTransform(*this);
+			Math::DecomposeTransform(transform, translation, rotation, scale);
 			return scale;
 		}
 	}
@@ -101,10 +101,8 @@ namespace Cine
 		hierarchy.Children.push_back(child);
 	}
 
-
-	bool Entity::AddParent(Entity parent)
+	bool Entity::AddParentWithoutTransform(Entity parent)
 	{
-		// Prevent self-parenting
 		if (*this == parent)
 		{
 			return false;
@@ -113,25 +111,21 @@ namespace Cine
 		auto& hierarchy = GetComponent<HierarchyComponent>();
 		auto& parentHierarchy = parent.GetComponent<HierarchyComponent>();
 
-		// Check for a cycle: If the new parent is a descendant of this entity, reject the operation
 		Entity currentParent = parent;
 		while (currentParent)
 		{
 			if (*this == currentParent)
 			{
-				return false; // Rejecting circular reference
+				return false;
 			}
 			currentParent = currentParent.GetComponent<HierarchyComponent>().Parent;
 		}
 
-		// If this entity already has a parent, detach it from the current parent first
 		if (hierarchy.Parent)
 		{
-			// Remove this entity from its current parent's children
 			auto& oldParentChildren = hierarchy.Parent.GetComponent<HierarchyComponent>().Children;
 			oldParentChildren.erase(std::remove(oldParentChildren.begin(), oldParentChildren.end(), *this), oldParentChildren.end());
 
-			// Transfer this entity's children to its current parent
 			for (auto& child : hierarchy.Children)
 			{
 				child.GetComponent<HierarchyComponent>().Parent = hierarchy.Parent;
@@ -141,11 +135,9 @@ namespace Cine
 			hierarchy.Children.clear();
 		}
 
-		// Now, assign the new parent and register this entity as a child
 		hierarchy.Parent = parent;
 		parentHierarchy.Children.push_back(*this);
 
-		// Confirm all children still point to this entity as their parent
 		for (auto& child : hierarchy.Children)
 		{
 			child.GetComponent<HierarchyComponent>().Parent = *this;
@@ -153,6 +145,79 @@ namespace Cine
 
 		return true;
 	}
+
+
+	bool Entity::AddParent(Entity parent)
+	{
+		if (*this == parent)
+		{
+			return false;
+		}
+
+		auto& hierarchy = GetComponent<HierarchyComponent>();
+		auto& parentHierarchy = parent.GetComponent<HierarchyComponent>();
+
+		// Avoid circular hierarchy
+		Entity currentParent = parent;
+		while (currentParent)
+		{
+			if (*this == currentParent)
+			{
+				return false;
+			}
+			currentParent = currentParent.GetComponent<HierarchyComponent>().Parent;
+		}
+
+		glm::vec3 worldTranslation, worldRotation, worldScale;
+		auto worldTransform = TransformComponent::GetWorldTransform(*this);
+		Math::DecomposeTransform(worldTransform, worldTranslation, worldRotation, worldScale);
+
+		// Detach from old parent
+		if (hierarchy.Parent)
+		{
+			auto& oldParentChildren = hierarchy.Parent.GetComponent<HierarchyComponent>().Children;
+			oldParentChildren.erase(std::remove(oldParentChildren.begin(), oldParentChildren.end(), *this), oldParentChildren.end());
+
+			for (auto& child : hierarchy.Children)
+			{
+				child.GetComponent<HierarchyComponent>().Parent = hierarchy.Parent;
+				oldParentChildren.push_back(child);
+			}
+
+			hierarchy.Children.clear();
+		}
+
+		// Set the new parent
+		hierarchy.Parent = parent;
+		parentHierarchy.Children.push_back(*this);
+
+		// Update the parent-child relationships
+		for (auto& child : hierarchy.Children)
+		{
+			child.GetComponent<HierarchyComponent>().Parent = *this;
+		}
+
+		glm::mat4 parentWorldTransform = TransformComponent::GetWorldTransform(parent);
+
+		// Construct the world transform based on local translation, rotation, and scale
+		glm::mat4 worldTransformWithParent = glm::translate(glm::mat4(1.0f), worldTranslation)
+			* glm::toMat4(glm::quat(worldRotation))  // Use worldRotation directly as it's in radians
+			* glm::scale(glm::mat4(1.0f), worldScale);
+
+		// Calculate the local transform by reversing the parent's world transform
+		glm::mat4 localTransform = glm::inverse(parentWorldTransform) * worldTransformWithParent;
+
+		glm::vec3 localTranslation, localRotation, localScale;
+		if (Math::DecomposeTransform(localTransform, localTranslation, localRotation, localScale))
+		{
+			LocalTranslation() = localTranslation;
+			LocalRotation() = localRotation;
+			LocalScale() = localScale;
+		}
+
+		return true;
+	}
+
 
 	void Entity::RemoveChild(Entity child)
 	{
@@ -196,6 +261,13 @@ namespace Cine
 			return;
 		}
 
+		auto& transform = Transform();
+
+		transform.Translation = Translation();
+		transform.Rotation = Rotation();
+		transform.Scale = Scale();
+
+
 		auto& parentHierarchy = hierarchy.Parent.GetComponent<HierarchyComponent>();
 
 		parentHierarchy.Children.erase(
@@ -203,7 +275,9 @@ namespace Cine
 			parentHierarchy.Children.end()
 		);
 
+
 		hierarchy.Parent = {};
+
 	}
 
 	Entity Entity::Clone()
