@@ -25,6 +25,8 @@ namespace Cine
 		SceneHierarchyPanel(const Ref<Scene>& scene);
 
 		void SetContext(const Ref<Scene>& scene);
+		void SetSelectedEntity(Entity entity);
+		void SetPropertiesEntity(Entity entity);
 
 		void OnImGuiRender();
 

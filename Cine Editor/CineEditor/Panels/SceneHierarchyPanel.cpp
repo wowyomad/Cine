@@ -196,6 +196,22 @@ namespace Cine
 		}
 	}
 
+	void SceneHierarchyPanel::SetSelectedEntity(Entity entity)
+	{
+		if (entity.IsValid())
+		{
+			m_Context.Selection = entity;
+		}
+	}
+
+	void SceneHierarchyPanel::SetPropertiesEntity(Entity entity)
+	{
+		if (entity.IsValid())
+		{
+			m_Context.Properties = entity;
+		}
+	}
+
 	void SceneHierarchyPanel::OnImGuiRender()
 	{
 		ImGui::Begin("Scene Hierarchy");

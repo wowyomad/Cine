@@ -72,7 +72,7 @@ namespace Cine
 			{
 			case SceneState::Play: m_ActiveScene->OnUpdateRuntime(ts); break;
 			case SceneState::Edit: case SceneState::Pause: m_ActiveScene->OnUpdateEditor(ts, m_EditorCamera); break;
-			}	
+			}
 		}
 
 		auto [mx, my] = ImGui::GetMousePos();
@@ -249,13 +249,13 @@ namespace Cine
 			Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
 			if (selectedEntity && selectedEntity.IsValid() && m_GizmoOperation > 0)
 			{
-				auto& hierachy = selectedEntity.GetComponent<HierarchyComponent>();	
+				auto& hierachy = selectedEntity.GetComponent<HierarchyComponent>();
 
 				ImGuizmo::SetDrawlist();
 				float windowWidth = static_cast<float>(ImGui::GetWindowWidth());
 				float windowHeight = static_cast<float>(ImGui::GetWindowHeight());
 				ImGuizmo::SetRect(m_ViewportBounds[0].x, m_ViewportBounds[0].y, m_ViewportBounds[1].x - m_ViewportBounds[0].x, m_ViewportBounds[1].y - m_ViewportBounds[0].y);
-				
+
 				const glm::mat4& cameraProjection = m_EditorCamera.GetProjection();
 				const glm::mat4& cameraView = m_EditorCamera.GetViewMatrix();
 
@@ -406,7 +406,7 @@ namespace Cine
 		}
 
 		m_ActiveScene = m_RuntimeScene;
-		ScriptEngine::Get().SetActiveRegistry(m_ActiveScene->GetRegistry()); 
+		ScriptEngine::Get().SetActiveRegistry(m_ActiveScene->GetRegistry());
 		m_ActiveScene->OnRuntimeStart();
 		m_ActiveScene->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
 
@@ -452,7 +452,7 @@ namespace Cine
 
 			m_ActiveScene = m_EditorScene;
 		}
-	
+
 	}
 	void EditorLayer::SaveSceneAs()
 	{
@@ -508,12 +508,22 @@ namespace Cine
 		if (m_IsRuntime) return false;
 
 		//Check for gizmo operation
+		if (m_GizmoOperation > -1)
+			return false;
 
 		if (m_HoveredEntity)
 		{
-			
+			if (m_SceneHierarchyPanel.GetSelectedEntity() == m_HoveredEntity)
+			{
+				m_SceneHierarchyPanel.SetPropertiesEntity(m_HoveredEntity);
+			}
+			else
+			{
+				m_SceneHierarchyPanel.SetSelectedEntity(m_HoveredEntity);
+			}
 		}
-		
+
+		return false;
 	}
 
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
@@ -558,7 +568,7 @@ namespace Cine
 				m_GuizmoMode = m_GuizmoMode == ImGuizmo::MODE::LOCAL ? ImGuizmo::MODE::WORLD : ImGuizmo::MODE::LOCAL;
 				break;
 			case Key::Q:
-				m_GizmoOperation = -1;
+				m_GizmoOperation = -1; //For future selection mode
 				break;
 			case Key::W:
 				m_GizmoOperation = ImGuizmo::OPERATION::TRANSLATE;
