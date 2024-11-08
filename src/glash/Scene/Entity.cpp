@@ -225,32 +225,34 @@ namespace Cine
 		for (auto&& [id, storage] : m_Scene->m_Registry.storage())
 		{
 			if (storage.type().hash() == entt::type_id<NativeScriptComponent>().hash())
-			{
 				continue;
-			}
-
 			if (storage.type().hash() == entt::type_id<IDComponent>().hash())
-			{
 				continue;
-			}
 
+			//???
 			if (storage.contains(m_EntityHandle))
 			{
-				//Contains 'script'
+				//Contains 'script' ('script'???)
 				if (storage.contains(clone))
 				{
 					storage.erase(clone);
 				}
 				storage.push(clone, storage.value(m_EntityHandle));
 			}
-
-			if (storage.type().hash() == entt::type_id<HierarchyComponent>().hash())
-			{
-				auto& cloneHierarchy = clone.GetComponent<HierarchyComponent>();
-				cloneHierarchy.Children = {};
-				cloneHierarchy.Parent = {};
-			}
 		}
+
+		//Clear hierarchy of clone
+		auto& cloneHierarchy = clone.GetComponent<HierarchyComponent>();
+		cloneHierarchy.Children = {};
+		cloneHierarchy.Parent = {};
+
+		if (clone.HasComponent<RigidBody2DComponent>())
+		{
+			auto& rb = clone.GetComponent<RigidBody2DComponent>();
+			rb.RuntimeBody = nullptr;
+			m_Scene->m_PhysicsSystem.AddRigidBody(clone);
+		}
+
 		return clone;
 	}
 

@@ -15,6 +15,9 @@ namespace Cine
 		static void Init();
 		static void Shutdown();
 		
+		static void StartBatch();
+		static void NextBatch();
+
 		//This can also be a system in the feature.
 		static void BeginScene(const Camera& camera, const glm::mat4& transform);
 		static void BeginScene(const EditorCamera& camera);

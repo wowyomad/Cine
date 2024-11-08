@@ -136,11 +136,7 @@ namespace Cine
 	{
 		CINE_PROFILE_FUNCTION();
 
-		uint32_t dataSize = (uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase;
-		s_Data.QuadVertexBuffer->SetData(s_Data.QuadVertexBufferBase, dataSize);
 		Renderer2D::Flush();
-
-		s_Data.Stats.DrawCalls += 1;
 	}
 
 	void Renderer2D::Flush()
@@ -148,15 +144,18 @@ namespace Cine
 		CINE_PROFILE_FUNCTION();
 
 		if (s_Data.QuadIndexCount == 0)
-		{
 			return;
-		}
+
+		uint32_t dataSize = (uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase;
+		s_Data.QuadVertexBuffer->SetData(s_Data.QuadVertexBufferBase, dataSize);
 
 		for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++)
 		{
 			s_Data.TextureSlots[i]->Bind(i);
 		}
+
 		RenderCommand::DrawIndexed(s_Data.QuadVertexArray, s_Data.QuadIndexCount);
+		s_Data.Stats.DrawCalls += 1;
 	}
 
 	void Renderer2D::Clear()
@@ -220,11 +219,7 @@ namespace Cine
 
 		if (s_Data.QuadIndexCount == s_Data.MaxIndices)
 		{
-			//TODO: NextBatch()
-			EndScene();
-			s_Data.QuadIndexCount = 0;
-			s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
-			DrawQuad(transform, color);
+			NextBatch();
 		}
 
 		constexpr size_t quadVertexCount = 4;
@@ -254,12 +249,7 @@ namespace Cine
 
 		if (s_Data.QuadIndexCount == s_Data.MaxIndices)
 		{
-			//TODO: NextBatch()
-			s_Data.Stats.DrawCalls += 1;
-			EndScene();
-			s_Data.QuadIndexCount = 0;
-			s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
-			DrawQuad(transform, texture, tiling, tintColor);
+			NextBatch();
 		}
 
 		constexpr size_t quadVertexCount = 4;
@@ -278,8 +268,7 @@ namespace Cine
 		{
 			if (s_Data.TextureSlotIndex >= s_Data.MaxTextureSlots)
 			{
-				//TODO: NextBatch();
-				DEBUG_BREAK;
+				NextBatch();
 			}
 			textureIndex = static_cast<float>(s_Data.TextureSlotIndex);
 			s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
@@ -307,12 +296,7 @@ namespace Cine
 
 		if (s_Data.QuadIndexCount == s_Data.MaxIndices)
 		{
-			//TODO: NextBatch()
-			s_Data.Stats.DrawCalls += 1;
-			EndScene();
-			s_Data.QuadIndexCount = 0;
-			s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
-			DrawQuad(transform, texture, texCoords, tintColor);
+			NextBatch();
 		}
 
 		constexpr size_t quadVertexCount = 4;
@@ -331,8 +315,7 @@ namespace Cine
 		{
 			if (s_Data.TextureSlotIndex >= s_Data.MaxTextureSlots)
 			{
-				//TODO: NextBatch();
-				DEBUG_BREAK;
+				NextBatch();
 			}
 			textureIndex = static_cast<float>(s_Data.TextureSlotIndex);
 			s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
@@ -375,5 +358,18 @@ namespace Cine
 		return s_Data.Stats;
 	}
 
+	void Renderer2D::StartBatch()
+	{
+		s_Data.QuadIndexCount = 0;
+		s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
+		
+		s_Data.TextureSlotIndex = 1;
+	}
+
+	void Renderer2D::NextBatch()
+	{
+		Flush();
+		StartBatch();
+	}
 
 }
