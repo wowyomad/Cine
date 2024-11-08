@@ -75,7 +75,6 @@ namespace Cine
 			}	
 		}
 
-
 		auto [mx, my] = ImGui::GetMousePos();
 		mx -= m_ViewportBounds[0].x;
 		my -= m_ViewportBounds[0].y;
@@ -84,10 +83,12 @@ namespace Cine
 		int mouseX = static_cast<int>(mx);
 		int mouseY = static_cast<int>(viewportSize.y - my); //flip Y coordinates
 
-		if (mouseX >= 0 && mouseY >= 0 && mouseX <= (int)viewportSize.x && mouseY <= (int)viewportSize.y)
+		if (mouseX > 0 && mouseY > 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y)
 		{
+			//Expensive call!
 			int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
-			CINE_CORE_INFO("Pixel Data: {0}", pixelData);
+			m_HoveredEntity = pixelData >= 0 ? (Entity(static_cast<entt::entity>(pixelData), m_ActiveScene.get())) : Entity();
+			CINE_CORE_TRACE("PIXELDATA: {0} ({1}, {2})", pixelData, mouseX, mouseY);
 		}
 
 		m_Framebuffer->Unbind();
@@ -103,6 +104,7 @@ namespace Cine
 
 		EventDispatcher dispatcher(event);
 		dispatcher.Dispatch<KeyPressedEvent>(CINE_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
+		dispatcher.Dispatch<MouseButtonPressedEvent>(CINE_BIND_EVENT_FN(EditorLayer::OnMousePressed));
 
 	}
 
@@ -178,6 +180,18 @@ namespace Cine
 		ImGui::Begin("Stats");
 		{
 			ImGui::Separator();
+
+			std::string hoveredEntityText;
+			if (m_HoveredEntity)
+			{
+				hoveredEntityText = m_HoveredEntity.GetComponent<TagComponent>().Tag + " (" + std::to_string(static_cast<uint32_t>(m_HoveredEntity)) + ")";
+			}
+			else
+			{
+				hoveredEntityText = "None";
+			}
+			ImGui::Text("Hovered Entity: %s", hoveredEntityText.c_str());
+
 			auto stats = Renderer2D::GetStats();
 			ImGui::Text("Draw Calls: %llu", stats.DrawCalls);
 			ImGui::Text("Quads: %llu", stats.QuadCount);
@@ -202,7 +216,11 @@ namespace Cine
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0.0f, 0.0f });
 		ImGui::Begin("Viewport");
 		{
-			auto viewportOffset = ImGui::GetCursorPos();
+			auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
+			auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
+			auto viewportOffset = ImGui::GetWindowPos();
+			m_ViewportBounds[0] = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
+			m_ViewportBounds[1] = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
 
 			m_ViewportFocused = ImGui::IsWindowFocused();
 			m_ViewportHovered = ImGui::IsWindowHovered();
@@ -213,15 +231,6 @@ namespace Cine
 
 			size_t id = m_Framebuffer->GetColorAttachmentRendererID();
 			ImGui::Image(reinterpret_cast<void*>(id), { m_ViewportSize.x, m_ViewportSize.y }, { 0, 1 }, { 1, 0 });
-
-			auto windowSize = ImGui::GetWindowSize();
-			ImVec2 minBound = ImGui::GetWindowPos();
-			minBound.x += viewportOffset.x;
-			//minBound.y += viewportOffset.y; //incorrect when flipped
-
-			ImVec2 maxBound = { minBound.x + windowSize.x, minBound.y + windowSize.y }; 
-			m_ViewportBounds[0] = { minBound.x, minBound.y };
-			m_ViewportBounds[1] = { maxBound.x, maxBound.y };
 
 			if (ImGui::BeginDragDropTarget())
 			{
@@ -245,8 +254,8 @@ namespace Cine
 				ImGuizmo::SetDrawlist();
 				float windowWidth = static_cast<float>(ImGui::GetWindowWidth());
 				float windowHeight = static_cast<float>(ImGui::GetWindowHeight());
-				ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
-				;
+				ImGuizmo::SetRect(m_ViewportBounds[0].x, m_ViewportBounds[0].y, m_ViewportBounds[1].x - m_ViewportBounds[0].x, m_ViewportBounds[1].y - m_ViewportBounds[0].y);
+				
 				const glm::mat4& cameraProjection = m_EditorCamera.GetProjection();
 				const glm::mat4& cameraView = m_EditorCamera.GetViewMatrix();
 
@@ -494,6 +503,19 @@ namespace Cine
 		return Internal::Input::IsKeyPressed(Key::LeftControl);
 	}
 
+	bool EditorLayer::OnMousePressed(MouseButtonPressedEvent& e)
+	{
+		if (m_IsRuntime) return false;
+
+		//Check for gizmo operation
+
+		if (m_HoveredEntity)
+		{
+			
+		}
+		
+	}
+
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
 	{
 		if (m_IsRuntime) return false;
@@ -594,4 +616,5 @@ namespace Cine
 		}
 		return false;
 	}
+
 }

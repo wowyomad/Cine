@@ -32,6 +32,7 @@ namespace Cine
 
 	private:
 		bool OnKeyPressed(KeyPressedEvent& e);
+		bool OnMousePressed(MouseButtonPressedEvent& e);
 		void DrawViewport();
 
 		void NewScene();
@@ -59,7 +60,6 @@ namespace Cine
 		Ref<Texture2D> m_IconPause;
 		Ref<Texture2D> m_IconStop;
 		
-
 		int32_t m_GizmoOperation = -1;
 		ImGuizmo::MODE m_GuizmoMode = ImGuizmo::MODE::LOCAL;
 		float m_SnapScale = 0.1f;
@@ -71,6 +71,8 @@ namespace Cine
 		glm::vec2 m_ViewportSize = { 0.0f, 0.0f };
 		bool m_ViewportFocused = true;
 		bool m_ViewportHovered = true;
+
+		Entity m_HoveredEntity;
 
 		std::filesystem::path m_ScenePath = "Assets/Scenes/Example.cine";
 

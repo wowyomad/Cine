@@ -106,11 +106,11 @@ namespace Cine
 					CINE_CORE_WARN("SpriteFrameIndex ({}) >= spriteSheet.Frames.size ({})", sprite.SpriteIndex, spriteSheet.Frames.size());
 					continue;
 				}
-				Renderer2D::DrawSprite(transform.CachedMatrix, spriteSheet, sprite.SpriteIndex, sprite.Color);
+				Renderer2D::DrawSprite(transform.CachedMatrix, spriteSheet, sprite.SpriteIndex, static_cast<int32_t>(entity), sprite.Color);
 			}
 			else
 			{
-				Renderer2D::DrawQuad(transform.CachedMatrix, sprite.Color);
+				Renderer2D::DrawQuad(transform.CachedMatrix, sprite.Color, static_cast<int32_t>(entity));
 			}
 		}
 
@@ -128,11 +128,11 @@ namespace Cine
 					CINE_CORE_WARN("SpriteFrameIndex ({}) >= spriteSheet.Frames.size ({})", sprite.SpriteIndex, spriteSheet.Frames.size());
 					continue;
 				}
-				Renderer2D::DrawSprite(transform.CachedMatrix, spriteSheet, sprite.SpriteIndex, sprite.Color);
+				Renderer2D::DrawSprite(transform.CachedMatrix, spriteSheet, sprite.SpriteIndex, static_cast<int32_t>(entity), sprite.Color);
 			}
 			else
 			{
-				Renderer2D::DrawQuad(transform.CachedMatrix, sprite.Color);
+				Renderer2D::DrawQuad(transform.CachedMatrix, sprite.Color, static_cast<int32_t>(entity));
 			}
 		}
 	}

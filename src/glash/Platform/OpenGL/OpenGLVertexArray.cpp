@@ -50,9 +50,31 @@ namespace Cine
 		
 		for (auto& element : layout)
 		{
-			glEnableVertexAttribArray(m_VertexBufferIndex);
-			glVertexAttribPointer(m_VertexBufferIndex, element.GetCount(), ShaderDataTypeToOpenGLEnumType(element.Type), element.Normalized, layout.Stride(), (void*)(uintptr_t)element.Offset);
-			m_VertexBufferIndex++;
+			switch (element.Type)
+			{
+			case ShaderDataType::Int:
+			case ShaderDataType::Int2:
+			case ShaderDataType::Int3:
+			case ShaderDataType::Int4:
+			{
+				glEnableVertexAttribArray(m_VertexBufferIndex);
+				glVertexAttribIPointer(m_VertexBufferIndex, element.GetCount(), ShaderDataTypeToOpenGLEnumType(element.Type), layout.Stride(), (void*)(uintptr_t)element.Offset);
+				m_VertexBufferIndex++;
+			} break;
+
+			case ShaderDataType::Float:
+			case ShaderDataType::Float2:
+			case ShaderDataType::Float3:
+			case ShaderDataType::Float4:
+			case ShaderDataType::Mat4:
+			{
+				glEnableVertexAttribArray(m_VertexBufferIndex);
+				glVertexAttribPointer(m_VertexBufferIndex, element.GetCount(), ShaderDataTypeToOpenGLEnumType(element.Type), element.Normalized, layout.Stride(), (void*)(uintptr_t)element.Offset);
+				m_VertexBufferIndex++;
+			} break;
+
+			}
+			
 		}
 
 		m_VertexBuffers.push_back(vertexBuffer);

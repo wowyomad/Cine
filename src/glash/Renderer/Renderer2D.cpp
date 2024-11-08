@@ -18,6 +18,8 @@ namespace Cine
 
 		float Tiling;
 		float TexIndex;
+
+		int EntityID;
 	};
 
 	struct Renderer2DData
@@ -54,13 +56,12 @@ namespace Cine
 
 		s_Data.QuadVertexBuffer = VertexBuffer::Create(s_Data.MaxVertices * sizeof(QuadVertex));
 		s_Data.QuadVertexBuffer->SetLayout({
-			{ ShaderDataType::Float3, "a_Position" },
-			{ ShaderDataType::Float4, "a_Color"},
-			{ ShaderDataType::Float2, "a_TexCoord"},
-			{ ShaderDataType::Float, "a_TexIndex"},
-			{ ShaderDataType::Float, "a_Tiling"},
-
-
+			{ ShaderDataType::Float3,	"a_Position" },
+			{ ShaderDataType::Float4,	"a_Color"},
+			{ ShaderDataType::Float2,	"a_TexCoord"},
+			{ ShaderDataType::Float,	"a_TexIndex"},
+			{ ShaderDataType::Float,	"a_Tiling"},
+			{ ShaderDataType::Int,		"a_EntityID"},
 			});
 		s_Data.QuadVertexArray->AddVertexBuffer(s_Data.QuadVertexBuffer);
 
@@ -213,7 +214,7 @@ namespace Cine
 		DrawQuad(transform, texture, tiling, tintColor);
 	}
 
-	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color)
+	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color, int entityID)
 	{
 		CINE_PROFILE_FUNCTION();
 
@@ -235,6 +236,7 @@ namespace Cine
 			s_Data.QuadVertexBufferPtr->TexCoord = textureCoord[i];
 			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
 			s_Data.QuadVertexBufferPtr->Tiling = tiling;
+			s_Data.QuadVertexBufferPtr->EntityID = entityID;
 			s_Data.QuadVertexBufferPtr++;
 		}
 
@@ -290,7 +292,7 @@ namespace Cine
 		s_Data.Stats.QuadCount++;
 	}
 
-	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, const std::array<glm::vec2, 4>& texCoords, const glm::vec4& tintColor)
+	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, const std::array<glm::vec2, 4>& texCoords, int entityID, const glm::vec4& tintColor)
 	{
 		CINE_PROFILE_FUNCTION();
 
@@ -329,6 +331,7 @@ namespace Cine
 			s_Data.QuadVertexBufferPtr->TexCoord = texCoords[i];
 			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
 			s_Data.QuadVertexBufferPtr->Tiling = 1.0f;
+			s_Data.QuadVertexBufferPtr->EntityID = entityID;
 			s_Data.QuadVertexBufferPtr++;
 		}
 
@@ -339,11 +342,16 @@ namespace Cine
 
 	void Renderer2D::DrawSprite(const glm::mat4& transform, const SpriteSheetComponent& spriteSheet, uint32_t spriteIndex, const glm::vec4& tintColor)
 	{
+		DrawSprite(transform, spriteSheet, spriteIndex, -1);
+	}
+
+	void Renderer2D::DrawSprite(const glm::mat4& transform, const SpriteSheetComponent& spriteSheet, uint32_t spriteIndex, int entityID, const glm::vec4& tintColor)
+	{
 		float width = spriteSheet.Texture->GetWidth();
 		float height = spriteSheet.Texture->GetHeight();
 		SpriteSheetComponent::Frame frame = spriteSheet.Frames[spriteIndex];
 
-		DrawQuad(transform, spriteSheet.Texture, frame.Coords, tintColor);
+		DrawQuad(transform, spriteSheet.Texture, frame.Coords, entityID, tintColor);
 	}
 
 

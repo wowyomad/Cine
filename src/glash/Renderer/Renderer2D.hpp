@@ -38,11 +38,12 @@ namespace Cine
 		static void DrawRotatedQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, float tiling = 1.0f, const glm::vec4& tint = glm::vec4(1.0f));
 
 		//mat4
-		static void DrawQuad(const glm::mat4& transform, const glm::vec4& color);
+		static void DrawQuad(const glm::mat4& transform, const glm::vec4& color, int entityID = -1);
 		static void DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, float tiling = 1.0f, const glm::vec4& tint = glm::vec4(1.0f));
-		static void DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, const std::array<glm::vec2, 4>& texCoords, const glm::vec4& tint = glm::vec4(1.0f));
+		static void DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, const std::array<glm::vec2, 4>& texCoords, int entityID, const glm::vec4& tint = glm::vec4(1.0f));
 
 		static void DrawSprite(const glm::mat4& transform, const SpriteSheetComponent& spriteSheet, uint32_t spriteIndex, const glm::vec4& tint = glm::vec4(1.0f));
+		static void DrawSprite(const glm::mat4& transform, const SpriteSheetComponent& spriteSheet, uint32_t spriteIndex, int entityID, const glm::vec4& tint = glm::vec4(1.0f));
 
 	public:
 		struct Statistics
