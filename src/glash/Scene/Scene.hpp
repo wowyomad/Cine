@@ -102,6 +102,12 @@ namespace Cine
 				component.Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight); //Shoudl it be here?
 			}
 
+			if constexpr (std::is_same<Component, SpriteRendererComponent>::value)
+			{
+				m_Registry.emplace_or_replace<SpriteComponent>(entity);
+				m_Registry.emplace_or_replace<SpriteSheetComponent>(entity);
+			}
+
 			if constexpr (std::is_same<Component, RigidBody2DComponent>::value)
 			{
 				if (!m_Registry.any_of<BoxCollider2DComponent>(entity))
