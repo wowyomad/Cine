@@ -11,20 +11,24 @@ public:
 
     void OnCreate() override
     {
-        self = m_Entity;
-        CINE_LOG_INFO("Constructed {0:0x} for {1}", (size_t)this, (uint32_t)self);
+        CINE_LOG_INFO("Constructed {0:0x} for {1}", (size_t)this, (uint32_t)m_Entity);
     }
 
     void OnUpdate(Timestep ts) override
     {
         m_Time += ts;
-
+        int id = (uint32_t)m_Entity;
+        if (id == 8)
+        {
+            std::cout << "Destroyed " << Destroyed << std::endl;
+        }
         if (!Destroyed && m_Time >= TimeToDestruction)
         {
+
             std::cout << "\n";
-            CINE_LOG_WARN("Self Destructing entity {0} in {1:0x}", (uint32_t)self, (size_t)this);
+            CINE_LOG_WARN("Self Destructing entity {0} in {1:0x}", (uint32_t)m_Entity, (size_t)this);
             std::cout << "\n";
-            self.Destroy();
+            m_Entity.Destroy();
             Destroyed = true;
         }
     }
@@ -34,9 +38,12 @@ public:
     {
         if (this == &other)
             return *this;
+
         m_Time = other.m_Time;
         TimeToDestruction = other.TimeToDestruction;
+        Destroyed = other.Destroyed;
 
+        NativeScript::operator=(other);
         return *this;
     }
 
@@ -44,7 +51,6 @@ private:
     float m_Time = 0.0f;
     float TimeToDestruction = 10.0f;
     bool Destroyed = false;
-    Entity self;
 
     SERIALIZE_CLASS(SelfDestructionScript,
         FIELD(m_Time)

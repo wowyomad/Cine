@@ -240,13 +240,15 @@ namespace Cine
 
 	void Physics2DSystem::AddRigidBody(Entity entity)
 	{
-		if (!m_PhysicsWorld) return;
-
-		auto& transform = entity.Transform();
 		if (!entity.HasComponent<RigidBody2DComponent>())
 		{
 			entity.AddComponent<RigidBody2DComponent>();
 		}
+
+		if (!m_PhysicsWorld) return;
+
+		auto& transform = entity.Transform();
+		
 		auto& rb = entity.GetComponent<RigidBody2DComponent>();
 
 		b2BodyDef bodyDef;

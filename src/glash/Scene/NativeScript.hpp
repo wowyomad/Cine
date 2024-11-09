@@ -86,7 +86,7 @@ namespace Cine
 		}
 
 
-	private:
+	protected:
 		Entity m_Entity;
 
 
