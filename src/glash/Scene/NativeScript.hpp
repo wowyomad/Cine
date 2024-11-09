@@ -57,6 +57,8 @@ namespace Cine
 			return reference.Clone();
 		}
 
+		TransformComponent& Transform() { return m_Entity.Transform(); }
+
 		glm::vec3& LocalTranslation()
 		{
 			return m_Entity.LocalTranslation();
