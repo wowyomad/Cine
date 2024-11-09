@@ -225,8 +225,8 @@ void SetActiveRegistry(entt::registry& registry)
 
 void SetLoggers(std::shared_ptr<spdlog::logger>* coreLoggerPtr, std::shared_ptr<spdlog::logger>* clientLoggerPtr)
 {
-	Log::SetCoreLogger(*coreLoggerPtr));
-	Log::SetClientLogger(*clientLoggerPtr));
+	Log::SetCoreLogger(*coreLoggerPtr);
+	Log::SetClientLogger(*clientLoggerPtr);
 }
 
 

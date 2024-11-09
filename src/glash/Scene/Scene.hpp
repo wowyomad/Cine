@@ -110,7 +110,7 @@ namespace Cine
 				}
 			}
 
-			if constexpr (std::is_same<Component, RigidBody2DComponent>::value)
+			if constexpr (std::is_same<Component, BoxCollider2DComponent>::value)
 			{
 				m_PhysicsSystem.AddRigidBody(Entity(entity, this));
 			}
