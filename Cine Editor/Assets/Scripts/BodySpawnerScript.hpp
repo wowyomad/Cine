@@ -1,6 +1,7 @@
 #pragma once
 #include "include/ScriptCore.hpp"
 
+#include "ColorScript.hpp"
 #include "SelfDestructionScript.hpp"
 
 using namespace Cine;
@@ -21,6 +22,7 @@ public:
         entity.AddComponent<BoxCollider2DComponent>();
         entity.AddComponent<SpriteRendererComponent>();
         entity.AddComponent<SelfDestructionScript>(EntityLifeTime);
+        entity.AddComponent<ColorScript>();
 
         if (!name.empty())
             entity.GetComponent<TagComponent>().Tag = name;
