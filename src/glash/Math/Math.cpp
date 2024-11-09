@@ -78,5 +78,27 @@ namespace Cine
 
 			return true;
 		}
+		bool IsInteger(const std::string& str) {
+			if (str.empty()) return false;
+			for (char c : str) {
+				if (!std::isdigit(c) && c != '-') return false;
+			}
+			return true;
+		}
+
+		bool IsFloat(const std::string& str) {
+			bool dotSeen = false;
+			if (str.empty()) return false;
+			for (size_t i = 0; i < str.size(); ++i) {
+				if (str[i] == '.') {
+					if (dotSeen) return false;
+					dotSeen = true;
+				}
+				else if (!std::isdigit(str[i]) && !(i == 0 && str[i] == '-')) {
+					return false;
+				}
+			}
+			return true;
+		}
 	}
 }

@@ -121,6 +121,31 @@ namespace Cine
 				m_PhysicsSystem.AddRigidBody(Entity(entity, this));
 			}
 
+			if constexpr (std::is_base_of<NativeScript, Component>::value)
+			{
+				//Temporarily taken from Scripts!
+				bool hasNativeScriptComponent = m_Registry.all_of<NativeScriptComponent>(entity);
+				if (!hasNativeScriptComponent)
+				{
+					m_Registry.emplace<NativeScriptComponent>(entity);
+				}
+				auto& nsc = m_Registry.get<NativeScriptComponent>(entity);
+				auto instantiateScript = [entity]() -> NativeScript*
+					{
+						return static_cast<Cine::NativeScript*>(&m_Registry.get<Component>(entity));
+					};
+				auto removeScript = [entity]() -> void
+					{
+						if (m_Registry.valid(entity) && m_Registry.all_of<Component>(entity))
+						{
+							m_Registry.get<Component>(entity).OnDestroy();
+							m_Registry.remove<Component>(entity);
+						}
+					};
+				nsc.Bind<Component>(instantiateScript, removeScript);
+				//
+			}
+
 			CINE_CORE_TRACE("Added component '{}' to entity '{}'", Utils::GetClassTypename<Component>(), static_cast<uint32_t>(entity));
 
 		}

@@ -175,7 +175,7 @@ namespace Cine
 		m_Context.Selection = {};
 		m_Context.Properties = {};
 
-		if (selection)
+		if (selection && selection.IsValid())
 		{
 			UUID selectedEntityID = selection.GetID();
 			Entity selectedEntity = m_Context.Scene->GetEntityById(selectedEntityID);
@@ -185,7 +185,7 @@ namespace Cine
 			}
 		}
 
-		if (properties)
+		if (properties && properties.IsValid())
 		{
 			UUID propertiesEntityID = properties.GetID();
 			Entity propertiesEntity = m_Context.Scene->GetEntityById(propertiesEntityID);
@@ -872,24 +872,13 @@ namespace Cine
 								float floatValue = 0.0f;
 								bool isInt = false, isFloat = false;
 
-								if (!stringValue.contains('.'))
-								{
-									try
-									{
-										intValue = std::stoi(stringValue);
-										isInt = true;
-									}
-									catch (const std::exception&) {}
+								if (Math::IsInteger(stringValue)) {
+									intValue = std::stoi(stringValue);
+									isInt = true;
 								}
-								else
-								{
-									try
-									{
-										floatValue = std::stof(stringValue);
-										isFloat = true;
-									}
-									catch (const std::exception&) {}
-
+								else if (Math::IsFloat(stringValue)) {
+									floatValue = std::stof(stringValue);
+									isFloat = true;
 								}
 
 								bool valueChanged = false;
