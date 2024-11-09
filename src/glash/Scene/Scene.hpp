@@ -137,6 +137,8 @@ namespace Cine
 		friend class SceneHierarchyPanel;
 		friend class SceneSerializer;
 		friend class Physics2DSystem;
+		friend class NativeScript;
+
 	};
 
 }
