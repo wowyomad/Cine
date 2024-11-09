@@ -38,8 +38,8 @@ namespace Cine
 		template <class Component, class... Args>
 		Component& AddComponent(Args&&... args)
 		{
-			CINE_CORE_ASSERT(!HasComponent<Component>(), "Entity already has component {}", typeid(Component).name());
-			Component& component = m_Scene->m_Registry.emplace<Component>(m_EntityHandle, std::forward<Args>(args)...);
+			//CINE_CORE_ASSERT(!HasComponent<Component>(), "Entity already has component {}", typeid(Component).name());
+			Component& component = m_Scene->m_Registry.emplace_or_replace<Component>(m_EntityHandle, std::forward<Args>(args)...);
 			m_Scene->OnComponentAdded<Component>(*this, component);
 			return component;
 		}
@@ -47,9 +47,9 @@ namespace Cine
 		template <class... Components>
 		std::tuple<Components&...>  AddComponents()
 		{
-			CINE_CORE_ASSERT(!HasComponents<Components...>(), "Entity already has one or more components");
+			//CINE_CORE_ASSERT(!HasComponents<Components...>(), "Entity already has one or more components");
 			std::tuple<Components&...> components = std::tuple<Components&...>(
-				m_Scene->m_Registry.emplace<Components>(m_EntityHandle)...
+				m_Scene->m_Registry.emplace_or_replace<Components>(m_EntityHandle)...
 			);
 			(m_Scene->OnComponentAdded<Components>(*this, std::get<Components&>(components)), ...);
 			return components;

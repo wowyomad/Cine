@@ -243,6 +243,10 @@ namespace Cine
 		if (!m_PhysicsWorld) return;
 
 		auto& transform = entity.Transform();
+		if (!entity.HasComponent<RigidBody2DComponent>())
+		{
+			entity.AddComponent<RigidBody2DComponent>();
+		}
 		auto& rb = entity.GetComponent<RigidBody2DComponent>();
 
 		b2BodyDef bodyDef;

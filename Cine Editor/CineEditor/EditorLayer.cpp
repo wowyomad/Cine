@@ -181,7 +181,7 @@ namespace Cine
 			ImGui::Separator();
 
 			std::string hoveredEntityText;
-			if (m_HoveredEntity)
+			if (m_HoveredEntity && m_HoveredEntity.IsValid())
 			{
 				hoveredEntityText = m_HoveredEntity.GetComponent<TagComponent>().Tag + " (" + std::to_string(static_cast<uint32_t>(m_HoveredEntity)) + ")";
 			}
