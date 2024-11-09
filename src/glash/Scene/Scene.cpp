@@ -272,6 +272,11 @@ namespace Cine
 	{
 		for (auto e : m_ToDestroyEntities)
 		{
+			if (!m_Registry.all_of<HierarchyComponent>(e))
+			{
+				continue;
+			}
+
 			auto& hierarchy = m_Registry.get<HierarchyComponent>(e);
 			Entity entity = { e, this };
 
@@ -292,10 +297,17 @@ namespace Cine
 			{
 				m_PhysicsSystem.RemoveRigidBody(Entity(e, this));
 			}
-
-			m_Registry.destroy(entity);
+			for (auto [id, storage] : m_Registry.storage()) {
+				storage.remove(e);
+			}
 		}
-		m_ToDestroyEntities.clear();
+		if (m_ToDestroyEntities.size() >= 0x100000)
+		{
+			for (auto e : m_ToDestroyEntities)
+			{
+				m_Registry.destroy(e);
+			}
+		}
 	}
 
 

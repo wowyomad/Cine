@@ -132,10 +132,12 @@ namespace Cine
 				auto& nsc = m_Registry.get<NativeScriptComponent>(entity);
 				auto instantiateScript = [&, entity]() -> NativeScript*
 					{
+						CINE_CORE_INFO("Instantiating Script {0} in {1}", Utils::GetClassTypename<Component>(), (uint32_t)entity);
 						return static_cast<Cine::NativeScript*>(&m_Registry.get<Component>(entity));
 					};
 				auto removeScript = [&, entity]() -> void
 					{
+						CINE_CORE_INFO("Removing Script {0} from {1}", Utils::GetClassTypename<Component>(), (uint32_t)entity);
 						if (m_Registry.valid(entity) && m_Registry.all_of<Component>(entity))
 						{
 							m_Registry.get<Component>(entity).OnDestroy();
