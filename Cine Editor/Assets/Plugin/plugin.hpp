@@ -49,4 +49,5 @@ extern "C" {
     );
 
     EXPORT void SetActiveRegistry(entt::registry& registry);
+    EXPORT void SetLoggers(std::shared_ptr<spdlog::logger>* coreLoggerPtr, std::shared_ptr<spdlog::logger>* clientLoggerPtr);
 }

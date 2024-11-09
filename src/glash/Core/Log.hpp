@@ -82,6 +82,10 @@ namespace Cine
 		static std::shared_ptr<spdlog::logger>& GetCoreLogger(); 
 		static std::shared_ptr<spdlog::logger>& GetClientLogger();
 
+		static void SetClientLogger(std::shared_ptr<spdlog::logger>& logger) { s_CoreLogger = logger; }
+		static void SetCoreLogger(std::shared_ptr<spdlog::logger>& logger) { s_ClientLogger = logger; };
+
+
 	private:
 		static std::shared_ptr<spdlog::logger> s_CoreLogger;
 		static std::shared_ptr<spdlog::logger> s_ClientLogger;

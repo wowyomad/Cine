@@ -34,6 +34,7 @@ namespace Cine
 		using DeserializeComponentCall = void(*)(entt::entity entity, const std::string& componentName, YAML::Node& node);
 		using GetComponentsDataCall = ComponentsDataC(*)();
 		using SetActiveRegistryCall = void(*)(entt::registry&);
+		using SetLoggersCall = void(*)(std::shared_ptr<spdlog::logger>*, std::shared_ptr<spdlog::logger>*);
 		using InitializeInputCall =  void(*)
 		(
 			KeyInputFunction,
@@ -83,6 +84,7 @@ namespace Cine
 			DeserializeComponentCall DeserializeComponent;
 			InitializeInputCall InitializeInput;
 			SetActiveRegistryCall SetActiveRegistry;
+			SetLoggersCall SetLoggers;
 		};
 
 	private:

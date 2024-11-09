@@ -44,6 +44,7 @@ namespace Cine
 	void ScriptEngine::InitializeComponents(entt::registry& registry)
 	{
 		m_LibraryCalls.InitializeComponents(registry);
+		m_LibraryCalls.SetLoggers(&Log::GetCoreLogger(), &Log::GetClientLogger());
 		m_LibraryCalls.InitializeInput
 		(
 			Internal::Input::IsKeyPressed,
@@ -103,6 +104,7 @@ namespace Cine
 		m_LibraryCalls.GetComponentsData = m_Library.GetFunction<GetComponentsDataCall>("GetComponentsData");
 		m_LibraryCalls.SetActiveRegistry = m_Library.GetFunction<SetActiveRegistryCall>("SetActiveRegistry");
 		m_LibraryCalls.InitializeInput = m_Library.GetFunction<InitializeInputCall>("InitializeInput");
+		m_LibraryCalls.SetLoggers = m_Library.GetFunction<SetLoggersCall>("SetLoggers");
 		
 		bool allSet = m_LibraryCalls.InitializeComponents
 			&& m_LibraryCalls.CreateComponent
@@ -112,7 +114,8 @@ namespace Cine
 			&& m_LibraryCalls.DeserializeComponent
 			&& m_LibraryCalls.SetActiveRegistry
 			&& m_LibraryCalls.GetComponentsData
-			&& m_LibraryCalls.InitializeInput;
+			&& m_LibraryCalls.InitializeInput
+			&& m_LibraryCalls.SetLoggers;
 		
 		CINE_CORE_ASSERT(allSet, "Some of the library function weren't initialized");
 

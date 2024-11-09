@@ -223,6 +223,13 @@ void SetActiveRegistry(entt::registry& registry)
 	s_Registry = &registry;
 }
 
+void SetLoggers(std::shared_ptr<spdlog::logger>* coreLoggerPtr, std::shared_ptr<spdlog::logger>* clientLoggerPtr)
+{
+	Log::SetCoreLogger(*coreLoggerPtr));
+	Log::SetClientLogger(*clientLoggerPtr));
+}
+
+
 YAML::Node SerializeComponent(entt::entity entity, const std::string& componentName)
 {
 	auto it = Serializers.find(componentName);
