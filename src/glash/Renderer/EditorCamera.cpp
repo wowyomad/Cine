@@ -39,12 +39,12 @@ namespace Cine
 		return { xFactor, yFactor };
 	}
 
-	float EditorCamera::RotationSpeed() const
+	float EditorCamera::GetRotationSpeed() const
 	{
 		return 0.8f;
 	}
 
-	float EditorCamera::ZoomSpeed() const
+	float EditorCamera::GetZoomSpeed() const
 	{
 		float distance = m_Distance * 0.2f;
 		distance = std::max(distance, 0.0f);
@@ -73,6 +73,34 @@ namespace Cine
 		UpdateView();
 	}
 
+	void EditorCamera::SetPosition(glm::vec3 position)
+	{
+		m_Position = position;
+	}
+
+	void EditorCamera::SetVocalPoint(glm::vec3 focalPoint)
+	{
+		m_FocalPoint = focalPoint;
+	}
+
+	void EditorCamera::SetYaw(float yaw)
+	{
+		m_Yaw = yaw;
+	}
+
+	void EditorCamera::SetPitch(float pitch)
+	{
+		m_Pitch = pitch;
+	}
+
+	void EditorCamera::Reset()
+	{
+		m_Position = { 0.0f, 0.0f, 0.0f };
+		m_FocalPoint = { 0.0f, 0.0f, 0.0f };
+		m_Yaw = 0.0f;
+		m_Pitch = 0.0f;
+	}
+
 	void EditorCamera::OnEvent(Event& e)
 	{
 		EventDispatcher dispatcher(e);
@@ -97,13 +125,13 @@ namespace Cine
 	void EditorCamera::MouseRotate(const glm::vec2& delta)
 	{
 		float yawSign = GetUpDirection().y < 0 ? -1.0f : 1.0f;
-		m_Yaw += yawSign * delta.x * RotationSpeed();
-		m_Pitch += delta.y * RotationSpeed();
+		m_Yaw += yawSign * delta.x * GetRotationSpeed();
+		m_Pitch += delta.y * GetRotationSpeed();
 	}
 
 	void EditorCamera::MouseZoom(float delta)
 	{
-		m_Distance -= delta * ZoomSpeed();
+		m_Distance -= delta * GetZoomSpeed();
 		if (m_Distance < 1.0f)
 		{
 			m_FocalPoint += GetForwardDirection();

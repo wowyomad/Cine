@@ -36,6 +36,12 @@ namespace Cine
 		float GetPitch() const { return m_Pitch; }
 		float GetYaw() const { return m_Yaw; }
 
+		void SetPosition(glm::vec3 position);
+		void SetVocalPoint(glm::vec3 focalPoint);
+		void SetYaw(float yaw);
+		void SetPitch(float pitch);
+		void Reset();
+
 	private:
 		void UpdateProjection();
 		void UpdateView();
@@ -49,8 +55,8 @@ namespace Cine
 		glm::vec3 CalculatePosition() const;
 
 		std::pair<float, float> PanSpeed() const;
-		float RotationSpeed() const;
-		float ZoomSpeed() const;
+		float GetRotationSpeed() const;
+		float GetZoomSpeed() const;
 
 	private:
 		float m_FOV = 45.0f, m_AspectRatio = 1.778f, m_NearClip = 0.1f, m_FarClip = 1000.0f;

@@ -556,6 +556,11 @@ namespace Cine
 			if (control && shift)
 				SaveSceneAs();
 		} break;
+		case Key::KP0:
+		{
+			m_EditorCamera.Reset();
+		} break;
+
 		}
 
 		//Gizmos

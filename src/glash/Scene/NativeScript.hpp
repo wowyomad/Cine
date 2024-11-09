@@ -7,6 +7,9 @@ namespace Cine
 {
 	class NativeScript
 	{
+		friend class Scene;
+		friend class Entity;
+
 	public:
 		NativeScript() = default;
 		NativeScript(const NativeScript&) = default;
@@ -45,9 +48,21 @@ namespace Cine
 		virtual void OnTriggerExit(Entity other) { }
 
 
+		Entity CreateEntity()
+		{
+			return m_Entity.m_Scene->CreateEntity();
+		}
+
+		Entity CreateEntity(Entity reference)
+		{
+			return reference.Clone();
+		}
+
+
 	private:
 		Entity m_Entity;
-		friend class Scene;
+
+
 
 	public:
 		bool Enabled = true;
