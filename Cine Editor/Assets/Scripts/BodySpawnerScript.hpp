@@ -1,5 +1,5 @@
 #pragma once
-#include "include/Base.hpp"
+#include "include/ScriptCore.hpp"
 
 using namespace Cine;
 
@@ -14,7 +14,7 @@ class BodySpawnerScript : public NativeScript
         void SpawnEntity()
         {
                 Entity entity = CreateEntity();
-                entity.Translation() = GetComponent<TransformComponent>().Translation;
+                entity.LocalTranslation() = GetCom
                 entity.AddComponent<BoxCollider2DComponent>();
                 entity.AddComponent<SpriteRendererComponent>();
         }

@@ -1,5 +1,5 @@
 #pragma once
-#include "include/Base.hpp"
+#include "include/ScriptCore.hpp"
 #include "input.hpp"
 
 #include <iostream>

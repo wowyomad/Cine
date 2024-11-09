@@ -47,7 +47,6 @@ namespace Cine
 		virtual void OnTriggerEnter(Entity other) { }
 		virtual void OnTriggerExit(Entity other) { }
 
-
 		Entity CreateEntity()
 		{
 			return m_Entity.m_Scene->CreateEntity();
@@ -56,6 +55,32 @@ namespace Cine
 		Entity CreateEntity(Entity reference)
 		{
 			return reference.Clone();
+		}
+
+		glm::vec3& LocalTranslation()
+		{
+			return m_Entity.LocalTranslation();
+		}
+		glm::vec3& LocalRotation()
+		{
+			return m_Entity.LocalRotation();
+		}
+		glm::vec3& LocalScale()
+		{
+			return m_Entity.LocalRotation();
+		}
+
+		glm::vec3 Translation()
+		{
+			return m_Entity.Translation();
+		}
+		glm::vec3 Rotation()
+		{
+			return m_Entity.Rotation();
+		}
+		glm::vec3 Scale()
+		{
+			return m_Entity.Scale();
 		}
 
 
