@@ -133,6 +133,11 @@ namespace Cine
 
 		~NativeScriptComponent()
 		{
+			
+		}
+
+		void Clear()
+		{
 			for (auto& script : Scripts)
 			{
 				if (script.RemoveScript)
@@ -141,7 +146,6 @@ namespace Cine
 				};
 			}
 		}
-
 
 		template <class T>
 		void Bind(std::function<NativeScript* ()> instantiateScript, std::function<void()> removeScript)

@@ -83,7 +83,7 @@ void OnComponentAdded(entt::entity entity)
 {
 	if constexpr (std::is_base_of<NativeScript, Component>::value)
 	{
-		std::cout << "Adding Script " << Utils::GetClassTypename<Component>() << " to " << static_cast<uint32_t>(entity) << " in registry " << s_Registry << '\n';
+		CINE_LOG_INFO("Adding to registry {0} for {1}", Utils::GetClassTypename<Component>(), (uint32_t)entity);
 		auto& component = s_Registry->emplace_or_replace<Component>(entity);
 
 		bool hasNativeScriptComponent = s_Registry->all_of<NativeScriptComponent>(entity);
@@ -92,16 +92,13 @@ void OnComponentAdded(entt::entity entity)
 			s_Registry->emplace<NativeScriptComponent>(entity);
 		}
 		auto& nsc = s_Registry->get<NativeScriptComponent>(entity);
-		auto instantiateScript = [entity]() -> NativeScript*
+		auto instantiateScript = [entity, &component]() -> NativeScript*
 			{
-				std::cout << "Instantiating Script " << Utils::GetClassTypename<Component>() << "(" << entt::type_id<Entity>().hash() << ", " << entt::type_id<Entity>().index() << ")" << " for entity " << static_cast<uint32_t>(entity) << " at " << s_Registry << "\n";
- 
-				return static_cast<Cine::NativeScript*>(&s_Registry->get<Component>(entity));
+				return (NativeScript*)&component;
+				//return static_cast<Cine::NativeScript*>(&s_Registry->get<Component>(entity));
 			};
-		auto removeScript = [entity]() -> void
+		auto removeScript = [entity, &component]() -> void
 			{
-				std::cout << "Removing Script " << Utils::GetClassTypename<Component>() << "(" << entt::type_id<Entity>().hash() << ", " << entt::type_id<Entity>().index() << ")" << " for entity " << static_cast<uint32_t>(entity) << " at " << s_Registry << "\n";
-
 				if (s_Registry->valid(entity) && s_Registry->all_of<Component>(entity))
 				{
 					s_Registry->get<Component>(entity).OnDestroy();

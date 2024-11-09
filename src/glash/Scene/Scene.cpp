@@ -219,6 +219,7 @@ namespace Cine
 				{
 					if (!script.Instance)
 					{
+						CINE_CORE_INFO("Instantiating script {0} for {1}", script.Name, (uint32_t)entity);
 						Entity e{ entity, this };
 						script.Instance = script.InstantiateScript();
 						script.Instance->m_Entity = Entity(entity, this);
@@ -272,7 +273,7 @@ namespace Cine
 	{
 		for (auto e : m_ToDestroyEntities)
 		{
-			if (!m_Registry.all_of<HierarchyComponent>(e))
+			if (e == entt::null || !m_Registry.valid(e))
 			{
 				continue;
 			}
@@ -300,14 +301,9 @@ namespace Cine
 			for (auto [id, storage] : m_Registry.storage()) {
 				storage.remove(e);
 			}
+			m_Registry.destroy(e);
 		}
-		if (m_ToDestroyEntities.size() >= 0x100000)
-		{
-			for (auto e : m_ToDestroyEntities)
-			{
-				m_Registry.destroy(e);
-			}
-		}
+		m_ToDestroyEntities.clear();
 	}
 
 

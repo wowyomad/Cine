@@ -80,6 +80,11 @@ namespace Cine
 		{
 			m_ToDestroyComponentCallbacks.push_back([&, entity]()
 				{
+					if constexpr (std::is_same<NativeScriptComponent, Component>::value)
+					{
+						m_Registry.get<NativeScriptComponent>(entity).Clear();
+					}
+
 					CINE_CORE_WARN("Removing component {0}", Utils::GetClassTypename<Component>());
 					CINE_CORE_ASSERT(m_Registry.all_of<Component>(entity), "Entity does not have component {}", typeid(Component).name());
 					m_Registry.remove<Component>(entity);
@@ -137,7 +142,7 @@ namespace Cine
 					};
 				auto removeScript = [&, entity]() -> void
 					{
-						CINE_CORE_INFO("Removing Script {0} from {1}", Utils::GetClassTypename<Component>(), (uint32_t)entity);
+						CINE_CORE_WARN("Removing Script {0} from {1}", Utils::GetClassTypename<Component>(), (uint32_t)entity);
 						if (m_Registry.valid(entity) && m_Registry.all_of<Component>(entity))
 						{
 							m_Registry.get<Component>(entity).OnDestroy();
