@@ -101,10 +101,22 @@ namespace Cine
 			{
 				component.Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight); //Shoudl it be here?
 			}
-			else
+
+			if constexpr (std::is_same<Component, RigidBody2DComponent>::value)
 			{
-				CINE_CORE_TRACE("Added component '{}' to entity '{}'", Utils::GetClassTypename<Component>(), static_cast<uint32_t>(entity));
+				if (!m_Registry.any_of<BoxCollider2DComponent>(entity))
+				{
+					m_Registry.remove<RigidBody2DComponent>(entity);
+				}
 			}
+
+			if constexpr (std::is_same<Component, RigidBody2DComponent>::value)
+			{
+				m_PhysicsSystem.AddRigidBody(Entity(entity, this));
+			}
+
+			CINE_CORE_TRACE("Added component '{}' to entity '{}'", Utils::GetClassTypename<Component>(), static_cast<uint32_t>(entity));
+
 		}
 
 	private:
