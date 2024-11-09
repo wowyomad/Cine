@@ -130,11 +130,11 @@ namespace Cine
 					m_Registry.emplace<NativeScriptComponent>(entity);
 				}
 				auto& nsc = m_Registry.get<NativeScriptComponent>(entity);
-				auto instantiateScript = [entity]() -> NativeScript*
+				auto instantiateScript = [&]() -> NativeScript*
 					{
 						return static_cast<Cine::NativeScript*>(&m_Registry.get<Component>(entity));
 					};
-				auto removeScript = [entity]() -> void
+				auto removeScript = [&]() -> void
 					{
 						if (m_Registry.valid(entity) && m_Registry.all_of<Component>(entity))
 						{
