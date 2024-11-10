@@ -858,10 +858,10 @@ namespace Cine
 
 						for (auto key : node)
 						{
-							const std::string fieldName = key.first.as<std::string>();
+							const std::string name = key.first.as<std::string>();
 							YAML::Node fieldNode = key.second;
 
-							std::string fieldStr = fieldName + "##" + script.Name;
+							std::string fieldName = name + "##" + script.Name;
 							if (fieldNode.IsScalar())
 							{
 								std::string stringValue = fieldNode.as<std::string>();
@@ -869,7 +869,11 @@ namespace Cine
 
 								int intValue = 0;
 								float floatValue = 0.0f;
-								bool isInt = false, isFloat = false;
+								bool boolValue = false;
+
+								bool isInt = false;
+								bool isFloat = false;
+								bool isBool = false;
 
 								if (Math::IsInteger(stringValue)) {
 									intValue = std::stoi(stringValue);
@@ -879,11 +883,16 @@ namespace Cine
 									floatValue = std::stof(stringValue);
 									isFloat = true;
 								}
+								else if (Math::IsBool(stringValue))
+								{
+									boolValue = stringValue == "True" || stringValue == "true" ? true : false;
+									isBool = true;
+								}
 
 								bool valueChanged = false;
 								if (isInt)
 								{
-									if (ImGui::DragInt(fieldStr.c_str(), &intValue, 1.0f, std::numeric_limits<int>::lowest(), std::numeric_limits<int>::max()))
+									if (ImGui::DragInt(fieldName.c_str(), &intValue, 1.0f, std::numeric_limits<int>::lowest(), std::numeric_limits<int>::max()))
 									{
 										stringValue = std::to_string(intValue);
 										valueChanged = true;
@@ -891,15 +900,23 @@ namespace Cine
 								}
 								else if (isFloat)
 								{
-									if (ImGui::DragFloat(fieldStr.c_str(), &floatValue, 0.1f, std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest(), "%.3f"))
+									if (ImGui::DragFloat(fieldName.c_str(), &floatValue, 0.1f, std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest(), "%.3f"))
 									{
 										stringValue = std::to_string(floatValue);
 										valueChanged = true;
 									}
 								}
+								else if (isBool)
+								{
+									if (ImGui::Checkbox(fieldName.c_str(), &boolValue))
+									{
+										stringValue = boolValue ? "True" : "False";
+										valueChanged = true;
+									}
+								}
 								else
 								{
-									if (ImGui::InputText(fieldStr.c_str(), const_cast<char*>(stringValue.c_str()), stringValue.length()))
+									if (ImGui::InputText(fieldName.c_str(), const_cast<char*>(stringValue.c_str()), stringValue.length()))
 									{
 										valueChanged = true;
 									}

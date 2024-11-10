@@ -1,6 +1,8 @@
 #pragma once
 #pragma warning(disable : 4190) //disable warning about C++ return type in 'extern "C"'
 
+#define NDEBUG
+
 #include <vector>
 #include <string>
 

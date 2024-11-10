@@ -117,13 +117,17 @@ namespace Cine
 
 	void Scene::DestroyEntity(Entity entity)
 	{
-		m_ToDestroyEntities.push_back(entity);
-
-		//There should be a better way.
-		if (entity == *m_MainCamera)
+		if (entity && entity.IsValid())
 		{
-			m_MainCamera->m_EntityHandle = entt::null;
+			m_ToDestroyEntities.push_back(entity);
+
+			//There should be a better way.
+			if (entity == *m_MainCamera)
+			{
+				m_MainCamera->m_EntityHandle = entt::null;
+			}
 		}
+
 	}
 
 	void Scene::OnViewportResize(uint32_t width, uint32_t height)
@@ -223,7 +227,19 @@ namespace Cine
 						Entity e{ entity, this };
 						script.Instance = script.InstantiateScript();
 						script.Instance->Object = Entity(entity, this);
-						script.Instance->OnCreate();
+
+						try
+						{
+							script.Instance->OnCreate();
+						}
+						catch (std::exception& e)
+						{
+							CINE_CORE_ERROR("Catched exceptoin when Creating script {0}: {1}", script.Name, e.what());
+						}
+					}
+					else if (!script.Instance->Object)
+					{
+						script.Instance->Object = Entity(entity, this);
 					}
 				}
 			});
@@ -231,7 +247,6 @@ namespace Cine
 
 	void Scene::UpdateScripts(Timestep ts)
 	{
-
 		m_ScriptEngine.UpdateScripts(ts);
 	}
 

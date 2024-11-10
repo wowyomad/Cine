@@ -350,11 +350,9 @@ namespace Cine
 		Ref<Texture2D> playPauseIcon = m_SceneState == SceneState::Play ? m_IconPause : m_IconPlay;
 
 		float totalWidth = size;
-		bool hasStopButton = (m_SceneState == SceneState::Play || m_SceneState == SceneState::Pause);
-		if (hasStopButton)
-		{
-			totalWidth += size + ImGui::GetStyle().ItemSpacing.x;
-		}
+
+		totalWidth += size + ImGui::GetStyle().ItemSpacing.x;
+
 
 		ImGui::SameLine((ImGui::GetWindowContentRegionMax().x * 0.5f) - (totalWidth * 0.5f));
 
@@ -370,14 +368,17 @@ namespace Cine
 			}
 		}
 
-		if (hasStopButton)
+
+		bool IsPlaying = (m_SceneState == SceneState::Play || m_SceneState == SceneState::Pause);
+
+		ImGui::SameLine();
+		if (!IsPlaying) ImGui::BeginDisabled();
+		if (ImGui::ImageButton("##stopIcon", (ImTextureID)(uint64_t)m_IconStop->GetRendererID(), { size, size }, { 0.0f, 0.0f }, { 1.0f, 1.0f }))
 		{
-			ImGui::SameLine();
-			if (ImGui::ImageButton("##stopIcon", (ImTextureID)(uint64_t)m_IconStop->GetRendererID(), { size, size }, { 0.0f, 0.0f }, { 1.0f, 1.0f }))
-			{
-				OnSceneStop();
-			}
+			OnSceneStop();
 		}
+		if (!IsPlaying) ImGui::EndDisabled();
+
 
 		ImGui::PopStyleVar(3);
 		ImGui::PopStyleColor(3);
@@ -630,5 +631,4 @@ namespace Cine
 		}
 		return false;
 	}
-
 }

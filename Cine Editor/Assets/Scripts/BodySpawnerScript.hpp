@@ -22,7 +22,11 @@ public:
         entity.AddComponent<BoxCollider2DComponent>();
         entity.AddComponent<SpriteRendererComponent>();
         entity.AddComponent<SelfDestructionScript>(EntityLifeTime);
-        entity.AddComponent<ColorScript>();
+
+        if (HasComponent<ColorScript>())
+        {
+            entity.AddComponent<ColorScript>(GetComponent<ColorScript>());
+        }
 
         if (!name.empty())
             entity.GetComponent<TagComponent>().Tag = name;

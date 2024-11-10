@@ -78,6 +78,11 @@ namespace Cine
 
 			return true;
 		}
+		bool IsBool(const std::string& str)
+		{
+			return str == "true" || str == "false" || str == "True" || str == "False";
+		}
+
 		bool IsInteger(const std::string& str) {
 			if (str.empty()) return false;
 			for (char c : str) {

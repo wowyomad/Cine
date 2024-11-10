@@ -36,10 +36,10 @@ void RegisterComponent()
 		};
 	Serializers[name] = [](entt::entity entity) -> 	YAML::Node
 		{
-			Component* component = s_Registry->try_get<Component>(entity);
-			if (component)
+			Component* serializedComponent = s_Registry->try_get<Component>(entity);
+			if (serializedComponent)
 			{
-				return Cine::Serialize(*component);
+				return Cine::Serialize(*serializedComponent);
 			}
 			else
 			{
@@ -48,14 +48,14 @@ void RegisterComponent()
 		};
 	Deserializers[name] = [](YAML::Node& node, entt::entity entity)
 		{
-			Component component;
-			Cine::Deserialize(component, node);
-			s_Registry->emplace_or_replace<Component>(entity, component);
+			Component deserializedComponent;
+			Cine::Deserialize(deserializedComponent, node);
+			s_Registry->emplace_or_replace<Component>(entity, deserializedComponent);
 
 			//TODO: Set Object referece. Object reference is invalid here.
 
 			if constexpr (std::is_base_of<NativeScript, Component>::value)
-			{
+			{				
 				//Make Instance null to make OnCreate call?
 			}
 
@@ -73,7 +73,15 @@ void RegisterComponent()
 				for (auto entity : scriptEnabled)
 				{
 					auto& component = view.get<Component>(entity);
-					component.OnUpdate(ts);
+					try
+					{
+						component.OnUpdate(ts);
+				
+					}
+					catch (std::exception& e)
+					{
+						CINE_CORE_WARN("Catched exception when updating script {0}: {1}", Utils::GetClassTypename<Component>(), e.what());
+					}
 				}
 			};
 

@@ -85,7 +85,10 @@ namespace Cine
 		template <class Component>
 		Component* TryGetComponent()
 		{
-			return m_Scene->m_Registry.try_get<Component>(m_EntityHandle);
+			if (m_EntityHandle)
+			{
+				return m_Scene->m_Registry.try_get<Component>(m_EntityHandle);
+			}
 		}
 
 		//Not really good for performance
