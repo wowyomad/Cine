@@ -89,6 +89,7 @@ namespace Cine
 			{
 				return m_Scene->m_Registry.try_get<Component>(m_EntityHandle);
 			}
+			return nullptr;
 		}
 
 		//Not really good for performance
