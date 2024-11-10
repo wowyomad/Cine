@@ -22,22 +22,22 @@ namespace Cine
 		template <class T>
 		T* TryGetComponent()
 		{
-			return m_Entity.TryGetComponent<T>();
+			return Object.TryGetComponent<T>();
 		}
 
 		template <class T>
 		T& GetComponent()
 		{
-			return m_Entity.GetComponent<T>();
+			return Object.GetComponent<T>();
 		}
 
 		template <class T>
 		bool HasComponent()
 		{
-			return m_Entity.HasComponent<T>();
+			return Object.HasComponent<T>();
 		}
 
-		const Entity GetEntity() const { return m_Entity; }
+		const Entity GetEntity() const { return Object; }
 
 	public:
 		virtual void OnCreate() {}
@@ -49,7 +49,7 @@ namespace Cine
 
 		Entity CreateEntity()
 		{
-			return m_Entity.m_Scene->CreateEntity();
+			return Object.m_Scene->CreateEntity();
 		}
 
 		Entity CreateEntity(Entity reference)
@@ -57,37 +57,37 @@ namespace Cine
 			return reference.Clone();
 		}
 
-		TransformComponent& Transform() { return m_Entity.Transform(); }
+		TransformComponent& Transform() { return Object.Transform(); }
 
 		glm::vec3& LocalTranslation()
 		{
-			return m_Entity.LocalTranslation();
+			return Object.LocalTranslation();
 		}
 		glm::vec3& LocalRotation()
 		{
-			return m_Entity.LocalRotation();
+			return Object.LocalRotation();
 		}
 		glm::vec3& LocalScale()
 		{
-			return m_Entity.LocalRotation();
+			return Object.LocalRotation();
 		}
 
 		glm::vec3 Translation()
 		{
-			return m_Entity.Translation();
+			return Object.Translation();
 		}
 		glm::vec3 Rotation()
 		{
-			return m_Entity.Rotation();
+			return Object.Rotation();
 		}
 		glm::vec3 Scale()
 		{
-			return m_Entity.Scale();
+			return Object.Scale();
 		}
 
 
-	protected:
-		Entity m_Entity;
+	public:
+		Entity Object;
 
 
 

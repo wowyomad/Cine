@@ -58,6 +58,7 @@ class SnakeController : public NativeScript
             m_Speed = other.m_Speed;
             m_Direction = other.m_Direction;
 
+            NativeScript::operator=(other);
             return *this;
         }
 

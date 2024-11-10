@@ -52,6 +52,8 @@ void RegisterComponent()
 			Cine::Deserialize(component, node);
 			s_Registry->emplace_or_replace<Component>(entity, component);
 
+			//TODO: Set Object referece. Object reference is invalid here.
+
 			if constexpr (std::is_base_of<NativeScript, Component>::value)
 			{
 				//Make Instance null to make OnCreate call?

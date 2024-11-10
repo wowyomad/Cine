@@ -89,7 +89,7 @@ namespace Cine
 		bool IsFloat(const std::string& str) {
 			bool dotSeen = false;
 			if (str.empty()) return false;
-			for (size_t i = 0; i < str.size(); ++i) {
+			for (size_t i = 0; i < str.length(); ++i) {
 				if (str[i] == '.') {
 					if (dotSeen) return false;
 					dotSeen = true;

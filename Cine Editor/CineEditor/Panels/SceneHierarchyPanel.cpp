@@ -866,7 +866,6 @@ namespace Cine
 							{
 								std::string stringValue = fieldNode.as<std::string>();
 								std::string value_copy = stringValue;
-								stringValue.resize(256);
 
 								int intValue = 0;
 								float floatValue = 0.0f;
@@ -884,7 +883,7 @@ namespace Cine
 								bool valueChanged = false;
 								if (isInt)
 								{
-									if (ImGui::DragInt(fieldStr.c_str(), &intValue, 1.0f, std::numeric_limits<int>::min(), std::numeric_limits<int>::max()))
+									if (ImGui::DragInt(fieldStr.c_str(), &intValue, 1.0f, std::numeric_limits<int>::lowest(), std::numeric_limits<int>::max()))
 									{
 										stringValue = std::to_string(intValue);
 										valueChanged = true;
@@ -892,7 +891,7 @@ namespace Cine
 								}
 								else if (isFloat)
 								{
-									if (ImGui::DragFloat(fieldStr.c_str(), &floatValue, 0.1f, std::numeric_limits<float>::min(), std::numeric_limits<float>::max(), "%.3f"))
+									if (ImGui::DragFloat(fieldStr.c_str(), &floatValue, 0.1f, std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest(), "%.3f"))
 									{
 										stringValue = std::to_string(floatValue);
 										valueChanged = true;
@@ -921,6 +920,7 @@ namespace Cine
 										serialized[script.Name] = node;
 										m_Context.Scene->DeserializeComponentByName(entity, script.Name, serialized);
 									}
+									script.Instance->Object = entity; //Currently Instnace is recreated losing the Object reference.
 								}
 							}
 						}

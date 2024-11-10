@@ -24,6 +24,7 @@ class Snake : public NativeScript
             if (this == &other)
                 return *this;
             
+            NativeScript::operator=(other);
             return *this;
         }
 

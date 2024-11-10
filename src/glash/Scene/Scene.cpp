@@ -222,7 +222,7 @@ namespace Cine
 						CINE_CORE_INFO("Instantiating script {0} for {1}", script.Name, (uint32_t)entity);
 						Entity e{ entity, this };
 						script.Instance = script.InstantiateScript();
-						script.Instance->m_Entity = Entity(entity, this);
+						script.Instance->Object = Entity(entity, this);
 						script.Instance->OnCreate();
 					}
 				}

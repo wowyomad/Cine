@@ -13,8 +13,13 @@ public:
 
 	ColorScript& operator=(const ColorScript& other)
 	{
+		if (this == &other)
+			return *this;
+
 		m_Time = other.m_Time;
 		m_String = other.m_String;
+
+		NativeScript::operator=(other);
 		return *this;
 	}
 
