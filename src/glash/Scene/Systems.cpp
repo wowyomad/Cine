@@ -218,7 +218,9 @@ namespace Cine
 	{
 		const int32_t velocityIterations = 6;
 		const int32_t positionIterations = 2;
+		CINE_CORE_TRACE("Physics Stop Started");
 		m_PhysicsWorld->Step(ts, velocityIterations, positionIterations);
+		CINE_CORE_TRACE("PhysicsS Step Ended");
 
 		auto view = m_Scene->m_Registry.view<RigidBody2DComponent>();
 		for (auto e : view)

@@ -94,6 +94,7 @@ namespace Cine
 		m_LibraryCalls.DeserializeComponent(entity, componentName, node);
 	}
 
+	//TODO: 
 	void ScriptEngine::SetActiveRegistry(entt::registry& registry)
 	{
 		m_LibraryCalls.SetActiveRegistry(registry);
