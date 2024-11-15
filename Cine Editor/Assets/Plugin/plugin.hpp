@@ -47,7 +47,9 @@ extern "C" {
         MouseInputFunction isMousePressedFunc,
         MouseInputFunction isMouseDownFunc,
         MouseInputFunction isMouseUpFunc,
-        MousePositionFunction getMousePositoinFunc
+        MousePositionFunction getMousePositoinFunc,
+        ToWorldSpaceFunction ToWorldSpaceFunc,
+        ToScreenSpaceFunction ToScreenSpaceFunc
     );
 
     EXPORT void SetActiveRegistry(entt::registry& registry);

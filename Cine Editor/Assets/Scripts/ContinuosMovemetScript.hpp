@@ -6,7 +6,7 @@
 
 using namespace Cine;
 
-class SnakeController : public NativeScript
+class ContinuosMovemetScript : public NativeScript
 {
     public:
         void OnCreate() override
@@ -49,8 +49,7 @@ class SnakeController : public NativeScript
             }
         }
 
-        // Assign fields that you expect to be serialized (don't assign pointers or references!)
-        SnakeController& operator=(const SnakeController& other)
+        ContinuosMovemetScript& operator=(const ContinuosMovemetScript& other)
         {
             if (this == &other)
                 return *this;
@@ -67,7 +66,7 @@ class SnakeController : public NativeScript
         float m_Speed = 1.0f;
         glm::vec3 m_Direction = {};
         TransformComponent* m_Transform = nullptr;
-        SERIALIZE_CLASS(SnakeController,
+        SERIALIZE_CLASS(ContinuosMovemetScript,
             FIELD(m_Speed)
             FIELD(m_Direction)
         )

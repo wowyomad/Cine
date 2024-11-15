@@ -15,12 +15,16 @@ namespace Cine
 		bool IsScript;
 	};
 
+	class Scene;
+
 	class ScriptEngine
 	{
 	private:
 		using KeyInputFunction = bool(*)(KeyCode);
 		using MouseInputFunction = bool(*)(MouseCode);
 		using MousePositionFunction = glm::vec2(*)();
+		using ToWorldSpaceFunction = glm::vec3(*)(const glm::vec2&);
+		using ToScreenSpaceFunction = glm::vec2(const glm::vec3&);
 		
 	public:
 		struct ComponentsDataC;
@@ -43,9 +47,10 @@ namespace Cine
 			MouseInputFunction,
 			MouseInputFunction,
 			MouseInputFunction,
-			MousePositionFunction
+			MousePositionFunction,
+			ToWorldSpaceFunction,
+			ToScreenSpaceFunction
 		);
-
 		static ScriptEngine& Get();
 
 		void LoadLibary(const std::filesystem::path& libraryPath);
@@ -59,6 +64,9 @@ namespace Cine
 		void DeserializeComponent(entt::entity entity, YAML::Node& node, const std::string& componentName);
 		void SetActiveRegistry(entt::registry& registry);
 		const std::vector<ComponentData>& GetComponentsData() const;
+
+		static void SetActiveScene(Scene* scnee);
+		static Scene* GetActiveScene();
 
 	private:
 		bool UpdateFunctionCalls();
@@ -91,6 +99,8 @@ namespace Cine
 		DynamicLibrary m_Library;
 		std::vector<ComponentData> m_ComponentsData;
 		LibraryScriptCalls m_LibraryCalls;
+		
+		Scene* m_ActiveScene = nullptr;
 
 		static ScriptEngine s_ScriptEngine;
 	};

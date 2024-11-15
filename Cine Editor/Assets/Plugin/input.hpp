@@ -12,9 +12,16 @@ using KeyInputFunction = bool(*)(KeyCode);
 using MouseInputFunction = bool(*)(MouseCode);
 using MousePositionFunction = glm::vec2(*)();
 
+using ToWorldSpaceFunction = glm::vec3(*)(const glm::vec2&);
+using ToScreenSpaceFunction = glm::vec2(*)(const glm::vec3&);
+
 extern KeyInputFunction IsKeyPressedFunc;
 extern KeyInputFunction IsKeyDownFunc;
 extern KeyInputFunction IsKeyUpFunc;
+
+extern ToWorldSpaceFunction ToWorldSpaceFunc;
+extern ToScreenSpaceFunction ToScreenSpaceFunc;
+
 extern MouseInputFunction IsMouseButtonPressedFunc;
 extern MouseInputFunction IsMouseButtonDownFunc;
 extern MouseInputFunction IsMouseButtonUpFunc;
@@ -32,6 +39,9 @@ public:
 		Up = 1,
 		Down = 2
 	};
+
+	static glm::vec3 ToWorldSpace(const glm::vec2& screenCoordinates);
+	static glm::vec2 ToScreenSpace(const glm::vec3& worldCoordinates);
 
 	static bool IsKeyPressed(KeyCode keycode);
 	static bool IsKeyDown(KeyCode keycode);

@@ -407,6 +407,7 @@ namespace Cine
 
 		m_ActiveScene = m_RuntimeScene;
 		ScriptEngine::Get().SetActiveRegistry(m_ActiveScene->GetRegistry());
+		ScriptEngine::Get().SetActiveScene(m_ActiveScene.get());
 		m_ActiveScene->OnRuntimeStart();
 		m_ActiveScene->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
 

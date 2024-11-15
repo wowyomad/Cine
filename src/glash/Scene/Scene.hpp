@@ -20,7 +20,16 @@ namespace Cine
 
 	class Scene
 	{
+
 	public:
+		struct ViewportData
+		{
+			uint32_t Width = 1;
+			uint32_t Height = 1;
+			uint32_t x = 0;
+			uint32_t y = 0;
+		};
+
 		Scene();
 		~Scene();
 
@@ -33,6 +42,7 @@ namespace Cine
 		Entity GetMainCameraEntity();
 
 		void OnViewportResize(uint32_t width, uint32_t height);
+		const ViewportData& GetViewportData() { return m_ViewportData; }
 
 		void OnPhysics2DStart();
 		void OnRuntimeStart();
@@ -104,7 +114,7 @@ namespace Cine
 		{
 			if constexpr (std::is_same<Component, CameraComponent>::value)
 			{
-				component.Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight); //Shoudl it be here?
+				component.Camera.SetViewportSize(m_ViewportData.Width, m_ViewportData.Height); //Shoudl it be here?
 			}
 
 			if constexpr (std::is_same<Component, SpriteRendererComponent>::value)
@@ -174,11 +184,9 @@ namespace Cine
 		std::vector<DestroyComponentCallback> m_ToDestroyComponentCallbacks;
 		bool m_UpdateScene = true;
 		bool m_IsRuntime = false;
+		ViewportData m_ViewportData;
 
 		Entity* m_MainCamera;
-
-		uint32_t m_ViewportWidth = 1;
-		uint32_t m_ViewportHeight = 1;
 
 		Physics2DSystem m_PhysicsSystem;
 

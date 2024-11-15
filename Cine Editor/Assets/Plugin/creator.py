@@ -47,6 +47,7 @@ class {base_name} : public NativeScript
             if (this == &other)
                 return *this;
             
+            NativeScript::operator=(other);
             return *this;
         }}
 

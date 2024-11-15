@@ -55,7 +55,7 @@ namespace Cine
 		if (cameraEntity.HasComponent<CameraComponent>())
 		{
 			*m_MainCamera = cameraEntity;
-			m_MainCamera->GetComponent<CameraComponent>().Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
+			m_MainCamera->GetComponent<CameraComponent>().Camera.SetViewportSize(m_ViewportData.Width, m_ViewportData.Height);
 		}
 		else
 		{
@@ -132,8 +132,8 @@ namespace Cine
 
 	void Scene::OnViewportResize(uint32_t width, uint32_t height)
 	{
-		m_ViewportWidth = width;
-		m_ViewportHeight = height;
+		m_ViewportData.Width;
+		m_ViewportData.Height;
 
 		if (!*m_MainCamera)
 		{

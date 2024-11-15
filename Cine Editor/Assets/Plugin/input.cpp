@@ -7,6 +7,18 @@ MouseInputFunction IsMouseButtonPressedFunc = nullptr;
 MouseInputFunction IsMouseButtonDownFunc = nullptr;
 MouseInputFunction IsMouseButtonUpFunc = nullptr;
 MousePositionFunction GetMousePositionFunc = nullptr;
+ToWorldSpaceFunction ToWorldSpaceFunc = nullptr;
+ToScreenSpaceFunction ToScreenSpaceFunc = nullptr;
+
+glm::vec3 Input::ToWorldSpace(const glm::vec2& screenCoordinates)
+{
+	return ToWorldSpaceFunc ? ToWorldSpaceFunc(screenCoordinates) : glm::vec3();
+}
+
+glm::vec2 Input::ToScreenSpace(const glm::vec3& worldCoordinates)
+{
+	return ToScreenSpaceFunc ? ToScreenSpaceFunc(worldCoordinates) : glm::vec2();
+}
 
 bool Input::IsKeyPressed(KeyCode keycode)
 {

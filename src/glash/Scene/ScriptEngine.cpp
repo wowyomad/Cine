@@ -1,6 +1,7 @@
 #include "ScriptEngine.hpp"
 
 #include "glash/Core/Log.hpp"
+#include "Scene.hpp"
 
 namespace Cine
 {
@@ -53,7 +54,17 @@ namespace Cine
 			Internal::Input::IsMouseButtonPressed,
 			Internal::Input::IsMouseButtonDown,
 			Internal::Input::IsMouseButtonUp,
-			Internal::Input::GetMousePosition
+			Internal::Input::GetMousePosition,
+			[](const glm::vec2& screen) -> glm::vec3
+			{
+				auto data = s_ScriptEngine.GetActiveScene()->GetViewportData();
+				return { data.Width, data.Height, 0.0f };
+			},
+			[](const glm::vec3& world)->glm::vec2
+			{
+				auto data = s_ScriptEngine.GetActiveScene()->GetViewportData();
+				return { data.Width, data.Height };
+			}
 		);
 		UpdateComponentsData();
 	}
@@ -136,4 +147,16 @@ namespace Cine
 		delete data.Names;
 		delete data.IsScript;
 	}
+
+	void ScriptEngine::SetActiveScene(Scene* scene)
+	{
+
+		s_ScriptEngine.m_ActiveScene = scene;
+	}
+
+	Scene* ScriptEngine::GetActiveScene()
+	{
+		return s_ScriptEngine.m_ActiveScene;
+	}
+
 }

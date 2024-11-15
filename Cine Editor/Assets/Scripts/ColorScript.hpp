@@ -17,7 +17,6 @@ public:
 			return *this;
 
 		m_Time = other.m_Time;
-		m_String = other.m_String;
 
 		NativeScript::operator=(other);
 		return *this;
@@ -55,11 +54,9 @@ public:
 public:
 	SERIALIZE_CLASS(ColorScript,
 		FIELD(m_Time)
-		FIELD(m_String)
 	)
 
 private:
 	float m_Time = 0.0f;
-	std::string m_String = "String from Color Script";
 
 };

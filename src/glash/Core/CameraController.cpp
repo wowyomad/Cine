@@ -115,6 +115,4 @@ namespace Cine
 		m_AspectRatio = width / height;
 		m_Camera.SetProjection(-m_AspectRatio * m_CameraZoom, m_AspectRatio * m_CameraZoom, -m_CameraZoom, m_CameraZoom);
 	}
-
-
 }

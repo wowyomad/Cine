@@ -18,7 +18,6 @@ class Snake : public NativeScript
             
         }
 
-        // Assign fields that you expect to be serialized (don't assign pointers or references!)
         Snake& operator=(const Snake& other)
         {
             if (this == &other)

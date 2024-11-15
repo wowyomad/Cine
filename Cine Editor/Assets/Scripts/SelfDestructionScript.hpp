@@ -29,7 +29,6 @@ public:
         }
     }
 
-    // Assign fields that you expect to be serialized (don't assign pointers or references!)
     SelfDestructionScript& operator=(const SelfDestructionScript& other)
     {
         if (this == &other)

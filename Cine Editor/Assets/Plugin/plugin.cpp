@@ -213,7 +213,9 @@ void InitializeInput
 	MouseInputFunction isMouseButtonPressedFunc,
 	MouseInputFunction isMouseButtonDownFunc,
 	MouseInputFunction isMouseButtonUpFunc,
-	MousePositionFunction getMousePositionFunc
+	MousePositionFunction getMousePositionFunc,
+	ToWorldSpaceFunction toWorldSpaceFunc,
+	ToScreenSpaceFunction toScreenSpaceFunc
 )
 {
 	IsKeyPressedFunc = isKeyPressedFunc;
@@ -223,6 +225,8 @@ void InitializeInput
 	IsMouseButtonDownFunc = isMouseButtonDownFunc;
 	IsMouseButtonUpFunc = isMouseButtonUpFunc;
 	GetMousePositionFunc = getMousePositionFunc;
+	ToWorldSpaceFunc = toWorldSpaceFunc;
+	ToScreenSpaceFunc = toScreenSpaceFunc;
 }
 
 void SetActiveRegistry(entt::registry& registry)
