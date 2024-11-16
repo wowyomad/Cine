@@ -1,5 +1,6 @@
 #include "glash/glash_pch.hpp"
 #include "ContentBrowserPanel.hpp"
+#include "Dialog.hpp"
 
 #include "glash/Scene/AssetManager.hpp"
 #include "glash/Scene/SceneSerializer.hpp"
@@ -10,14 +11,25 @@
 #include <filesystem>
 #include <imgui.h>	
 
+struct ReloadNotification
+{
+	bool Show = false;
+	std::string Message = "";
+	ImVec4 Color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	float Duration = 600.0f;
+	float Elapsed = 0.0f;
+};
+
+static ReloadNotification s_ReloadNotification;
 static std::atomic<bool> s_IsReloadingScripts(false);
 static std::atomic<int> s_ScriptReloadTimeElapsed(0);
 static std::thread s_ScriptThread;
+
 static bool s_IsSceneRuntime = false;
 
 namespace Cine
 {
-	void RunScriptAsync(const std::string& scriptPath, std::function<void()> onFinish) {
+	void RunScriptAsync(const std::string& scriptPath, std::function<void(bool)> onFinish) {
 		if (s_ScriptThread.joinable()) {
 			s_ScriptThread.join();
 		}
@@ -35,7 +47,7 @@ namespace Cine
 				}
 				});
 			s_IsReloadingScripts = true;
-			Shell::RunPythonLoud(scriptPath);
+			bool result = Shell::RunPythonLoud(scriptPath);
 			s_IsReloadingScripts = false;
 
 			if (timerThread.joinable()) {
@@ -43,7 +55,7 @@ namespace Cine
 			}
 
 			if (onFinish) {
-				onFinish();
+				onFinish(result);
 			}
 			});
 
@@ -67,32 +79,49 @@ namespace Cine
 #else
 				std::string path = "./Assets/Plugin/all_in_one.py --configuration Release";
 #endif
-				RunScriptAsync(path, [&]()
+				RunScriptAsync(path, [&](bool success)
 					{
-						SceneSerializer serializer(m_ActiveScene);
-						std::filesystem::path savePath = std::filesystem::path(AssetManager::AssetsDirectory / "Scenes" / m_ActiveScene->GetName());
-						savePath.replace_extension(".cine.temp");
-						serializer.Serialize(savePath);
-
-						Application::Get().SetUpdateUI(false);
-						std::this_thread::sleep_for(std::chrono::milliseconds(30)); //Right...
-						m_ActiveScene->Clear();
-
-						ScriptEngine::Get().UnloadLibrary();
-						ScriptEngine::Get().LoadLibary("plugin.dll");
-						ScriptEngine::Get().InitializeComponents(m_ActiveScene->GetRegistry());
-						
-						serializer.Deserialize(savePath);
-						if (s_IsSceneRuntime)
+						if (success)
 						{
-							m_ActiveScene->OnRuntimeStart();
-							s_IsSceneRuntime = false;
+							SceneSerializer serializer(m_ActiveScene);
+							std::filesystem::path savePath = std::filesystem::path(AssetManager::AssetsDirectory / "Scenes" / m_ActiveScene->GetName());
+							savePath.replace_extension(".cine.temp");
+							serializer.Serialize(savePath);
+
+							Application::Get().SetUpdateUI(false);
+							std::this_thread::sleep_for(std::chrono::milliseconds(30)); //Right...
+							m_ActiveScene->Clear();
+
+							ScriptEngine::Get().UnloadLibrary();
+							ScriptEngine::Get().LoadLibary("plugin.dll");
+							ScriptEngine::Get().InitializeComponents(m_ActiveScene->GetRegistry());
+
+							serializer.Deserialize(savePath);
+							if (s_IsSceneRuntime)
+							{
+								m_ActiveScene->OnRuntimeStart();
+								s_IsSceneRuntime = false;
+							}
+							m_ActiveScene->SetUpdateScene(true);
+
+							Application::Get().SetUpdateUI(true);
+
+							s_ReloadNotification.Message = "Reloaded scripts successfully!";
+							s_ReloadNotification.Color = { 0.3f, 0.85f, 0.3f, 1.0f };
+							s_ReloadNotification.Show = true;
+							s_ReloadNotification.Elapsed = 0.0;
+
+							CINE_CORE_INFO("{0}", s_ReloadNotification.Message);
 						}
-						m_ActiveScene->SetUpdateScene(true);
+						else
+						{
+							s_ReloadNotification.Message = "Failed to reload scripts...";
+							s_ReloadNotification.Color = { 0.85f, 0.3f, 0.3f, 1.0f };
+							s_ReloadNotification.Show = true;
+							s_ReloadNotification.Elapsed = 0.0;
 
-						Application::Get().SetUpdateUI(true);
-
-						CINE_CORE_INFO("Finished reloading!");
+							CINE_CORE_WARN("{0}", s_ReloadNotification.Message);
+						}
 					});
 				return true;
 			}
@@ -201,6 +230,16 @@ namespace Cine
 		}
 
 		ImGui::End();
+
+		if (s_ReloadNotification.Show)
+		{
+			ShowNotification(s_ReloadNotification.Message, &s_ReloadNotification.Show, s_ReloadNotification.Color);
+			s_ReloadNotification.Elapsed += ImGui::GetIO().DeltaTime;
+			if (s_ReloadNotification.Elapsed >= s_ReloadNotification.Duration)
+			{
+				s_ReloadNotification.Show = false;
+			}
+		}
 	}
 
 	void ContentBrowserPanel::SetContext(Ref<Scene> scene)

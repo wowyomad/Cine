@@ -52,9 +52,30 @@ namespace Cine
 		if (CreateProcessA(NULL, cmdLine, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi))
 		{
 			WaitForSingleObject(pi.hProcess, INFINITE);
-			CloseHandle(pi.hProcess);
-			CloseHandle(pi.hThread);
-			return true;
+
+			DWORD exitCode;
+			if (GetExitCodeProcess(pi.hProcess, &exitCode))
+			{
+				CloseHandle(pi.hProcess);
+				CloseHandle(pi.hThread);
+
+				if (exitCode == 0)
+				{
+					return true;
+				}
+				else
+				{
+					CINE_CORE_ERROR("Script exited with error code: {0}", exitCode);;
+					return false;
+				}
+			}
+			else
+			{
+				CloseHandle(pi.hProcess);
+				CloseHandle(pi.hThread);
+				CINE_CORE_ERROR("Failed to get exit code with error code: {0}", GetLastError());
+				return false;
+			}
 		}
 		else
 		{
@@ -62,6 +83,7 @@ namespace Cine
 			return false;
 		}
 	}
+
 	bool Shell::OpenEditor(const std::filesystem::path& where)
 	{
 		HINSTANCE result = ShellExecuteA(NULL, "open", "code", where.string().c_str(), NULL, SW_HIDE);
