@@ -1,6 +1,8 @@
 #include "glash/glash_pch.hpp"
-#include "SceneHierarchyPanel.hpp"
 #include "glash/Cine.hpp"
+#include "SceneHierarchyPanel.hpp"
+#include "Dialog.hpp"
+
 
 #include "glash/Scene/Components.hpp"
 #include "glash/Scene/SceneSerializer.hpp"
@@ -8,7 +10,6 @@
 
 #include "../Utils/Shell.hpp"
 
-#include "Dialog.hpp"
 
 #include <imgui_internal.h>
 
@@ -971,6 +972,7 @@ namespace Cine
 				static bool showCreationResult = false;
 				static bool creationSuccess = false;
 				static std::string creationMessage;
+				static ImVec4 messageColor;
 				static float notificationTimer = 0.0f;
 				const float notificationDuration = 5.0f;
 
@@ -992,6 +994,7 @@ namespace Cine
 						{
 							creationSuccess = false;
 							creationMessage = "Script already exists.";
+							messageColor = { 0.8, 0.8, 0.3, 1.0 }; //Yellow
 						}
 						else
 						{
@@ -1005,11 +1008,14 @@ namespace Cine
 							if (creationSuccess)
 							{
 								creationMessage = "Script created successfully!";
+								messageColor = { 0.2, 0.8, 0.3, 1.0 }; //Green
 								ZeroMemory(searchBuffer, sizeof(searchBuffer));
 							}
 							else
 							{
 								creationMessage = "Failed to create the script.";
+								messageColor = { 0.8, 0.2, 0.3, 1.0 }; //Red
+
 							}
 						}
 
@@ -1060,7 +1066,8 @@ namespace Cine
 
 				if (showCreationResult)
 				{
-					ShowNotification(creationMessage, notificationTimer, notificationDuration);
+					ShowNotification(creationMessage, messageColor);
+					notificationTimer -= ImGui::GetIO().DeltaTime;
 					if (notificationTimer <= 0.0f)
 					{
 						showCreationResult = false;

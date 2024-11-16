@@ -1,0 +1,76 @@
+Scene: Unnamed Scene
+Entities:
+  - Entity: 12630672647212125983
+    TagComponent:
+      Tag: New Entity (Clone)
+    TransformComponent:
+      Translation: [0.301925659, 0, 0.100000001]
+      Rotation: [0, -0, 0]
+      Scale: [0.25, 0.800000012, 1]
+    SpriteRendererComponent:
+      UseSprite: false
+    SpriteComponent:
+      Color: [1, 0, 0, 1]
+      SpriteIndex: 0
+    SpriteSheetComponent:
+      ? []
+    NativeScriptComponent:
+      []
+  - Entity: 3388448915901913565
+    TagComponent:
+      Tag: Cam
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CameraComponent:
+      Camera:
+        ProjectionType: 1
+        PerspectiveFOV: 0.785398185
+        PerspectiveNear: 0.00999999978
+        PerspectiveFar: 1000
+        OrthographicSize: 10
+        OrthographicNear: -1
+        OrthographicFar: 1
+      FixedAspectRatio: false
+      IsMainCamera: true
+    NativeScriptComponent:
+      []
+  - Entity: 6435437037582078671
+    TagComponent:
+      Tag: New Entity
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      UseSprite: false
+    SpriteComponent:
+      Color: [1, 1, 1, 1]
+      SpriteIndex: 0
+    SpriteSheetComponent:
+      ? []
+    NativeScriptComponent:
+      - PlayerController:
+          m_MoveSpeed: 5.00000000
+          UseMouse: false
+          m_LastLookDirection: [0, -1, 0]
+          m_MovementDirectionTiming:
+            DirectionTiming:
+              Right: 0.00000000
+              Left: 0.00000000
+              Up: 0.00000000
+              Down: 0.00000000
+          m_LookDirectionTiming:
+            DirectionTiming:
+              Right: 0.00000000
+              Left: 0.00000000
+              Up: 0.00000000
+              Down: 0.00000000
+Hierarchy:
+  - ID: 12630672647212125983
+    ParentID: 6435437037582078671
+  - ID: 3388448915901913565
+    ParentID: ~
+  - ID: 6435437037582078671
+    ParentID: ~

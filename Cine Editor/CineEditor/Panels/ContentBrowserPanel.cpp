@@ -22,7 +22,6 @@ namespace Cine
 			s_ScriptThread.join();
 		}
 
-		s_IsReloadingScripts = true;
 		s_ScriptReloadTimeElapsed = 0;
 
 		s_ScriptThread = std::thread([scriptPath, onFinish]() {
@@ -35,9 +34,8 @@ namespace Cine
 					s_ScriptReloadTimeElapsed = std::chrono::duration_cast<std::chrono::seconds>(now - startTime).count();
 				}
 				});
-
+			s_IsReloadingScripts = true;
 			Shell::RunPythonLoud(scriptPath);
-
 			s_IsReloadingScripts = false;
 
 			if (timerThread.joinable()) {

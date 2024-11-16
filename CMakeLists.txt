@@ -92,6 +92,12 @@ FetchContent_Declare(
     GIT_TAG 6d588209f99b1324a608783d1f52faa518886c29 # 24.09.2024
 	GIT_PROGRESS TRUE
 )
+FetchContent_Declare(
+    ImGuizmo
+    GIT_REPOSITORY https://github.com/CedricGuillemet/ImGuizmo.git
+    GIT_TAG 6d588209f99b1324a608783d1f52faa518886c29 # 24.09.2024
+	GIT_PROGRESS TRUE
+)
 FetchContent_MakeAvailable(ImGuizmo) #It's special
 
 list(APPEND BUILD_DEPENDENCIES glfw fmt glm spdlog imgui entt yaml-cpp box2d)
