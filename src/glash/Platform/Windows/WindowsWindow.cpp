@@ -38,6 +38,19 @@ namespace Cine
 		Shutdown();
 	}
 
+	unsigned int WindowsWindow::GetPositionX() const
+	{
+		int x, y;
+		glfwGetWindowPos(m_Window, &x, &y);
+		return x;
+	}
+	unsigned int WindowsWindow::GetPositionY() const
+	{
+		int x, y;
+		glfwGetWindowPos(m_Window, &x, &y);
+		return y;
+	}
+
 	void WindowsWindow::SetEventCallback(const EventCallbackFn& callback)
 	{
 		m_Data.EventCallback = callback;

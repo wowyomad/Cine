@@ -42,6 +42,7 @@ namespace Cine
 		Entity GetMainCameraEntity();
 
 		void OnViewportResize(uint32_t width, uint32_t height);
+		void UpdateViewportPosition(uint32_t x, uint32_t y);
 		const ViewportData& GetViewportData() { return m_ViewportData; }
 
 		void OnPhysics2DStart();

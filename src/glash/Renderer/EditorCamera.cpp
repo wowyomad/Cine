@@ -28,15 +28,26 @@ namespace Cine
 		m_ViewMatrix = glm::inverse(m_ViewMatrix);
 	}
 
+	//std::pair<float, float> EditorCamera::PanSpeed() const
+	//{
+	//	float x = std::min(m_ViewportWidth / 1000.0f, 2.4f);
+	//	float xFactor = 0.0366f * (x * x) - 0.1778f * x + 0.3021f;
+
+	//	float y = std::min(m_ViewportHeight / 1000.0f, 2.4f);
+	//	float yFactor = 0.0366f * (y * y) - 0.1778f * y + 0.3021f;
+
+	//	return { xFactor, yFactor };
+	//}
 	std::pair<float, float> EditorCamera::PanSpeed() const
 	{
-		float x = std::min(m_ViewportWidth / 1000.0f, 2.4f);
-		float xFactor = 0.0366f * (x * x) - 0.1778f * x + 0.3021f;
+		// Nonlinear scaling factor to reduce speed at higher distances
+		float distanceFactor = m_Distance * tan(glm::radians(m_FOV * 0.5f));
 
-		float y = std::min(m_ViewportHeight / 1000.0f, 2.4f);
-		float yFactor = 0.0366f * (y * y) - 0.1778f * y + 0.3021f;
+		distanceFactor = std::pow(distanceFactor, 0.25f);
 
-		return { xFactor, yFactor };
+		float speed = (m_ViewportWidth + m_ViewportHeight) * 0.0001f * distanceFactor;
+
+		return { speed, speed };
 	}
 
 	float EditorCamera::GetRotationSpeed() const
@@ -78,7 +89,7 @@ namespace Cine
 		m_Position = position;
 	}
 
-	void EditorCamera::SetVocalPoint(glm::vec3 focalPoint)
+	void EditorCamera::SetFocalPoint(glm::vec3 focalPoint)
 	{
 		m_FocalPoint = focalPoint;
 	}

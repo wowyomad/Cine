@@ -2,6 +2,7 @@
 
 #include "glash/Core/Log.hpp"
 #include "Scene.hpp"
+#include "Entity.hpp"
 
 namespace Cine
 {
@@ -54,16 +55,78 @@ namespace Cine
 			Internal::Input::IsMouseButtonPressed,
 			Internal::Input::IsMouseButtonDown,
 			Internal::Input::IsMouseButtonUp,
-			Internal::Input::GetMousePosition,
-			[](const glm::vec2& screen) -> glm::vec3
+			[]()->glm::vec2
 			{
+				glm::vec2 screenMousePosition = Internal::Input::GetMousePosition();
 				auto data = s_ScriptEngine.GetActiveScene()->GetViewportData();
-				return { data.Width, data.Height, 0.0f };
+
+				glm::vec2 viewportMousePosition = { screenMousePosition.x - data.x, screenMousePosition.y - data.y };
+				return viewportMousePosition;
+
 			},
-			[](const glm::vec3& world)->glm::vec2
+			[](const glm::vec2& screen) -> glm::vec3 //ScreenToWorld
 			{
 				auto data = s_ScriptEngine.GetActiveScene()->GetViewportData();
-				return { data.Width, data.Height };
+				Entity cameraEntity = s_ScriptEngine.GetActiveScene()->GetMainCameraEntity();
+				if (!cameraEntity)
+				{
+					CINE_CORE_WARN("Getting position from camera without main camera");
+					return {};
+				}
+
+				auto& camera = cameraEntity.GetComponent<CameraComponent>().Camera;
+				auto& transformMatrix = cameraEntity.GetComponent<CachedTransform>().CachedMatrix;  // Corrected to use TransformMatrix
+
+				glm::mat4 projectionMatrix = camera.GetProjection(); // Projection matrix
+				glm::mat4 viewMatrix = glm::inverse(transformMatrix); // The view matrix is the inverse of the camera's transform matrix
+
+				// Get the normalized device coordinates (NDC) from screen coordinates
+				float x = (2.0f * screen.x) / data.Width - 1.0f;
+				float y = 1.0f - (2.0f * screen.y) / data.Height;
+
+				glm::vec4 ndc(x, y, 0.0f, 1.0f); // Homogeneous coordinates in NDC
+
+				// Calculate the inverse of the projection * view matrix
+				glm::mat4 invProjView = glm::inverse(projectionMatrix * viewMatrix);
+
+				// Convert from NDC to world coordinates
+				glm::vec4 worldSpace = invProjView * ndc;
+				worldSpace /= worldSpace.w; // Normalize the homogeneous coordinate
+
+				return glm::vec3(worldSpace);
+
+			},
+			[](const glm::vec3& world) -> glm::vec2 //WorldToScreen
+			{
+				auto data = s_ScriptEngine.GetActiveScene()->GetViewportData();
+				Entity cameraEntity = s_ScriptEngine.GetActiveScene()->GetMainCameraEntity();
+				if (!cameraEntity)
+				{
+					CINE_CORE_WARN("Getting position from camera without main camera");
+					return {};
+				}
+
+				auto& camera = cameraEntity.GetComponent<CameraComponent>().Camera;
+				auto& transform = cameraEntity.GetComponent<CachedTransform>().CachedMatrix;
+
+				glm::mat4 projectionMatrix = camera.GetProjection();
+				glm::mat4 viewMatrix = glm::inverse(transform);
+
+				glm::mat4 viewProjMatrix = projectionMatrix * viewMatrix;
+
+				glm::vec4 clipSpacePosition = viewProjMatrix * glm::vec4(world, 1.0f);
+
+				glm::vec2 ndc = glm::vec2(
+					(clipSpacePosition.x / clipSpacePosition.w + 1.0f) * 0.5f,
+					(1.0f - clipSpacePosition.y / clipSpacePosition.w) * 0.5f
+				);
+
+				glm::vec2 screen = glm::vec2(
+					ndc.x * data.Width,
+					ndc.y * data.Height
+				);
+
+				return screen;
 			}
 		);
 		UpdateComponentsData();
@@ -117,7 +180,7 @@ namespace Cine
 		m_LibraryCalls.SetActiveRegistry = m_Library.GetFunction<SetActiveRegistryCall>("SetActiveRegistry");
 		m_LibraryCalls.InitializeInput = m_Library.GetFunction<InitializeInputCall>("InitializeInput");
 		m_LibraryCalls.SetLoggers = m_Library.GetFunction<SetLoggersCall>("SetLoggers");
-		
+
 		bool allSet = m_LibraryCalls.InitializeComponents
 			&& m_LibraryCalls.CreateComponent
 			&& m_LibraryCalls.RemoveComponent
@@ -128,7 +191,7 @@ namespace Cine
 			&& m_LibraryCalls.GetComponentsData
 			&& m_LibraryCalls.InitializeInput
 			&& m_LibraryCalls.SetLoggers;
-		
+
 		CINE_CORE_ASSERT(allSet, "Some of the library function weren't initialized");
 
 		return allSet;

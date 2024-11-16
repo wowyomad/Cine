@@ -18,6 +18,8 @@ namespace Cine
 
 		inline unsigned int GetWidth() const override final { return m_Data.Width; }
 		inline unsigned int GetHeight() const override final { return m_Data.Height; }
+		unsigned int GetPositionX() const override final;
+		unsigned int GetPositionY() const override final;
 
 		void SetEventCallback(const EventCallbackFn& callback) override final;
 		void AddEventCallback(const EventCallbackFn& callback) override final;

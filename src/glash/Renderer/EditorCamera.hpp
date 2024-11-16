@@ -37,7 +37,7 @@ namespace Cine
 		float GetYaw() const { return m_Yaw; }
 
 		void SetPosition(glm::vec3 position);
-		void SetVocalPoint(glm::vec3 focalPoint);
+		void SetFocalPoint(glm::vec3 focalPoint);
 		void SetYaw(float yaw);
 		void SetPitch(float pitch);
 		void Reset();

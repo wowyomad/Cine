@@ -43,6 +43,8 @@ namespace Cine
 
 		virtual unsigned int GetWidth() const = 0;
 		virtual unsigned int GetHeight() const = 0;
+		virtual unsigned int GetPositionX() const = 0;
+		virtual unsigned int GetPositionY() const = 0;
 
 		static Ref<Window> Create(const WindowProps& props = WindowProps());
 	};

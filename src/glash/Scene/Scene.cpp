@@ -132,8 +132,8 @@ namespace Cine
 
 	void Scene::OnViewportResize(uint32_t width, uint32_t height)
 	{
-		m_ViewportData.Width;
-		m_ViewportData.Height;
+		m_ViewportData.Width = width;
+		m_ViewportData.Height = height;
 
 		if (!*m_MainCamera)
 		{
@@ -147,6 +147,13 @@ namespace Cine
 			cameraComponent.Camera.SetViewportSize(width, height);
 		}
 	}
+
+	void Scene::UpdateViewportPosition(uint32_t x, uint32_t y)
+	{
+		m_ViewportData.x = x;
+		m_ViewportData.y = y;
+	}
+
 
 	void Scene::OnPhysics2DStart()
 	{

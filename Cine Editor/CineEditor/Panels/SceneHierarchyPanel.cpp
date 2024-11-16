@@ -218,7 +218,18 @@ namespace Cine
 		{
 			Scene& scene = *m_Context.Scene.get();
 			auto view = scene.m_Registry.view<entt::entity>();
+
+			std::vector<entt::entity> entities;
 			for (auto entityID : view)
+			{
+				entities.push_back(entityID);
+			}
+
+			// Reverse the entities vector
+			std::reverse(entities.begin(), entities.end());
+
+			// Iterate over the reversed vector
+			for (auto entityID : entities)
 			{
 				Entity entity(entityID, &scene);
 

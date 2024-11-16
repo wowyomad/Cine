@@ -42,6 +42,12 @@ namespace Cine
 		float GetPerspectiveNearClip() const { return m_PerspectiveData.Near; }
 		float GetPerspectiveFarClip() const { return m_PerspectiveData.Far; }
 
+		glm::mat4 GetViewMatrix() const;
+
+		bool IsOrthographic() const { return m_ProjectionType == ProjectionType::Orthographic; }
+		bool IsPerspective() const { return m_ProjectionType == ProjectionType::Perspective; }
+
+
 		ProjectionType GetProjectionType() const { return m_ProjectionType; }
 		void SetProjectionType(ProjectionType type);
 

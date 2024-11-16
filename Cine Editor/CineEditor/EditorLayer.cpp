@@ -216,9 +216,15 @@ namespace Cine
 		ImGui::Begin("Viewport");
 		{
 			auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
-			auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
 			auto viewportOffset = ImGui::GetWindowPos();
-			m_ViewportBounds[0] = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
+
+			float viewportX = viewportMinRegion.x + viewportOffset.x;
+			float viewportY = viewportMinRegion.y + viewportOffset.y;
+
+			m_ActiveScene->UpdateViewportPosition(viewportX - Application::Get().GetWindow().GetPositionX(), viewportY - Application::Get().GetWindow().GetPositionY());
+
+			auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
+			m_ViewportBounds[0] = { viewportX, viewportY };
 			m_ViewportBounds[1] = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
 
 			m_ViewportFocused = ImGui::IsWindowFocused();
@@ -523,6 +529,7 @@ namespace Cine
 			{
 				m_SceneHierarchyPanel.SetSelectedEntity(m_HoveredEntity);
 			}
+
 		}
 
 		return false;
@@ -559,9 +566,18 @@ namespace Cine
 			if (control && shift)
 				SaveSceneAs();
 		} break;
+
+		//Camera
 		case Key::KP0:
 		{
 			m_EditorCamera.Reset();
+		} break; 
+		case Key::F:
+		{
+			if (m_SceneHierarchyPanel.GetSelectedEntity())
+			{
+				m_EditorCamera.SetFocalPoint(m_SceneHierarchyPanel.GetSelectedEntity().Translation());
+			}
 		} break;
 
 		}
