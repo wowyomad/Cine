@@ -109,69 +109,69 @@ namespace Cine
 	}
 
 	template<typename Func>
-void DisplayScript(Entity entity, NativeScript& script, const std::string& scriptName, Func&& displayFieldsFunction)
-{
-	ImGui::Spacing();
-
-	ImGuiTreeNodeFlags treeNodeFlags =
-		ImGuiTreeNodeFlags_AllowItemOverlap
-		| ImGuiTreeNodeFlags_Framed
-		| ImGuiTreeNodeFlags_FramePadding
-		| ImGuiTreeNodeFlags_SpanAvailWidth;
-
-	ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
-
-	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 4.0f, 4.0f });
-	float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
-	ImGui::Separator();
-
-	// Handle script name display
-	std::string displayedName = script.Enabled ? scriptName : "(Disabled) " + scriptName;
-
-	if (!script.Enabled)
-		ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);
-
-	// Use stable string IDs for ImGui's TreeNode
-	std::string treeNodeID = scriptName + "##" + std::to_string(entity.GetID());
-
-	bool open = ImGui::TreeNodeEx(treeNodeID.c_str(), treeNodeFlags, displayedName.c_str());
-	if (!script.Enabled)
-		ImGui::PopStyleColor();
-
-	ImGui::PopStyleVar();
-
-	// '+' button implementation
-	std::string buttonLabel = "+##" + treeNodeID; // Stable ID for the button
-	std::string popupID = "ScriptActions##" + treeNodeID; // Stable ID for the popup
-	ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
-	if (ImGui::Button(buttonLabel.c_str(), { lineHeight, lineHeight }))
+	void DisplayScript(Entity entity, NativeScript& script, const std::string& scriptName, Func&& displayFieldsFunction)
 	{
-		ImGui::OpenPopup(popupID.c_str());
-	}
+		ImGui::Spacing();
 
-	// Popup for '+' button actions
-	if (ImGui::BeginPopup(popupID.c_str()))
-	{
-		if (ImGui::MenuItem(script.Enabled ? "Disable Script" : "Enable Script"))
+		ImGuiTreeNodeFlags treeNodeFlags =
+			ImGuiTreeNodeFlags_AllowItemOverlap
+			| ImGuiTreeNodeFlags_Framed
+			| ImGuiTreeNodeFlags_FramePadding
+			| ImGuiTreeNodeFlags_SpanAvailWidth;
+
+		ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
+
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 4.0f, 4.0f });
+		float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+		ImGui::Separator();
+
+		// Handle script name display
+		std::string displayedName = script.Enabled ? scriptName : "(Disabled) " + scriptName;
+
+		if (!script.Enabled)
+			ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);
+
+		// Use stable string IDs for ImGui's TreeNode
+		std::string treeNodeID = scriptName + "##" + std::to_string(entity.GetID());
+
+		bool open = ImGui::TreeNodeEx(treeNodeID.c_str(), treeNodeFlags, displayedName.c_str());
+		if (!script.Enabled)
+			ImGui::PopStyleColor();
+
+		ImGui::PopStyleVar();
+
+		// '+' button implementation
+		std::string buttonLabel = "+##" + treeNodeID; // Stable ID for the button
+		std::string popupID = "ScriptActions##" + treeNodeID; // Stable ID for the popup
+		ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
+		if (ImGui::Button(buttonLabel.c_str(), { lineHeight, lineHeight }))
 		{
-			script.Enabled = !script.Enabled;
+			ImGui::OpenPopup(popupID.c_str());
 		}
-		if (ImGui::MenuItem("Remove Script"))
+
+		// Popup for '+' button actions
+		if (ImGui::BeginPopup(popupID.c_str()))
 		{
-			entity.RemoveComponentByName(scriptName);
+			if (ImGui::MenuItem(script.Enabled ? "Disable Script" : "Enable Script"))
+			{
+				script.Enabled = !script.Enabled;
+			}
+			if (ImGui::MenuItem("Remove Script"))
+			{
+				entity.RemoveComponentByName(scriptName);
+				ImGui::EndPopup();
+				return; // Exit to avoid further rendering for a removed component
+			}
 			ImGui::EndPopup();
-			return; // Exit to avoid further rendering for a removed component
 		}
-		ImGui::EndPopup();
-	}
 
-	// Display fields if the TreeNode is open
-	if (open)
-	{
-		displayFieldsFunction(script);
-		ImGui::TreePop();
+		// Display fields if the TreeNode is open
+		if (open)
+		{
+			displayFieldsFunction(script);
+			ImGui::TreePop();
+		}
 	}
-}
 
 
 
@@ -280,6 +280,119 @@ void DisplayScript(Entity entity, NativeScript& script, const std::string& scrip
 		}
 	}
 
+	void SceneHierarchyPanel::AddScriptPopup(Entity entity)
+	{
+		static char searchBuffer[128] = "";
+		static bool showCreationResult = false;
+		static bool creationSuccess = false;
+		static std::string creationMessage;
+		static ImVec4 messageColor;
+		static float notificationTimer = 0.0f;
+		const float notificationDuration = 5.0f;
+
+		if (ImGui::BeginPopup("AddScriptPopup"))
+		{
+			ImVec2 viewportSize = ImGui::GetIO().DisplaySize;
+			float popupWidth = viewportSize.x * 0.3f;
+			float popupHeight = viewportSize.y * 0.4f;
+			ImGui::SetNextWindowSize(ImVec2(popupWidth, popupHeight), ImGuiCond_Always);
+
+			auto& componentsData = m_Context.Scene->GetComponentsData();
+			auto& scripts = m_Context.Properties.GetComponent<NativeScriptComponent>().Scripts;
+
+			ImGui::InputText("Search", searchBuffer, IM_ARRAYSIZE(searchBuffer));
+
+			ImGui::SetCursorPosX(0);
+
+			ImVec2 searchResultsSize = ImVec2(popupWidth, popupHeight * 0.4f);
+			ImGui::BeginChild("SearchResults", searchResultsSize, true);
+
+			for (auto&& [name, isScript] : componentsData)
+			{
+				if (!isScript)
+					continue;
+
+				auto it = std::find_if(scripts.begin(), scripts.end(), [&name](auto& script) {
+					return script.Name == name;
+					});
+				bool hasScript = it != scripts.end();
+				if (hasScript)
+					ImGui::BeginDisabled();
+
+				std::string nameCopy(name);
+				std::string searchValue = searchBuffer;
+				std::transform(nameCopy.begin(), nameCopy.end(), nameCopy.begin(), ::tolower);
+				std::transform(searchValue.begin(), searchValue.end(), searchValue.begin(), ::tolower);
+
+				if (nameCopy.find(searchValue) != std::string::npos)
+				{
+					if (ImGui::Button(name.c_str(), ImVec2(searchResultsSize.x - 20.0f, 0.0f)))
+					{
+						m_Context.Scene->AddComponentByName(m_Context.Properties, name);
+						ImGui::CloseCurrentPopup();
+					}
+				}
+
+				if (hasScript)
+					ImGui::EndDisabled();
+			}
+
+			ImGui::EndChild();
+
+			if (strlen(searchBuffer) > 0)
+			{
+				std::string createButtonLabel = "Create Script (" + std::string(searchBuffer) + ")";
+				if (ImGui::Button(createButtonLabel.c_str(), ImVec2(popupWidth, 0.0f)))
+				{
+					std::string scriptName = searchBuffer;
+					scriptName += ".hpp";
+					std::filesystem::path scriptFilePath = AssetManager::AssetsDirectory / "Scripts" / scriptName;
+
+					if (std::filesystem::exists(scriptFilePath))
+					{
+						creationSuccess = false;
+						creationMessage = "Script already exists.";
+						messageColor = { 0.8, 0.8, 0.3, 1.0 };
+					}
+					else
+					{
+						Shell::CreateNewScript(searchBuffer);
+						creationSuccess = std::filesystem::exists(scriptFilePath);
+
+						if (creationSuccess)
+						{
+							creationMessage = "Script created successfully!";
+							messageColor = { 0.2, 0.8, 0.3, 1.0 };
+							ZeroMemory(searchBuffer, sizeof(searchBuffer));
+						}
+						else
+						{
+							creationMessage = "Failed to create the script.";
+							messageColor = { 0.8, 0.2, 0.3, 1.0 };
+						}
+					}
+
+					showCreationResult = true;
+					notificationTimer = notificationDuration;
+					ImGui::CloseCurrentPopup();
+				}
+			}
+
+			ImGui::EndPopup();
+		}
+
+		if (showCreationResult)
+		{
+			ShowNotification(creationMessage, messageColor);
+			notificationTimer -= ImGui::GetIO().DeltaTime;
+			if (notificationTimer <= 0.0f)
+			{
+				showCreationResult = false;
+			}
+		}
+	}
+
+
 	void SceneHierarchyPanel::OnImGuiRender()
 	{
 		ImGui::Begin("Scene Hierarchy");
@@ -358,7 +471,6 @@ void DisplayScript(Entity entity, NativeScript& script, const std::string& scrip
 
 		ImGui::End();
 
-
 		ImGui::Begin("Properties");
 		if (m_Context.Properties)
 		{
@@ -366,16 +478,21 @@ void DisplayScript(Entity entity, NativeScript& script, const std::string& scrip
 
 			ImGui::Dummy(ImVec2(0.0f, 10.0f));
 
-			float buttonWidth = ImGui::CalcTextSize("Add Component").x + ImGui::GetStyle().FramePadding.x * 2.0f;
+			float buttonWidth = std::max(ImGui::CalcTextSize("Add Component").x, ImGui::CalcTextSize("Add Script").x)
+				+ ImGui::GetStyle().FramePadding.x * 2.0f;
+
 			float availableWidth = ImGui::GetContentRegionAvail().x;
-			float buttonPosX = (availableWidth - buttonWidth) * 0.5f;
+			float buttonPosX = (availableWidth - buttonWidth * 2 - 30.0f) * 0.5f;
+
 			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + buttonPosX);
 
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(ImGui::GetStyle().FramePadding.x, 0));
 
-			if (ImGui::Button("Add Component"))
+			if (ImGui::Button("Add Component", ImVec2(buttonWidth, 0)))
 			{
 				ImGui::OpenPopup("AddComponent");
 			}
+
 			if (ImGui::BeginPopup("AddComponent"))
 			{
 				AddComponentItem<CameraComponent>(m_Context.Properties, "Camera");
@@ -386,8 +503,21 @@ void DisplayScript(Entity entity, NativeScript& script, const std::string& scrip
 				ImGui::EndPopup();
 			}
 
+			ImGui::SameLine();
+			ImGui::Dummy(ImVec2(20.0f, 0.0f));
+			ImGui::SameLine();
+
+			if (ImGui::Button("Add Script", ImVec2(buttonWidth, 0)))
+			{
+				ImGui::OpenPopup("AddScriptPopup");
+			}
+
+			ImGui::PopStyleVar();
+
+			AddScriptPopup(m_Context.Properties);
 		}
 		ImGui::End();
+
 	}
 
 	Entity SceneHierarchyPanel::GetSelectedEntity() const
@@ -912,7 +1042,6 @@ void DisplayScript(Entity entity, NativeScript& script, const std::string& scrip
 					if (!node)
 						return;
 
-					// Iterate over fields and edit them
 					for (auto key : node)
 					{
 						std::string name = key.first.as<std::string>();
@@ -980,131 +1109,15 @@ void DisplayScript(Entity entity, NativeScript& script, const std::string& scrip
 								}
 								catch (const std::exception& e)
 								{
-									// Revert if deserialization fails
 									fieldNode = valueCopy.c_str();
 									serialized[scriptName] = node;
 									m_Context.Scene->DeserializeComponentByName(entity, scriptName, serialized);
 								}
-								scriptInstance.Object = entity; // Reattach object reference
+								scriptInstance.Object = entity;
 							}
 						}
 					}
 				});
 		}
-
-		auto& componetsData = m_Context.Scene->GetComponentsData();
-		auto& scripts = nsc.Scripts;
-
-		static char searchBuffer[128] = "";
-
-		if (ImGui::Button("Add Script"))
-		{
-			ImGui::OpenPopup("AddScriptPopup");
-		}
-
-		static bool showCreationResult = false;
-		static bool creationSuccess = false;
-		static std::string creationMessage;
-		static ImVec4 messageColor;
-		static float notificationTimer = 0.0f;
-		const float notificationDuration = 5.0f;
-
-		if (ImGui::BeginPopup("AddScriptPopup"))
-		{
-			ImGui::InputText("Search", searchBuffer, IM_ARRAYSIZE(searchBuffer));
-
-			ImGui::SameLine();
-			ImGui::Dummy(ImVec2(10.0f, 0.0f));
-			ImGui::SameLine();
-
-			if (ImGui::Button("Create"))
-			{
-				std::string scriptName = searchBuffer;
-				scriptName += ".hpp";
-				std::filesystem::path scriptFilePath = AssetManager::AssetsDirectory / "Scripts" / scriptName;
-
-				if (std::filesystem::exists(scriptFilePath))
-				{
-					creationSuccess = false;
-					creationMessage = "Script already exists.";
-					messageColor = { 0.8, 0.8, 0.3, 1.0 }; //Yellow
-				}
-				else
-				{
-					Shell::CreateNewScript(searchBuffer);
-
-					if (std::filesystem::exists(scriptFilePath))
-					{
-						creationSuccess = true;
-					}
-
-					if (creationSuccess)
-					{
-						creationMessage = "Script created successfully!";
-						messageColor = { 0.2, 0.8, 0.3, 1.0 }; //Green
-						ZeroMemory(searchBuffer, sizeof(searchBuffer));
-					}
-					else
-					{
-						creationMessage = "Failed to create the script.";
-						messageColor = { 0.8, 0.2, 0.3, 1.0 }; //Red
-
-					}
-				}
-
-				showCreationResult = true;
-				notificationTimer = notificationDuration;
-				ImGui::CloseCurrentPopup();
-			}
-
-			for (auto&& [name, isScript] : componetsData)
-			{
-				if (!isScript)
-				{
-					continue;
-				}
-
-				auto it = std::find_if(scripts.begin(), scripts.end(), [&name](auto& script)
-					{
-						return script.Name == name;
-					});
-				bool hasScript = it != scripts.end();
-
-				if (hasScript)
-					ImGui::BeginDisabled();
-
-				std::string nameCopy(name);
-				std::string searchValue = searchBuffer;
-
-				std::transform(nameCopy.begin(), nameCopy.end(), nameCopy.begin(), ::tolower);
-				std::transform(searchValue.begin(), searchValue.end(), searchValue.begin(), ::tolower);
-
-				if (nameCopy.find(searchValue) != std::string::npos)
-				{
-					ImVec2 buttonSize = ImVec2(200.0f, 0.0f);
-
-					if (ImGui::Button(name.c_str(), buttonSize))
-					{
-						m_Context.Scene->AddComponentByName(entity, name);
-						ImGui::CloseCurrentPopup();
-					}
-				}
-
-				if (hasScript)
-					ImGui::EndDisabled();
-			}
-
-			ImGui::EndPopup();
-		}
-
-		if (showCreationResult)
-		{
-			ShowNotification(creationMessage, messageColor);
-			notificationTimer -= ImGui::GetIO().DeltaTime;
-			if (notificationTimer <= 0.0f)
-			{
-				showCreationResult = false;
-			}
-		}
-	};
+	}
 }

@@ -50,5 +50,8 @@ namespace Cine
 		void DisplayBoxCollider2DComponent(Entity entity);
 		void DisplayNativeScriptComponent(Entity entity);
 
+		void AddScriptPopup(Entity entity);
+
+
 	};
 }
