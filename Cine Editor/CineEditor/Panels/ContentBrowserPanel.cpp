@@ -11,24 +11,19 @@
 #include <filesystem>
 #include <imgui.h>	
 
-struct ReloadNotification
-{
-	bool Show = false;
-	std::string Message = "";
-	ImVec4 Color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	float Duration = 600.0f;
-	float Elapsed = 0.0f;
-};
 
-static ReloadNotification s_ReloadNotification;
-static std::atomic<bool> s_IsReloadingScripts(false);
-static std::atomic<int> s_ScriptReloadTimeElapsed(0);
-static std::thread s_ScriptThread;
 
-static bool s_IsSceneRuntime = false;
+
 
 namespace Cine
 {
+	static EditorNotification s_ReloadNotification;
+	static std::atomic<bool> s_IsReloadingScripts(false);
+	static std::atomic<int> s_ScriptReloadTimeElapsed(0);
+	static std::thread s_ScriptThread;
+
+	static bool s_IsSceneRuntime = false;
+
 	void RunScriptAsync(const std::string& scriptPath, std::function<void(bool)> onFinish) {
 		if (s_ScriptThread.joinable()) {
 			s_ScriptThread.join();
@@ -106,20 +101,12 @@ namespace Cine
 
 							Application::Get().SetUpdateUI(true);
 
-							s_ReloadNotification.Message = "Reloaded scripts successfully!";
-							s_ReloadNotification.Color = { 0.3f, 0.85f, 0.3f, 1.0f };
-							s_ReloadNotification.Show = true;
-							s_ReloadNotification.Elapsed = 0.0;
-
+							s_ReloadNotification = EditorNotification("Reloaded scripts successfully!", { 0.3f, 0.85f, 0.3f, 1.0f });
 							CINE_CORE_INFO("{0}", s_ReloadNotification.Message);
 						}
 						else
 						{
-							s_ReloadNotification.Message = "Failed to reload scripts...";
-							s_ReloadNotification.Color = { 0.85f, 0.3f, 0.3f, 1.0f };
-							s_ReloadNotification.Show = true;
-							s_ReloadNotification.Elapsed = 0.0;
-
+							s_ReloadNotification = EditorNotification("Failed to reload scripts...", { 0.85f, 0.3f, 0.3f, 1.0f });
 							CINE_CORE_WARN("{0}", s_ReloadNotification.Message);
 						}
 					});

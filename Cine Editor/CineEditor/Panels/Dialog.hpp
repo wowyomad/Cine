@@ -5,6 +5,19 @@
 
 namespace Cine
 {
+	struct EditorNotification
+	{
+		bool Show = false;
+		std::string Message = "";
+		ImVec4 Color = { 1.0f, 1.0f, 1.0f, 1.0f };
+		float Duration = 600.0f;
+		float Elapsed = 0.0f;
+
+		EditorNotification() = default;
+		EditorNotification(const std::string& message, const ImVec4& color = { 1.0f, 1.0f, 1.0f, 1.0f }, float duration = 600.0f)
+			: Message(message), Color(color), Duration(duration), Show(true) { };
+	};
+
 	inline bool ShowConfirmationPopup(const char* title, const char* message, std::function<void()> onConfirm)
 	{
 		if (ImGui::BeginPopupModal(title, nullptr, ImGuiWindowFlags_AlwaysAutoResize))

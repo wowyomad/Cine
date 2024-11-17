@@ -61,7 +61,7 @@ namespace Cine
 			| ImGuiTreeNodeFlags_Framed
 			| ImGuiTreeNodeFlags_FramePadding
 			| ImGuiTreeNodeFlags_SpanAvailWidth;
-		
+
 		if constexpr (std::is_same<T, TransformComponent>::value || std::is_same<T, TagComponent>::value)
 		{
 			treeNodeFlags |= ImGuiTreeNodeFlags_DefaultOpen;
@@ -82,7 +82,7 @@ namespace Cine
 			static const std::string uniqueButtonName = "+##" + Utils::GetClassTypename<T>();
 			static const std::string uniquePopupID = "ComponentSettings##" + Utils::GetClassTypename<T>();
 			ImGui::SameLine(contentRegionAvailable.x - lineHeigh * 0.5f);
-			if (ImGui::Button(uniqueButtonName.c_str(), {lineHeigh, lineHeigh}))
+			if (ImGui::Button(uniqueButtonName.c_str(), { lineHeigh, lineHeigh }))
 			{
 				ImGui::OpenPopup(uniquePopupID.c_str());
 			}
@@ -107,6 +107,73 @@ namespace Cine
 			entity.RemoveComponent<T>();
 		}
 	}
+
+	template<typename Func>
+void DisplayScript(Entity entity, NativeScript& script, const std::string& scriptName, Func&& displayFieldsFunction)
+{
+	ImGui::Spacing();
+
+	ImGuiTreeNodeFlags treeNodeFlags =
+		ImGuiTreeNodeFlags_AllowItemOverlap
+		| ImGuiTreeNodeFlags_Framed
+		| ImGuiTreeNodeFlags_FramePadding
+		| ImGuiTreeNodeFlags_SpanAvailWidth;
+
+	ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
+
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 4.0f, 4.0f });
+	float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+	ImGui::Separator();
+
+	// Handle script name display
+	std::string displayedName = script.Enabled ? scriptName : "(Disabled) " + scriptName;
+
+	if (!script.Enabled)
+		ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);
+
+	// Use stable string IDs for ImGui's TreeNode
+	std::string treeNodeID = scriptName + "##" + std::to_string(entity.GetID());
+
+	bool open = ImGui::TreeNodeEx(treeNodeID.c_str(), treeNodeFlags, displayedName.c_str());
+	if (!script.Enabled)
+		ImGui::PopStyleColor();
+
+	ImGui::PopStyleVar();
+
+	// '+' button implementation
+	std::string buttonLabel = "+##" + treeNodeID; // Stable ID for the button
+	std::string popupID = "ScriptActions##" + treeNodeID; // Stable ID for the popup
+	ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
+	if (ImGui::Button(buttonLabel.c_str(), { lineHeight, lineHeight }))
+	{
+		ImGui::OpenPopup(popupID.c_str());
+	}
+
+	// Popup for '+' button actions
+	if (ImGui::BeginPopup(popupID.c_str()))
+	{
+		if (ImGui::MenuItem(script.Enabled ? "Disable Script" : "Enable Script"))
+		{
+			script.Enabled = !script.Enabled;
+		}
+		if (ImGui::MenuItem("Remove Script"))
+		{
+			entity.RemoveComponentByName(scriptName);
+			ImGui::EndPopup();
+			return; // Exit to avoid further rendering for a removed component
+		}
+		ImGui::EndPopup();
+	}
+
+	// Display fields if the TreeNode is open
+	if (open)
+	{
+		displayFieldsFunction(script);
+		ImGui::TreePop();
+	}
+}
+
+
 
 	static bool DisplayVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f)
 	{
@@ -172,7 +239,7 @@ namespace Cine
 		m_Context.Scene = scene;
 		auto selection = m_Context.Selection;
 		auto properties = m_Context.Properties;
-		
+
 		m_Context.Selection = {};
 		m_Context.Properties = {};
 
@@ -313,7 +380,6 @@ namespace Cine
 			{
 				AddComponentItem<CameraComponent>(m_Context.Properties, "Camera");
 				AddComponentItem<SpriteRendererComponent>(m_Context.Properties, "Sprite Renderer");
-				AddComponentItem<NativeScriptComponent>(m_Context.Properties, "Native Script");
 				AddComponentItem<RigidBody2DComponent>(m_Context.Properties, "Rigid Body 2D");
 				AddComponentItem<BoxCollider2DComponent>(m_Context.Properties, "Box Collider 2D");
 
@@ -513,7 +579,7 @@ namespace Cine
 				updated |= DisplayVec3Control("Scale", scale, 1.0f);
 
 
-				if(updated)
+				if (updated)
 					m_Context.Scene->GetPhysics2DSystem().UpdateRigidBodyParameters(entity);
 			});
 	}
@@ -792,7 +858,7 @@ namespace Cine
 		DisplayComponent<RigidBody2DComponent>(entity, "Rigid Body 2D", [this, entity](RigidBody2DComponent& rb)
 			{
 				bool valueChanged = false;
-				std::array<const char*, 3> typeStrigns = { "Static", "Dynamic", "Kinematic"};
+				std::array<const char*, 3> typeStrigns = { "Static", "Dynamic", "Kinematic" };
 				const char* currentType = typeStrigns[static_cast<int>(rb.Type)];
 
 				if (ImGui::BeginCombo("Body Type", currentType))
@@ -828,252 +894,217 @@ namespace Cine
 	}
 	void SceneHierarchyPanel::DisplayNativeScriptComponent(Entity entity)
 	{
-		DisplayComponent<NativeScriptComponent>(entity, "Native Scripts", [this, entity](NativeScriptComponent& nsc)
-			{
-				if (!nsc.Scripts.size() == 0)
+		if (!entity.HasComponent<NativeScriptComponent>())
+			return;
+
+		auto& nsc = entity.GetComponent<NativeScriptComponent>();
+		for (auto& script : nsc.Scripts)
+		{
+			if (!script.Instance)
+				continue;
+
+			std::string scriptName = script.Name;
+			DisplayScript(entity, *script.Instance, scriptName, [this, entity, scriptName](NativeScript& scriptInstance)
 				{
-					for (auto& script : nsc.Scripts)
+					YAML::Node serialized = m_Context.Scene->SerializeComponentByName(entity, scriptName);
+					YAML::Node node = serialized[scriptName];
+
+					if (!node)
+						return;
+
+					// Iterate over fields and edit them
+					for (auto key : node)
 					{
-						if (!script.Instance)
+						std::string name = key.first.as<std::string>();
+						YAML::Node fieldNode = key.second;
+
+						std::string fieldName = name + "##" + scriptName;
+
+						if (fieldNode.IsScalar())
 						{
-							continue;
-						}
+							std::string stringValue = fieldNode.as<std::string>();
+							std::string valueCopy = stringValue;
 
-						bool& enabled = script.Instance->Enabled;
+							int intValue = 0;
+							float floatValue = 0.0f;
+							bool boolValue = false;
 
-						std::string buttonIcon = "X##" + script.Name;
-						if (ImGui::Button(buttonIcon.c_str()))
-						{
-							m_Context.Scene->RemoveComponentByName(entity, script.Name);
-							return;
-						}
-						ImGui::Text("%s", script.Name.c_str());
+							bool isInt = Math::IsInteger(stringValue);
+							bool isFloat = Math::IsFloat(stringValue);
+							bool isBool = Math::IsBool(stringValue);
 
-						ImGui::SameLine();
+							if (isInt) intValue = std::stoi(stringValue);
+							if (isFloat) floatValue = std::stof(stringValue);
+							if (isBool) boolValue = (stringValue == "True" || stringValue == "true");
 
-						float maxContentWidth = ImGui::GetContentRegionMax().x;
-
-						float checkboxWidth = ImGui::CalcTextSize("Enabled").x + ImGui::GetStyle().FramePadding.x * 10;
-
-						ImGui::SetCursorPosX(maxContentWidth - checkboxWidth);
-
-						std::string EnabledField = "Enabled##" + script.Name;
-						ImGui::Checkbox(EnabledField.c_str(), &enabled);
-
-						YAML::Node serialized = m_Context.Scene->SerializeComponentByName(entity, script.Name);
-						YAML::Node node = serialized[script.Name];
-
-						if (!node)
-						{
-							continue;
-						}
-
-						for (auto key : node)
-						{
-							const std::string name = key.first.as<std::string>();
-							YAML::Node fieldNode = key.second;
-
-							std::string fieldName = name + "##" + script.Name;
-							if (fieldNode.IsScalar())
+							bool valueChanged = false;
+							if (isInt)
 							{
-								std::string stringValue = fieldNode.as<std::string>();
-								std::string value_copy = stringValue;
-
-								int intValue = 0;
-								float floatValue = 0.0f;
-								bool boolValue = false;
-
-								bool isInt = false;
-								bool isFloat = false;
-								bool isBool = false;
-
-								if (Math::IsInteger(stringValue)) {
-									intValue = std::stoi(stringValue);
-									isInt = true;
-								}
-								else if (Math::IsFloat(stringValue)) {
-									floatValue = std::stof(stringValue);
-									isFloat = true;
-								}
-								else if (Math::IsBool(stringValue))
+								if (ImGui::DragInt(fieldName.c_str(), &intValue, 1.0f))
 								{
-									boolValue = stringValue == "True" || stringValue == "true" ? true : false;
-									isBool = true;
-								}
-
-								bool valueChanged = false;
-								if (isInt)
-								{
-									if (ImGui::DragInt(fieldName.c_str(), &intValue, 1.0f, std::numeric_limits<int>::lowest(), std::numeric_limits<int>::max()))
-									{
-										stringValue = std::to_string(intValue);
-										valueChanged = true;
-									}
-								}
-								else if (isFloat)
-								{
-									if (ImGui::DragFloat(fieldName.c_str(), &floatValue, 0.1f, std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest(), "%.3f"))
-									{
-										stringValue = std::to_string(floatValue);
-										valueChanged = true;
-									}
-								}
-								else if (isBool)
-								{
-									if (ImGui::Checkbox(fieldName.c_str(), &boolValue))
-									{
-										stringValue = boolValue ? "True" : "False";
-										valueChanged = true;
-									}
-								}
-								else
-								{
-									if (ImGui::InputText(fieldName.c_str(), const_cast<char*>(stringValue.c_str()), stringValue.length()))
-									{
-										valueChanged = true;
-									}
-								}
-
-								if (valueChanged)
-								{
-									try
-									{
-										fieldNode = stringValue.c_str();
-										serialized[script.Name] = node;
-										m_Context.Scene->DeserializeComponentByName(entity, script.Name, serialized);
-									}
-									catch (const std::exception& e)
-									{
-										// Revert the value if deserialization fails
-										fieldNode = value_copy.c_str();
-										serialized[script.Name] = node;
-										m_Context.Scene->DeserializeComponentByName(entity, script.Name, serialized);
-									}
-									script.Instance->Object = entity; //Currently Instnace is recreated losing the Object reference.
+									stringValue = std::to_string(intValue);
+									valueChanged = true;
 								}
 							}
-						}
-						ImGui::Separator();
-
-					}
-				}
-
-
-				auto& componetsData = m_Context.Scene->GetComponentsData();
-				auto& scripts = nsc.Scripts;
-
-				static char searchBuffer[128] = "";
-
-				if (ImGui::Button("Add Script"))
-				{
-					ImGui::OpenPopup("AddScriptPopup");
-				}
-
-				static bool showCreationResult = false;
-				static bool creationSuccess = false;
-				static std::string creationMessage;
-				static ImVec4 messageColor;
-				static float notificationTimer = 0.0f;
-				const float notificationDuration = 5.0f;
-
-				if (ImGui::BeginPopup("AddScriptPopup"))
-				{
-					ImGui::InputText("Search", searchBuffer, IM_ARRAYSIZE(searchBuffer));
-
-					ImGui::SameLine();
-					ImGui::Dummy(ImVec2(10.0f, 0.0f));
-					ImGui::SameLine();
-
-					if (ImGui::Button("Create"))
-					{
-						std::string scriptName = searchBuffer;
-						scriptName += ".hpp";
-						std::filesystem::path scriptFilePath = AssetManager::AssetsDirectory / "Scripts" / scriptName;
-
-						if (std::filesystem::exists(scriptFilePath))
-						{
-							creationSuccess = false;
-							creationMessage = "Script already exists.";
-							messageColor = { 0.8, 0.8, 0.3, 1.0 }; //Yellow
-						}
-						else
-						{
-							Shell::CreateNewScript(searchBuffer);
-
-							if (std::filesystem::exists(scriptFilePath))
+							else if (isFloat)
 							{
-								creationSuccess = true;
+								if (ImGui::DragFloat(fieldName.c_str(), &floatValue, 0.1f))
+								{
+									stringValue = std::to_string(floatValue);
+									valueChanged = true;
+								}
 							}
-
-							if (creationSuccess)
+							else if (isBool)
 							{
-								creationMessage = "Script created successfully!";
-								messageColor = { 0.2, 0.8, 0.3, 1.0 }; //Green
-								ZeroMemory(searchBuffer, sizeof(searchBuffer));
+								if (ImGui::Checkbox(fieldName.c_str(), &boolValue))
+								{
+									stringValue = boolValue ? "True" : "False";
+									valueChanged = true;
+								}
 							}
 							else
 							{
-								creationMessage = "Failed to create the script.";
-								messageColor = { 0.8, 0.2, 0.3, 1.0 }; //Red
+								if (ImGui::InputText(fieldName.c_str(), const_cast<char*>(stringValue.c_str()), stringValue.length()))
+								{
+									valueChanged = true;
+								}
+							}
 
+							if (valueChanged)
+							{
+								try
+								{
+									fieldNode = stringValue.c_str();
+									serialized[scriptName] = node;
+									m_Context.Scene->DeserializeComponentByName(entity, scriptName, serialized);
+								}
+								catch (const std::exception& e)
+								{
+									// Revert if deserialization fails
+									fieldNode = valueCopy.c_str();
+									serialized[scriptName] = node;
+									m_Context.Scene->DeserializeComponentByName(entity, scriptName, serialized);
+								}
+								scriptInstance.Object = entity; // Reattach object reference
 							}
 						}
+					}
+				});
+		}
 
-						showCreationResult = true;
-						notificationTimer = notificationDuration;
+		auto& componetsData = m_Context.Scene->GetComponentsData();
+		auto& scripts = nsc.Scripts;
+
+		static char searchBuffer[128] = "";
+
+		if (ImGui::Button("Add Script"))
+		{
+			ImGui::OpenPopup("AddScriptPopup");
+		}
+
+		static bool showCreationResult = false;
+		static bool creationSuccess = false;
+		static std::string creationMessage;
+		static ImVec4 messageColor;
+		static float notificationTimer = 0.0f;
+		const float notificationDuration = 5.0f;
+
+		if (ImGui::BeginPopup("AddScriptPopup"))
+		{
+			ImGui::InputText("Search", searchBuffer, IM_ARRAYSIZE(searchBuffer));
+
+			ImGui::SameLine();
+			ImGui::Dummy(ImVec2(10.0f, 0.0f));
+			ImGui::SameLine();
+
+			if (ImGui::Button("Create"))
+			{
+				std::string scriptName = searchBuffer;
+				scriptName += ".hpp";
+				std::filesystem::path scriptFilePath = AssetManager::AssetsDirectory / "Scripts" / scriptName;
+
+				if (std::filesystem::exists(scriptFilePath))
+				{
+					creationSuccess = false;
+					creationMessage = "Script already exists.";
+					messageColor = { 0.8, 0.8, 0.3, 1.0 }; //Yellow
+				}
+				else
+				{
+					Shell::CreateNewScript(searchBuffer);
+
+					if (std::filesystem::exists(scriptFilePath))
+					{
+						creationSuccess = true;
+					}
+
+					if (creationSuccess)
+					{
+						creationMessage = "Script created successfully!";
+						messageColor = { 0.2, 0.8, 0.3, 1.0 }; //Green
+						ZeroMemory(searchBuffer, sizeof(searchBuffer));
+					}
+					else
+					{
+						creationMessage = "Failed to create the script.";
+						messageColor = { 0.8, 0.2, 0.3, 1.0 }; //Red
+
+					}
+				}
+
+				showCreationResult = true;
+				notificationTimer = notificationDuration;
+				ImGui::CloseCurrentPopup();
+			}
+
+			for (auto&& [name, isScript] : componetsData)
+			{
+				if (!isScript)
+				{
+					continue;
+				}
+
+				auto it = std::find_if(scripts.begin(), scripts.end(), [&name](auto& script)
+					{
+						return script.Name == name;
+					});
+				bool hasScript = it != scripts.end();
+
+				if (hasScript)
+					ImGui::BeginDisabled();
+
+				std::string nameCopy(name);
+				std::string searchValue = searchBuffer;
+
+				std::transform(nameCopy.begin(), nameCopy.end(), nameCopy.begin(), ::tolower);
+				std::transform(searchValue.begin(), searchValue.end(), searchValue.begin(), ::tolower);
+
+				if (nameCopy.find(searchValue) != std::string::npos)
+				{
+					ImVec2 buttonSize = ImVec2(200.0f, 0.0f);
+
+					if (ImGui::Button(name.c_str(), buttonSize))
+					{
+						m_Context.Scene->AddComponentByName(entity, name);
 						ImGui::CloseCurrentPopup();
 					}
-
-					for (auto&& [name, isScript] : componetsData)
-					{
-						if (!isScript)
-						{
-							continue;
-						}
-
-						auto it = std::find_if(scripts.begin(), scripts.end(), [&name](auto& script)
-							{
-								return script.Name == name;
-							});
-						bool hasScript = it != scripts.end();
-
-						if (hasScript)
-							ImGui::BeginDisabled();
-
-						std::string nameCopy(name);
-						std::string searchValue = searchBuffer;
-						
-						std::transform(nameCopy.begin(), nameCopy.end(), nameCopy.begin(), ::tolower);
-						std::transform(searchValue.begin(), searchValue.end(), searchValue.begin(), ::tolower);
-
-						if (nameCopy.find(searchValue) != std::string::npos)
-						{
-							ImVec2 buttonSize = ImVec2(200.0f, 0.0f);
-
-							if (ImGui::Button(name.c_str(), buttonSize))
-							{
-								m_Context.Scene->AddComponentByName(entity, name);
-								ImGui::CloseCurrentPopup();
-							}
-						}
-
-						if (hasScript)
-							ImGui::EndDisabled();
-					}
-
-					ImGui::EndPopup();
 				}
 
-				if (showCreationResult)
-				{
-					ShowNotification(creationMessage, messageColor);
-					notificationTimer -= ImGui::GetIO().DeltaTime;
-					if (notificationTimer <= 0.0f)
-					{
-						showCreationResult = false;
-					}
-				}
-			});
+				if (hasScript)
+					ImGui::EndDisabled();
+			}
 
-	}
+			ImGui::EndPopup();
+		}
+
+		if (showCreationResult)
+		{
+			ShowNotification(creationMessage, messageColor);
+			notificationTimer -= ImGui::GetIO().DeltaTime;
+			if (notificationTimer <= 0.0f)
+			{
+				showCreationResult = false;
+			}
+		}
+	};
 }

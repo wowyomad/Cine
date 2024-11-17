@@ -74,6 +74,11 @@ namespace Cine
 			m_Scene->OnComponentRemoved<Component>(*this);
 		}
 
+		void RemoveComponentByName(const std::string& name)
+		{
+			m_Scene->RemoveComponentByName(*this, name);
+		}
+
 		template<class Component>
 		Component& GetComponent()
 		{
