@@ -17,7 +17,7 @@
 namespace Cine
 {
 	Scene::Scene()
-		: m_MainCamera(new Entity()),
+		: m_MainCameraEntity(new Entity()),
 		m_ScriptEngine(ScriptEngine::Get()),
 		m_Name("Unnamed Scene"),
 		m_PhysicsSystem(*this)
@@ -54,8 +54,8 @@ namespace Cine
 	{
 		if (cameraEntity.HasComponent<CameraComponent>())
 		{
-			*m_MainCamera = cameraEntity;
-			m_MainCamera->GetComponent<CameraComponent>().Camera.SetViewportSize(m_ViewportData.Width, m_ViewportData.Height);
+			*m_MainCameraEntity = cameraEntity;
+			m_MainCameraEntity->GetComponent<CameraComponent>().Camera.SetViewportSize(m_ViewportData.Width, m_ViewportData.Height);
 		}
 		else
 		{
@@ -69,10 +69,10 @@ namespace Cine
 		m_Registry.clear();
 		m_Registry = entt::registry();
 
-		if (m_MainCamera && *m_MainCamera)
+		if (m_MainCameraEntity && *m_MainCameraEntity)
 		{
-			delete m_MainCamera;
-			m_MainCamera = new Entity();;
+			delete m_MainCameraEntity;
+			m_MainCameraEntity = new Entity();;
 		}
 	}
 	void Scene::SetUpdateScene(bool update)
@@ -84,7 +84,7 @@ namespace Cine
 
 	Entity Scene::GetMainCameraEntity()
 	{
-		return *m_MainCamera;
+		return *m_MainCameraEntity;
 	}
 
 
@@ -122,12 +122,69 @@ namespace Cine
 			m_ToDestroyEntities.push_back(entity);
 
 			//There should be a better way.
-			if (entity == *m_MainCamera)
+			if (entity == *m_MainCameraEntity)
 			{
-				m_MainCamera->m_EntityHandle = entt::null;
+				m_MainCameraEntity->m_EntityHandle = entt::null;
 			}
 		}
+	}
 
+	glm::vec3 Scene::ScreenToWorldSpace(const glm::vec2& screenSpace)
+	{
+		if (!*m_MainCameraEntity || !m_MainCameraEntity->IsValid())
+		{
+			CINE_CORE_WARN("Getting position from camera without main camera");
+			return {};
+		}
+
+		auto& camera = m_MainCameraEntity->GetComponent<CameraComponent>().Camera;
+		glm::mat4& transformMatrix = m_MainCameraEntity->GetComponent<CachedTransform>().CachedMatrix;
+
+		glm::mat4 projectionMatrix = camera.GetProjection();
+		glm::mat4 viewMatrix = glm::inverse(transformMatrix);
+
+		float x = (2.0f * screenSpace.x) / m_ViewportData.Width - 1.0f;
+		float y = 1.0f - (2.0f * screenSpace.y) / m_ViewportData.Height;
+
+		glm::vec4 ndc(x, y, 0.0f, 1.0f);
+
+		glm::mat4 invProjView = glm::inverse(projectionMatrix * viewMatrix);
+
+		glm::vec4 worldSpace = invProjView * ndc;
+		worldSpace /= worldSpace.w;
+
+		return glm::vec3(worldSpace);
+	}
+
+	glm::vec2 Scene::WorldToScreenSpace(const glm::vec3& worldSpace)
+	{
+		if (!m_MainCameraEntity || m_MainCameraEntity->IsValid())
+		{
+			CINE_CORE_WARN("Getting position from camera without main camera");
+			return {};
+		}
+
+		auto& camera = m_MainCameraEntity->GetComponent<CameraComponent>().Camera;
+		auto& transform = m_MainCameraEntity->GetComponent<CachedTransform>().CachedMatrix;
+
+		glm::mat4 projectionMatrix = camera.GetProjection();
+		glm::mat4 viewMatrix = glm::inverse(transform);
+
+		glm::mat4 viewProjMatrix = projectionMatrix * viewMatrix;
+
+		glm::vec4 clipSpacePosition = viewProjMatrix * glm::vec4(worldSpace, 1.0f);
+
+		glm::vec2 ndc = glm::vec2(
+			(clipSpacePosition.x / clipSpacePosition.w + 1.0f) * 0.5f,
+			(1.0f - clipSpacePosition.y / clipSpacePosition.w) * 0.5f
+		);
+
+		glm::vec2 screen = glm::vec2(
+			ndc.x * m_ViewportData.Width,
+			ndc.y * m_ViewportData.Height
+		);
+
+		return screen;
 	}
 
 	void Scene::OnViewportResize(uint32_t width, uint32_t height)
@@ -135,12 +192,12 @@ namespace Cine
 		m_ViewportData.Width = width;
 		m_ViewportData.Height = height;
 
-		if (!*m_MainCamera)
+		if (!*m_MainCameraEntity)
 		{
 			return;
 		}
 
-		auto& cameraComponent = m_MainCamera->GetComponent<CameraComponent>();
+		auto& cameraComponent = m_MainCameraEntity->GetComponent<CameraComponent>();
 
 		if (!cameraComponent.FixedAspectRatio)
 		{
@@ -192,9 +249,9 @@ namespace Cine
 			UpdateScripts(ts);
 			SpriteAnimationSystem::Update(m_Registry, ts);
 
-			if (*m_MainCamera)
+			if (*m_MainCameraEntity)
 			{
-				auto&& [cameraComponent, transform] = m_MainCamera->GetComponents<CameraComponent, CachedTransform>();
+				auto&& [cameraComponent, transform] = m_MainCameraEntity->GetComponents<CameraComponent, CachedTransform>();
 				Renderer2D::BeginScene(cameraComponent.Camera, transform.CachedMatrix);
 				SpriteRendererSystem::Update(m_Registry);
 				Renderer2D::EndScene();

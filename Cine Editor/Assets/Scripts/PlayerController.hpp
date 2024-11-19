@@ -86,7 +86,8 @@ public:
         {
             if (Input::IsMouseButtonDown(Mouse::ButtonLeft))
             {
-                Shoot(Input::ToWorldSpace(Input::GetMousePosition()) - Translation());
+                auto mouse = Input::GetMousePosition();
+                Shoot(glm::normalize(Input::ToWorldSpace(mouse) - Translation()));
             }
         }
         

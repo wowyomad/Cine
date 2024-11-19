@@ -20,7 +20,6 @@ namespace Cine
 
 	void EditorCamera::UpdateView()
 	{
-		//m_Yaw = m_Pitch = 0.0f; // Lock the camera's rotation
 		m_Position = CalculatePosition();
 
 		glm::quat orientation = GetOrientation();
@@ -28,16 +27,6 @@ namespace Cine
 		m_ViewMatrix = glm::inverse(m_ViewMatrix);
 	}
 
-	//std::pair<float, float> EditorCamera::PanSpeed() const
-	//{
-	//	float x = std::min(m_ViewportWidth / 1000.0f, 2.4f);
-	//	float xFactor = 0.0366f * (x * x) - 0.1778f * x + 0.3021f;
-
-	//	float y = std::min(m_ViewportHeight / 1000.0f, 2.4f);
-	//	float yFactor = 0.0366f * (y * y) - 0.1778f * y + 0.3021f;
-
-	//	return { xFactor, yFactor };
-	//}
 	std::pair<float, float> EditorCamera::PanSpeed() const
 	{
 		// Nonlinear scaling factor to reduce speed at higher distances

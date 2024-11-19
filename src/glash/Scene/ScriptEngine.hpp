@@ -105,7 +105,14 @@ namespace Cine
 		static ScriptEngine s_ScriptEngine;
 
 		static bool IsKeyPressedFocused(KeyCode key);
-		
+		static bool IsKeyDownFocused(KeyCode key);
+		static bool IsKeyUpFocused(KeyCode key);
+		static bool IsMouseButtonPressedFocused(MouseCode button);
+		static bool IsMouseButtonDownFocused(MouseCode button);
+		static bool IsMouseButtonUpFocused(MouseCode button);
+		static glm::vec2 GetMouseViewportPosition();
+		static glm::vec3 ToWorldSpace(const glm::vec2& screenSpace);
+		static glm::vec2 ToScreenSpace(const glm::vec3& worldSpace);
 	};
 	
 }

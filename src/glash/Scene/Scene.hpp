@@ -39,6 +39,10 @@ namespace Cine
 		Entity GetEntity(const std::string& name);
 		void DestroyEntity(Entity entity);
 
+		glm::vec3 ScreenToWorldSpace(const glm::vec2& screenSpace);
+		glm::vec2 WorldToScreenSpace(const glm::vec3& worldSpace);
+		
+
 		void SetMainCamera(Entity cameraEntity);
 		Entity GetMainCameraEntity();
 
@@ -190,7 +194,7 @@ namespace Cine
 		bool m_IsRuntime = false;
 		ViewportData m_ViewportData;
 
-		Entity* m_MainCamera;
+		Entity* m_MainCameraEntity;
 
 		Physics2DSystem m_PhysicsSystem;
 

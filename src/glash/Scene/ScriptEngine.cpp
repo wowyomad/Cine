@@ -10,12 +10,44 @@ namespace Cine
 
 	bool ScriptEngine::IsKeyPressedFocused(KeyCode key)
 	{
-		if (s_ScriptEngine.m_ActiveScene->IsViewportFocused())
-		{
-			return Internal::Input::IsKeyPressed(key);
-		}
-		return false;
+		return s_ScriptEngine.m_ActiveScene->IsViewportFocused() ? Internal::Input::IsKeyPressed(key) : false;
+	}
+	bool ScriptEngine::IsKeyDownFocused(KeyCode key)
+	{
+		return s_ScriptEngine.m_ActiveScene->IsViewportFocused() ? Internal::Input::IsKeyDown(key) : false;
+	}
+	bool ScriptEngine::IsKeyUpFocused(KeyCode key)
+	{
+		return s_ScriptEngine.m_ActiveScene->IsViewportFocused() ? Internal::Input::IsKeyUp(key) : false;;
+	}
+	bool ScriptEngine::IsMouseButtonPressedFocused(MouseCode button)
+	{
+		return s_ScriptEngine.m_ActiveScene->IsViewportFocused() ? Internal::Input::IsMouseButtonPressed(button) : false;
+	}
+	bool ScriptEngine::IsMouseButtonDownFocused(MouseCode button)
+	{
+		return s_ScriptEngine.m_ActiveScene->IsViewportFocused() ? Internal::Input::IsMouseButtonDown(button) : false;
+	}
+	bool ScriptEngine::IsMouseButtonUpFocused(MouseCode button)
+	{
+		return s_ScriptEngine.m_ActiveScene->IsViewportFocused() ? Internal::Input::IsMouseButtonDown(button) : false;
+	}
+	glm::vec2 ScriptEngine::GetMouseViewportPosition()
+	{
+		glm::vec2 screenMousePosition = Internal::Input::GetMousePosition();
+		auto& viewport = s_ScriptEngine.GetActiveScene()->GetViewportData();
+		glm::vec2 viewportMousePosition = { screenMousePosition.x - viewport.x, screenMousePosition.y - viewport.y };
 
+		CINE_CORE_TRACE("Mouse: {0}, {1}", viewportMousePosition.x, viewportMousePosition.y);
+		return viewportMousePosition;
+	}
+	glm::vec3 ScriptEngine::ToWorldSpace(const glm::vec2& screenSpace)
+	{
+		return s_ScriptEngine.m_ActiveScene->ScreenToWorldSpace(screenSpace);
+	}
+	glm::vec2 ScriptEngine::ToScreenSpace(const glm::vec3& worldSpace)
+	{
+		return s_ScriptEngine.m_ActiveScene->WorldToScreenSpace(worldSpace);
 	}
 
 
@@ -61,81 +93,14 @@ namespace Cine
 		m_LibraryCalls.InitializeInput
 		(
 			IsKeyPressedFocused,
-			Internal::Input::IsKeyDown,
-			Internal::Input::IsKeyUp,
-			Internal::Input::IsMouseButtonPressed,
-			Internal::Input::IsMouseButtonDown,
-			Internal::Input::IsMouseButtonUp,
-			[]()->glm::vec2
-			{
-				glm::vec2 screenMousePosition = Internal::Input::GetMousePosition();
-				auto data = s_ScriptEngine.GetActiveScene()->GetViewportData();
-
-				glm::vec2 viewportMousePosition = { screenMousePosition.x - data.x, screenMousePosition.y - data.y };
-				return viewportMousePosition;
-
-			},
-			[](const glm::vec2& screen) -> glm::vec3 //ScreenToWorld
-			{
-				auto data = s_ScriptEngine.GetActiveScene()->GetViewportData();
-				Entity cameraEntity = s_ScriptEngine.GetActiveScene()->GetMainCameraEntity();
-				if (!cameraEntity)
-				{
-					CINE_CORE_WARN("Getting position from camera without main camera");
-					return {};
-				}
-
-				auto& camera = cameraEntity.GetComponent<CameraComponent>().Camera;
-				auto& transformMatrix = cameraEntity.GetComponent<CachedTransform>().CachedMatrix;
-
-				glm::mat4 projectionMatrix = camera.GetProjection();
-				glm::mat4 viewMatrix = glm::inverse(transformMatrix);
-
-				float x = (2.0f * screen.x) / data.Width - 1.0f;
-				float y = 1.0f - (2.0f * screen.y) / data.Height;
-
-				glm::vec4 ndc(x, y, 0.0f, 1.0f);
-
-				glm::mat4 invProjView = glm::inverse(projectionMatrix * viewMatrix);
-
-				glm::vec4 worldSpace = invProjView * ndc;
-				worldSpace /= worldSpace.w;
-
-				return glm::vec3(worldSpace);
-
-			},
-			[](const glm::vec3& world) -> glm::vec2
-			{
-				auto data = s_ScriptEngine.GetActiveScene()->GetViewportData();
-				Entity cameraEntity = s_ScriptEngine.GetActiveScene()->GetMainCameraEntity();
-				if (!cameraEntity)
-				{
-					CINE_CORE_WARN("Getting position from camera without main camera");
-					return {};
-				}
-
-				auto& camera = cameraEntity.GetComponent<CameraComponent>().Camera;
-				auto& transform = cameraEntity.GetComponent<CachedTransform>().CachedMatrix;
-
-				glm::mat4 projectionMatrix = camera.GetProjection();
-				glm::mat4 viewMatrix = glm::inverse(transform);
-
-				glm::mat4 viewProjMatrix = projectionMatrix * viewMatrix;
-
-				glm::vec4 clipSpacePosition = viewProjMatrix * glm::vec4(world, 1.0f);
-
-				glm::vec2 ndc = glm::vec2(
-					(clipSpacePosition.x / clipSpacePosition.w + 1.0f) * 0.5f,
-					(1.0f - clipSpacePosition.y / clipSpacePosition.w) * 0.5f
-				);
-
-				glm::vec2 screen = glm::vec2(
-					ndc.x * data.Width,
-					ndc.y * data.Height
-				);
-
-				return screen;
-			}
+			IsKeyDownFocused,
+			IsKeyUpFocused,
+			IsMouseButtonPressedFocused,
+			IsMouseButtonDownFocused,
+			IsMouseButtonUpFocused,
+			GetMouseViewportPosition,
+			ToWorldSpace,
+			ToScreenSpace
 		);
 		UpdateComponentsData();
 	}
