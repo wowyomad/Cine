@@ -28,6 +28,7 @@ namespace Cine
 			uint32_t Height = 1;
 			uint32_t x = 0;
 			uint32_t y = 0;
+			bool Focused = false;
 		};
 
 		Scene();
@@ -44,6 +45,8 @@ namespace Cine
 		void OnViewportResize(uint32_t width, uint32_t height);
 		void UpdateViewportPosition(uint32_t x, uint32_t y);
 		const ViewportData& GetViewportData() { return m_ViewportData; }
+		void SetViewportFocus(bool focused) { m_ViewportData.Focused = focused; }
+		bool IsViewportFocused() const { return m_ViewportData.Focused; }
 
 		void OnPhysics2DStart();
 		void OnRuntimeStart();

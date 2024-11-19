@@ -103,6 +103,9 @@ namespace Cine
 		Scene* m_ActiveScene = nullptr;
 
 		static ScriptEngine s_ScriptEngine;
+
+		static bool IsKeyPressedFocused(KeyCode key);
+		
 	};
 	
 }

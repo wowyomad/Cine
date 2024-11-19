@@ -54,6 +54,8 @@ namespace Cine
 			m_EditorCamera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
 			m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 		}
+
+		m_ActiveScene->SetViewportFocus(m_ViewportFocused);
 		if (m_ViewportHovered && m_SceneState != SceneState::Play)
 		{
 			m_EditorCamera.OnUpdate(ts);

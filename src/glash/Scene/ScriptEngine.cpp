@@ -8,6 +8,17 @@ namespace Cine
 {
 	ScriptEngine ScriptEngine::s_ScriptEngine;
 
+	bool ScriptEngine::IsKeyPressedFocused(KeyCode key)
+	{
+		if (s_ScriptEngine.m_ActiveScene->IsViewportFocused())
+		{
+			return Internal::Input::IsKeyPressed(key);
+		}
+		return false;
+
+	}
+
+
 	ScriptEngine& ScriptEngine::Get()
 	{
 		return s_ScriptEngine;
@@ -49,7 +60,7 @@ namespace Cine
 		m_LibraryCalls.SetLoggers(&Log::GetCoreLogger(), &Log::GetClientLogger());
 		m_LibraryCalls.InitializeInput
 		(
-			Internal::Input::IsKeyPressed,
+			IsKeyPressedFocused,
 			Internal::Input::IsKeyDown,
 			Internal::Input::IsKeyUp,
 			Internal::Input::IsMouseButtonPressed,
@@ -75,28 +86,25 @@ namespace Cine
 				}
 
 				auto& camera = cameraEntity.GetComponent<CameraComponent>().Camera;
-				auto& transformMatrix = cameraEntity.GetComponent<CachedTransform>().CachedMatrix;  // Corrected to use TransformMatrix
+				auto& transformMatrix = cameraEntity.GetComponent<CachedTransform>().CachedMatrix;
 
-				glm::mat4 projectionMatrix = camera.GetProjection(); // Projection matrix
-				glm::mat4 viewMatrix = glm::inverse(transformMatrix); // The view matrix is the inverse of the camera's transform matrix
+				glm::mat4 projectionMatrix = camera.GetProjection();
+				glm::mat4 viewMatrix = glm::inverse(transformMatrix);
 
-				// Get the normalized device coordinates (NDC) from screen coordinates
 				float x = (2.0f * screen.x) / data.Width - 1.0f;
 				float y = 1.0f - (2.0f * screen.y) / data.Height;
 
-				glm::vec4 ndc(x, y, 0.0f, 1.0f); // Homogeneous coordinates in NDC
+				glm::vec4 ndc(x, y, 0.0f, 1.0f);
 
-				// Calculate the inverse of the projection * view matrix
 				glm::mat4 invProjView = glm::inverse(projectionMatrix * viewMatrix);
 
-				// Convert from NDC to world coordinates
 				glm::vec4 worldSpace = invProjView * ndc;
-				worldSpace /= worldSpace.w; // Normalize the homogeneous coordinate
+				worldSpace /= worldSpace.w;
 
 				return glm::vec3(worldSpace);
 
 			},
-			[](const glm::vec3& world) -> glm::vec2 //WorldToScreen
+			[](const glm::vec3& world) -> glm::vec2
 			{
 				auto data = s_ScriptEngine.GetActiveScene()->GetViewportData();
 				Entity cameraEntity = s_ScriptEngine.GetActiveScene()->GetMainCameraEntity();
