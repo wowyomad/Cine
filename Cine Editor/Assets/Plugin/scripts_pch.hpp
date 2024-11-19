@@ -39,3 +39,9 @@
 #include <glm/ext/scalar_constants.hpp> // glm::pi
 #include <glm/gtc/type_ptr.hpp>
 #include <cmath>
+
+//Library
+#include "glash/Cine.hpp"
+#include "glash/Scene/Components.hpp"
+#include "glash/Core/Application.hpp"
+#include "glash/Core/Log.hpp"

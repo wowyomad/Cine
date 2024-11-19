@@ -1,5 +1,6 @@
 #pragma once
 #include "include/ScriptCore.hpp"
+#include "TestShootScript.hpp"
 
 using namespace Cine;
 
@@ -74,7 +75,21 @@ public:
         {
             glm::vec3 lookDirection = GetLookDirection(m_LookDirectionTiming, moveDirection);
             SetLookRotation(lookDirection);
+
+            //Direction key is active
+            if(m_LookDirectionTiming.GetLatestDirection() != Direction::None)
+            {
+                Shoot(lookDirection);
+            }
         }
+        else
+        {
+            if (Input::IsMouseButtonDown(Mouse::ButtonLeft))
+            {
+                Shoot(Input::ToWorldSpace(Input::GetMousePosition()) - Translation());
+            }
+        }
+        
     }
 
     void UpdateDirectionTimings(float ts)
@@ -200,6 +215,22 @@ public:
         }
     }
 
+    void Shoot(glm::vec3 direction)
+    {
+        CINE_CORE_INFO("Shooting at {0}, {1}", direction.x, direction.y);
+        Entity entity = CreateEntity();
+        entity.GetComponent<TransformComponent>().Translation = Translation();
+        entity.AddComponent<SpriteRendererComponent>();
+        entity.LocalScale().z = 0.5f + (1 + rand() % 10) / 10.0f;
+
+        auto& projectile = entity.AddComponent<TestShootScript>();
+        projectile.Damage = rand() % 10;
+        projectile.Direction = direction;
+        projectile.LifeTime = 5;
+        projectile.Speed = 5 + rand() % 5;
+        
+    }
+
     void OnMouseButtonClicked(glm::vec2 screenPosition)
     {
         auto world = Input::ToWorldSpace(screenPosition);
@@ -212,6 +243,9 @@ private:
     bool UseMouse = false;
     float m_Timer = 0.0f;
 
+    float m_ShootCooldownTime = 0.0f;
+    float m_ShootPeriod = 0.2f; 
+
     glm::vec3 m_LastLookDirection = {0.0f, -1.0f, 0.0f};
     glm::vec3 m_LastMoveDirection = {0.0f, 0.0f, 0.0f};
 
@@ -223,7 +257,9 @@ private:
                     FIELD(UseMouse);
                     FIELD(m_LastLookDirection);
                     FIELD(m_MovementDirectionTiming);
-                    FIELD(m_LookDirectionTiming))
+                    FIELD(m_LookDirectionTiming);
+                    FIELD(m_ShootCooldownTime)
+                    FIELD(m_ShootPeriod))
                     
 public:
     PlayerController &operator=(const PlayerController &other)
@@ -236,6 +272,8 @@ public:
         m_LastLookDirection = other.m_LastLookDirection;
         m_MovementDirectionTiming = other.m_MovementDirectionTiming;
         m_LookDirectionTiming = other.m_LookDirectionTiming;
+        m_ShootCooldownTime = other.m_ShootCooldownTime;
+        m_ShootPeriod = other.m_ShootPeriod;
 
         NativeScript::operator=(other);
         return *this;

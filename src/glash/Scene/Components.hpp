@@ -179,6 +179,16 @@ namespace Cine
 		
 		RigidBody2DComponent() = default;
 		RigidBody2DComponent(const RigidBody2DComponent&) = default;
+
+		void SetLinearVelocity(glm::vec2 v);
+		void SetAngularVelocity(float v);
+
+		void AddLinearVelocity(glm::vec2 v);
+		void AddAngularVelocity(float v);
+
+		glm::vec2 GetLinearVelocity() const;
+		float GetAngularVelocity() const;
+
 	};
 
 	struct BoxCollider2DComponent
