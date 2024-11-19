@@ -258,7 +258,14 @@ namespace Cine
 			{
 				if constexpr (is_serializable<T>::value)
 				{
-					value = node[name].as<T>();
+					try
+					{
+						value = node[name].as<T>();
+					}
+					catch (const std::exception& e)
+					{
+						CINE_LOG_ERROR("Coudln't parse node {0}: {1}", name, e.what());
+					}
 				}
 				else
 				{
