@@ -1,0 +1,108 @@
+Scene: Unnamed Scene
+Entities:
+  - Entity: 6192554169641768405
+    TagComponent:
+      Tag: Spawner
+    TransformComponent:
+      Translation: [0, 4.91573334, 0]
+      Rotation: [0, -0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      UseSprite: false
+    SpriteComponent:
+      Color: [1, 1, 1, 1]
+      SpriteIndex: 0
+    SpriteSheetComponent:
+      ? []
+    NativeScriptComponent:
+      - BodySpawnerScript:
+          Interval: 1.00000000
+          m_TimePassed: 0.00000000
+          EntityLifeTime: 5.00000000
+          m_Counter: 0
+  - Entity: 2121282883655634046
+    TagComponent:
+      Tag: Ground
+    TransformComponent:
+      Translation: [0, -1.87171173, 0]
+      Rotation: [0, -0, 0]
+      Scale: [31.6769276, 1, 1]
+    SpriteRendererComponent:
+      UseSprite: false
+    SpriteComponent:
+      Color: [1, 1, 1, 1]
+      SpriteIndex: 0
+    SpriteSheetComponent:
+      ? []
+    RigidBody2DComponent:
+      Type: Static
+      FixedRotation: false
+    BoxCollider2DComponent:
+      IsTrigger: false
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 0.5
+      Restitution: 0.349999994
+      RestitutionThreshold: 0.100000001
+    NativeScriptComponent:
+      []
+  - Entity: 9167451781575665336
+    TagComponent:
+      Tag: Box
+    TransformComponent:
+      Translation: [0.687320948, 3.36864662, 0]
+      Rotation: [0, -0, -0.562616706]
+      Scale: [0.99999994, 0.99999994, 1]
+    SpriteRendererComponent:
+      UseSprite: false
+    SpriteComponent:
+      Color: [1, 1, 1, 1]
+      SpriteIndex: 0
+    SpriteSheetComponent:
+      ? []
+    RigidBody2DComponent:
+      Type: Dynamic
+      FixedRotation: false
+    BoxCollider2DComponent:
+      IsTrigger: false
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.100000001
+    NativeScriptComponent:
+      - ColorScript:
+          m_Time: 0.00000000
+      - PController2D:
+          Speed: 5.00000000
+  - Entity: 7831991275264311690
+    TagComponent:
+      Tag: Camera
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CameraComponent:
+      Camera:
+        ProjectionType: 1
+        PerspectiveFOV: 0.785398185
+        PerspectiveNear: 0.00999999978
+        PerspectiveFar: 1000
+        OrthographicSize: 15
+        OrthographicNear: -1
+        OrthographicFar: 1
+      FixedAspectRatio: false
+      IsMainCamera: true
+    NativeScriptComponent:
+      []
+Hierarchy:
+  - ID: 6192554169641768405
+    ParentID: ~
+  - ID: 2121282883655634046
+    ParentID: ~
+  - ID: 9167451781575665336
+    ParentID: ~
+  - ID: 7831991275264311690
+    ParentID: ~

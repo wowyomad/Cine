@@ -442,6 +442,12 @@ namespace Cine
 
 		ScriptEngine::Get().SetActiveRegistry(m_EditorScene->GetRegistry());
 
+		std::string tempSceneName = m_EditorScene->GetName() + ".runtime";
+		SceneSerializer deserializer(m_EditorScene);
+		deserializer.Deserialize(tempSceneName);
+
+		ScriptEngine::Get().SetActiveScene(m_EditorScene.get());
+
 
 		m_ActiveScene = m_EditorScene;
 
