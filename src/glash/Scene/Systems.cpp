@@ -256,6 +256,7 @@ namespace Cine
 		bodyDef.position = { transform.Translation.x, transform.Translation.y };
 		bodyDef.angle = transform.Rotation.z;
 		bodyDef.fixedRotation = rb.FixedRotation;
+		bodyDef.gravityScale = rb.GravityScale;
 
 		b2Body* body = m_PhysicsWorld->CreateBody(&bodyDef);
 		rb.RuntimeBody = body;
@@ -298,6 +299,7 @@ namespace Cine
 
 		body->SetType(CineRigiBody2DTypeToBox2DType(rb.Type));
 		body->SetFixedRotation(rb.FixedRotation);
+		body->SetGravityScale(rb.GravityScale);
 
 		body->SetLinearVelocity({ 0.0f, 0.0f });
 		body->SetAngularVelocity(0.0f);

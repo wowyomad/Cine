@@ -172,10 +172,13 @@ namespace Cine
 	struct RigidBody2DComponent
 	{
 		enum class BodyType { Static = 0, Dynamic, Kinematic };
+
 		BodyType Type = BodyType::Dynamic;
 		bool FixedRotation = false;
-
+		float GravityScale = 1.0f;
+		
 		void* RuntimeBody = nullptr;
+
 		
 		RigidBody2DComponent() = default;
 		RigidBody2DComponent(const RigidBody2DComponent&) = default;

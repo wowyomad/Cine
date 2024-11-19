@@ -1011,6 +1011,11 @@ namespace Cine
 					ImGui::EndCombo();
 				}
 
+				if (ImGui::DragFloat("Gravity Scale", &rb.GravityScale, 0.1f, 0.0f, 0.0f, "%.3f"))
+				{
+					valueChanged |= true;
+				}
+
 				if (ImGui::Checkbox("Fixed Rotation", &rb.FixedRotation))
 				{
 					valueChanged |= true;
