@@ -140,7 +140,6 @@ namespace Cine
 
 		ImGui::PopStyleVar();
 
-		// '+' button implementation
 		std::string buttonLabel = "+##" + treeNodeID; // Stable ID for the button
 		std::string popupID = "ScriptActions##" + treeNodeID; // Stable ID for the popup
 		ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
@@ -149,7 +148,7 @@ namespace Cine
 			ImGui::OpenPopup(popupID.c_str());
 		}
 
-		// Popup for '+' button actions
+		bool scriptRemoved = false; // Track whether the script is removed
 		if (ImGui::BeginPopup(popupID.c_str()))
 		{
 			if (ImGui::MenuItem(script.Enabled ? "Disable Script" : "Enable Script"))
@@ -159,13 +158,18 @@ namespace Cine
 			if (ImGui::MenuItem("Remove Script"))
 			{
 				entity.RemoveComponentByName(scriptName);
-				ImGui::EndPopup();
-				return; // Exit to avoid further rendering for a removed component
+				scriptRemoved = true; // Mark as removed
 			}
 			ImGui::EndPopup();
 		}
 
-		// Display fields if the TreeNode is open
+		if (scriptRemoved)
+		{
+			if (open) // Close the TreeNode if it was opened
+				ImGui::TreePop();
+			return; // Early exit after ensuring TreePop
+		}
+
 		if (open)
 		{
 			displayFieldsFunction(script);
@@ -1050,8 +1054,10 @@ namespace Cine
 					for (auto key : node)
 					{
 						std::string name = key.first.as<std::string>();
-						YAML::Node fieldNode = key.second;
 
+						if (name == "Enabled") continue;
+
+						YAML::Node fieldNode = key.second;
 						std::string fieldName = name + "##" + scriptName;
 
 						if (fieldNode.IsScalar())

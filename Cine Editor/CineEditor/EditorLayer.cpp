@@ -434,12 +434,10 @@ namespace Cine
 	{
 		m_ActiveScene->OnRuntimeStop();
 
-		m_SceneHierarchyPanel.SetContext(m_EditorScene);
-		m_ContentBrowserPanel.SetContext(m_EditorScene);
-
 		m_ActiveScene.reset();
 		m_RuntimeScene.reset();
 
+		m_EditorScene = CreateRef<Scene>();
 		ScriptEngine::Get().SetActiveRegistry(m_EditorScene->GetRegistry());
 
 		std::string tempSceneName = m_EditorScene->GetName() + ".runtime";
@@ -449,8 +447,11 @@ namespace Cine
 		ScriptEngine::Get().SetActiveScene(m_EditorScene.get());
 
 
-		m_ActiveScene = m_EditorScene;
 
+		m_SceneHierarchyPanel.SetContext(m_EditorScene);
+		m_ContentBrowserPanel.SetContext(m_EditorScene);
+
+		m_ActiveScene = m_EditorScene;
 		m_SceneState = SceneState::Edit;
 	}
 
