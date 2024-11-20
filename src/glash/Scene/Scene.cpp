@@ -205,7 +205,7 @@ namespace Cine
 		}
 	}
 
-	void Scene::UpdateViewportPosition(uint32_t x, uint32_t y)
+	void Scene::OnViewportPositionChange(uint32_t x, uint32_t y)
 	{
 		m_ViewportData.x = x;
 		m_ViewportData.y = y;

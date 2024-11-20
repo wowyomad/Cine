@@ -228,7 +228,7 @@ public:
         projectile.Damage = rand() % 10;
         projectile.Direction = direction;
         projectile.LifeTime = 5;
-        projectile.Speed = 5 + rand() % 5;
+        projectile.Speed = (direction * m_MoveSpeed);
         
     }
 

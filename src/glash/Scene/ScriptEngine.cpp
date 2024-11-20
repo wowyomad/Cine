@@ -18,28 +18,33 @@ namespace Cine
 	}
 	bool ScriptEngine::IsKeyUpFocused(KeyCode key)
 	{
-		return s_ScriptEngine.m_ActiveScene->IsViewportFocused() ? Internal::Input::IsKeyUp(key) : false;;
+		//Doesn't make sense to return neither false nor true but it is what it is.
+		return s_ScriptEngine.m_ActiveScene->IsViewportFocused() ? Internal::Input::IsKeyUp(key) : true;
 	}
 	bool ScriptEngine::IsMouseButtonPressedFocused(MouseCode button)
 	{
-		return s_ScriptEngine.m_ActiveScene->IsViewportFocused() ? Internal::Input::IsMouseButtonPressed(button) : false;
+		return s_ScriptEngine.m_ActiveScene->IsViewportHoveredAndFocused() ? Internal::Input::IsMouseButtonPressed(button) : false;
 	}
 	bool ScriptEngine::IsMouseButtonDownFocused(MouseCode button)
 	{
-		return s_ScriptEngine.m_ActiveScene->IsViewportFocused() ? Internal::Input::IsMouseButtonDown(button) : false;
+		return s_ScriptEngine.m_ActiveScene->IsViewportHoveredAndFocused() ? Internal::Input::IsMouseButtonDown(button) : false;
 	}
 	bool ScriptEngine::IsMouseButtonUpFocused(MouseCode button)
 	{
-		return s_ScriptEngine.m_ActiveScene->IsViewportFocused() ? Internal::Input::IsMouseButtonDown(button) : false;
+		//Same as IsKeyUpFocused
+		return s_ScriptEngine.m_ActiveScene->IsViewportHoveredAndFocused() ? Internal::Input::IsMouseButtonDown(button) : true;
 	}
 	glm::vec2 ScriptEngine::GetMouseViewportPosition()
 	{
-		glm::vec2 screenMousePosition = Internal::Input::GetMousePosition();
-		auto& viewport = s_ScriptEngine.GetActiveScene()->GetViewportData();
-		glm::vec2 viewportMousePosition = { screenMousePosition.x - viewport.x, screenMousePosition.y - viewport.y };
+		static glm::vec2 s_LastViewportMousePosition = glm::vec2(0.0f);
+		if (s_ScriptEngine.m_ActiveScene->IsViewportHoveredAndFocused())
+		{
+			glm::vec2 screenMousePosition = Internal::Input::GetMousePosition();
+			auto& viewport = s_ScriptEngine.GetActiveScene()->GetViewportData();
+			s_LastViewportMousePosition = { screenMousePosition.x - viewport.x, screenMousePosition.y - viewport.y };
+		}
 
-		CINE_CORE_TRACE("Mouse: {0}, {1}", viewportMousePosition.x, viewportMousePosition.y);
-		return viewportMousePosition;
+		return s_LastViewportMousePosition;
 	}
 	glm::vec3 ScriptEngine::ToWorldSpace(const glm::vec2& screenSpace)
 	{

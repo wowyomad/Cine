@@ -28,7 +28,6 @@ namespace Cine
 		m_IconPause = Texture2D::Create("Resources/Icons/UI/PauseButton.png", iconSpecification);
 		m_IconStop = Texture2D::Create("Resources/Icons/UI/StopButton.png", iconSpecification);
 
-
 		FramebufferSpecification spec;
 		spec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::Depth };
 		spec.Width = 1280;
@@ -37,6 +36,49 @@ namespace Cine
 
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 		m_ContentBrowserPanel.SetContext(m_ActiveScene);
+	}
+
+	void TestGarbage()
+	{
+		static int MAX = 10;
+		static std::deque <glm::vec3> state_stack;
+		static glm::vec3 value(1.0f);
+		static glm::vec3 oldValue = value;
+		static bool isEdited = false;
+
+		ImGui::Begin("Test");
+		{
+			bool currentEdited = ImGui::DragFloat3("Value", &value.x);
+			bool active = ImGui::IsItemActive();
+			isEdited |= currentEdited;
+
+			if (!active && isEdited && value != oldValue)
+			{
+				state_stack.push_front(oldValue);
+				oldValue = value;
+				isEdited = false;
+				if (state_stack.size() > 10)
+				{
+					state_stack.pop_back();
+				}
+			}
+
+			if (ImGui::Button("Undo"))
+			{
+				if (!state_stack.empty())
+				{
+					value = state_stack.front();
+					state_stack.pop_front();
+					oldValue = value;
+				}
+			}
+
+			for (auto value : state_stack)
+			{
+				ImGui::Text("%f %f %f", value.x, value.y, value.z);
+			}
+		}
+		ImGui::End();
 	}
 
 	void EditorLayer::OnDetach()
@@ -55,7 +97,6 @@ namespace Cine
 			m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 		}
 
-		m_ActiveScene->SetViewportFocus(m_ViewportFocused);
 		if (m_ViewportHovered && m_SceneState != SceneState::Play)
 		{
 			m_EditorCamera.OnUpdate(ts);
@@ -65,7 +106,7 @@ namespace Cine
 		m_LastFrametime = ts.Milleseconds();
 
 		m_Framebuffer->Bind();
-		RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
+		RenderCommand::SetClearColor({ 0.25f, 0.25f, 0.25f, 1.0f });
 		RenderCommand::Clear();
 		m_Framebuffer->ClearAttachment(1, -1);
 
@@ -113,49 +154,7 @@ namespace Cine
 	{
 		ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
 
-		static int MAX = 10;
-		static std::deque <glm::vec3> state_stack;
-		static glm::vec3 value(1.0f);
-		static glm::vec3 oldValue = value;
-		static bool isEdited = false;
-
-		ImGui::Begin("Test");
-		{
-			bool currentEdited = ImGui::DragFloat3("Value", &value.x);
-			bool active = ImGui::IsItemActive();
-			isEdited |= currentEdited;
-
-			if (!active && isEdited && value != oldValue)
-			{
-				state_stack.push_front(oldValue);
-				oldValue = value;
-				isEdited = false;
-				if (state_stack.size() > 10)
-				{
-					state_stack.pop_back();
-				}
-			}
-
-			if (ImGui::Button("Undo"))
-			{
-				if (!state_stack.empty())
-				{
-					value = state_stack.front();
-					state_stack.pop_front();
-					oldValue = value;
-				}
-			}
-
-			for (auto value : state_stack)
-			{
-				ImGui::Text("%f %f %f", value.x, value.y, value.z);
-			}
-		}
-		ImGui::End();
-
-
-		static bool show = true;
-		ImGui::ShowDemoWindow(&show);
+		TestGarbage();
 
 		if (ImGui::BeginMainMenuBar())
 		{
@@ -208,6 +207,7 @@ namespace Cine
 		m_ContentBrowserPanel.OnImGuiRender();
 
 		DrawViewport();
+		DrawSettingsPanel();
 
 	}
 
@@ -223,7 +223,7 @@ namespace Cine
 			float viewportX = viewportMinRegion.x + viewportOffset.x;
 			float viewportY = viewportMinRegion.y + viewportOffset.y;
 
-			m_ActiveScene->UpdateViewportPosition(viewportX - Application::Get().GetWindow().GetPositionX(), viewportY - Application::Get().GetWindow().GetPositionY());
+			m_ActiveScene->OnViewportPositionChange(viewportX - Application::Get().GetWindow().GetPositionX(), viewportY - Application::Get().GetWindow().GetPositionY());
 
 			auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
 			m_ViewportBounds[0] = { viewportX, viewportY };
@@ -232,6 +232,9 @@ namespace Cine
 			m_ViewportFocused = ImGui::IsWindowFocused();
 			m_ViewportHovered = ImGui::IsWindowHovered();
 			Application::Get().GetImGuiLayer()->SetBlockEvents(!m_ViewportFocused && !m_ViewportHovered);
+
+			m_ActiveScene->SetViewportFocused(m_ViewportFocused); //It's only here because UI is updated before Update calls.
+			m_ActiveScene->SetViewportHovered(m_ViewportHovered);
 
 			ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 			m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
@@ -393,6 +396,29 @@ namespace Cine
 		ImGui::End();
 	}
 
+	void EditorLayer::DrawSettingsPanel()
+	{
+		ImGui::Begin("Settings");
+
+		float fov = m_EditorCamera.GetFOV();
+		float nearClip = m_EditorCamera.GetNearClip();
+		float farClip = m_EditorCamera.GetFarClip();
+		glm::vec3& focalPoint = m_EditorCamera.GetFocalPoint();
+
+		if (ImGui::DragFloat("Field of View", &fov, 0.1f)) { m_EditorCamera.SetFOV(fov); }
+		if (ImGui::DragFloat("Near Clip", &nearClip, 0.1f)) { m_EditorCamera.SetNearClip(nearClip); }
+		if (ImGui::DragFloat("Far Clip", &farClip, 0.1f)) { m_EditorCamera.SetFarClip(farClip); }
+		ImGui::DragFloat3("Focal Point", glm::value_ptr(focalPoint), 0.1f);
+		
+
+		if (ImGui::Button("Reset Camera"))
+		{
+			m_EditorCamera.Reset();
+		}
+
+		ImGui::End();
+	}
+
 
 	void EditorLayer::OnScenePlay()
 	{
@@ -413,6 +439,8 @@ namespace Cine
 		}
 
 		m_ActiveScene = m_RuntimeScene;
+		m_EditorScene.reset();
+
 		
 		ScriptEngine::Get().SetActiveRegistry(m_ActiveScene->GetRegistry());
 		m_ActiveScene->OnRuntimeStart();
@@ -421,7 +449,6 @@ namespace Cine
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 		m_ContentBrowserPanel.SetContext(m_ActiveScene);
 		ScriptEngine::Get().SetActiveScene(m_ActiveScene.get());
-
 
 		m_SceneState = SceneState::Play;
 	}
@@ -574,6 +601,10 @@ namespace Cine
 		{
 			if (control && shift)
 				SaveSceneAs();
+		} break;
+		case Key::Delete:
+		{
+			m_SceneHierarchyPanel.DeleteSelectedEntity();
 		} break;
 
 		//Camera

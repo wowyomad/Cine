@@ -35,15 +35,11 @@ namespace Cine
 		template <class T>
 		constexpr std::string  GetClassTypename()
 		{
-			// Get the demangled type name
 			std::string name = typeid(T).name();
 
-			// Transform the type name into a readable format
-			// 1. Remove any leading "class", "struct", etc.
 			static const std::regex prefixRegex(R"(^class |^struct |^enum )");
 			name = std::regex_replace(name, prefixRegex, "");
 
-			// 2. Remove namespace, if present (e.g., "Cine::")
 			auto pos = name.rfind("::");
 			if (pos != std::string::npos)
 			{

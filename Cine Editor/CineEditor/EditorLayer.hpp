@@ -41,6 +41,7 @@ namespace Cine
 		void OpenScene(const std::filesystem::path& path);
 
 		void UI_Toolbar();
+		void DrawSettingsPanel(); //temporary here
 
 		void OnScenePlay();
 		void OnScenePause();

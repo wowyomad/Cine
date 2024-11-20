@@ -29,6 +29,7 @@ namespace Cine
 			uint32_t x = 0;
 			uint32_t y = 0;
 			bool Focused = false;
+			bool Hovered = false;
 		};
 
 		Scene();
@@ -47,10 +48,15 @@ namespace Cine
 		Entity GetMainCameraEntity();
 
 		void OnViewportResize(uint32_t width, uint32_t height);
-		void UpdateViewportPosition(uint32_t x, uint32_t y);
+		void OnViewportPositionChange(uint32_t x, uint32_t y);
+
 		const ViewportData& GetViewportData() { return m_ViewportData; }
-		void SetViewportFocus(bool focused) { m_ViewportData.Focused = focused; }
+		void SetViewportFocused(bool focused) { m_ViewportData.Focused = focused; }
+		void SetViewportHovered(bool hovered) { m_ViewportData.Hovered = hovered; }
 		bool IsViewportFocused() const { return m_ViewportData.Focused; }
+		bool IsViewportHovered() const { return m_ViewportData.Hovered; }
+		bool IsViewportHoveredAndFocused() const { return m_ViewportData.Hovered && m_ViewportData.Focused; }
+
 
 		void OnPhysics2DStart();
 		void OnRuntimeStart();

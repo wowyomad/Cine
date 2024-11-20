@@ -10,7 +10,6 @@
 
 #include <yaml-cpp/yaml.h>
 
-
 namespace Cine
 {
 	static std::string RigidBody2DBodyTypeToString(RigidBody2DComponent::BodyType bodyType)
@@ -34,6 +33,26 @@ namespace Cine
 
 		CINE_CORE_ASSERT(false, "Unknown body type");
 		return RigidBody2DComponent::BodyType::Static;
+	}
+
+
+	template<typename T> T ParseValueSafe(const YAML::Node& node, const std::string& key, const T& defaultValue)
+	{
+		if (node[key])
+		{
+			try {
+				return node[key].as<T>();
+			}
+			catch (const YAML::Exception&)
+			{
+				CINE_LOG_WARN("Coudln't parse key {0} in node {1}. Using default value.", key, node.Tag());
+			}
+		}
+		else
+		{
+			CINE_LOG_WARN("Tried to parse non-existing key {0} in node {1}", key, node.Tag());
+		}
+		return defaultValue;
 	}
 
 	void SceneSerializer::SerializeEntity(YAML::Emitter& out, Entity entity)
@@ -166,6 +185,7 @@ namespace Cine
 
 			out << YAML::Key << "Type" << YAML::Value << RigidBody2DBodyTypeToString(rb.Type);
 			out << YAML::Key << "FixedRotation" << YAML::Value << rb.FixedRotation;
+			out << YAML::Key << "GravityScale" << YAML::Value << rb.GravityScale;
 
 			out << YAML::EndMap;
 		}
@@ -274,7 +294,6 @@ namespace Cine
 
 	bool SceneSerializer::Deserialize(const std::filesystem::path& filepath)
 	{
-
 		std::ifstream stream(filepath);
 		std::stringstream strStream;
 		strStream << stream.rdbuf();
@@ -283,24 +302,23 @@ namespace Cine
 		if (!data["Scene"])
 			return false;
 
-		std::string sceneName = data["Scene"].as<std::string>();
+		std::string sceneName = ParseValueSafe(data, "Scene", std::string("DefaultScene"));
 		CINE_CORE_TRACE("Deserializing scene '{0}'", sceneName);
 
 		auto entitiesNode = data["Entities"];
-
 		auto& entities = entitiesNode;
 
 		if (entities)
 		{
 			for (auto entity : entities)
 			{
-				uint64_t uuid = entity["Entity"].as<uint64_t>(); //TODO
+				uint64_t uuid = ParseValueSafe(entity, "Entity", uint64_t(0));
 
 				std::string name;
 				auto tagComponent = entity["TagComponent"];
 				if (tagComponent)
 				{
-					name = tagComponent["Tag"].as<std::string>();
+					name = ParseValueSafe(tagComponent, "Tag", std::string("Unnamed Entity"));
 				}
 				CINE_CORE_TRACE("Deserialized entity with ID = {0}, name = {1}", uuid, name);
 
@@ -310,9 +328,9 @@ namespace Cine
 				if (transformComponent)
 				{
 					auto& tc = deserializedEntity.GetComponent<TransformComponent>();
-					tc.Translation = transformComponent["Translation"].as<glm::vec3>();
-					tc.Rotation = transformComponent["Rotation"].as<glm::vec3>();
-					tc.Scale = transformComponent["Scale"].as<glm::vec3>();
+					tc.Translation = ParseValueSafe(transformComponent, "Translation", tc.Translation);
+					tc.Rotation = ParseValueSafe(transformComponent, "Rotation", tc.Rotation);
+					tc.Scale = ParseValueSafe(transformComponent, "Scale", tc.Scale);
 				}
 
 				auto cameraComponent = entity["CameraComponent"];
@@ -321,16 +339,16 @@ namespace Cine
 					auto cameraProps = cameraComponent["Camera"];
 
 					auto& cc = deserializedEntity.AddComponent<CameraComponent>();
-					cc.Camera.SetProjectionType(static_cast<SceneCamera::ProjectionType>(cameraProps["ProjectionType"].as<int>()));
-					cc.Camera.SetPerspectiveVerticalFOV(cameraProps["PerspectiveFOV"].as<float>());
-					cc.Camera.SetPerspectiveNearClip(cameraProps["PerspectiveNear"].as<float>());
-					cc.Camera.SetPerspectiveFarClip(cameraProps["PerspectiveFar"].as<float>());
-					cc.Camera.SetOrthographicSize(cameraProps["OrthographicSize"].as<float>());
-					cc.Camera.SetOrthographicNearClip(cameraProps["OrthographicNear"].as<float>());
-					cc.Camera.SetOrthographicFarClip(cameraProps["OrthographicFar"].as<float>());
+					cc.Camera.SetProjectionType(static_cast<SceneCamera::ProjectionType>(ParseValueSafe(cameraProps, "ProjectionType", static_cast<int>(cc.Camera.GetProjectionType()))));
+					cc.Camera.SetPerspectiveVerticalFOV(ParseValueSafe(cameraProps, "PerspectiveFOV", cc.Camera.GetPerspectiveVerticalFOV()));
+					cc.Camera.SetPerspectiveNearClip(ParseValueSafe(cameraProps, "PerspectiveNear", cc.Camera.GetPerspectiveNearClip()));
+					cc.Camera.SetPerspectiveFarClip(ParseValueSafe(cameraProps, "PerspectiveFar", cc.Camera.GetPerspectiveFarClip()));
+					cc.Camera.SetOrthographicSize(ParseValueSafe(cameraProps, "OrthographicSize", cc.Camera.GetOrthographicSize()));
+					cc.Camera.SetOrthographicNearClip(ParseValueSafe(cameraProps, "OrthographicNear", cc.Camera.GetOrthographicNearClip()));
+					cc.Camera.SetOrthographicFarClip(ParseValueSafe(cameraProps, "OrthographicFar", cc.Camera.GetOrthographicFarClip()));
 
-					cc.FixedAspectRatio = cameraComponent["FixedAspectRatio"].as<bool>();
-					bool isMainCamera = cameraComponent["IsMainCamera"].as<bool>();
+					cc.FixedAspectRatio = ParseValueSafe(cameraComponent, "FixedAspectRatio", cc.FixedAspectRatio);
+					bool isMainCamera = ParseValueSafe(cameraComponent, "IsMainCamera", false);
 					if (isMainCamera)
 					{
 						m_Scene->SetMainCamera(deserializedEntity);
@@ -341,15 +359,15 @@ namespace Cine
 				if (spriteRendererComponent)
 				{
 					auto& cc = deserializedEntity.AddComponent<SpriteRendererComponent>();
-					cc.UseSprite = spriteRendererComponent["UseSprite"].as<bool>();
+					cc.UseSprite = ParseValueSafe(spriteRendererComponent, "UseSprite", cc.UseSprite);
 				}
 
 				auto spriteComponent = entity["SpriteComponent"];
 				if (spriteComponent)
 				{
 					auto&& cc = deserializedEntity.AddComponent<SpriteComponent>();
-					cc.Color = spriteComponent["Color"].as<glm::vec4>();
-					cc.SpriteIndex = spriteComponent["SpriteIndex"].as<int32_t>();
+					cc.Color = ParseValueSafe(spriteComponent, "Color", cc.Color);
+					cc.SpriteIndex = ParseValueSafe(spriteComponent, "SpriteIndex", cc.SpriteIndex);
 				}
 
 				auto spriteSheetComponent = entity["SpriteSheetComponent"];
@@ -359,8 +377,8 @@ namespace Cine
 
 					if (spriteSheetComponent["Texture"])
 					{
-						std::filesystem::path texturePath = spriteSheetComponent["Texture"].as<std::string>();
-						std::string name = spriteSheetComponent["Name"].as<std::string>();
+						std::filesystem::path texturePath = ParseValueSafe(spriteSheetComponent, "Texture", std::string());
+						std::string name = ParseValueSafe(spriteSheetComponent, "Name", std::string());
 
 						cc = AssetManager::LoadSpriteSheet(name, texturePath, false);
 
@@ -377,8 +395,8 @@ namespace Cine
 									if (coordNode.size() != 2) continue;
 
 									glm::vec2 coord;
-									coord.x = coordNode[0].as<float>();
-									coord.y = coordNode[1].as<float>();
+									coord.x = ParseValueSafe(coordNode, "0", 0.0f);
+									coord.y = ParseValueSafe(coordNode, "1", 0.0f);
 									frame.Coords[i++] = coord;
 								}
 
@@ -392,21 +410,22 @@ namespace Cine
 				if (rigidBody2DComponent)
 				{
 					auto&& rb = deserializedEntity.AddOrReplaceComponent<RigidBody2DComponent>();
-					rb.FixedRotation = rigidBody2DComponent["FixedRotation"].as<bool>();
-					rb.Type = RigidBody2DBodyTypeFromString(rigidBody2DComponent["Type"].as<std::string>());
+					rb.FixedRotation = ParseValueSafe(rigidBody2DComponent, "FixedRotation", rb.FixedRotation);
+					rb.Type = RigidBody2DBodyTypeFromString(ParseValueSafe(rigidBody2DComponent, "Type", std::string("Static")));
+					rb.GravityScale = ParseValueSafe(rigidBody2DComponent, "GravityScale", rb.GravityScale);
 				}
 
 				auto boxCollider2DComponent = entity["BoxCollider2DComponent"];
 				if (boxCollider2DComponent)
 				{
 					auto&& collider = deserializedEntity.AddOrReplaceComponent<BoxCollider2DComponent>();
-					collider.IsTrigger = boxCollider2DComponent["IsTrigger"].as<bool>();
-					collider.Offset = boxCollider2DComponent["Offset"].as<glm::vec2>();
-					collider.Size = boxCollider2DComponent["Size"].as<glm::vec2>();
-					collider.Density = boxCollider2DComponent["Density"].as<float>();
-					collider.Friction = boxCollider2DComponent["Friction"].as<float>();
-					collider.Restitution = boxCollider2DComponent["Restitution"].as<float>();
-					collider.RestitutionThreshold = boxCollider2DComponent["RestitutionThreshold"].as<float>();
+					collider.IsTrigger = ParseValueSafe(boxCollider2DComponent, "IsTrigger", collider.IsTrigger);
+					collider.Offset = ParseValueSafe(boxCollider2DComponent, "Offset", collider.Offset);
+					collider.Size = ParseValueSafe(boxCollider2DComponent, "Size", collider.Size);
+					collider.Density = ParseValueSafe(boxCollider2DComponent, "Density", collider.Density);
+					collider.Friction = ParseValueSafe(boxCollider2DComponent, "Friction", collider.Friction);
+					collider.Restitution = ParseValueSafe(boxCollider2DComponent, "Restitution", collider.Restitution);
+					collider.RestitutionThreshold = ParseValueSafe(boxCollider2DComponent, "RestitutionThreshold", collider.RestitutionThreshold);
 				}
 
 				auto nativeScriptComponent = entity["NativeScriptComponent"];
@@ -430,7 +449,6 @@ namespace Cine
 						ScriptEngine::Get().CreateComponent(deserializedEntity, componentName);
 						ScriptEngine::Get().DeserializeComponent(deserializedEntity, const_cast<YAML::Node&>(wrappedComponentData), componentName);
 					}
-
 				}
 			}
 		}
@@ -438,14 +456,14 @@ namespace Cine
 		auto hierarchy = data["Hierarchy"];
 		if (hierarchy)
 		{
-			for (const auto& node : hierarchy)	
+			for (const auto& node : hierarchy)
 			{
-				UUID entityID = node["ID"].as<uint64_t>();
+				UUID entityID = ParseValueSafe(node, "ID", uint64_t(0));
 				Entity entity = m_Scene->GetEntityById(entityID);
 
 				if (entity && node["ParentID"].IsScalar())
 				{
-					UUID parentID = node["ParentID"].as<uint64_t>();
+					UUID parentID = ParseValueSafe(node, "ParentID", uint64_t(0));
 					Entity parentEntity = m_Scene->GetEntityById(parentID);
 					entity.AddParentWithoutTransform(parentEntity);
 				}
@@ -454,6 +472,7 @@ namespace Cine
 
 		return true;
 	}
+
 
 	bool SceneSerializer::DeserializeRuntime(const std::filesystem::path& filepath)
 	{

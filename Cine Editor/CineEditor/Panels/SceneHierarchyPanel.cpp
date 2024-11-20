@@ -238,6 +238,21 @@ namespace Cine
 		SetContext(scene);
 	}
 
+	void SceneHierarchyPanel::DeleteSelectedEntity()
+	{
+		if (m_Context.Selection)
+		{
+			m_Context.Scene->DestroyEntity(m_Context.Selection);
+
+			if (m_Context.Properties == m_Context.Selection)
+			{
+				m_Context.Properties = {};
+			}
+
+			m_Context.Selection = {};
+		}
+	}
+
 	void SceneHierarchyPanel::SetContext(const Ref<Scene>& scene)
 	{
 		m_Context.Scene = scene;
@@ -586,14 +601,35 @@ namespace Cine
 		}
 
 		bool entityDeleted = false;
+		bool entityRemovedFromHierarchy = false;
+
 		if (ImGui::BeginPopupContextItem())
 		{
-			ImVec4 cloneButtonColor = { 0.25f, 1.0f, 0.35f, 1.0f };
-			ImGui::PushStyleColor(ImGuiCol_Text, cloneButtonColor);
+
 			if (ImGui::MenuItem("Clone"))
 			{
 				Entity clone = entity.Clone();
-				clone.GetComponent<TagComponent>().Tag = entity.GetComponent<TagComponent>().Tag + " (Clone)";
+
+				auto& tag = entity.GetComponent<TagComponent>().Tag;
+				size_t start = tag.find_last_of('(');
+				size_t end = tag.find_last_of(')');
+
+				std::string newTag;
+
+				if (start == std::string::npos || end == std::string::npos || start >= end || end != tag.length() - 1)
+				{
+					// No existing ([num]) pattern
+					newTag = tag + " (0)";
+				}
+				else
+				{
+					// Existing ([num]) pattern
+					int num = std::stoi(tag.substr(start + 1, end - start - 1));
+					newTag = tag.substr(0, start) + "(" + std::to_string(num + 1) + ")";
+				}
+
+				clone.GetComponent<TagComponent>().Tag = newTag;
+
 				if (entity == m_Context.Selection)
 				{
 					m_Context.Selection = clone;
@@ -604,7 +640,22 @@ namespace Cine
 					m_Context.Properties = clone;
 				}
 			}
-			ImGui::PopStyleColor();
+
+
+			if (entity.GetParent())
+			{
+				if (ImGui::MenuItem("Extract from hierarchy"))
+				{
+					entityRemovedFromHierarchy = true;
+				}
+			}
+			else
+			{
+				ImGui::BeginDisabled();
+				ImGui::MenuItem("Extract from hierarchy");
+				ImGui::EndDisabled();
+			}
+
 			ImVec4 deleteButtonColor = { 1.0f, 0.15f, 0.15f, 1.0f };
 			ImGui::PushStyleColor(ImGuiCol_Text, deleteButtonColor);
 			if (ImGui::MenuItem("Delete"))
@@ -627,6 +678,11 @@ namespace Cine
 		else if (!expanded && isExpanded)
 		{
 			isExpanded = false;
+		}
+
+		if (entityRemovedFromHierarchy)
+		{
+			entity.RemoveParent();
 		}
 
 		if (entityDeleted)

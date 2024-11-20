@@ -35,11 +35,22 @@ namespace Cine
 
 		float GetPitch() const { return m_Pitch; }
 		float GetYaw() const { return m_Yaw; }
+		float GetFOV() const { return m_FOV; }
+		float GetNearClip() const { return m_NearClip; }
+		float GetFarClip() const { return m_FarClip; }
+		
+		glm::vec3& GetFocalPoint() { return m_FocalPoint; }
+		const glm::vec3& GetFocalPoint() const { return m_FocalPoint; }
+
 
 		void SetPosition(glm::vec3 position);
 		void SetFocalPoint(glm::vec3 focalPoint);
 		void SetYaw(float yaw);
 		void SetPitch(float pitch);
+		void SetFOV(float fov) { m_FOV = fov; UpdateProjection(); }
+		void SetNearClip(float nearClip) { m_NearClip = nearClip; UpdateProjection(); }
+		void SetFarClip(float farClip) { m_FarClip = farClip;  UpdateProjection(); }
+
 		void Reset();
 
 	private:

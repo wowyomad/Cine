@@ -24,6 +24,8 @@ namespace Cine
 		SceneHierarchyPanel() = default;
 		SceneHierarchyPanel(const Ref<Scene>& scene);
 
+		void DeleteSelectedEntity();
+
 		void SetContext(const Ref<Scene>& scene);
 		void SetSelectedEntity(Entity entity);
 		void SetPropertiesEntity(Entity entity);
