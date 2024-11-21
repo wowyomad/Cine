@@ -792,6 +792,11 @@ namespace Cine
 	{
 		DisplayComponent<SpriteComponent>(entity, "Sprite", [&entity](SpriteComponent& sprite)
 			{
+				if (entity.HasComponent<SpriteLayerComponent>())
+				{
+					int32_t& layerID = entity.GetComponent<SpriteLayerComponent>().LayerID;
+					ImGui::DragInt("Layer ID", &layerID);
+				}
 				ImGui::ColorEdit4("Color", glm::value_ptr(sprite.Color));
 				if (entity.HasComponent<SpriteSheetComponent>())
 				{

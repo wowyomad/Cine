@@ -37,7 +37,7 @@ namespace Cine
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		glEnable(GL_DEPTH_TEST);
+		//glEnable(GL_DEPTH_TEST);
 		glEnable(GL_LINE_SMOOTH);
 	}
 	void OpenGLRendererAPI::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
@@ -67,5 +67,28 @@ namespace Cine
 	void OpenGLRendererAPI::SetLineWidth(float width)
 	{
 		GLCall(glLineWidth(width));
+	}
+
+	void OpenGLRendererAPI::SetDepthTest(bool enabled)
+	{
+		if (m_DepthTestEnabled != enabled)
+		{
+			if (enabled)
+			{
+				GLCall(glEnable(GL_DEPTH_TEST));
+			}
+			else
+			{
+				GLCall(glDisable(GL_DEPTH_TEST));
+			}
+			m_DepthTestEnabled = enabled;
+		}
+
+
+
+	}
+	bool OpenGLRendererAPI::GetDepthTest() const
+	{
+		return m_DepthTestEnabled;
 	}
 }

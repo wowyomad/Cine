@@ -35,6 +35,10 @@ namespace Cine
 		virtual Ref<VertexArray> CreateVertexArray() = 0;
 		virtual Ref<FrameBuffer> CreateFrameBuffer(const FramebufferSpecification& specification) = 0;
 
+		virtual void SetDepthTest(bool enabled) = 0;
+		virtual bool GetDepthTest() const = 0;
+		
+
 		static Ref<RendererAPI> Create();
 
 		static inline Ref<RendererAPI> Get() { return s_Instance;  }

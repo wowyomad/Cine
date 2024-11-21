@@ -73,6 +73,17 @@ namespace Cine
 			out << YAML::EndMap; //TagComponent
 		}
 
+		if (entity.HasComponent<SpriteLayerComponent>())
+		{
+			out << YAML::Key << "SpriteLayerComponent";
+			out << YAML::BeginMap; //SpriteLayerComponent
+
+			auto& layerID = entity.GetComponent<SpriteLayerComponent>().LayerID;
+			out << YAML::Key << "LayerID" << YAML::Value << layerID;
+
+			out << YAML::EndMap; //SpriteLayerComponent
+		}
+
 		if (entity.HasComponent<TransformComponent>())
 		{
 			out << YAML::Key << "TransformComponent";
@@ -323,6 +334,13 @@ namespace Cine
 				CINE_CORE_TRACE("Deserialized entity with ID = {0}, name = {1}", uuid, name);
 
 				Entity deserializedEntity = m_Scene->CreateEntityWithUUID(uuid, name);
+
+				auto spriteLayerComponent = entity["SpriteLayerComponent"];
+				if (spriteLayerComponent)
+				{
+					auto& spriteLayer = deserializedEntity.GetComponent<SpriteLayerComponent>();
+					spriteLayer.LayerID = ParseValueSafe(spriteLayerComponent, "LayerID", spriteLayer.LayerID);
+				}
 
 				auto transformComponent = entity["TransformComponent"];
 				if (transformComponent)

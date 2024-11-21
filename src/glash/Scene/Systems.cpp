@@ -63,13 +63,14 @@ namespace Cine
 
 	void SpriteRendererSystem::Update(entt::registry& registry)
 	{
-		auto view = registry.view<TransformComponent, SpriteRendererComponent, SpriteComponent>();
+		auto view = registry.view<TransformComponent, SpriteRendererComponent, SpriteComponent, SpriteLayerComponent>();
 		std::vector<entt::entity> opaqueEntities;
 		std::vector<entt::entity> transparentEntities;
 
 		for (auto entity : view)
 		{
 			auto& sprite = view.get<SpriteComponent>(entity);
+			auto& layer = view.get<SpriteLayerComponent>(entity);
 			if (sprite.Color.a >= 1.0f)
 			{
 				opaqueEntities.push_back(entity);
@@ -81,15 +82,27 @@ namespace Cine
 		}
 
 		std::sort(opaqueEntities.begin(), opaqueEntities.end(), [&](entt::entity a, entt::entity b) {
-			auto& transformA = view.get<TransformComponent>(a);
-			auto& transformB = view.get<TransformComponent>(b);
-			return transformA.Translation.z < transformB.Translation.z;
+			auto& layerA = view.get<SpriteLayerComponent>(a);
+			auto& layerB = view.get<SpriteLayerComponent>(b);
+			if (layerA.LayerID == layerB.LayerID)
+			{
+				auto& transformA = view.get<TransformComponent>(a);
+				auto& transformB = view.get<TransformComponent>(b);
+				return transformA.Translation.z < transformB.Translation.z;
+			}
+			return layerA.LayerID > layerB.LayerID;
 			});
 
 		std::sort(transparentEntities.begin(), transparentEntities.end(), [&](entt::entity a, entt::entity b) {
-			auto& transformA = view.get<TransformComponent>(a);
-			auto& transformB = view.get<TransformComponent>(b);
-			return transformA.Translation.z > transformB.Translation.z;
+			auto& layerA = view.get<SpriteLayerComponent>(a);
+			auto& layerB = view.get<SpriteLayerComponent>(b);
+			if (layerA.LayerID == layerB.LayerID)
+			{
+				auto& transformA = view.get<TransformComponent>(a);
+				auto& transformB = view.get<TransformComponent>(b);
+				return transformA.Translation.z > transformB.Translation.z;
+			}
+			return layerA.LayerID > layerB.LayerID;
 			});
 
 		for (auto entity : opaqueEntities)
@@ -136,6 +149,7 @@ namespace Cine
 			}
 		}
 	}
+
 
 	//TODO: Checks?
 	void SpriteAnimationSystem::Update(entt::registry& registry, Timestep deltaTime)

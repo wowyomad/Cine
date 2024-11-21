@@ -409,6 +409,12 @@ namespace Cine
 		if (ImGui::DragFloat("Near Clip", &nearClip, 0.1f)) { m_EditorCamera.SetNearClip(nearClip); }
 		if (ImGui::DragFloat("Far Clip", &farClip, 0.1f)) { m_EditorCamera.SetFarClip(farClip); }
 		ImGui::DragFloat3("Focal Point", glm::value_ptr(focalPoint), 0.1f);
+
+		bool depthTestEnabled = RenderCommand::GetDepthTest();
+		if (ImGui::Checkbox("Depth Test", &depthTestEnabled))
+		{
+			RenderCommand::SetDepthTest(depthTestEnabled);
+		}
 		
 
 		if (ImGui::Button("Reset Camera"))

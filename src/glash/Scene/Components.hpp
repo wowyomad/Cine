@@ -34,6 +34,16 @@ namespace Cine
 		operator const std::string& () const { return Tag; }
 	};
 
+	struct SpriteLayerComponent
+	{
+		int32_t LayerID = 0;
+
+		bool operator==(const SpriteLayerComponent& other)
+		{
+			return LayerID == other.LayerID;
+		}
+	};
+
 	struct TransformComponent
 	{
 		glm::vec3 Translation = glm::vec3(0.0f);

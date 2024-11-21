@@ -45,6 +45,16 @@ namespace Cine
 			s_RendererAPI->SetLineWidth(width);
 		}
 
+		inline static void SetDepthTest(bool enabled)
+		{
+			s_RendererAPI->SetDepthTest(enabled);
+		}
+
+		inline static bool GetDepthTest()
+		{
+			return s_RendererAPI->GetDepthTest();
+		}
+
 	private:
 		static Ref<RendererAPI> s_RendererAPI;
 	};
