@@ -79,6 +79,7 @@ target_include_directories(glash
     PUBLIC ${EnTT_SOURCE_DIR}
     PUBLIC ${yaml-cpp_SOURCE_DIR}/include
     PUBLIC ${imguizmo_SOURCE_DIR}
+    PUBLIC ${msdf-atlas-gen_SOURCE_DIR}/include
 )
 
 target_link_libraries(glash
@@ -93,6 +94,7 @@ target_link_libraries(glash
     PUBLIC yaml-cpp::yaml-cpp
     PUBLIC ImGuizmo
     PUBLIC box2d
+    PUBLIC msdf-atlas-gen
 )
 
 if(MSVC)

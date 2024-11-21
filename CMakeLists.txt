@@ -1,4 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.20)
+﻿cmake_minimum_required(VERSION 3.15)
 project(Cine VERSION 0.0.1 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 23)
@@ -17,6 +17,8 @@ set_undefined(GLASH_BUILD_EXAMPLES OFF CACHE BOOL "Build examples" FORCE)
 set_undefined(GLASH_BUILD_SANDDOX OFF CACHE BOOL "Build sandbox" FORCE)
 set_undefined(GLASH_BUILD_EDITOR ON CACHE BOOL "Build editor" FORCE)
 set_undefined(GLASH_ENABLE_ASSERTS ON CACHE BOOL "Enable asserts" FORCE)
+
+set(SKIP_INSTALL_ALL ON CACHE BOOL "Skip installation of shit" FORCE)
 
 # Might be needed for planned hot reload.
 set(CMAKE_POSITION_INDEPENDENT_CODE ON CACHE BOOL "" FORCE) 
@@ -92,15 +94,52 @@ FetchContent_Declare(
     GIT_TAG 6d588209f99b1324a608783d1f52faa518886c29 # 24.09.2024
 	GIT_PROGRESS TRUE
 )
+
+#This is all is just for msdf-atlas-gen. Holy shit
 FetchContent_Declare(
-    ImGuizmo
-    GIT_REPOSITORY https://github.com/CedricGuillemet/ImGuizmo.git
-    GIT_TAG 6d588209f99b1324a608783d1f52faa518886c29 # 24.09.2024
-	GIT_PROGRESS TRUE
+    libzlib
+    GIT_REPOSITORY https://github.com/madler/zlib.git
+    GIT_TAG v1.3.1 
 )
+FetchContent_MakeAvailable(libzlib)
+add_library(ZLIB::ZLIB ALIAS zlib)
+set(ZLIB_INCLUDE_DIR ${zlib_SOURCE_DIR})
+set(ZLIB_LIBRARY zlib) 
+
+SET(PNG_SHARED OFF CACHE BOOL "Don't build shared library of png" FORCE)
+FetchContent_Declare(
+	libpng
+	GIT_REPOSITORY https://github.com/glennrp/libpng.git
+	GIT_TAG v1.6.44
+)
+FetchContent_MakeAvailable(libpng)
+add_library(PNG::PNG ALIAS png_static)
+set(PNG_INCLUDE_DIR ${png_SOURCE_DIR})
+set(PNG_LIBRARY png)
+
+FetchContent_Declare( 
+    freetype
+    GIT_REPOSITORY https://github.com/freetype/freetype.git
+    GIT_TAG 3f3e3de34ee3613d621b643c58a40b93148e0932
+    GIT_PROGRESS TRUE
+)
+FetchContent_MakeAvailable(freetype)
+add_library(Freetype::Freetype ALIAS freetype)
+
+set(MSDFGEN_USE_SKIA OFF CACHE BOOL "Disable Skia in msdf-atlas-gen" FORCE)
+set(MSDF_ATLAS_USE_SKIA OFF CACHE BOOL "Disable Skia in msdf-atlas-gen" FORCE)
+set(MSDF_ATLAS_USE_VCPKG OFF CACHE BOOL "Disable vcpkg in msdf-atlas-gen" FORCE) 
+FetchContent_Declare(
+    msdf-atlas-gen
+    GIT_REPOSITORY https://github.com/Chlumsky/msdf-atlas-gen.git
+    GIT_TAG v1.3
+    GIT_PROGRESS TRUE
+)
+#End of msdf-atlas-gen
+
 FetchContent_MakeAvailable(ImGuizmo) #It's special
 
-list(APPEND BUILD_DEPENDENCIES glfw fmt glm spdlog imgui entt yaml-cpp box2d)
+list(APPEND BUILD_DEPENDENCIES glfw fmt glm spdlog imgui entt yaml-cpp box2d msdf-atlas-gen)
 list(APPEND HEADER_DEPENDENCIES stb)
 list(APPEND DEPENDENCY_TARGETS ${BUILD_DEPENDENCIES} ${HEADER_DEPENDENCIES})
 FetchContent_MakeAvailable(${DEPENDENCY_TARGETS})
@@ -147,4 +186,3 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
         add_compile_options(-Wno-unused-parameter)
     endif()
 endif()
-
