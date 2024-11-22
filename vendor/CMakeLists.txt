@@ -16,3 +16,7 @@ target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR} ${glfw_SOURCE_DIR}/i
 add_library(ImGuizmo STATIC ${imguizmo_SOURCE_DIR}/ImGuizmo.cpp)
 target_include_directories (ImGuizmo PUBLIC ${imguizmo_SOURCE_DIR})
 target_link_libraries(ImGuizmo PUBLIC imgui)
+set_target_properties(ImGuizmo PROPERTIES
+     MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
+     FOLDER "Dependencies"
+)

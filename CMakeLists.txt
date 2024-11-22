@@ -111,12 +111,13 @@ set(ZLIB_LIBRARY zlib)
 SET(PNG_SHARED OFF CACHE BOOL "Don't build shared library of png" FORCE)
 FetchContent_Declare(
 	libpng
-	GIT_REPOSITORY https://github.com/glennrp/libpng.git
-	GIT_TAG v1.6.44
+	GIT_REPOSITORY https://github.com/wowyomad/libpng
+	GIT_TAG 54414290e6f73c3a87bb06299ed34107edbe888a #v1.6.44 
 )
 FetchContent_MakeAvailable(libpng)
 add_library(PNG::PNG ALIAS png_static)
 set(PNG_INCLUDE_DIR ${libpng_SOURCE_DIR} CACHE STRING "PNG dir" FORCE)
+set(PNG_PNG_INCLUDE_DIR ${libpng_SOURCE_DIR} CACHE STRING "PNG dir" FORCE)
 set(PNG_LIBRARY png_static)
 
 FetchContent_Declare( 
