@@ -105,7 +105,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(libzlib)
 add_library(ZLIB::ZLIB ALIAS zlib)
-set(ZLIB_INCLUDE_DIR ${zlib_SOURCE_DIR})
+set(ZLIB_INCLUDE_DIR ${zlib_SOURCE_DIR} CACHE STRING "Zlib dir" FORCE)
 set(ZLIB_LIBRARY zlib) 
 
 SET(PNG_SHARED OFF CACHE BOOL "Don't build shared library of png" FORCE)
@@ -116,8 +116,8 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(libpng)
 add_library(PNG::PNG ALIAS png_static)
-set(PNG_PNG_INCLUDE_DIR ${png_SOURCE_DIR})
-set(PNG_LIBRARY png)
+set(PNG_INCLUDE_DIR ${libpng_SOURCE_DIR} CACHE STRING "PNG dir" FORCE)
+set(PNG_LIBRARY png_static)
 
 FetchContent_Declare( 
     freetype
@@ -180,7 +180,6 @@ if(MSVC)
         set_target_properties(${target} PROPERTIES 
             FOLDER "Dependencies"
             MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
-
         )
     else()
         message(WARNING "Target ${target} not found.")
