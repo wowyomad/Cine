@@ -1,8 +1,6 @@
 ﻿cmake_minimum_required(VERSION 3.15)
 project(Cine VERSION 0.0.1 LANGUAGES C CXX)
 
-cmake_policy(SET CMP0091 NEW)
-
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -107,7 +105,6 @@ FetchContent_MakeAvailable(libzlib)
 add_library(ZLIB::ZLIB ALIAS zlib)
 set_target_properties(zlib PROPERTIES
     FOLDER "Dependencies"
-    MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
 )
 set(ZLIB_INCLUDE_DIR ${zlib_SOURCE_DIR} CACHE STRING "Zlib dir" FORCE)
 set(ZLIB_LIBRARY zlib) 
@@ -125,7 +122,6 @@ set(PNG_PNG_INCLUDE_DIR ${libpng_SOURCE_DIR} CACHE STRING "PNG dir" FORCE)
 set(PNG_LIBRARY png_static)
 set_target_properties(png_static PROPERTIES
     FOLDER "Dependencies"
-    MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
 )
 
 FetchContent_Declare( 
@@ -138,7 +134,6 @@ FetchContent_MakeAvailable(freetype)
 add_library(Freetype::Freetype ALIAS freetype)
 set_target_properties(freetype PROPERTIES
     FOLDER "Dependencies"
-    MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
 )
 
 set(MSDFGEN_USE_SKIA OFF CACHE BOOL "Disable Skia in msdf-atlas-gen" FORCE)
@@ -161,7 +156,9 @@ list(APPEND DEPENDENCY_TARGETS ${BUILD_DEPENDENCIES} ${HEADER_DEPENDENCIES})
 FetchContent_MakeAvailable(${DEPENDENCY_TARGETS})
 list(APPEND BUILD_DEPENDENCIES zlib png_static freetype)
 
-set(MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>") 
+set_property(TARGET msdf-atlas-gen msdf-atlas-gen-standalone msdfgen-core msdfgen-ext PROPERTY
+    MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:DebugDLL>$<$<CONFIG:Release>:DLL>"
+)
 
 
 # Use vendor OpenGL 
@@ -192,7 +189,6 @@ if(MSVC)
  #       target_link_options(${target} PRIVATE $<$<CONFIG:Debug>:/INCREMENTAL>)
         set_target_properties(${target} PROPERTIES 
             FOLDER "Dependencies"
-            MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
         )
     else()
         message(WARNING "Target ${target} not found.")

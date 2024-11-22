@@ -11,7 +11,7 @@ set(GLASH_BUILD_EDITOR OFF)
 FetchContent_Declare(
 	glash_lib
 	GIT_REPOSITORY https://github.com/wowyomad/cine.git
-	GIT_TAG c0f59354da52239a81bfea3b3ed51a247202f0a9
+	GIT_TAG ca23533671f4f7a9125caa2668913af768562ef2
 )
 FetchContent_MakeAvailable(glash_lib)
 
@@ -31,7 +31,6 @@ set_target_properties(plugin PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib
     VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-    MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
     FOLDER "Plugin"
 )
 

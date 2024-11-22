@@ -38,7 +38,7 @@ def main():
     commands = [
         f"{python_cmd} obtain_tools_paths.py ../Scripts/.vscode", 
         f"{python_cmd} generator.py",
-        f"cmake --build {build_dir} --config {args.configuration}",  # Use the parameter here
+        f"cmake --build {build_dir} --config {args.configuration} --target plugin",  # Use the parameter here
         f"{python_cmd} copywriter.py"
     ]
 

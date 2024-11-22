@@ -6,5 +6,4 @@ target_include_directories(glad PUBLIC ${glad_INCLUDE_DIR})
 
 set_target_properties(glad PROPERTIES 
 	FOLDER "Dependencies"
-    MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
 )
