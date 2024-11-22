@@ -57,4 +57,6 @@ extern "C" {
     EXPORT void SetImGuiContext(ImGuiContext* context);
     EXPORT void DrawImGui();
     EXPORT void SetLoggers(std::shared_ptr<spdlog::logger>* coreLoggerPtr, std::shared_ptr<spdlog::logger>* clientLoggerPtr);
+    EXPORT void OnSceneLoad();
+    EXPORT void UnLibraryUnload();
 }

@@ -237,6 +237,20 @@ void InitializeInput
 	ToScreenSpaceFunc = toScreenSpaceFunc;
 }
 
+
+void ReloadImGui()
+{
+	for (auto&& element : ImGuiElements)
+	{
+		delete element;
+	}
+
+	ImGuiElements.clear();
+
+	//Temporarily
+	InitializeComponents(*s_Registry);
+}
+
 void SetActiveRegistry(entt::registry& registry)
 {
 	s_Registry = &registry;
@@ -279,4 +293,18 @@ EXPORT void DrawImGui()
 	{
 		element->Draw();
 	}
+}
+
+void OnSceneLoad()
+{
+	ReloadImGui();
+}
+
+void UnLibraryUnload()
+{
+	for (auto&& element : ImGuiElements)
+	{
+		delete element;
+	}
+	ImGuiElements.clear();
 }

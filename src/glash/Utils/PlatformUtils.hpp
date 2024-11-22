@@ -71,6 +71,11 @@ namespace Cine
 #endif
         }
 
+        operator bool() const
+        {
+            return m_Handle != nullptr;
+        }
+
     private:
         void* m_Handle = nullptr;
         std::string m_Name;

@@ -41,6 +41,8 @@ namespace Cine
 		using SetLoggersCall = void(*)(std::shared_ptr<spdlog::logger>*, std::shared_ptr<spdlog::logger>*);
 		using DrawImGuiCall = void(*)();
 		using SetImGuiContextCall = void(*)(ImGuiContext*);
+		using OnSceneLoadCall = void(*)();
+		using OnUnloadCall = void(*)();
 		using InitializeInputCall =  void(*)
 		(
 			KeyInputFunction,
@@ -57,6 +59,7 @@ namespace Cine
 
 		void LoadLibary(const std::filesystem::path& libraryPath);
 		void UnloadLibrary();
+		void OnLibraryUnload();
 
 		void InitializeComponents(entt::registry& registry);
 		void CreateComponent(entt::entity entity, const std::string& componentName);
@@ -69,9 +72,13 @@ namespace Cine
 
 		static void SetActiveScene(Scene* scnee);
 		static Scene* GetActiveScene();
+		void OnSceneLoad();
+
 
 		void SetImGuiContext(ImGuiContext* context);
 		void DrawImGui();
+
+		~ScriptEngine();
 
 	private:
 		bool UpdateFunctionCalls();
@@ -100,6 +107,8 @@ namespace Cine
 			SetLoggersCall SetLoggers;
 			SetImGuiContextCall SetImGuiContext;
 			DrawImGuiCall DrawImGui;
+			OnSceneLoadCall OnSceneLoad;
+			OnUnloadCall OnUnload;
 
 		};
 

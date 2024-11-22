@@ -8,6 +8,11 @@ namespace Cine
 {
 	ScriptEngine ScriptEngine::s_ScriptEngine;
 
+	ScriptEngine::~ScriptEngine()
+	{
+		UnloadLibrary();
+	}
+
 	bool ScriptEngine::IsKeyPressedFocused(KeyCode key)
 	{
 		return s_ScriptEngine.m_ActiveScene->IsViewportFocused() ? Internal::Input::IsKeyPressed(key) : false;
@@ -89,6 +94,7 @@ namespace Cine
 	}
 	void ScriptEngine::UnloadLibrary()
 	{
+		OnLibraryUnload();
 		m_Library.Unload();
 	}
 	void ScriptEngine::InitializeComponents(entt::registry& registry)
@@ -96,6 +102,7 @@ namespace Cine
 		m_LibraryCalls.InitializeComponents(registry);
 		m_LibraryCalls.SetImGuiContext(Application::Get().GetImGuiContext());
 		m_LibraryCalls.SetLoggers(&Log::GetCoreLogger(), &Log::GetClientLogger());
+
 		m_LibraryCalls.InitializeInput
 		(
 			IsKeyPressedFocused,
@@ -109,6 +116,9 @@ namespace Cine
 			ToScreenSpace
 		);
 		UpdateComponentsData();
+
+		//TODO: Move to appropriate place
+		m_LibraryCalls.OnSceneLoad(); //Temporarily!!!
 	}
 
 	void ScriptEngine::CreateComponent(entt::entity entity, const std::string& componentName)
@@ -149,18 +159,20 @@ namespace Cine
 
 	bool ScriptEngine::UpdateFunctionCalls()
 	{
-		m_LibraryCalls.InitializeComponents =	m_Library.GetFunction<InitializeComponentsCall>("InitializeComponents");
-		m_LibraryCalls.CreateComponent =		m_Library.GetFunction<CreateComponentCall>("CreateComponent");
-		m_LibraryCalls.RemoveComponent =		m_Library.GetFunction<CreateComponentCall>("RemoveComponent");
-		m_LibraryCalls.UpdateScripts =			m_Library.GetFunction<UpdateAllScriptsCall>("UpdateScripts");
-		m_LibraryCalls.SerializeComponent =		m_Library.GetFunction<SerializeComponentCall>("SerializeComponent");
-		m_LibraryCalls.DeserializeComponent =	m_Library.GetFunction<DeserializeComponentCall>("DeserializeComponent");
-		m_LibraryCalls.GetComponentsData =		m_Library.GetFunction<GetComponentsDataCall>("GetComponentsData");
-		m_LibraryCalls.SetActiveRegistry =		m_Library.GetFunction<SetActiveRegistryCall>("SetActiveRegistry");
-		m_LibraryCalls.InitializeInput =		m_Library.GetFunction<InitializeInputCall>("InitializeInput");
-		m_LibraryCalls.SetLoggers =				m_Library.GetFunction<SetLoggersCall>("SetLoggers");
-		m_LibraryCalls.SetImGuiContext =		m_Library.GetFunction<SetImGuiContextCall>("SetImGuiContext");
-		m_LibraryCalls.DrawImGui =				m_Library.GetFunction<DrawImGuiCall>("DrawImGui");
+		m_LibraryCalls.InitializeComponents = m_Library.GetFunction<InitializeComponentsCall>("InitializeComponents");
+		m_LibraryCalls.CreateComponent = m_Library.GetFunction<CreateComponentCall>("CreateComponent");
+		m_LibraryCalls.RemoveComponent = m_Library.GetFunction<CreateComponentCall>("RemoveComponent");
+		m_LibraryCalls.UpdateScripts = m_Library.GetFunction<UpdateAllScriptsCall>("UpdateScripts");
+		m_LibraryCalls.SerializeComponent = m_Library.GetFunction<SerializeComponentCall>("SerializeComponent");
+		m_LibraryCalls.DeserializeComponent = m_Library.GetFunction<DeserializeComponentCall>("DeserializeComponent");
+		m_LibraryCalls.GetComponentsData = m_Library.GetFunction<GetComponentsDataCall>("GetComponentsData");
+		m_LibraryCalls.SetActiveRegistry = m_Library.GetFunction<SetActiveRegistryCall>("SetActiveRegistry");
+		m_LibraryCalls.InitializeInput = m_Library.GetFunction<InitializeInputCall>("InitializeInput");
+		m_LibraryCalls.SetLoggers = m_Library.GetFunction<SetLoggersCall>("SetLoggers");
+		m_LibraryCalls.SetImGuiContext = m_Library.GetFunction<SetImGuiContextCall>("SetImGuiContext");
+		m_LibraryCalls.DrawImGui = m_Library.GetFunction<DrawImGuiCall>("DrawImGui");
+		m_LibraryCalls.OnSceneLoad = m_Library.GetFunction<OnSceneLoadCall>("OnSceneLoad");
+		m_LibraryCalls.OnUnload = m_Library.GetFunction<OnUnloadCall>("OnUnload");
 
 		bool allSet = m_LibraryCalls.InitializeComponents
 			&& m_LibraryCalls.CreateComponent
@@ -173,9 +185,11 @@ namespace Cine
 			&& m_LibraryCalls.InitializeInput
 			&& m_LibraryCalls.SetLoggers
 			&& m_LibraryCalls.SetImGuiContext
-			&& m_LibraryCalls.DrawImGui;
+			&& m_LibraryCalls.DrawImGui
+			&& m_LibraryCalls.OnSceneLoad
+			&& m_LibraryCalls.OnUnload;
 
-		CINE_CORE_ASSERT(allSet, "Some of the library function weren't initialized!");
+		//CINE_CORE_ASSERT(allSet, "Some of the library function weren't initialized!");
 
 		return allSet;
 	}
@@ -206,9 +220,25 @@ namespace Cine
 		return s_ScriptEngine.m_ActiveScene;
 	}
 
+	void ScriptEngine::OnSceneLoad()
+	{
+		m_LibraryCalls.OnSceneLoad();
+	}
+
 	void ScriptEngine::SetImGuiContext(ImGuiContext* context)
 	{
 		m_LibraryCalls.SetImGuiContext(context);
+	}
+
+	void ScriptEngine::OnLibraryUnload()
+	{
+		if (m_Library)
+		{
+			if (m_LibraryCalls.OnUnload)
+			{
+				m_LibraryCalls.OnUnload();
+			}
+		}
 	}
 
 	void ScriptEngine::DrawImGui()
