@@ -49,16 +49,13 @@ namespace UI
             std::string displayedText = text;
             ImVec2 textSize = ::ImGui::CalcTextSize(text.c_str());
 
-            // Calculate button size with margin and size constraints
             ImVec2 buttonSize = ImVec2(
                 (size.width > 0 ? size.width : textSize.x + margin.left + margin.right),
                 (size.height > 0 ? size.height : FontSize + margin.top + margin.bottom)
             );
 
-            // Check if the text fits inside the button
             if (textSize.x > buttonSize.x - margin.left - margin.right)
             {
-                // Truncate text and add '...'
                 size_t len = text.length();
                 while (textSize.x > buttonSize.x - margin.left - margin.right && len > 0)
                 {
@@ -68,7 +65,6 @@ namespace UI
                 }
             }
 
-            // Center the button within its parent container based on alignment flags
             ImVec2 parentSize = ::ImGui::GetContentRegionAvail();
             ImVec2 centeredPos = ::ImGui::GetCursorPos();
             if (align & AlignCenterHorizontal)
@@ -81,7 +77,6 @@ namespace UI
             }
             ::ImGui::SetCursorPos(centeredPos);
 
-            // Render the button
             return ::ImGui::Button(displayedText.c_str(), buttonSize);
         }
 
@@ -90,7 +85,6 @@ namespace UI
             ImGuiIO& io = ::ImGui::GetIO();
             ImFont* font = nullptr;
 
-            // Select the font based on FontSize (simplified example)
             for (ImFont* f : io.Fonts->Fonts)
             {
                 if (f->ConfigData[0].SizePixels == static_cast<float>(FontSize))
@@ -111,7 +105,6 @@ namespace UI
                 (size.height > 0 ? size.height : FontSize + margin.top + margin.bottom)
             );
 
-            // Center the text within its parent container based on alignment flags
             ImVec2 parentSize = ::ImGui::GetContentRegionAvail();
             ImVec2 centeredPos = ::ImGui::GetCursorPos();
             if (align & AlignCenterHorizontal)
@@ -124,7 +117,6 @@ namespace UI
             }
             ::ImGui::SetCursorPos(centeredPos);
 
-            // Render the text
             ::ImGui::Text("%s", text.c_str());
 
             if (font != nullptr)
@@ -141,7 +133,6 @@ namespace UI
                 (size.height > 0 ? size.height : FontSize + margin.top + margin.bottom)
             );
 
-            // Center the text box within its parent container based on alignment flags
             ImVec2 parentSize = ::ImGui::GetContentRegionAvail();
             ImVec2 centeredPos = ::ImGui::GetCursorPos();
             if (align & AlignCenterHorizontal)
@@ -154,7 +145,6 @@ namespace UI
             }
             ::ImGui::SetCursorPos(centeredPos);
 
-            // Render the text box
             ::ImGui::BeginChildFrame(::ImGui::GetID(text.c_str()), textBoxSize);
             ::ImGui::TextWrapped("%s", text.c_str());
             ::ImGui::EndChildFrame();
