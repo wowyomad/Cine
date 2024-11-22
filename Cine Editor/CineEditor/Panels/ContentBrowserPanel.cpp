@@ -28,7 +28,7 @@ namespace Cine
 		if (s_ScriptThread.joinable()) {
 			s_ScriptThread.join();
 		}
-
+		
 		s_ScriptReloadTimeElapsed = 0;
 
 		s_ScriptThread = std::thread([scriptPath, onFinish]() {

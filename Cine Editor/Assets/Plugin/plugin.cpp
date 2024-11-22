@@ -1,9 +1,8 @@
 #include "scripts_pch.hpp"
 #include "plugin.hpp"
+
 #include <iostream>
 #include <entt/entt.hpp>
-
-#include "GLFW/glfw3.h" //Temporarily
 
 // [INCLUDES]
 
@@ -22,10 +21,19 @@ std::map<std::string, UpdateScriptComponentCall> Updaters;
 std::map<std::string, SerializeComponentCall> Serializers;
 std::map<std::string, DeserializeComponentCall> Deserializers;
 
-template <class Component>
+std::vector<UI::ImGuiRenderable*> ImGuiElements;
+
+template <typename Component, std::enable_if_t<std::is_base_of_v<UI::ImGuiRenderable, Component>, bool> = true>
+void RegisterComponent()
+{
+	ImGuiElements.push_back(new Component());
+}
+
+template <class Component, std::enable_if_t<!std::is_base_of_v<UI::ImGuiRenderable, Component>, bool> = true>
 void RegisterComponent()
 {
 	std::string name = Utils::GetClassTypename<Component>();
+
 	Creators[name] = [](entt::entity entity) -> void
 		{
 			OnComponentAdded<Component>(entity);
@@ -267,9 +275,8 @@ EXPORT void SetImGuiContext(ImGuiContext* context)
 
 EXPORT void DrawImGui()
 {
-	ImGui::Begin("Игра :o", nullptr, ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar);
-	ImGui::Text("Текст в игре!!!");
-	ImGui::Spacing();
-	ImGui::Button("Нажим, если не лох");
-	ImGui::End();
+	for (UI::ImGuiRenderable* element : ImGuiElements)
+	{
+		element->Draw();
+	}
 }

@@ -15,6 +15,7 @@
 #include "glash/Core/Log.hpp"
 
 #include "input.hpp"
+#include "ImguiElement.hpp"
 
 #ifdef _WIN32
 #define EXPORT __declspec(dllexport)

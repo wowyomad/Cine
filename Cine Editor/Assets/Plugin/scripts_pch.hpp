@@ -30,6 +30,7 @@
 #include <stdexcept>
 #include <algorithm>
 #include <functional>
+#include <type_traits>
 
 //maths
 #define GLM_ENABLE_EXPERIMENTAL
