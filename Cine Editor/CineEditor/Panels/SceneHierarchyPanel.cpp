@@ -616,16 +616,17 @@ namespace Cine
 
 				std::string newTag;
 
-				if (start == std::string::npos || end == std::string::npos || start >= end || end != tag.length() - 1)
+				std::string strNum = tag.substr(start + 1, end - start - 1);
+
+				if ((start != std::string::npos && end != std::string::npos && start < end && end == tag.length() - 1)
+					&& Math::IsInteger(strNum))
 				{
-					// No existing ([num]) pattern
-					newTag = tag + " (0)";
+					int num = std::stoi(strNum.c_str());
+					newTag = tag.substr(0, start) + "(" + std::to_string(num + 1) + ")";
 				}
 				else
 				{
-					// Existing ([num]) pattern
-					int num = std::stoi(tag.substr(start + 1, end - start - 1));
-					newTag = tag.substr(0, start) + "(" + std::to_string(num + 1) + ")";
+					newTag = tag + " (0)";
 				}
 
 				clone.GetComponent<TagComponent>().Tag = newTag;

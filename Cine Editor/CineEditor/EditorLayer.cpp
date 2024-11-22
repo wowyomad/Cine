@@ -158,9 +158,11 @@ namespace Cine
 
 	void EditorLayer::OnImGuiRender()
 	{
+		ScriptEngine::Get().DrawImGui();
+
 		ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
 
-		TestGarbage();
+		//TestGarbage();
 
 		if (ImGui::BeginMainMenuBar())
 		{
@@ -214,6 +216,8 @@ namespace Cine
 
 		DrawViewport();
 		DrawSettingsPanel();
+
+
 
 	}
 

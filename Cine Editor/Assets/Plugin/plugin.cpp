@@ -259,3 +259,17 @@ void DeserializeComponent(entt::entity entity, const std::string& componentName,
 		return it->second(node, entity);
 	}
 }
+
+EXPORT void SetImGuiContext(ImGuiContext* context)
+{
+	ImGui::SetCurrentContext(context);
+}
+
+EXPORT void DrawImGui()
+{
+	ImGui::Begin("Игра :o", nullptr, ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar);
+	ImGui::Text("Текст в игре!!!");
+	ImGui::Spacing();
+	ImGui::Button("Нажим, если не лох");
+	ImGui::End();
+}

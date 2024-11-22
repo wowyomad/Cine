@@ -94,6 +94,7 @@ namespace Cine
 	void ScriptEngine::InitializeComponents(entt::registry& registry)
 	{
 		m_LibraryCalls.InitializeComponents(registry);
+		m_LibraryCalls.SetImGuiContext(Application::Get().GetImGuiContext());
 		m_LibraryCalls.SetLoggers(&Log::GetCoreLogger(), &Log::GetClientLogger());
 		m_LibraryCalls.InitializeInput
 		(
@@ -148,16 +149,18 @@ namespace Cine
 
 	bool ScriptEngine::UpdateFunctionCalls()
 	{
-		m_LibraryCalls.InitializeComponents = m_Library.GetFunction<InitializeComponentsCall>("InitializeComponents");
-		m_LibraryCalls.CreateComponent = m_Library.GetFunction<CreateComponentCall>("CreateComponent");
-		m_LibraryCalls.RemoveComponent = m_Library.GetFunction<CreateComponentCall>("RemoveComponent");
-		m_LibraryCalls.UpdateScripts = m_Library.GetFunction<UpdateAllScriptsCall>("UpdateScripts");
-		m_LibraryCalls.SerializeComponent = m_Library.GetFunction<SerializeComponentCall>("SerializeComponent");
-		m_LibraryCalls.DeserializeComponent = m_Library.GetFunction<DeserializeComponentCall>("DeserializeComponent");
-		m_LibraryCalls.GetComponentsData = m_Library.GetFunction<GetComponentsDataCall>("GetComponentsData");
-		m_LibraryCalls.SetActiveRegistry = m_Library.GetFunction<SetActiveRegistryCall>("SetActiveRegistry");
-		m_LibraryCalls.InitializeInput = m_Library.GetFunction<InitializeInputCall>("InitializeInput");
-		m_LibraryCalls.SetLoggers = m_Library.GetFunction<SetLoggersCall>("SetLoggers");
+		m_LibraryCalls.InitializeComponents =	m_Library.GetFunction<InitializeComponentsCall>("InitializeComponents");
+		m_LibraryCalls.CreateComponent =		m_Library.GetFunction<CreateComponentCall>("CreateComponent");
+		m_LibraryCalls.RemoveComponent =		m_Library.GetFunction<CreateComponentCall>("RemoveComponent");
+		m_LibraryCalls.UpdateScripts =			m_Library.GetFunction<UpdateAllScriptsCall>("UpdateScripts");
+		m_LibraryCalls.SerializeComponent =		m_Library.GetFunction<SerializeComponentCall>("SerializeComponent");
+		m_LibraryCalls.DeserializeComponent =	m_Library.GetFunction<DeserializeComponentCall>("DeserializeComponent");
+		m_LibraryCalls.GetComponentsData =		m_Library.GetFunction<GetComponentsDataCall>("GetComponentsData");
+		m_LibraryCalls.SetActiveRegistry =		m_Library.GetFunction<SetActiveRegistryCall>("SetActiveRegistry");
+		m_LibraryCalls.InitializeInput =		m_Library.GetFunction<InitializeInputCall>("InitializeInput");
+		m_LibraryCalls.SetLoggers =				m_Library.GetFunction<SetLoggersCall>("SetLoggers");
+		m_LibraryCalls.SetImGuiContext =		m_Library.GetFunction<SetImGuiContextCall>("SetImGuiContext");
+		m_LibraryCalls.DrawImGui =				m_Library.GetFunction<DrawImGuiCall>("DrawImGui");
 
 		bool allSet = m_LibraryCalls.InitializeComponents
 			&& m_LibraryCalls.CreateComponent
@@ -168,9 +171,11 @@ namespace Cine
 			&& m_LibraryCalls.SetActiveRegistry
 			&& m_LibraryCalls.GetComponentsData
 			&& m_LibraryCalls.InitializeInput
-			&& m_LibraryCalls.SetLoggers;
+			&& m_LibraryCalls.SetLoggers
+			&& m_LibraryCalls.SetImGuiContext
+			&& m_LibraryCalls.DrawImGui;
 
-		CINE_CORE_ASSERT(allSet, "Some of the library function weren't initialized");
+		CINE_CORE_ASSERT(allSet, "Some of the library function weren't initialized!");
 
 		return allSet;
 	}
@@ -183,11 +188,11 @@ namespace Cine
 		for (size_t i = 0; i < data.Count; ++i)
 		{
 			m_ComponentsData.push_back({ data.Names[i], data.IsScript[i] });
-			//delete data.Names[i];
+			delete data.Names[i];
 		}
 
-		//delete data.Names;
-		//delete data.IsScript;
+		delete data.Names;
+		delete data.IsScript;
 	}
 
 	void ScriptEngine::SetActiveScene(Scene* scene)
@@ -199,6 +204,16 @@ namespace Cine
 	Scene* ScriptEngine::GetActiveScene()
 	{
 		return s_ScriptEngine.m_ActiveScene;
+	}
+
+	void ScriptEngine::SetImGuiContext(ImGuiContext* context)
+	{
+		m_LibraryCalls.SetImGuiContext(context);
+	}
+
+	void ScriptEngine::DrawImGui()
+	{
+		return  m_LibraryCalls.DrawImGui();
 	}
 
 }

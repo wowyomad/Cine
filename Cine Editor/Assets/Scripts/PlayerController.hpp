@@ -1,6 +1,5 @@
 #pragma once
 #include "include/ScriptCore.hpp"
-#include "TestShootScript.hpp"
 
 using namespace Cine;
 
@@ -212,31 +211,15 @@ public:
 
         if (Input::IsMouseButtonDown(Mouse::ButtonLeft))
         {
-            OnMouseButtonClicked(mousePosition);
+            
         }
     }
 
     void Shoot(glm::vec3 direction)
     {
         CINE_CORE_INFO("Shooting at {0}, {1}", direction.x, direction.y);
-        Entity entity = CreateEntity();
-        entity.GetComponent<TransformComponent>().Translation = Translation();
-        entity.AddComponent<SpriteRendererComponent>();
-        entity.LocalScale().z = 0.5f + (1 + rand() % 10) / 10.0f;
-
-        auto& projectile = entity.AddComponent<TestShootScript>();
-        projectile.Damage = rand() % 10;
-        projectile.Direction = direction;
-        projectile.LifeTime = 5;
-        projectile.Speed = (direction * m_MoveSpeed);
-        
     }
 
-    void OnMouseButtonClicked(glm::vec2 screenPosition)
-    {
-        auto world = Input::ToWorldSpace(screenPosition);
-        auto screen = Input::ToScreenSpace(world);
-    }
 
 private:
     float m_MoveSpeed = 5.0f;

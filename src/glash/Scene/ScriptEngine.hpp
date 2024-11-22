@@ -39,6 +39,8 @@ namespace Cine
 		using GetComponentsDataCall = ComponentsDataC(*)();
 		using SetActiveRegistryCall = void(*)(entt::registry&);
 		using SetLoggersCall = void(*)(std::shared_ptr<spdlog::logger>*, std::shared_ptr<spdlog::logger>*);
+		using DrawImGuiCall = void(*)();
+		using SetImGuiContextCall = void(*)(ImGuiContext*);
 		using InitializeInputCall =  void(*)
 		(
 			KeyInputFunction,
@@ -68,6 +70,9 @@ namespace Cine
 		static void SetActiveScene(Scene* scnee);
 		static Scene* GetActiveScene();
 
+		void SetImGuiContext(ImGuiContext* context);
+		void DrawImGui();
+
 	private:
 		bool UpdateFunctionCalls();
 		void UpdateComponentsData();
@@ -93,6 +98,9 @@ namespace Cine
 			InitializeInputCall InitializeInput;
 			SetActiveRegistryCall SetActiveRegistry;
 			SetLoggersCall SetLoggers;
+			SetImGuiContextCall SetImGuiContext;
+			DrawImGuiCall DrawImGui;
+
 		};
 
 	private:
