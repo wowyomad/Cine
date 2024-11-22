@@ -183,11 +183,11 @@ namespace Cine
 		for (size_t i = 0; i < data.Count; ++i)
 		{
 			m_ComponentsData.push_back({ data.Names[i], data.IsScript[i] });
-			delete data.Names[i];
+			//delete data.Names[i];
 		}
 
-		delete data.Names;
-		delete data.IsScript;
+		//delete data.Names;
+		//delete data.IsScript;
 	}
 
 	void ScriptEngine::SetActiveScene(Scene* scene)

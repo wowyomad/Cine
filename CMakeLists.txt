@@ -105,6 +105,10 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(libzlib)
 add_library(ZLIB::ZLIB ALIAS zlib)
+set_target_properties(zlib PROPERTIES
+    FOLDER "Dependencies"
+    MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
+)
 set(ZLIB_INCLUDE_DIR ${zlib_SOURCE_DIR} CACHE STRING "Zlib dir" FORCE)
 set(ZLIB_LIBRARY zlib) 
 
@@ -119,6 +123,10 @@ add_library(PNG::PNG ALIAS png_static)
 set(PNG_INCLUDE_DIR ${libpng_SOURCE_DIR} CACHE STRING "PNG dir" FORCE)
 set(PNG_PNG_INCLUDE_DIR ${libpng_SOURCE_DIR} CACHE STRING "PNG dir" FORCE)
 set(PNG_LIBRARY png_static)
+set_target_properties(png_static PROPERTIES
+    FOLDER "Dependencies"
+    MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
+)
 
 FetchContent_Declare( 
     freetype
@@ -128,6 +136,10 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(freetype)
 add_library(Freetype::Freetype ALIAS freetype)
+set_target_properties(freetype PROPERTIES
+    FOLDER "Dependencies"
+    MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
+)
 
 set(MSDFGEN_USE_SKIA OFF CACHE BOOL "Disable Skia in msdf-atlas-gen" FORCE)
 set(MSDF_ATLAS_USE_SKIA OFF CACHE BOOL "Disable Skia in msdf-atlas-gen" FORCE)
@@ -147,7 +159,7 @@ list(APPEND BUILD_DEPENDENCIES glfw fmt glm spdlog imgui entt yaml-cpp box2d msd
 list(APPEND HEADER_DEPENDENCIES stb)
 list(APPEND DEPENDENCY_TARGETS ${BUILD_DEPENDENCIES} ${HEADER_DEPENDENCIES})
 FetchContent_MakeAvailable(${DEPENDENCY_TARGETS})
-list(APPEND BUILD_DEPENDENCIES zlib png freetype)
+list(APPEND BUILD_DEPENDENCIES zlib png_static freetype)
 
 set(MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>") 
 
