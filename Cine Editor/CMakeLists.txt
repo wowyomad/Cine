@@ -46,3 +46,4 @@ target_include_directories(${CineEditor}
 target_precompile_headers(${CineEditor} REUSE_FROM glash_pch)
 
 add_dependencies(${CineEditor} copy_assets copy_resources copy_imgui_ini)
+set_property(TARGET ${CineEditor} PROPERTY VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})

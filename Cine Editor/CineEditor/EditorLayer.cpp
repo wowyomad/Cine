@@ -8,12 +8,18 @@
 #include "glash/Core/Timer.hpp"
 #include "glash/Math/Math.hpp"
 
+#include <msdf-atlas-gen/msdf-atlas-gen.h>
+
 #include <ImGuizmo.h>
 
 namespace Cine
 {
 	void EditorLayer::OnAttach()
 	{
+		msdfgen::Contour contour;
+		msdfgen::EdgeHolder holder;
+		contour.addEdge(holder);
+
 		m_EditorScene = CreateRef<Scene>();
 		m_ActiveScene = m_EditorScene;
 		ScriptEngine::Get().LoadLibary("plugin.dll");

@@ -1,6 +1,8 @@
 ﻿cmake_minimum_required(VERSION 3.15)
 project(Cine VERSION 0.0.1 LANGUAGES C CXX)
 
+cmake_policy(SET CMP0091 NEW)
+
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -114,7 +116,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(libpng)
 add_library(PNG::PNG ALIAS png_static)
-set(PNG_INCLUDE_DIR ${png_SOURCE_DIR})
+set(PNG_PNG_INCLUDE_DIR ${png_SOURCE_DIR})
 set(PNG_LIBRARY png)
 
 FetchContent_Declare( 
@@ -135,6 +137,7 @@ FetchContent_Declare(
     GIT_TAG v1.3
     GIT_PROGRESS TRUE
 )
+
 #End of msdf-atlas-gen
 
 FetchContent_MakeAvailable(ImGuizmo) #It's special
@@ -143,6 +146,10 @@ list(APPEND BUILD_DEPENDENCIES glfw fmt glm spdlog imgui entt yaml-cpp box2d msd
 list(APPEND HEADER_DEPENDENCIES stb)
 list(APPEND DEPENDENCY_TARGETS ${BUILD_DEPENDENCIES} ${HEADER_DEPENDENCIES})
 FetchContent_MakeAvailable(${DEPENDENCY_TARGETS})
+list(APPEND BUILD_DEPENDENCIES zlib png freetype)
+
+set(MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>") 
+
 
 # Use vendor OpenGL 
 if (POLICY CMP0072)
@@ -170,7 +177,11 @@ if(MSVC)
         target_compile_options(${target} PRIVATE /MP)
  #       target_compile_options(${target} PRIVATE $<$<CONFIG:Debug>:/Zi>)
  #       target_link_options(${target} PRIVATE $<$<CONFIG:Debug>:/INCREMENTAL>)
-        set_target_properties(${target} PROPERTIES FOLDER "Dependencies")
+        set_target_properties(${target} PROPERTIES 
+            FOLDER "Dependencies"
+            MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
+
+        )
     else()
         message(WARNING "Target ${target} not found.")
     endif()
