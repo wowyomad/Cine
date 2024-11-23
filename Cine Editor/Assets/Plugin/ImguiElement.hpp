@@ -39,7 +39,11 @@ namespace UI
     {
     public:
         virtual void Draw() = 0;
+        virtual void Update(Timestep ts) = 0;
+
         bool Display = true;
+        bool Focused = false;
+        bool Hovered = false;
     };
 
     namespace ImGui

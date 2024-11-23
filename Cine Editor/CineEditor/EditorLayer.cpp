@@ -42,6 +42,7 @@ namespace Cine
 
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 		m_ContentBrowserPanel.SetContext(m_ActiveScene);
+		ScriptEngine::Get().SetActiveScene(m_ActiveScene.get());
 	}
 
 	void TestGarbage()
@@ -158,7 +159,11 @@ namespace Cine
 
 	void EditorLayer::OnImGuiRender()
 	{
-		ScriptEngine::Get().DrawImGui();
+		if (m_SceneState == SceneState::Play)
+		{
+			ScriptEngine::Get().DrawImGui();
+		}
+
 
 		ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
 
@@ -250,7 +255,7 @@ namespace Cine
 			m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
 
 			size_t id = m_Framebuffer->GetColorAttachmentRendererID();
-			ImGui::Image(reinterpret_cast<void*>(id), { m_ViewportSize.x, m_ViewportSize.y }, { 0, 1 }, { 1, 0 });
+			ImGui::Image(id, { m_ViewportSize.x, m_ViewportSize.y }, { 0, 1 }, { 1, 0 });
 
 			if (ImGui::BeginDragDropTarget())
 			{

@@ -33,66 +33,77 @@ set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "Cames from yaml-cpp. Builds 'read' and 
 
 set(BOX2D_BUILD_TESTBED OFF CACHE BOOL "Came from box2d. Causes target errors since their test builds create targets imgui, glad and glfw")
 
+Set(FETCHCONTENT_QUIET FALSE)
 include(FetchContent)
 FetchContent_Declare(
     glfw
     GIT_REPOSITORY https://github.com/glfw/glfw.git
     GIT_TAG 3.4
 	GIT_PROGRESS TRUE
+    GIT_SHALLOW TRUE
 )
 FetchContent_Declare(
     fmt
     GIT_REPOSITORY https://github.com/fmtlib/fmt.git
     GIT_TAG 11.0.2
 	GIT_PROGRESS TRUE
+    GIT_SHALLOW TRUE
 )
 FetchContent_Declare(
     glm
     GIT_REPOSITORY https://github.com/g-truc/glm.git
     GIT_TAG 1.0.1
 	GIT_PROGRESS TRUE
+    GIT_SHALLOW TRUE
 )
 FetchContent_Declare(
     spdlog
     GIT_REPOSITORY https://github.com/gabime/spdlog.git
     GIT_TAG v1.14.1
 	GIT_PROGRESS TRUE
+    GIT_SHALLOW TRUE
 )
 FetchContent_Declare(
     stb
     GIT_REPOSITORY https://github.com/nothings/stb.git
-    GIT_TAG f75e8d1cad7d90d72ef7a4661f1b994ef78b4e31
 	GIT_PROGRESS TRUE
+    GIT_SHALLOW TRUE
 )
 FetchContent_Declare(
     imgui
     GIT_REPOSITORY https://github.com/ocornut/imgui.git
-    GIT_TAG 793773209bb0fdeb8ccb756052e770457193c9f2
-	GIT_PROGRESS TRUE
+    GIT_TAG docking
+    GIT_PROGRESS TRUE
+    GIT_SHALLOW TRUE
 )
 FetchContent_Declare(
     entt
     GIT_REPOSITORY https://github.com/skypjack/entt.git
     GIT_TAG v3.13.2
 	GIT_PROGRESS TRUE
+    GIT_SHALLOW TRUE
 )
 FetchContent_Declare(
     yaml-cpp
     GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
     GIT_TAG 0.8.0
 	GIT_PROGRESS TRUE
+    GIT_SHALLOW TRUE
 )
 FetchContent_Declare(
     box2d
     GIT_REPOSITORY https://github.com/erincatto/box2d.git
     GIT_TAG v2.4.2
 	GIT_PROGRESS TRUE
+    GIT_SHALLOW TRUE
 )
 FetchContent_Declare(
     ImGuizmo
     GIT_REPOSITORY https://github.com/CedricGuillemet/ImGuizmo.git
-    GIT_TAG 6d588209f99b1324a608783d1f52faa518886c29 # 24.09.2024
+    GIT_TAG master
+    #GIT_TAG b10e91756d32395f5c1fefd417899b657ed7cb88 # 14.11.2024
 	GIT_PROGRESS TRUE
+    GIT_SHALLOW TRUE
 )
 
 #This is all is just for msdf-atlas-gen. Holy shit
@@ -100,6 +111,7 @@ FetchContent_Declare(
     libzlib
     GIT_REPOSITORY https://github.com/madler/zlib.git
     GIT_TAG v1.3.1 
+    GIT_SHALLOW TRUE
 )
 FetchContent_MakeAvailable(libzlib)
 add_library(ZLIB::ZLIB ALIAS zlib)
@@ -113,7 +125,9 @@ SET(PNG_SHARED OFF CACHE BOOL "Don't build shared library of png" FORCE)
 FetchContent_Declare(
 	libpng
 	GIT_REPOSITORY https://github.com/wowyomad/libpng
-	GIT_TAG 54414290e6f73c3a87bb06299ed34107edbe888a #v1.6.44 
+    GIT_TAG libpng16
+	#GIT_TAG 54414290e6f73c3a87bb06299ed34107edbe888a #v1.6.44 
+    GIT_SHALLOW TRUE
 )
 FetchContent_MakeAvailable(libpng)
 add_library(PNG::PNG ALIAS png_static)
@@ -127,8 +141,10 @@ set_target_properties(png_static PROPERTIES
 FetchContent_Declare( 
     freetype
     GIT_REPOSITORY https://github.com/freetype/freetype.git
-    GIT_TAG 3f3e3de34ee3613d621b643c58a40b93148e0932
+    GIT_TAG master
+    #GIT_TAG 3f3e3de34ee3613d621b643c58a40b93148e0932
     GIT_PROGRESS TRUE
+    GIT_SHALLOW TRUE
 )
 FetchContent_MakeAvailable(freetype)
 add_library(Freetype::Freetype ALIAS freetype)
@@ -144,6 +160,7 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/Chlumsky/msdf-atlas-gen.git
     GIT_TAG v1.3
     GIT_PROGRESS TRUE
+    GIT_SHALLOW TRUE
 )
 
 #End of msdf-atlas-gen

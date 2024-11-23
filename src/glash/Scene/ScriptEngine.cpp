@@ -172,7 +172,7 @@ namespace Cine
 		m_LibraryCalls.SetImGuiContext = m_Library.GetFunction<SetImGuiContextCall>("SetImGuiContext");
 		m_LibraryCalls.DrawImGui = m_Library.GetFunction<DrawImGuiCall>("DrawImGui");
 		m_LibraryCalls.OnSceneLoad = m_Library.GetFunction<OnSceneLoadCall>("OnSceneLoad");
-		m_LibraryCalls.OnUnload = m_Library.GetFunction<OnUnloadCall>("OnUnload");
+		m_LibraryCalls.OnUnload = m_Library.GetFunction<OnUnloadCall>("OnLibraryUnload");
 
 		bool allSet = m_LibraryCalls.InitializeComponents
 			&& m_LibraryCalls.CreateComponent
@@ -189,7 +189,7 @@ namespace Cine
 			&& m_LibraryCalls.OnSceneLoad
 			&& m_LibraryCalls.OnUnload;
 
-		//CINE_CORE_ASSERT(allSet, "Some of the library function weren't initialized!");
+		CINE_CORE_ASSERT(allSet, "Some of the library function weren't initialized!");
 
 		return allSet;
 	}

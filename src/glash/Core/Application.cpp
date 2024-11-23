@@ -152,6 +152,7 @@ namespace Cine
 				}
 
 				Internal::Input::ClearStates();
+
 			}
 
 #if CINE_IMGUI
@@ -174,7 +175,6 @@ namespace Cine
 			{
 				m_Window->OnUpdate();
 			}
-			
 		}
 	}
 

@@ -187,6 +187,10 @@ void UpdateScripts(Timestep ts)
 	{
 		update(ts);
 	}
+	for (auto&& element : ImGuiElements)
+	{
+		element->Update(ts);
+	}
 }
 
 void Destroy()
@@ -300,7 +304,7 @@ void OnSceneLoad()
 	ReloadImGui();
 }
 
-void UnLibraryUnload()
+void OnLibraryUnload()
 {
 	for (auto&& element : ImGuiElements)
 	{
